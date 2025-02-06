@@ -1,18 +1,16 @@
-import './index.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Shop from "./pages/Shop";
+import Navbar from "./components/Navbar";
 
-function App() {
- 
-
+export default function App() {
   return (
-    <>
-      <p className="read-the-docs">
-        LUV ALLURE
-      </p>
-      <h1 className="text-3xl font-bold underline">
-    Hello world!
-  </h1>
-    </>
-  )
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/shop" element={<Shop />} />
+      </Routes>
+    </Router>
+  );
 }
-
-export default App
