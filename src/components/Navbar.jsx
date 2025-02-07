@@ -20,7 +20,7 @@ export default function Navbar() {
     >
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
        
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex space-x-6 text-white">
           <a href="#" className="hover:underline">SHOP</a>
           <a href="#" className="hover:underline">TRENDING</a>
           <a href="#" className="hover:underline">LOOKBOOK</a>
@@ -41,7 +41,7 @@ export default function Navbar() {
         </div>
         
         
-        <div className="hidden md:flex space-x-6 items-center">
+        <div className="hidden md:flex space-x-6 items-center text-white">
           <img src="/icons/search.svg" alt="Search" className="w-5 h-5 cursor-pointer" />
           <img src="/icons/contact.svg" alt="Phone" className="w-5 h-5 cursor-pointer" />
           <img src="/icons/cart.svg" alt="Cart" className="w-5 h-5 cursor-pointer" />
