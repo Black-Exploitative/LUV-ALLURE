@@ -21,10 +21,10 @@ export default function Navbar() {
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
        
         <div className="hidden md:flex space-x-6">
-          <a href="#" className="hover:underline">Shop</a>
-          <a href="#" className="hover:underline">Trending</a>
-          <a href="#" className="hover:underline">Lookbook</a>
-          <a href="#" className="hover:underline">New Arrivals</a>
+          <a href="#" className="hover:underline">SHOP</a>
+          <a href="#" className="hover:underline">TRENDING</a>
+          <a href="#" className="hover:underline">LOOKBOOK</a>
+          <a href="#" className="hover:underline">NEW ARRIVALS</a>
         </div>
         
         
@@ -42,11 +42,11 @@ export default function Navbar() {
         
         
         <div className="hidden md:flex space-x-6 items-center">
-          <a href="#" className="hover:underline">Contact Us</a>
-          <a href="#" className="hover:underline">Services</a>
           <img src="/icons/search.svg" alt="Search" className="w-5 h-5 cursor-pointer" />
           <img src="/icons/contact.svg" alt="Phone" className="w-5 h-5 cursor-pointer" />
           <img src="/icons/cart.svg" alt="Cart" className="w-5 h-5 cursor-pointer" />
+          <a href="#" className="hover:underline">CONTACT US</a>
+          <a href="#" className="hover:underline">SERVICES</a>
         </div>
       </div>
 
