@@ -66,7 +66,7 @@ export default function OfferSection() {
 
         <div className="grid grid-cols-2 gap-0 max-w-7xl mx-auto mt-[162px]">
           {/* Rectangle 1 */}
-          <div className="h-[800px]  flex items-center justify-center">
+          <div className="h-[800px] flex items-center justify-center">
             <img
               src="/images/photo1.jpg"
               alt="Rectangle 1"
@@ -98,7 +98,7 @@ export default function OfferSection() {
         </div>
 
         <div className="absolute inset-0 bg-black opacity-40"></div>
- 
+
         <div className="absolute inset-0 flex flex-col justify-end items-center z-10">
           <div className="mb-8">
             <a
@@ -107,6 +107,85 @@ export default function OfferSection() {
             >
               Shop Now
             </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full h-screen grid grid-cols-1 md:grid-cols-2 mt-[103px] mb-[162px]">
+        {/* Left Image Section */}
+        <div className="h-full pl-8">
+          <img
+            src="/images/photo4.jpg"
+            alt="Left Side Image"
+            className="w-full h-80vh object-cover"
+          />
+        </div>
+
+        {/* Right Content Section */}
+        <div className="flex items-center justify-center p-10">
+          <div className="text-center md:text-left max-w-lg">
+            <h2 className="text-4xl font-bold mb-6">
+              We Share the Love of Valentine
+            </h2>
+            <p className="text-lg mb-8">
+              As the lofty and flory presence of valentine ensumes the air and
+              fills our heart. We bring you a subtlyty of blah blah blh ythis
+              that that
+            </p>
+            <p className="text-lg font-semibold">Explore Collection</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full py-16 mt-[462px]">
+        <div className="max-w-7xl mx-auto px-4">
+       
+          {/* Card Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card 1 */}
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="/images/photo11.jpg"
+                alt="Card 1"
+                className="w-full h-[400px] object-cover"
+              />
+              <h3 className="text-xl font-semibold mt-6">
+              EXCLUSIVE PERSONAL SHOPPING
+              </h3>
+              <p className=" mt-2 text-sm">
+              Looking for something special that’s not in our collection? Share your vision, and we’ll find it or curate a perfect alternative just for you.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="/images/photo12.jpg"
+                alt="Card 2"
+                className="w-full h-[400px] object-cover"
+              />
+              <h3 className="text-xl font-semibold  mt-6">
+              SIGNATURE STYLING SERVICE
+              </h3>
+              <p className="mt-2 text-sm">
+              From birthdays to galas, our expert stylists create personalized looks tailored to your unique style and any occasion.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="/images/photo13.jpg"
+                alt="Card 3"
+                className="w-full h-[400px] object-cover"
+              />
+              <h3 className="text-xl font-semibold mt-6">
+              PERFECT FIT TAILORING
+              </h3>
+              <p className=" mt-2 text-sm">
+              Ensure every piece fits perfectly. Our tailoring service adjusts garments from our collection to match your exact measurements..
+              </p>
+            </div>
           </div>
         </div>
       </section>
