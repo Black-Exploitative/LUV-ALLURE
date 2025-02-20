@@ -1,39 +1,39 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, gridType }) => {
   const { name, price, sizes = [], images } = product;
   const [currentImage, setCurrentImage] = useState(0);
 
+ 
+  const cardWidthClass = gridType === 2 ? "w-[655px]" : "w-full";
+  const imageHeightClass = gridType === 2 ? "h-[751px]" : "h-[500px]";
+
   return (
-    <div className="w-72 p-4 bg-white shadow-lg rounded-lg relative group">
+    <div className={`${cardWidthClass}  p-4 relative group`}>
       {/* Image Section */}
       <div className="relative">
         <img
           src={images[currentImage]}
           alt={name}
-          className="w-full h-64 object-cover rounded-t-lg"
+          className="w-full ${imageHeightClass} object-cover"
         />
+        {/* Hover arrow for carousel */}
         <div
           className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-          onClick={() =>
-            setCurrentImage((prev) => (prev + 1) % images.length)
-          }
+          onClick={() => setCurrentImage((prev) => (prev + 1) % images.length)}
         >
           <span className="text-white text-2xl font-bold">→</span>
         </div>
       </div>
-
-      {/* Product Name & Price */}
+      {/* Product Details */}
       <h3 className="text-lg font-semibold text-gray-900 mt-4">{name}</h3>
-      <p className="text-gray-700 text-lg mt-2">${price}</p>
-
-      {/* Size Options */}
-      <div className="flex flex-wrap mt-4">
+      <p className="text-gray-700 text-lg mt-2">&#8358;{price}</p>
+      <div className="flex  mt-4">
         {sizes.map((size) => (
           <div
             key={size}
-            className="px-2 py-1 border border-gray-300 rounded mr-2 mb-2 cursor-pointer hover:bg-gray-200"
+            className="px-2 py-1 border border-gray-300 mr-2 mb-2 cursor-pointer hover:bg-gray-200"
           >
             {size}
           </div>
@@ -50,6 +50,7 @@ ProductCard.propTypes = {
     sizes: PropTypes.arrayOf(PropTypes.string),
     images: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
+  gridType: PropTypes.oneOf([2, 4]).isRequired,
 };
 
 export default ProductCard;

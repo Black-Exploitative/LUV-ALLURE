@@ -18,7 +18,7 @@ const FilterSortBar = ({ onGridChange }) => {
     <div className="flex items-center justify-between p-4 border-b border-gray-300">
       <div className="flex items-center">
         <span className="text-gray-700 font-semibold mr-2">+</span>
-        <span className="text-gray-700 font-semibold cursor-pointer">Filter</span>
+        <span className="text-gray-700 font-semibold cursor-pointer">FILTER</span>
       </div>
 
       <div className="flex items-center space-x-4">
@@ -33,7 +33,7 @@ const FilterSortBar = ({ onGridChange }) => {
         <span className="text-gray-400">|</span>
         <div className="relative">
           <button className="flex items-center text-gray-700 font-semibold" onClick={toggleDropdown}>
-            Sort <IoMdArrowDropdown className="ml-1" />
+            SORT <IoMdArrowDropdown className="ml-1" />
           </button>
           {isDropdownOpen && (
             <div className="absolute top-full left-0 bg-white shadow-lg border mt-1 w-40">
