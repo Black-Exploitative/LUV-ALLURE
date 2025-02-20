@@ -5,7 +5,8 @@ import FilterSortBar from "../components/FilterSortBar";
 import ProductGrid from "../components/ProductGrid";
 
 const ShopPage = () => {
-  const [gridType, setGridType] = useState(4); 
+  
+  const [gridType, setGridType] = useState(4);
 
   const handleGridChange = (type) => {
     setGridType(type);
@@ -20,6 +21,7 @@ const ShopPage = () => {
         description="Find your perfect style today."
       />
       <FilterSortBar onGridChange={handleGridChange} />
+
       <ProductGrid gridType={gridType} />
     </div>
   );

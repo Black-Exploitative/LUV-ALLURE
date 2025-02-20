@@ -2,8 +2,8 @@ import ProductCarousel from "./ProductCarousel";
 
 const ProductDetailsPage = () => {
   const productImages = [
-    "https://via.placeholder.com/500x500?text=Image1",
-    "https://via.placeholder.com/500x500?text=Image2",
+    "../public/images/photo6.jpg",
+    "../public/images/photo6.jpg",
     "https://via.placeholder.com/500x500?text=Image3",
     "https://via.placeholder.com/500x500?text=Image4",
   ];
