@@ -1,9 +1,8 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-
 const ProductCard = ({ product }) => {
-  const { name, price, sizes, images } = product;
+  const { name, price, sizes = [], images } = product;
   const [currentImage, setCurrentImage] = useState(0);
 
   return (
@@ -15,8 +14,6 @@ const ProductCard = ({ product }) => {
           alt={name}
           className="w-full h-64 object-cover rounded-t-lg"
         />
-
-        {/* Hover arrow for next image */}
         <div
           className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
           onClick={() =>
@@ -27,10 +24,8 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* Product Name */}
+      {/* Product Name & Price */}
       <h3 className="text-lg font-semibold text-gray-900 mt-4">{name}</h3>
-
-      {/* Price */}
       <p className="text-gray-700 text-lg mt-2">${price}</p>
 
       {/* Size Options */}
@@ -49,12 +44,12 @@ const ProductCard = ({ product }) => {
 };
 
 ProductCard.propTypes = {
-    product: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      price: PropTypes.number.isRequired,
-      sizes: PropTypes.arrayOf(PropTypes.string).isRequired,
-      images: PropTypes.arrayOf(PropTypes.string).isRequired,
-    }).isRequired,
-  };
+  product: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    sizes: PropTypes.arrayOf(PropTypes.string),
+    images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+};
 
 export default ProductCard;

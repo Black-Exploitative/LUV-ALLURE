@@ -15,7 +15,7 @@ const ShopPage = () => {
     <div>
       <Navbar />
       <Banner
-        imageUrl="/images/shop-banner.jpg"
+        imageUrl="/images/banner.webp"
         title="Shop the Latest Trends"
         description="Find your perfect style today."
       />

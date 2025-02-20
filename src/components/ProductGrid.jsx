@@ -1,11 +1,18 @@
 import ProductCard from "./ProductCard";
 import PropTypes from "prop-types";
 
-const products = [
-  { name: "Formal Dress", price: 99.99, images: ["/images/dress1.jpg"] },
-  { name: "Evening Gown", price: 149.99, images: ["/images/dress2.jpg"] },
- 
-];
+const products = [{ 
+    name: "Formal Dress", 
+    price: 99.99, 
+    sizes: ["S", "M", "L"], 
+    images: ["/images/photo4.jpg"] 
+  },
+  { 
+    name: "Evening Gown", 
+    price: 149.99, 
+    sizes: ["M", "L", "XL"], 
+    images: ["/images/photo6.jpg"] 
+  },];
 
 const ProductGrid = ({ gridType }) => {
   return (

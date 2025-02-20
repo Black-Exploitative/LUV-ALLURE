@@ -5,7 +5,7 @@ import { IoMdArrowDropdown } from "react-icons/io";
 
 const FilterSortBar = ({ onGridChange }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [gridType, setGridType] = useState(4); // Default grid
+  const [gridType, setGridType] = useState(4);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
