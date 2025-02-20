@@ -2,9 +2,10 @@
 @import "tailwindcss";
 
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica,  sans-serif;
   font-weight: 400;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  letter-spacing: 20%;
 }
