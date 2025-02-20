@@ -1,6 +1,7 @@
 import ProductCard from "./ProductCard";
 import PropTypes from "prop-types";
 
+
 const products = [
   {
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
@@ -53,12 +54,24 @@ const products = [
 ];
 
 const ProductGrid = ({ gridType }) => {
+    const navigate = useNavigate();
+
+    const handleProductClick = (product) => {
+      navigate(`/product/${product.id}`, { state: { product } });
+    };
+
   return (
     <div
       className={`grid gap-6 p-6 ${
         gridType === 2 ? "grid-cols-2" : "grid-cols-4"
       }`}
     >
+        {products.map((product) => (
+        <div key={product.id} onClick={() => handleProductClick(product)}>
+          <ProductCard product={product} gridType={gridType} />
+        </div>
+      ))}
+
       {products.map((product, index) => (
         <ProductCard key={index} product={product} />
       ))}

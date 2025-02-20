@@ -1,4 +1,4 @@
-import ProductCarousel from "./ProductCarousel";
+import ProductCarousel from "../components/ProductCarousel";
 
 const ProductDetailsPage = () => {
   const productImages = [
