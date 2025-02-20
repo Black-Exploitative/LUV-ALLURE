@@ -1,16 +1,27 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const ProductCard = ({ product, gridType }) => {
   const { name, price, sizes = [], images } = product;
   const [currentImage, setCurrentImage] = useState(0);
 
- 
   const cardWidthClass = gridType === 2 ? "w-[655px]" : "w-full";
+   // eslint-disable-next-line no-unused-vars
   const imageHeightClass = gridType === 2 ? "h-[751px]" : "h-[500px]";
+  // DEBUG:Figure the error being caused header, not now
+
+
+  const handlePrev = () => {
+    setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentImage((prev) => (prev + 1) % images.length);
+  };
 
   return (
-    <div className={`${cardWidthClass}  p-4 relative group`}>
+    <div className={`${cardWidthClass} p-4 relative group`}>
       {/* Image Section */}
       <div className="relative">
         <img
@@ -18,18 +29,25 @@ const ProductCard = ({ product, gridType }) => {
           alt={name}
           className="w-full ${imageHeightClass} object-cover"
         />
-        {/* Hover arrow for carousel */}
+        {/* Left Arrow */}
         <div
-          className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-          onClick={() => setCurrentImage((prev) => (prev + 1) % images.length)}
+          className="absolute left-2 top-1/2 transform -translate-y-1/2  bg-opacity-50 p-2 rounded-full cursor-pointer"
+          onClick={handlePrev}
         >
-          <span className="text-white text-2xl font-bold">→</span>
+          <FaChevronLeft className="text-white text-xl" />
+        </div>
+        {/* Right Arrow */}
+        <div
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-opacity-50 p-2 rounded-full cursor-pointer"
+          onClick={handleNext}
+        >
+          <FaChevronRight className="text-white text-xl" />
         </div>
       </div>
       {/* Product Details */}
       <h3 className="text-lg font-semibold text-gray-900 mt-4">{name}</h3>
       <p className="text-gray-700 text-lg mt-2">&#8358;{price}</p>
-      <div className="flex  mt-4">
+      <div className="flex mt-4">
         {sizes.map((size) => (
           <div
             key={size}
