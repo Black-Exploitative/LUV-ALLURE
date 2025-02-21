@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 
 const PurchasedCard = ({ product }) => {
-  const { name, price, sizes = [], images } = product;
+  const { name, price, color, images } = product;
 
 
  
@@ -17,8 +17,9 @@ const PurchasedCard = ({ product }) => {
       </div>
       {/* Product Details */}
       <h3 className="text-lg font-semibold text-gray-900 mt-4">{name}</h3>
+      <p className="text-gray-700 text-md mt-2">{color}</p>
       <p className="text-gray-700 text-lg mt-2">&#8358;{price}</p>
-      <div className="flex mt-4">
+      {/* <div className="flex mt-4">
         {sizes.map((size) => (
           <div
             key={size}
@@ -27,7 +28,7 @@ const PurchasedCard = ({ product }) => {
             {size}
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };
@@ -36,7 +37,7 @@ PurchasedCard.propTypes = {
   product: PropTypes.shape({
     name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
-    sizes: PropTypes.arrayOf(PropTypes.string),
+    color: PropTypes.string.isRequired,
     images: PropTypes.string.isRequired,
   }).isRequired,
 };

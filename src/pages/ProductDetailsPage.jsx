@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import { useLocation } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
+import PurchasedCard from "../components/PurchasedCard";
 
 const ProductDetailsPage = () => {
     const location = useLocation();
@@ -31,6 +32,13 @@ const ProductDetailsPage = () => {
           price: "56,000",
           image: "../public/images/photo6.jpg",
         },
+      ];
+
+      const purchasedProducts = [
+        { name: "Purchased 1", price: 1000, color: "BEIGE", images: "../public/images/photo6.jpg" },
+        { name: "Purchased 2", price: 1200, color: "MAROON", images: "../public/images/photo11.jpg" },
+        { name: "Purchased 3", price: 800, color: "CORAL", images: "../public/images/photo6.jpg" },
+        { name: "Purchased 4", price: 900, color: "BURGUNDY", images: "../public/images/photo11.jpg" },
       ];
 
   return (
@@ -112,6 +120,22 @@ const ProductDetailsPage = () => {
             />
           ))}
         </div>
+
+        {/* Purchased Products Section */}
+        <h2 className="text-xl font-semibold mt-8 mb-4">CUSTOMERS ALSO PURCHASED</h2>
+        <div className="grid grid-cols-4 gap-6">
+          {purchasedProducts.map((product, index) => (
+            <PurchasedCard key={index} product={product} />
+          ))}
+        </div>
+
+        <h2 className="text-xl font-semibold mt-8 mb-4">CUSTOMERS ALSO VIEWED</h2>
+        <div className="grid grid-cols-4 gap-6">
+          {purchasedProducts.map((product, index) => (
+            <PurchasedCard key={index} product={product} />
+          ))}
+        </div>
+        
         </div>
     </>
   );
