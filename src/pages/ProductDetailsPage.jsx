@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
+import { toast } from "react-hot-toast";
+
 
 const ProductDetailsPage = () => {
     const location = useLocation();
@@ -78,7 +80,7 @@ const ProductDetailsPage = () => {
           {/* Add to Cart Button */}
           <button
             className="w-full bg-black text-white py-3 hover:bg-gray-800"
-            onClick={() => alert("Added to cart!")}
+            onClick={() => toast.success("Added to cart!")}
           >
             ADD TO SHOPPING BAG
           </button>
