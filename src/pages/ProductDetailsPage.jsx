@@ -17,6 +17,19 @@ const ProductDetailsPage = () => {
       ],
     }
 
+    const relatedProducts = [
+        {
+          name: "Sybil Scarf - Black",
+          color: "Black",
+          image: "../public/images/photo11.jpg",
+        },
+        {
+          name: "Sybil Scarf - Pink",
+          color: "Pink",
+          image: "../public/images/photo6.jpg",
+        },
+      ];
+
   return (
     <>
     <Navbar />
