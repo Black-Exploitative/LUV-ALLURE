@@ -21,9 +21,34 @@ const ProductCarousel = ({ images }) => {
   };
 
   return (
-    <div className="flex">
-      {/* Thumbnails */}
-      <div className="flex flex-col space-y-4 mr-4">
+    <div className="flex flex-col">
+      {/* Main Image Section */}
+      <div className="relative">
+        <img
+          src={images[currentImageIndex]}
+          alt={`Main Image ${currentImageIndex + 1}`}
+          className="w-[500px] h-[500px] object-cover"
+        />
+
+        {/* Left Arrow */}
+        <button
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-opacity-50 text-white px-2 py-1 rounded-full"
+          onClick={handlePrev}
+        >
+          ←
+        </button>
+
+        {/* Right Arrow */}
+        <button
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-opacity-50 text-white px-2 py-1 rounded-full"
+          onClick={handleNext}
+        >
+          →
+        </button>
+      </div>
+
+      {/* Thumbnails at the bottom */}
+      <div className="flex mt-4 gap-2">
         {images.map((image, index) => (
           <img
             key={index}
@@ -36,35 +61,9 @@ const ProductCarousel = ({ images }) => {
           />
         ))}
       </div>
-
-      {/* Main Image Section */}
-      <div className="relative">
-        <img
-          src={images[currentImageIndex]}
-          alt={`Main Image ${currentImageIndex + 1}`}
-          className="w-[500px] h-[500px] object-cover"
-        />
-
-        {/* Left Arrow */}
-        <button
-          className="absolute left-0 top-1/2 transform -translate-y-1/2  bg-opacity-50 text-white px-2 py-1 rounded-full"
-          onClick={handlePrev}
-        >
-          ←
-        </button>
-
-        {/* Right Arrow */}
-        <button
-          className="absolute right-0 top-1/2 transform -translate-y-1/2  bg-opacity-50 text-white px-2 py-1 rounded-full"
-          onClick={handleNext}
-        >
-          →
-        </button>
-      </div>
     </div>
   );
 };
-
 
 ProductCarousel.propTypes = {
   images: PropTypes.arrayOf(PropTypes.string).isRequired,
