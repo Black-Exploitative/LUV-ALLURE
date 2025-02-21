@@ -4,11 +4,10 @@ import Banner from "../components/Banner";
 import { toast } from "react-hot-toast";
 
 export default function Checkout() {
-  const { cart, updateQuantity, removeFromCart } = useCart();
-
+  const { cart = [], updateQuantity, removeFromCart } = useCart(); // Ensure cart is always an array
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const estimatedTax = subtotal * 0.05; 
+  const estimatedTax = subtotal * 0.05;
   const shipping = subtotal > 100 ? 0 : 5;
   const total = subtotal + estimatedTax + shipping;
 
@@ -19,14 +18,14 @@ export default function Checkout() {
 
       <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left Side: Cart Items */}
-        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
-          {cart.length === 0 ? (
+        <div className="md:col-span-2 bg-white p-6  shadow-md">
+          {!cart || cart.length === 0 ? (
             <p className="text-center text-gray-600">Your cart is empty.</p>
           ) : (
             cart.map((item) => (
               <div key={item.id} className="flex items-center justify-between border-b py-4">
                 {/* Product Image */}
-                <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
+                <img src={item.image} alt={item.name} className="w-24 h-24 object-cover " />
 
                 {/* Product Details */}
                 <div className="ml-4 flex-1">
@@ -38,14 +37,14 @@ export default function Checkout() {
                 {/* Quantity Controls */}
                 <div className="flex items-center space-x-2">
                   <button
-                    className="px-3 py-1 bg-gray-300 rounded"
+                    className="px-3 py-1 bg-gray-300 "
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                   >
                     −
                   </button>
                   <span className="text-lg font-semibold">{item.quantity}</span>
                   <button
-                    className="px-3 py-1 bg-gray-300 rounded"
+                    className="px-3 py-1 bg-gray-300 "
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                   >
                     +
@@ -68,7 +67,7 @@ export default function Checkout() {
         </div>
 
         {/* Right Side: Order Summary */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-6 shadow-md">
           <h2 className="text-lg font-semibold">ORDER SUMMARY</h2>
           <hr className="my-2" />
 
@@ -93,7 +92,7 @@ export default function Checkout() {
             <p>${total.toFixed(2)}</p>
           </div>
 
-          <button className="w-full bg-black text-white py-3 mt-4 hover:bg-gray-800">
+          <button className="w-full bg-black text-white py-3 mt-4 ">
             Checkout
           </button>
         </div>

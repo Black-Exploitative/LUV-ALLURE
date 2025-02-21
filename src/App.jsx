@@ -5,7 +5,7 @@ import ProductDetailsPage from "./pages/ProductDetailsPage";
 import { CartProvider } from "./context/CartContext"; 
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
-
+import Checkout from "./components/Checkout";
 export default function App() {
   return (
     <CartProvider>
@@ -16,6 +16,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product/:productId" element={<ProductDetailsPage />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
     </Router>
     </CartProvider>
