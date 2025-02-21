@@ -14,7 +14,11 @@
     "@tailwindcss/vite": "^4.0.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.3.1",
+<<<<<<< HEAD
+    "luv-allure": "file:",
+=======
     "prop-types": "^15.8.1",
+>>>>>>> 4ef4e46bcc97562cd8033a30324aa1e503cbc5b0
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
