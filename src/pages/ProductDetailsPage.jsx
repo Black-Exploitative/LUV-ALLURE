@@ -2,6 +2,7 @@ import ProductCarousel from "../components/ProductCarousel";
 import Navbar from "../components/Navbar";
 import { useLocation } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
+import SmallProductCard from "../components/SmallProductCard";
 
 const ProductDetailsPage = () => {
     const location = useLocation();
@@ -20,12 +21,14 @@ const ProductDetailsPage = () => {
     const relatedProducts = [
         {
           name: "Sybil Scarf - Black",
-          color: "Black",
+          color: "BLACK",
+          price: "78,000",
           image: "../public/images/photo11.jpg",
         },
         {
           name: "Sybil Scarf - Pink",
-          color: "Pink",
+          color: "PINK",
+          price: "56,000",
           image: "../public/images/photo6.jpg",
         },
       ];
@@ -94,6 +97,22 @@ const ProductDetailsPage = () => {
 
         </div>
       </div>
+       {/* Related Products */}
+       <div className="p-6">
+        <h2 className="text-xl mb-4">STYLE IT WITH</h2>
+        <div className="grid gap-6">
+          {relatedProducts.map((product, index) => (
+            <SmallProductCard
+              key={index}
+              image={product.image}
+              name={product.name}
+              color={product.color}
+              price={product.price}
+              onViewProduct={() => console.log(`Viewing ${product.name}`)}
+            />
+          ))}
+        </div>
+        </div>
     </>
   );
 };
