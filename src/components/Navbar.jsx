@@ -1,16 +1,25 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = ({ cartItemCount }) => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleCartClick = () => {
+    if (cartItemCount === 0) {
+      toast.error("No item in cart yet!"); 
+    } else {
+      toast.success("Opening cart...");
+    }
+  };
 
   return (
     <nav
@@ -42,11 +51,16 @@ export default function Navbar() {
         
         
         <div className="hidden md:flex space-x-6 items-center text-white">
-          <img src="/icons/search.svg" alt="Search" className="w-5 h-5 cursor-pointer" />
-          <img src="/icons/contact.svg" alt="Phone" className="w-5 h-5 cursor-pointer" />
-          <img src="/icons/cart.svg" alt="Cart" className="w-5 h-5 cursor-pointer" />
           <a href="#" className="hover:underline">CONTACT US</a>
           <a href="#" className="hover:underline">SERVICES</a>
+          <img src="/icons/search.svg" alt="Search" className="w-5 h-5 cursor-pointer" />
+          <img src="/icons/contact.svg" alt="Phone" className="w-5 h-5 cursor-pointer" />
+          <img src="/icons/cart.svg" alt="Cart" className="w-5 h-5 cursor-pointer"
+          onClick={handleCartClick}
+          />
+          {cartItemCount > 0 && (
+              <span className="absolute top-0 right-0 h-3 w-3 bg-black rounded-full"></span>
+            )}
         </div>
       </div>
 
