@@ -13,7 +13,7 @@ export default function Button({ children }) {
         className="absolute inset-0 bg-black"
         initial={{ x: "-100%" }}
         variants={{
-          hover: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
+          hover: { x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
         }}
       />
 
@@ -21,7 +21,7 @@ export default function Button({ children }) {
       <motion.span
         className="relative z-10"
         variants={{
-          hover: {  color: "#fff", transition: { duration: 0.3 } },
+          hover: {  color: "#fff", transition: { duration: 0.5 } },
         }}
       >
         {children}

@@ -119,17 +119,18 @@ export default function OfferSection() {
         </div>
 
         {/* Right Content Section */}
-        <div className="flex items-center justify-center p-10">
+        <div className="flex items-center justify-center p-10 w-3x">
           <div className="text-center md:text-left max-w-lg">
-            <h2 className="text-4xl font-bold mb-6">
+            <h2 className="text-4xl mb-[40px]">
               We Share the Love of Valentine
             </h2>
-            <p className="text-lg mb-8">
+            <p className="text-lg mb-[30px] text-center font-medium">
               As the lofty and flory presence of valentine ensumes the air and
               fills our heart. We bring you a subtlyty of blah blah blh ythis
-              that that
+              that that.
             </p>
-            <p className="text-lg font-semibold">Explore Collection</p>
+            <p className="text-lg text-center ">Explore Collection</p>
+            <hr className="my-2 w-[2ch] border-t border-black/50 text-center ml-[20.75ch] -mt-1" />
           </div>
         </div>
       </section>
