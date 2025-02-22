@@ -1,4 +1,5 @@
 import Button from "./Button";
+import AnimatedImage from './AnimatedImage';
 
 export default function OfferSection() {
   return (
@@ -15,7 +16,7 @@ export default function OfferSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto px-4">
           {/* Card 1 */}
           <div className="w-[280px] h-auto rounded-none overflow-hidden">
-            <img
+            <AnimatedImage
               src="/images/photo4.jpg"
               alt="Product"
               className="w-full h-80 object-cover"
@@ -28,7 +29,7 @@ export default function OfferSection() {
 
           {/* Card 2 */}
           <div className="w-[280px] h-auto rounded-none overflow-hidden">
-            <img
+            <AnimatedImage
               src="/images/photo5.jpg"
               alt="Product"
               className="w-full h-80 object-cover"
@@ -41,7 +42,7 @@ export default function OfferSection() {
 
           {/* Card 3 */}
           <div className="w-[280px] h-auto rounded-none overflow-hidden">
-            <img
+            <AnimatedImage
               src="/images/photo6.jpg"
               alt="Product"
               className="w-full h-80 object-cover"
@@ -54,7 +55,7 @@ export default function OfferSection() {
 
           {/* Card 4 */}
           <div className="w-[280px] h-auto rounded-none overflow-hidden">
-            <img
+            <AnimatedImage
               src="/images/man-wearing-blank-shirt.jpg"
               alt="Product"
               className="w-full h-80 object-cover"
@@ -92,7 +93,7 @@ export default function OfferSection() {
       <section className="relative w-full h-screen">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img
+          <AnimatedImage
             src="/images/photo3.jpg"
             alt="Fashion Model"
             className="w-full h-full object-cover"
@@ -111,7 +112,7 @@ export default function OfferSection() {
       <section className="w-full h-screen grid grid-cols-1 md:grid-cols-2 mt-[103px] mb-[162px]">
         {/* Left Image Section */}
         <div className="h-full pl-8">
-          <img
+          <AnimatedImage
             src="/images/photo4.jpg"
             alt="Left Side Image"
             className="w-full h-80vh object-cover"
@@ -142,7 +143,7 @@ export default function OfferSection() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card 1 */}
             <div className="flex flex-col items-center text-center">
-              <img
+              <AnimatedImage
                 src="/images/photo11.jpg"
                 alt="Card 1"
                 className="w-full h-[400px] object-cover"
@@ -157,7 +158,7 @@ export default function OfferSection() {
 
             {/* Card 2 */}
             <div className="flex flex-col items-center text-center">
-              <img
+              <AnimatedImage
                 src="/images/photo12.jpg"
                 alt="Card 2"
                 className="w-full h-[400px] object-cover"
@@ -172,7 +173,7 @@ export default function OfferSection() {
 
             {/* Card 3 */}
             <div className="flex flex-col items-center text-center">
-              <img
+              <AnimatedImage
                 src="/images/photo13.jpg"
                 alt="Card 3"
                 className="w-full h-[400px] object-cover"

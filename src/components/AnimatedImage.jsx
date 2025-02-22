@@ -8,7 +8,7 @@ export default function AnimatedImage({ src, alt, className }) {
       src={src}
       alt={alt}
       className={`cursor-pointer ${className}`} 
-      whileHover={{ opacity: 0.8 }} 
+      whileHover={{ scale: 0.9 }} 
       transition={{ duration: 0.3 }} 
     />
   );
