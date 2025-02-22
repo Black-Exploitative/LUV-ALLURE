@@ -150,7 +150,7 @@ export default function OfferSection() {
               <h3 className="text-xl font-semibold mt-6">
               EXCLUSIVE PERSONAL SHOPPING
               </h3>
-              <p className=" mt-2 text-sm">
+              <p className=" mt-2 text-sm text-[#5F6368]">
               Looking for something special that’s not in our collection? Share your vision, and we’ll find it or curate a perfect alternative just for you.
               </p>
             </div>
@@ -165,7 +165,7 @@ export default function OfferSection() {
               <h3 className="text-xl font-semibold  mt-6">
               SIGNATURE STYLING SERVICE
               </h3>
-              <p className="mt-2 text-sm">
+              <p className="mt-2 text-sm text-[#5F6368]">
               From birthdays to galas, our expert stylists create personalized looks tailored to your unique style and any occasion.
               </p>
             </div>
@@ -180,7 +180,7 @@ export default function OfferSection() {
               <h3 className="text-xl font-semibold mt-6">
               PERFECT FIT TAILORING
               </h3>
-              <p className=" mt-2 text-sm">
+              <p className=" mt-2 text-sm text-[#5F6368]">
               Ensure every piece fits perfectly. Our tailoring service adjusts garments from our collection to match your exact measurements..
               </p>
             </div>
