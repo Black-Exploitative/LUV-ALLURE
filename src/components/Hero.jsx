@@ -16,7 +16,8 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black" style={{ opacity: 0.3 }}></div>
 
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10 text-white text-center">
-        <h1 className="text-5xl  tracking-widest">EXPLORE</h1>
+        <h1 className="text-5xl  tracking-[.25em] font-[100]">EXPLORE</h1>
+        <hr className="my-2 w-[4ch] border-t border-white/50" />
       </div>
     </section>
   );
