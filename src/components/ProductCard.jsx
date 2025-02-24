@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-// import { Link } from "react-router-dom";
 
 const ProductCard = ({ product, gridType, onProductClick }) => {
   const { name, price, sizes = [], images } = product;
@@ -29,7 +28,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     }
   };
 
-  // Image slide variants
+  // Image slide variants - slower, smoother transition
   const slideVariants = {
     enter: (direction) => ({
       x: direction > 0 ? 300 : -300,
@@ -49,11 +48,6 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
 
   // Direction tracking for animations
   const [[page, direction], setPage] = useState([0, 0]);
-
-  // Update page and direction when currentImage changes
-  const paginate = (newDirection) => {
-    setPage([currentImage, newDirection]);
-  };
 
   return (
     <motion.div
@@ -82,8 +76,8 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
             animate="center"
             exit="exit"
             transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
+              x: { type: "spring", stiffness: 200, damping: 25 }, 
+              opacity: { duration: 0.3 }
             }}
           />
         </AnimatePresence>
@@ -98,53 +92,36 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
           {currentImage + 1}/{images.length}
         </motion.div>
 
-        {/* Navigation Arrows */}
+        {/* Navigation Arrows - lighter, no background */}
         <motion.div
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/40 p-2 rounded-full cursor-pointer z-10"
+          className="absolute left-2 top-1/2 transform -translate-y-1/2 cursor-pointer z-10"
           onClick={handlePrev}
           initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -10 }}
+          animate={{ opacity: isHovered ? 0.7 : 0, x: isHovered ? 0 : -10 }}
           transition={{ duration: 0.3 }}
-          whileHover={{ scale: 1.1, backgroundColor: "rgba(0,0,0,0.6)" }}
+          whileHover={{ scale: 1.1, opacity: 1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <FaChevronLeft className="text-white text-xl" />
+          <FaChevronLeft className="text-white text-lg" />
         </motion.div>
 
         <motion.div
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/40 p-2 rounded-full cursor-pointer z-10"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer z-10"
           onClick={handleNext}
           initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : 10 }}
+          animate={{ opacity: isHovered ? 0.7 : 0, x: isHovered ? 0 : 10 }}
           transition={{ duration: 0.3 }}
-          whileHover={{ scale: 1.1, backgroundColor: "rgba(0,0,0,0.6)" }}
+          whileHover={{ scale: 1.1, opacity: 1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <FaChevronRight className="text-white text-xl" />
-        </motion.div>
-
-        {/* Hover overlay with view details */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <motion.div
-            className="bg-white/90 px-6 py-3 font-medium text-sm cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleProductClick}
-          >
-            VIEW DETAILS
-          </motion.div>
+          <FaChevronRight className="text-white text-lg" />
         </motion.div>
       </div>
 
       {/* Product Details Section */}
       <div onClick={handleProductClick} className="cursor-pointer">
         <motion.h3 
-          className="text-lg font-medium text-gray-900 mt-4 hover:underline"
+          className="text-lg md:text-lg font-medium text-gray-900 mt-4 hover:underline text-sm sm:text-base"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -153,7 +130,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         </motion.h3>
         
         <motion.p 
-          className="text-gray-700 text-lg mt-2"
+          className="text-gray-700 text-sm sm:text-base md:text-lg mt-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
@@ -162,7 +139,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         </motion.p>
       </div>
 
-      {/* Size Selection */}
+      {/* Size Selection - smaller on mobile */}
       <motion.div 
         className="flex flex-wrap mt-4"
         initial={{ opacity: 0, y: 10 }}
@@ -172,7 +149,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         {sizes.map((size) => (
           <motion.div
             key={size}
-            className="px-2 py-1 border border-gray-300 mr-2 mb-2 cursor-pointer"
+            className="px-1 py-0.5 sm:px-2 sm:py-1 border border-gray-300 mr-1 sm:mr-2 mb-1 sm:mb-2 cursor-pointer text-xs sm:text-sm"
             whileHover={{ backgroundColor: "#f7f7f7", scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={(e) => e.stopPropagation()}
