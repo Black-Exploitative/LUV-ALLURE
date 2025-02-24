@@ -8,7 +8,13 @@ const products = [
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
     price: 74000,
     sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    images: ["/images/photo4.jpg", "/images/photo6.jpg", "/images/photo4.jpg"],
+    images: ["/images/shop1.jpg", "/images/photo6.jpg", "/images/photo4.jpg"],
+  },
+  {
+    name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
+    price: 74000,
+    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    images: ["/images/shop2.jpg", "/images/photo4.jpg"],
   },
   {
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
@@ -20,31 +26,25 @@ const products = [
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
     price: 74000,
     sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    images: ["/images/photo6.jpg", "/images/photo4.jpg"],
+    images: ["/images/shop4.jpg", "/images/photo4.jpg"]
   },
   {
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
     price: 74000,
     sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    images: ["/images/photo6.jpg", "/images/photo4.jpg"]
+    images: ["/images/photo11.jpg", "/images/photo6.jpg"],
   },
   {
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
     price: 74000,
     sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    images: ["/images/photo6.jpg", "/images/photo6.jpg"],
+    images: ["/images/photo4.jpg", "/images/photo6.jpg"],
   },
   {
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
     price: 74000,
     sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    images: ["/images/photo6.jpg", "/images/photo6.jpg"],
-  },
-  {
-    name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
-    price: 74000,
-    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    images: ["/images/photo6.jpg", "/images/photo4.jpg"],
+    images: ["/images/photo5.jpg", "/images/photo4.jpg"],
   },
   {
     name: "AUBERGINE ALLURE ROMP SKIRT - BIEGE",
