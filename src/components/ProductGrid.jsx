@@ -85,22 +85,29 @@ const ProductGrid = ({ gridType }) => {
   return (
     <motion.div
       ref={gridRef}
-      className={`grid gap-6 p-6 ${
-        gridType === 2 
-          ? "grid-cols-1 sm:grid-cols-1 md:grid-cols-2" 
-          : "grid-cols-2 sm:grid-cols-2 md:grid-cols-4"
-      }`}
+      className={`
+        max-w-[1440px] mx-auto px-4 sm:px-6 
+        ${gridType === 2 
+          ? "grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" 
+          : "grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"}
+      `}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {products.map((product) => (
-        <ProductCard 
-          key={product.id} 
-          product={product} 
-          gridType={gridType}
-          onProductClick={() => handleProductClick(product)}
-        />
+        <div key={product.id} className={`
+          ${gridType === 2 
+            ? "w-full md:max-w-none" 
+            : "w-full"}
+          overflow-hidden
+        `}>
+          <ProductCard 
+            product={product} 
+            gridType={gridType}
+            onProductClick={() => handleProductClick(product)}
+          />
+        </div>
       ))}
     </motion.div>
   );
