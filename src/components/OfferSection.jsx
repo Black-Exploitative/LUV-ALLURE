@@ -110,33 +110,34 @@ export default function OfferSection() {
       </section>
 
       <section className="w-full h-screen grid grid-cols-1 md:grid-cols-2 mt-[103px] mb-[162px]">
-        {/* Left Image Section */}
-        <div className="h-full pl-8">
-          <AnimatedImage
-            src="/images/photo4.jpg"
-            alt="Left Side Image"
-            className="w-full h-80vh object-cover"
-          />
-        </div>
+  {/* Left Image Section */}
+  <div className="pl-8 flex items-center justify-center h-full">
+    <AnimatedImage
+      src="/images/grid1.avif"
+      alt="Left Side Image"
+      className="w-full max-h-[400px] object-cover"
+    />
+  </div>
 
-        {/* Right Content Section */}
-        <div className="flex items-center justify-center p-10 w-3x">
-          <div className="text-center md:text-left max-w-lg">
-            <h2 className="text-4xl mb-[40px]">
-              We Share the Love of Valentine
-            </h2>
-            <p className="text-lg mb-[30px] text-center font-medium">
-              As the lofty and flory presence of valentine ensumes the air and
-              fills our heart. We bring you a subtlyty of blah blah blh ythis
-              that that.
-            </p>
-            <p className="text-lg text-center ">Explore Collection</p>
-            <hr className="my-2 w-[2ch] border-t border-black/50 text-center ml-[20.75ch] -mt-1" />
-          </div>
-        </div>
-      </section>
+  {/* Right Content Section */}
+  <div className="flex items-center justify-center p-10 w-full">
+    <div className="text-center md:text-left max-w-lg">
+      <h2 className="text-4xl mb-[40px]">
+        We Share the Love of Valentine
+      </h2>
+      <p className="text-lg mb-[30px] font-medium">
+        As the lofty and flory presence of valentine ensumes the air and
+        fills our heart. We bring you a subtlyty of blah blah blah this
+        that that.
+      </p>
+      <p className="text-lg">Explore Collection</p>
+      <hr className="my-2 w-[2ch] border-t border-black/50 mx-auto ml-3" />
+    </div>
+  </div>
+</section>
 
-      <section className="w-full py-16 mt-[462px]">
+
+      <section className="w-full py-16 mt-[162px]">
         <div className="max-w-7xl mx-auto px-4">
        
           {/* Card Grid */}
@@ -148,7 +149,7 @@ export default function OfferSection() {
                 alt="Card 1"
                 className="w-full h-[400px] object-cover"
               />
-              <h3 className="text-xl  mt-6 tracking-wide font-semibold">
+              <h3 className="text-xl  mt-6 tracking-wide font-medium">
               EXCLUSIVE PERSONAL SHOPPING
               </h3>
               <p className=" mt-2 text-base text-[#5F6368]">
@@ -163,7 +164,7 @@ export default function OfferSection() {
                 alt="Card 2"
                 className="w-full h-[400px] object-cover"
               />
-              <h3 className="text-xl font-semibold  mt-6">
+              <h3 className="text-xl font-medium mt-6 tracking-wide">
               SIGNATURE STYLING SERVICE
               </h3>
               <p className="mt-2  text-[#5F6368] text-base">
@@ -178,7 +179,7 @@ export default function OfferSection() {
                 alt="Card 3"
                 className="w-full h-[400px] object-cover"
               />
-              <h3 className="text-xl font-semibold mt-6">
+              <h3 className="text-xl font-medium tracking-wide mt-6">
               PERFECT FIT TAILORING
               </h3>
               <p className=" mt-2 text-base text-[#5F6368]">
