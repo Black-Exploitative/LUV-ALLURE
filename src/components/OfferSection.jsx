@@ -1,35 +1,35 @@
 import { useEffect, useRef } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
 import Button from "./Button";
-import AnimatedImage from './AnimatedImage';
-import PropTypes from 'prop-types';
+import AnimatedImage from "./AnimatedImage";
+import PropTypes from "prop-types";
 
 // Enhanced ProductCard component with animations
 const ProductCard = ({ src, title, index }) => {
   const controls = useAnimation();
   const cardRef = useRef(null);
   const isInView = useInView(cardRef, { once: false, amount: 0.3 });
-  
+
   useEffect(() => {
     if (isInView) {
       controls.start("visible");
     }
   }, [controls, isInView]);
-  
+
   return (
     <motion.div
       ref={cardRef}
       className="w-[280px] h-auto rounded-none overflow-hidden"
       variants={{
         hidden: { opacity: 0, y: 50 },
-        visible: { opacity: 1, y: 0 }
+        visible: { opacity: 1, y: 0 },
       }}
       initial="hidden"
       animate={controls}
-      transition={{ 
-        duration: 0.6, 
+      transition={{
+        duration: 0.6,
         delay: index * 0.15,
-        ease: "easeOut"
+        ease: "easeOut",
       }}
     >
       <AnimatedImage
@@ -37,8 +37,8 @@ const ProductCard = ({ src, title, index }) => {
         alt={title}
         className="w-full h-80 object-cover"
       />
-      
-      <motion.h3 
+
+      <motion.h3
         className="text-xl font-medium text-black mt-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -55,19 +55,19 @@ const AnimatedSection = ({ children, delay = 0 }) => {
   const controls = useAnimation();
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: false, amount: 0.2 });
-  
+
   useEffect(() => {
     if (isInView) {
       controls.start("visible");
     }
   }, [controls, isInView]);
-  
+
   return (
     <motion.section
       ref={sectionRef}
       variants={{
         hidden: { opacity: 0 },
-        visible: { opacity: 1 }
+        visible: { opacity: 1 },
       }}
       initial="hidden"
       animate={controls}
@@ -84,20 +84,20 @@ const AnimatedHeading = ({ children, className }) => {
   const controls = useAnimation();
   const headingRef = useRef(null);
   const isInView = useInView(headingRef, { once: false, amount: 0.5 });
-  
+
   useEffect(() => {
     if (isInView) {
       controls.start("visible");
     }
   }, [controls, isInView]);
-  
+
   return (
     <motion.h2
       ref={headingRef}
       className={className}
       variants={{
         hidden: { opacity: 0, y: -20 },
-        visible: { opacity: 1, y: 0 }
+        visible: { opacity: 1, y: 0 },
       }}
       initial="hidden"
       animate={controls}
@@ -113,20 +113,20 @@ const RectangleImage = ({ src, alt, className, direction = "left" }) => {
   const controls = useAnimation();
   const imageRef = useRef(null);
   const isInView = useInView(imageRef, { once: false, amount: 0.3 });
-  
+
   useEffect(() => {
     if (isInView) {
       controls.start("visible");
     }
   }, [controls, isInView]);
-  
+
   return (
     <motion.div
       ref={imageRef}
       className={className}
       variants={{
         hidden: { x: direction === "left" ? -50 : 50, opacity: 0 },
-        visible: { x: 0, opacity: 1 }
+        visible: { x: 0, opacity: 1 },
       }}
       initial="hidden"
       animate={controls}
@@ -146,26 +146,25 @@ const RectangleImage = ({ src, alt, className, direction = "left" }) => {
 };
 // Proptype validation
 
-
 // Service card component
 const ServiceCard = ({ src, title, description, index }) => {
   const controls = useAnimation();
   const cardRef = useRef(null);
   const isInView = useInView(cardRef, { once: false, amount: 0.2 });
-  
+
   useEffect(() => {
     if (isInView) {
       controls.start("visible");
     }
   }, [controls, isInView]);
-  
+
   return (
     <motion.div
       ref={cardRef}
       className="flex flex-col items-center text-center"
       variants={{
         hidden: { opacity: 0, y: 30 },
-        visible: { opacity: 1, y: 0 }
+        visible: { opacity: 1, y: 0 },
       }}
       initial="hidden"
       animate={controls}
@@ -176,7 +175,7 @@ const ServiceCard = ({ src, title, description, index }) => {
         alt={title}
         className="w-full h-[400px] object-cover"
       />
-      
+
       <motion.h3
         className="text-xl font-medium tracking-wide mt-6"
         initial={{ opacity: 0 }}
@@ -185,7 +184,7 @@ const ServiceCard = ({ src, title, description, index }) => {
       >
         {title}
       </motion.h3>
-      
+
       <motion.p
         className="mt-2 text-base text-[#5F6368]"
         initial={{ opacity: 0 }}
@@ -198,12 +197,10 @@ const ServiceCard = ({ src, title, description, index }) => {
   );
 };
 
-
-
 export default function OfferSection() {
   useEffect(() => {
     document.body.style.overflowX = "hidden";
-    
+
     return () => {
       document.body.style.overflowX = "";
     };
@@ -212,28 +209,35 @@ export default function OfferSection() {
     { id: 1, src: "/images/photo4.jpg", title: "Crimson Allure" },
     { id: 2, src: "/images/photo5.jpg", title: "L'dact Allure" },
     { id: 3, src: "/images/photo6.jpg", title: "Novo Amor Allure" },
-    { id: 4, src: "/images/man-wearing-blank-shirt.jpg", title: "Swivel Allure" },
+    {
+      id: 4,
+      src: "/images/man-wearing-blank-shirt.jpg",
+      title: "Swivel Allure",
+    },
   ];
-  
+
   const services = [
     {
       id: 1,
       src: "/images/photo11.jpg",
       title: "EXCLUSIVE PERSONAL SHOPPING",
-      description: "Looking for something special that's not in our collection? Share your vision, and we'll find it or curate a perfect alternative just for you."
+      description:
+        "Looking for something special that's not in our collection? Share your vision, and we'll find it or curate a perfect alternative just for you.",
     },
     {
       id: 2,
       src: "/images/photo12.jpg",
       title: "SIGNATURE STYLING SERVICE",
-      description: "From birthdays to galas, our expert stylists create personalized looks tailored to your unique style and any occasion."
+      description:
+        "From birthdays to galas, our expert stylists create personalized looks tailored to your unique style and any occasion.",
     },
     {
       id: 3,
       src: "/images/photo13.jpg",
       title: "PERFECT FIT TAILORING",
-      description: "Ensure every piece fits perfectly. Our tailoring service adjusts garments from our collection to match your exact measurements."
-    }
+      description:
+        "Ensure every piece fits perfectly. Our tailoring service adjusts garments from our collection to match your exact measurements.",
+    },
   ];
 
   return (
@@ -242,19 +246,20 @@ export default function OfferSection() {
         {/* Section Heading */}
         <div className="max-w-7xl mx-auto px-4 text-center">
           <AnimatedHeading className="text-3xl font-thin text-black mb-[103px]">
-          HERE’S WHAT THE SEASON OFFERS
+            HERE’S WHAT THE SEASON OFFERS
           </AnimatedHeading>
         </div>
 
         {/* Card Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 max-w-7xl mx-auto px-4">
           {products.map((product, index) => (
-            <ProductCard
-              key={product.id}
-              src={product.src}
-              title={product.title}
-              index={index}
-            />
+            <div key={product.id} className="flex justify-center">
+              <ProductCard
+                src={product.src}
+                title={product.title}
+                index={index}
+              />
+            </div>
           ))}
         </div>
 
@@ -290,7 +295,7 @@ export default function OfferSection() {
 
           <div className="absolute inset-0 bg-black opacity-40"></div>
 
-          <motion.div 
+          <motion.div
             className="absolute inset-0 flex flex-col justify-end items-center z-10"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -306,7 +311,7 @@ export default function OfferSection() {
       <AnimatedSection delay={0.3}>
         <div className="w-full grid grid-cols-1 md:grid-cols-2 mt-[103px] mb-[162px]">
           {/* Left Image Section */}
-          <motion.div 
+          <motion.div
             className="pl-8 flex items-center justify-center h-full"
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -320,14 +325,14 @@ export default function OfferSection() {
           </motion.div>
 
           {/* Right Content Section */}
-          <motion.div 
+          <motion.div
             className="flex items-center justify-center p-10 w-full"
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <div className="text-center md:text-left max-w-lg">
-              <motion.h2 
+              <motion.h2
                 className="text-4xl mb-[40px]"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -335,7 +340,7 @@ export default function OfferSection() {
               >
                 We Share the Love of Valentine
               </motion.h2>
-              <motion.p 
+              <motion.p
                 className="text-lg mb-[30px] font-medium"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -386,26 +391,22 @@ ProductCard.propTypes = {
   index: PropTypes.number.isRequired,
 };
 
-
 AnimatedSection.propTypes = {
   children: PropTypes.node.isRequired,
   delay: PropTypes.number,
 };
-
 
 AnimatedHeading.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string.isRequired,
 };
 
-
 RectangleImage.propTypes = {
   src: PropTypes.string.isRequired,
   alt: PropTypes.string.isRequired,
   className: PropTypes.string.isRequired,
-  direction: PropTypes.oneOf(['left', 'right']),
+  direction: PropTypes.oneOf(["left", "right"]),
 };
-
 
 ServiceCard.propTypes = {
   src: PropTypes.string.isRequired,
