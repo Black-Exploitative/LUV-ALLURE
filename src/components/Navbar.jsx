@@ -98,7 +98,7 @@ export default function Navbar() {
           whileTap={{ scale: 0.9 }}
         >
           {isMobileMenuOpen ? (
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center">
               <div className="absolute bg-black rounded-full w-10 h-10 flex items-center justify-center">
                 <img src="/icons/close-menu.svg" alt="Close Menu" className="w-5 h-5" />
               </div>

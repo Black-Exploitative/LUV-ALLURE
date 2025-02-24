@@ -8,4 +8,5 @@ body {
   padding: 0;
   box-sizing: border-box;
   letter-spacing: 20%;
+  overflow-x: hidden;
 }
