@@ -22,7 +22,8 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     handleImageChange(1);
   };
 
-  const handleProductClick = () => {
+  const handleProductClick = (e) => {
+    e.stopPropagation();
     if (onProductClick) {
       onProductClick(product);
     }
