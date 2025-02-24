@@ -14,12 +14,12 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
 
   const handlePrev = (e) => {
     e.stopPropagation(); // Prevent event from bubbling up
-    setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    handleImageChange(-1);
   };
 
   const handleNext = (e) => {
     e.stopPropagation(); // Prevent event from bubbling up
-    setCurrentImage((prev) => (prev + 1) % images.length);
+    handleImageChange(1);
   };
 
   const handleProductClick = () => {
@@ -45,9 +45,19 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
       opacity: 0
     })
   };
-
-  // Direction tracking for animations
-  const [[page, direction], setPage] = useState([0, 0]);
+  
+  // Track direction for animation
+  const [direction, setDirection] = useState(0);
+  
+  // Update direction when changing images
+  const handleImageChange = (newDirection) => {
+    setDirection(newDirection);
+    if (newDirection > 0) {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    } else {
+      setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    }
+  };
 
   return (
     <motion.div
@@ -76,7 +86,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
             animate="center"
             exit="exit"
             transition={{
-              x: { type: "spring", stiffness: 200, damping: 25 }, 
+              x: { type: "spring", stiffness: 200, damping: 25 }, // Slower animation
               opacity: { duration: 0.3 }
             }}
           />
