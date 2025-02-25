@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Checkout from "./components/Checkout";
 import ContactUs from "./pages/ContactUs";
+import Payment from "./pages/Payment";
 import AlreadyInCartModal from "./components/AlreadyInCartModal";
 import CartDrawer from "./components/CartDrawer";
 
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/product/:productId" element={<ProductDetailsPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/payment" element={<Payment />} />
       </Routes>
     </Router>
     </CartProvider>
