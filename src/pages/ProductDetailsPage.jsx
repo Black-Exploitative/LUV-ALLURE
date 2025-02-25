@@ -59,15 +59,15 @@ const ProductDetailsPage = () => {
   };
 
   return (
-    <>
-      <div className="p-6 mt-[72px] flex space-x-8">
-        {/* Left Side: Product Carousel */}
-        <div className="w-1/2">
+    <div className="max-w-screen-xl mx-auto">
+      <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
+        {/* Left Side: Product Carousel - Now takes a bit more space on larger screens */}
+        <div className="w-full md:w-3/5 mb-8 md:mb-0">
           <ProductCarousel images={product.images} />
         </div>
 
         {/* Right Side: Product Details */}
-        <div className="w-1/2 space-y-4">
+        <div className="w-full md:w-2/5 space-y-4">
           {/* Product Name */}
           <h1 className="text-2xl font-bold">{product.name}</h1>
 
@@ -79,7 +79,7 @@ const ProductDetailsPage = () => {
           {/* Size Selection */}
           <div>
             <p className="text-lg font-medium mb-2">SIZE:</p>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               {product.sizes.map((size, index) => (
                 <button
                   key={index}
@@ -126,10 +126,10 @@ const ProductDetailsPage = () => {
         </div>
       </div>
       
-      {/* Related Products */}
-      <div className="p-6">
+      {/* Related Products - Using responsive grid */}
+      <div className="p-4 md:p-6">
         <h2 className="text-xl mb-4">STYLE IT WITH</h2>
-        <div className="grid gap-6">
+        <div className="grid gap-4 md:gap-6">
           {relatedProducts.map((product, index) => (
             <SmallProductCard
               key={index}
@@ -142,22 +142,22 @@ const ProductDetailsPage = () => {
           ))}
         </div>
 
-        {/* Purchased Products Section */}
+        {/* Purchased Products Section - Using responsive grid */}
         <h2 className="text-xl font-semibold mt-8 mb-4">CUSTOMERS ALSO PURCHASED</h2>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {purchasedProducts.map((product, index) => (
             <PurchasedCard key={index} product={product} />
           ))}
         </div>
 
         <h2 className="text-xl font-semibold mt-8 mb-4">CUSTOMERS ALSO VIEWED</h2>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {purchasedProducts.map((product, index) => (
             <PurchasedCard key={index} product={product} />
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
