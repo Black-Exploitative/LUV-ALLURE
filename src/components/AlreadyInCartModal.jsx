@@ -1,19 +1,31 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { AiOutlineClose } from "react-icons/ai";
-import PropTypes from "prop-types";
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
-const AlreadyInCartModal = ({ isOpen, onClose, onProceedToCheckout }) => {
+const AlreadyInCartModal = () => {
+  const navigate = useNavigate();
+  const { isAlreadyInCartModalOpen, setIsAlreadyInCartModalOpen } = useCart();
+
+  // If modal is not open, don't render anything
+  if (!isAlreadyInCartModalOpen) return null;
+
+  const handleProceedToCheckout = () => {
+    setIsAlreadyInCartModalOpen(false);
+    navigate('/checkout');
+  };
+
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isAlreadyInCartModalOpen && (
         <>
           {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             className="fixed inset-0 bg-black z-40"
-            onClick={onClose}
+            onClick={() => setIsAlreadyInCartModalOpen(false)}
           />
 
           {/* Modal */}
@@ -27,27 +39,26 @@ const AlreadyInCartModal = ({ isOpen, onClose, onProceedToCheckout }) => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-medium">Item Already In Cart</h2>
               <button
-                onClick={onClose}
+                onClick={() => setIsAlreadyInCartModalOpen(false)}
                 className="p-1 rounded-full hover:bg-gray-100 transition-colors"
               >
-                <AiOutlineClose size={24} />
+                <img src="/icons/close-menu.svg" alt="Close" className="w-5 h-5" />
               </button>
             </div>
-
+            
             <p className="text-gray-600 mb-6">
-              This item is already in your shopping bag. Would you like to
-              proceed to checkout?
+              This item is already in your shopping bag. Would you like to proceed to checkout?
             </p>
-
+            
             <div className="space-y-3">
-              <button
-                onClick={onProceedToCheckout}
+              <button 
+                onClick={handleProceedToCheckout}
                 className="w-full bg-black text-white py-3 hover:bg-gray-800 transition-colors"
               >
                 PROCEED TO CHECKOUT
               </button>
-              <button
-                onClick={onClose}
+              <button 
+                onClick={() => setIsAlreadyInCartModalOpen(false)}
                 className="w-full bg-white text-black border border-black py-3 hover:bg-gray-100 transition-colors"
               >
                 CONTINUE SHOPPING
@@ -58,12 +69,6 @@ const AlreadyInCartModal = ({ isOpen, onClose, onProceedToCheckout }) => {
       )}
     </AnimatePresence>
   );
-};
-
-AlreadyInCartModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onProceedToCheckout: PropTypes.func.isRequired,
 };
 
 export default AlreadyInCartModal;
