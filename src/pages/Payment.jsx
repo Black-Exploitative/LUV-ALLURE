@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { FaChevronDown, FaChevronUp, FaCheck } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
 import Navbar from '../components/Navbar';
 
@@ -119,7 +119,7 @@ const PaymentPage = () => {
   // Get section status icon
   const getSectionIcon = (section) => {
     if (completedSections.includes(section)) {
-      return <Check className="w-5 h-5 text-green-500" />;
+      return <FaCheck className="w-5 h-5 text-green-500" />;
     }
     return <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-800">{section}</span>;
   };
@@ -144,7 +144,7 @@ const PaymentPage = () => {
                   {getSectionIcon(1)}
                   <span className="font-medium">Personal Information</span>
                 </div>
-                {activeSection === 1 ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                {activeSection === 1 ? <FaChevronUp className="w-4 h-4" /> : <FaChevronDown className="w-4 h-4" />}
               </button>
               
               <AnimatePresence>
@@ -226,7 +226,7 @@ const PaymentPage = () => {
                   {getSectionIcon(2)}
                   <span className="font-medium">Shipping</span>
                 </div>
-                {activeSection === 2 ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                {activeSection === 2 ? <FaChevronUp className="w-4 h-4" /> : <FaChevronDown className="w-4 h-4" />}
               </button>
               
               <AnimatePresence>
@@ -375,7 +375,7 @@ const PaymentPage = () => {
                   {getSectionIcon(3)}
                   <span className="font-medium">Packaging and Gifting</span>
                 </div>
-                {activeSection === 3 ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                {activeSection === 3 ? <FaChevronUp className="w-4 h-4" /> : <FaChevronDown className="w-4 h-4" />}
               </button>
               
               <AnimatePresence>
@@ -449,7 +449,7 @@ const PaymentPage = () => {
                   {getSectionIcon(4)}
                   <span className="font-medium">Payment</span>
                 </div>
-                {activeSection === 4 ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                {activeSection === 4 ? <FaChevronUp className="w-4 h-4" /> : <FaChevronDown className="w-4 h-4" />}
               </button>
               
               <AnimatePresence>
