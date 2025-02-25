@@ -6,12 +6,17 @@ import { CartProvider } from "./context/CartContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Checkout from "./components/Checkout";
+import AlreadyInCartModal from "./components/AlreadyInCartModal";
+import CartDrawer from "./components/CartDrawer";
+
 export default function App() {
   return (
     <CartProvider>
     <Router>
     <Navbar />
     <Toaster />
+    <CartDrawer />
+    <AlreadyInCartModal />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
