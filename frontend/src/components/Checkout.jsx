@@ -1,6 +1,6 @@
 import { useCart } from "../context/CartContext";
-import Navbar from "../components/Navbar";
-import Banner from "../components/Banner";
+import Navbar from "./Navbar";
+import Banner from "./Banner";
 import { toast } from "react-hot-toast";
 
 // Helper function to generate product ID (duplicated from CartContext to ensure consistency)
