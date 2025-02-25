@@ -3,6 +3,18 @@ import Navbar from "../components/Navbar";
 import Banner from "../components/Banner";
 import { toast } from "react-hot-toast";
 
+// Helper function to generate product ID (duplicated from CartContext to ensure consistency)
+const generateProductId = (product) => {
+  if (product.id) return product.id;
+  
+  const nameStr = product.name || '';
+  const sizeStr = product.selectedSize || 'default';
+  const colorStr = product.color || '';
+  const priceStr = String(product.price || '');
+  
+  return `${nameStr}-${sizeStr}-${colorStr}-${priceStr}`;
+};
+
 export default function Checkout() {
   const { cartItems, removeFromCart } = useCart();
 
@@ -23,7 +35,6 @@ export default function Checkout() {
   const updateQuantity = (itemId, quantity) => {
     console.log(`Update quantity for ${itemId} to ${quantity}`);
     // This function doesn't exist in your context, so you'd need to implement it
-    // For now, we'll just show a toast
     toast.info("Quantity update functionality not implemented yet");
   };
 
@@ -39,7 +50,7 @@ export default function Checkout() {
             <p className="text-center text-gray-600">Your cart is empty.</p>
           ) : (
             cartItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between border-b py-4">
+              <div key={generateProductId(item)} className="flex items-center justify-between border-b py-4">
                 {/* Product Image */}
                 <img 
                   src={item.images?.[0] || item.image || "/images/placeholder.jpg"} 
@@ -62,14 +73,14 @@ export default function Checkout() {
                 <div className="flex items-center space-x-2">
                   <button
                     className="px-3 py-1 bg-gray-300"
-                    onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
+                    onClick={() => updateQuantity(generateProductId(item), (item.quantity || 1) - 1)}
                   >
                     −
                   </button>
                   <span className="text-lg font-semibold">{item.quantity || 1}</span>
                   <button
                     className="px-3 py-1 bg-gray-300"
-                    onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
+                    onClick={() => updateQuantity(generateProductId(item), (item.quantity || 1) + 1)}
                   >
                     +
                   </button>
@@ -79,7 +90,7 @@ export default function Checkout() {
                 <button
                   className="text-red-500 ml-4"
                   onClick={() => {
-                    removeFromCart(item.id);
+                    removeFromCart(generateProductId(item));
                     toast.success("Item removed from cart");
                   }}
                 >
