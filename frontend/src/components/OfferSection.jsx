@@ -108,42 +108,7 @@ const AnimatedHeading = ({ children, className }) => {
   );
 };
 
-// Enhanced rectangle image component
-const RectangleImage = ({ src, alt, className, direction = "left" }) => {
-  const controls = useAnimation();
-  const imageRef = useRef(null);
-  const isInView = useInView(imageRef, { once: false, amount: 0.3 });
 
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible");
-    }
-  }, [controls, isInView]);
-
-  return (
-    <motion.div
-      ref={imageRef}
-      className={className}
-      variants={{
-        hidden: { x: direction === "left" ? -50 : 50, opacity: 0 },
-        visible: { x: 0, opacity: 1 },
-      }}
-      initial="hidden"
-      animate={controls}
-      transition={{ duration: 0.9, ease: "easeOut" }}
-    >
-      <motion.img
-        src={src}
-        alt={alt}
-        className="w-full h-full object-cover"
-        loading="lazy"
-        whileInView={{ scale: 1.05 }}
-        initial={{ scale: 1 }}
-        transition={{ duration: 8, ease: "easeOut" }}
-      />
-    </motion.div>
-  );
-};
 // Proptype validation
 
 // Service card component
@@ -265,7 +230,7 @@ export default function OfferSection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-0 max-w-7xl mx-auto mt-[100px] sm:mt-[162px]">
           {/* Rectangle 1 */}
-          <RectangleImage
+          <img
             src="/images/photo1.jpg"
             alt="Rectangle 1"
             className="h-[400px] sm:h-[600px] md:h-[800px] flex items-center justify-center overflow-hidden"
@@ -273,7 +238,7 @@ export default function OfferSection() {
           />
 
           {/* Rectangle 2 */}
-          <RectangleImage
+          <img
             src="/images/photo2.jpg"
             alt="Rectangle 2"
             className="h-[400px] sm:h-[600px] md:h-[800px] flex items-center justify-center overflow-hidden"
@@ -401,12 +366,6 @@ AnimatedHeading.propTypes = {
   className: PropTypes.string.isRequired,
 };
 
-RectangleImage.propTypes = {
-  src: PropTypes.string.isRequired,
-  alt: PropTypes.string.isRequired,
-  className: PropTypes.string.isRequired,
-  direction: PropTypes.oneOf(["left", "right"]),
-};
 
 ServiceCard.propTypes = {
   src: PropTypes.string.isRequired,
