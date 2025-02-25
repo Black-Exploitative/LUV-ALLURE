@@ -1,52 +1,67 @@
+import { useState } from "react";
 import ProductCarousel from "../components/ProductCarousel";
 import Navbar from "../components/Navbar";
 import { useLocation } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
-import { toast } from "react-hot-toast";
-
+import CartDrawer from "../components/CartDrawer";
 
 const ProductDetailsPage = () => {
-    const location = useLocation();
-    const product = location.state?.product || {
-      name: "SWIVEL ALLURE MAXI DRESS",
-      price: "300,000.00",
-      sizes: ["S", "M", "L", "XL"],
-      images: [
-        "../public/images/photo6.jpg",
-        "../public/images/photo6.jpg",
-        "../public/images/photo11.jpg",
-        "../public/images/photo11.jpg",
-      ],
-    }
+  const location = useLocation();
+  const product = location.state?.product || {
+    name: "SWIVEL ALLURE MAXI DRESS",
+    price: "300,000.00",
+    sizes: ["S", "M", "L", "XL"],
+    images: [
+      "../public/images/photo6.jpg",
+      "../public/images/photo6.jpg",
+      "../public/images/photo11.jpg",
+      "../public/images/photo11.jpg",
+    ],
+  };
 
-    const relatedProducts = [
-        {
-          name: "Sybil Scarf - Black",
-          color: "BLACK",
-          price: "78,000",
-          image: "../public/images/stylewith.jpg",
-        },
-        {
-          name: "Sybil Scarf - Pink",
-          color: "PINK",
-          price: "56,000",
-          image: "../public/images/stylewith2.jpg",
-        },
-      ];
+  const [selectedSize, setSelectedSize] = useState("");
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-      const purchasedProducts = [
-        { name: "Purchased 1", price: 1000, color: "BEIGE", images: "../public/images/photo6.jpg" },
-        { name: "Purchased 2", price: 1200, color: "MAROON", images: "../public/images/photo11.jpg" },
-        { name: "Purchased 3", price: 800, color: "CORAL", images: "../public/images/photo6.jpg" },
-        { name: "Purchased 4", price: 900, color: "BURGUNDY", images: "../public/images/photo11.jpg" },
-      ];
+  const relatedProducts = [
+    {
+      name: "Sybil Scarf - Black",
+      color: "BLACK",
+      price: "78,000",
+      image: "../public/images/stylewith.jpg",
+    },
+    {
+      name: "Sybil Scarf - Pink",
+      color: "PINK",
+      price: "56,000",
+      image: "../public/images/stylewith2.jpg",
+    },
+  ];
+
+  const purchasedProducts = [
+    { name: "Purchased 1", price: 1000, color: "BEIGE", images: "../public/images/photo6.jpg" },
+    { name: "Purchased 2", price: 1200, color: "MAROON", images: "../public/images/photo11.jpg" },
+    { name: "Purchased 3", price: 800, color: "CORAL", images: "../public/images/photo6.jpg" },
+    { name: "Purchased 4", price: 900, color: "BURGUNDY", images: "../public/images/photo11.jpg" },
+  ];
+
+  const handleAddToCart = () => {
+    setIsCartOpen(true);
+  };
 
   return (
     <>
-    <Navbar />
-    <div className="p-6 mt-[72px] flex space-x-8">
+      <Navbar />
+      
+      {/* Cart Drawer */}
+      <CartDrawer 
+        isOpen={isCartOpen} 
+        onClose={() => setIsCartOpen(false)} 
+        product={product} 
+      />
+      
+      <div className="p-6 mt-[72px] flex space-x-8">
         {/* Left Side: Product Carousel */}
         <div className="w-1/2">
           <ProductCarousel images={product.images} />
@@ -58,7 +73,7 @@ const ProductDetailsPage = () => {
           <h1 className="text-2xl font-bold">{product.name}</h1>
 
           {/* Product Price */}
-          <p className="text-xl font-semibold text-gray-700">{product.price}</p>
+          <p className="text-xl font-semibold text-gray-700">₦{product.price}</p>
 
           <hr className="border-t border-gray-300 my-4" />
 
@@ -69,7 +84,12 @@ const ProductDetailsPage = () => {
               {product.sizes.map((size, index) => (
                 <button
                   key={index}
-                  className="border border-gray-300 px-4 py-2 rounded hover:bg-gray-100 active:bg-gray-200"
+                  className={`border ${
+                    selectedSize === size 
+                      ? "border-black bg-black text-white" 
+                      : "border-gray-300 hover:bg-gray-100"
+                  } px-4 py-2 rounded active:bg-gray-200 transition-colors`}
+                  onClick={() => setSelectedSize(size)}
                 >
                   {size}
                 </button>
@@ -79,8 +99,8 @@ const ProductDetailsPage = () => {
 
           {/* Add to Cart Button */}
           <button
-            className="w-full bg-black text-white py-3 hover:bg-gray-800"
-            onClick={() => toast.success("Added to cart!")}
+            className="w-full bg-black text-white py-3 hover:bg-gray-800 transition-colors"
+            onClick={handleAddToCart}
           >
             ADD TO SHOPPING BAG
           </button>
@@ -88,7 +108,7 @@ const ProductDetailsPage = () => {
           <hr className="border-t border-gray-300 my-4" />
 
           {/* Expandable Sections */}
-           <ExpandableSection
+          <ExpandableSection
             title="PRODUCT DETAILS"
             content="This is a beautiful Sybil Scarf made from high-quality materials. It's lightweight, breathable, and perfect for any season."
           />
@@ -104,11 +124,11 @@ const ProductDetailsPage = () => {
             title="RETURNS"
             content="If you're not satisfied with your purchase, you may return the item within 30 days for a full refund."
           />
-
         </div>
       </div>
-       {/* Related Products */}
-       <div className="p-6">
+      
+      {/* Related Products */}
+      <div className="p-6">
         <h2 className="text-xl mb-4">STYLE IT WITH</h2>
         <div className="grid gap-6">
           {relatedProducts.map((product, index) => (
@@ -137,8 +157,7 @@ const ProductDetailsPage = () => {
             <PurchasedCard key={index} product={product} />
           ))}
         </div>
-        
-        </div>
+      </div>
     </>
   );
 };

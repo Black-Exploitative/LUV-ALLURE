@@ -1,12 +1,15 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { motion, AnimatePresence } from 'framer-motion';
+import { AiOutlineClose } from "react-icons/ai";
 import PropTypes from "prop-types";
+
 
 const CartDrawer = ({ isOpen, onClose, product, quantity = 1 }) => {
   if (!product) return null;
 
-  // Format price for calculations
-  const priceValue = parseFloat(product.price.replace(/,/g, ""));
+  // Format price for calculations - handle different price formats
+  const priceValue = typeof product.price === 'string' 
+    ? parseFloat(product.price.replace(/,/g, '')) 
+    : parseFloat(product.price || 0);
   const totalPrice = (priceValue * quantity).toLocaleString();
 
   return (
@@ -38,7 +41,7 @@ const CartDrawer = ({ isOpen, onClose, product, quantity = 1 }) => {
                   onClick={onClose}
                   className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  <X size={24} />
+                  <AiOutlineClose size={24} />
                 </button>
               </div>
 
@@ -46,9 +49,9 @@ const CartDrawer = ({ isOpen, onClose, product, quantity = 1 }) => {
               <div className="flex mb-6 pb-6 border-b border-gray-200">
                 {/* Product Image */}
                 <div className="w-24 h-24 bg-gray-100 mr-4">
-                  <img
-                    src={product.images?.[0]}
-                    alt={product.name}
+                  <img 
+                    src={product.images?.[0]} 
+                    alt={product.name} 
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -56,9 +59,7 @@ const CartDrawer = ({ isOpen, onClose, product, quantity = 1 }) => {
                 {/* Product Info */}
                 <div className="flex-1">
                   <h3 className="text-base font-medium mb-1">{product.name}</h3>
-                  <p className="text-sm text-gray-600 mb-1">
-                    Quantity: {quantity}
-                  </p>
+                  <p className="text-sm text-gray-600 mb-1">Quantity: {quantity}</p>
                   <p className="text-sm font-medium">₦{product.price}</p>
                 </div>
               </div>
@@ -87,14 +88,14 @@ const CartDrawer = ({ isOpen, onClose, product, quantity = 1 }) => {
 };
 
 CartDrawer.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  product: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.string.isRequired,
-    images: PropTypes.arrayOf(PropTypes.string),
-  }),
-  quantity: PropTypes.number,
-};
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    product: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      price: PropTypes.string.isRequired,
+      images: PropTypes.arrayOf(PropTypes.string),
+    }),
+    quantity: PropTypes.number,
+  };
 
 export default CartDrawer;
