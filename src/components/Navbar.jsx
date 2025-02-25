@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useCart } from "../context/CartContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
@@ -10,6 +10,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartItemCount } = useCart();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -40,7 +41,7 @@ export default function Navbar() {
     if (cartItemCount === 0) {
       toast.error("No item in cart yet!");
     } else {
-      toast.success("Opening cart...");
+      navigate('/checkout');
     }
   };
 

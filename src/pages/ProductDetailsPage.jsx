@@ -1,11 +1,10 @@
-import { useState } from "react";
 import ProductCarousel from "../components/ProductCarousel";
-import Navbar from "../components/Navbar";
 import { useLocation } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
-import CartDrawer from "../components/CartDrawer";
+import { useCart } from "../context/CartContext";
+import { useState } from "react";
 
 const ProductDetailsPage = () => {
   const location = useLocation();
@@ -22,7 +21,7 @@ const ProductDetailsPage = () => {
   };
 
   const [selectedSize, setSelectedSize] = useState("");
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { addToCart } = useCart();
 
   const relatedProducts = [
     {
@@ -47,20 +46,20 @@ const ProductDetailsPage = () => {
   ];
 
   const handleAddToCart = () => {
-    setIsCartOpen(true);
+    // Generate a unique ID for this product + size combination
+    const productWithSize = {
+      ...product,
+      id: `${product.name}-${selectedSize || 'default'}`,
+      selectedSize
+    };
+    
+    // Try to add to cart - returns false if already in cart
+    // The cart drawer or "already in cart" modal will be shown automatically by the context
+    addToCart(productWithSize);
   };
 
   return (
     <>
-      <Navbar />
-      
-      {/* Cart Drawer */}
-      <CartDrawer 
-        isOpen={isCartOpen} 
-        onClose={() => setIsCartOpen(false)} 
-        product={product} 
-      />
-      
       <div className="p-6 mt-[72px] flex space-x-8">
         {/* Left Side: Product Carousel */}
         <div className="w-1/2">
