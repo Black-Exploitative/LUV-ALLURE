@@ -11,7 +11,8 @@ const CartDrawer = () => {
     getCartTotals 
   } = useCart();
 
-  if (!selectedProduct) return null;
+  // If no product is selected or drawer is closed, don't render anything
+  if (!isCartDrawerOpen || !selectedProduct) return null;
 
   const { subtotal } = getCartTotals();
   const formattedSubtotal = subtotal.toLocaleString();
@@ -55,7 +56,7 @@ const CartDrawer = () => {
                 {/* Product Image */}
                 <div className="w-24 h-24 bg-gray-100 mr-4">
                   <img 
-                    src={selectedProduct.images?.[0] || selectedProduct.image} 
+                    src={selectedProduct.images?.[0] || selectedProduct.image || "/images/placeholder.jpg"} 
                     alt={selectedProduct.name} 
                     className="w-full h-full object-cover"
                   />
@@ -95,7 +96,9 @@ const CartDrawer = () => {
                   className="w-full bg-white text-black border border-black py-3 hover:bg-gray-100 transition-colors"
                   onClick={() => {
                     setIsCartDrawerOpen(false);
-                    navigate('/cart');
+                    // If you have a dedicated cart page, navigate there
+                    // Otherwise, just navigate to checkout
+                    navigate('/checkout');
                   }}
                 >
                   VIEW SHOPPING BAG
