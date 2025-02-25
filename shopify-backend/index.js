@@ -9,7 +9,7 @@ app.use(express.json());
 
 // Initialize Apollo Client for Shopify
 const shopifyClient = new ApolloClient({
-  uri: `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2023-10/graphql.json`,
+  uri: `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2025-01/graphql.json`,
   cache: new InMemoryCache(),
   headers: {
     'X-Shopify-Storefront-Access-Token': process.env.SHOPIFY_STOREFRONT_TOKEN
