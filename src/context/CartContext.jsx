@@ -28,17 +28,36 @@ export const CartProvider = ({ children }) => {
 
   const cartItemCount = cartItems.length;
 
+  // Generate a unique ID for a product based on its properties
+  const generateProductId = (product) => {
+    // If the product already has an ID, use it
+    if (product.id) return product.id;
+    
+    // Otherwise, create a unique ID based on multiple properties
+    // Include more properties to make the ID more unique
+    const nameStr = product.name || '';
+    const sizeStr = product.selectedSize || 'default';
+    const colorStr = product.color || '';
+    const priceStr = String(product.price || '');
+    
+    // Concatenate all properties to form a unique identifier
+    return `${nameStr}-${sizeStr}-${colorStr}-${priceStr}`;
+  };
+
   // Check if a product is already in the cart
-  const isInCart = (productId) => {
-    return cartItems.some(item => item.id === productId);
+  const isInCart = (product) => {
+    const productId = generateProductId(product);
+    
+    return cartItems.some(item => {
+      const itemId = generateProductId(item);
+      return itemId === productId;
+    });
   };
 
   // Add product to cart
   const addToCart = (item) => {
-    // Check if the product is already in cart
-    const productId = item.id || `${item.name}-${item.selectedSize || 'default'}`;
-    
-    if (isInCart(productId)) {
+    // Check if the product is already in cart using our improved method
+    if (isInCart(item)) {
       setSelectedProduct(item);
       setIsAlreadyInCartModalOpen(true);
       return false; // Indicate product was not added
@@ -47,7 +66,7 @@ export const CartProvider = ({ children }) => {
     // Add the product with a generated ID if it doesn't have one
     const itemWithId = {
       ...item,
-      id: productId,
+      id: generateProductId(item),
       dateAdded: new Date().toISOString()
     };
     
@@ -59,7 +78,7 @@ export const CartProvider = ({ children }) => {
 
   // Remove product from cart
   const removeFromCart = (productId) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+    setCartItems(prevItems => prevItems.filter(item => generateProductId(item) !== productId));
   };
 
   // Calculate cart totals
