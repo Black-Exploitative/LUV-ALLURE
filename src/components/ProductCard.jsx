@@ -13,12 +13,12 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
   const imageHeightClass = gridType === 2 ? "h-[751px]" : "h-[500px]";
 
   const handlePrev = (e) => {
-    e.stopPropagation(); // Prevent event from bubbling up
+    e.stopPropagation(); 
     handleImageChange(-1);
   };
 
   const handleNext = (e) => {
-    e.stopPropagation(); // Prevent event from bubbling up
+    e.stopPropagation();
     handleImageChange(1);
   };
 
@@ -29,7 +29,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     }
   };
 
-  // Image slide variants - slower, smoother transition
+ 
   const slideVariants = {
     enter: (direction) => ({
       x: direction > 0 ? 300 : -300,
