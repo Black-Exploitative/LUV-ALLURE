@@ -13,6 +13,7 @@ import CartDrawer from "./components/CartDrawer";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
 import ForgotPassword from "./auth/ForgotPassword";
+import UserAccount from "./auth/UserAccount";
 
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/user-account" element={<UserAccount />} />
       </Routes>
     </Router>
     </CartProvider>
