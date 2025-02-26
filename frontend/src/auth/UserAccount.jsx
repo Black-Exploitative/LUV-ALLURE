@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
+// Import the separated components
 import Orders from "./Orders";
 import ProfileManagement from "./ProfileManagement";
 import StyleAdvisor from "./StyleAdvisor";
 
 export default function UserAccount() {
-  // Mock user data - this would come from your auth context or API
+  // Mock user data -
   const [user, setUser] = useState({
     firstName: "Emma",
     lastName: "Thompson",
@@ -98,7 +100,7 @@ export default function UserAccount() {
             </div>
           </div>
           
-          {/* Main content area */}
+          {/* Main content area - conditionally render based on active section */}
           <div className="md:w-3/4">
             {activeSection === "dashboard" && (
               <div className="space-y-8">
@@ -184,7 +186,7 @@ export default function UserAccount() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-600">You have not placed any orders yet.</p>
+                    <p className="text-sm text-gray-600">You haven't placed any orders yet.</p>
                   )}
                   
                   {orders.length > 0 && (
@@ -216,7 +218,7 @@ export default function UserAccount() {
               <div className="space-y-6">
                 <h2 className="text-xl font-light">MY WISHLIST</h2>
                 <p className="text-sm text-gray-600">
-                  Items you have saved for later.
+                  Items you've saved for later.
                 </p>
                 
                 <div className="py-12 text-center border border-gray-200">
