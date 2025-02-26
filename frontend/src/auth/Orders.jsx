@@ -1,7 +1,6 @@
-// Orders.jsx
-import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import PropTypes from "prop-types";
 
 const Orders = ({ orders }) => {
   return (
@@ -62,7 +61,7 @@ const Orders = ({ orders }) => {
       ) : (
         <div className="py-12 text-center border border-gray-200">
           <p className="text-gray-600 mb-4">
-            You haven't placed any orders yet.
+            You have not placed any orders yet.
           </p>
           <Link
             to="/shop"
@@ -74,6 +73,26 @@ const Orders = ({ orders }) => {
       )}
     </div>
   );
+};
+
+Orders.propTypes = {
+  orders: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      date: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired,
+      items: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          quantity: PropTypes.number.isRequired,
+          price: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            .isRequired,
+        })
+      ).isRequired,
+      total: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+    })
+  ).isRequired,
 };
 
 export default Orders;
