@@ -9,6 +9,7 @@ export default function SignUp() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    dateOfBirth: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -97,6 +98,21 @@ export default function SignUp() {
                   autoComplete="email"
                   required
                   value={formData.email}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="dateOfBirth" className="block text-xs font-medium text-gray-700 mb-1">
+                  DATE OF BIRTH
+                </label>
+                <input
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  type="date"
+                  required
+                  value={formData.dateOfBirth}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm"
                 />
