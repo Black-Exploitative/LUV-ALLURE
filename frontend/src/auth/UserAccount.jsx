@@ -186,7 +186,7 @@ export default function UserAccount() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-600">You haven't placed any orders yet.</p>
+                    <p className="text-sm text-gray-600">You have not placed any orders yet.</p>
                   )}
                   
                   {orders.length > 0 && (
@@ -218,7 +218,7 @@ export default function UserAccount() {
               <div className="space-y-6">
                 <h2 className="text-xl font-light">MY WISHLIST</h2>
                 <p className="text-sm text-gray-600">
-                  Items you've saved for later.
+                  Items you&apos;ve saved for later. 
                 </p>
                 
                 <div className="py-12 text-center border border-gray-200">
