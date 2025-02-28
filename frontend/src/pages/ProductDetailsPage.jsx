@@ -9,9 +9,7 @@ import Footer from "../components/Footer";
 import { useRecentlyViewed } from '../components/RecentlyViewedProducts';
 
 const ProductDetailsPage = () => {
-  const { addToRecentlyViewed } = useRecentlyViewed();
   
- 
 
   const location = useLocation();
   const product = location.state?.product || {
@@ -84,7 +82,7 @@ const ProductDetailsPage = () => {
     addToCart(productWithSize);
   };
 
-  
+  const { addToRecentlyViewed } = useRecentlyViewed();
   useEffect(() => {
     if (product) {
       addToRecentlyViewed(product);
