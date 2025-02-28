@@ -22,21 +22,21 @@ const FilterSortBar = ({ onGridChange }) => {
 
   const handleApplyFilters = () => {
     const newFilters = [];
-    
+
     if (selectedSize.length > 0) {
       newFilters.push({
         type: "size",
-        values: [...selectedSize]
+        values: [...selectedSize],
       });
     }
-    
+
     if (priceRange[0] > 0 || priceRange[1] < 5000) {
       newFilters.push({
         type: "price",
-        values: [...priceRange]
+        values: [...priceRange],
       });
     }
-    
+
     setActiveFilters(newFilters);
     setIsFilterOpen(false);
   };
@@ -49,33 +49,37 @@ const FilterSortBar = ({ onGridChange }) => {
 
   const handleRemoveFilter = (filterType, value) => {
     if (filterType === "size") {
-      const newSizes = selectedSize.filter(size => size !== value);
+      const newSizes = selectedSize.filter((size) => size !== value);
       setSelectedSize(newSizes);
-      
+
       // Update active filters
-      const updatedFilters = activeFilters.map(filter => {
-        if (filter.type === "size") {
-          return {
-            ...filter,
-            values: filter.values.filter(v => v !== value)
-          };
-        }
-        return filter;
-      }).filter(filter => filter.values.length > 0);
-      
+      const updatedFilters = activeFilters
+        .map((filter) => {
+          if (filter.type === "size") {
+            return {
+              ...filter,
+              values: filter.values.filter((v) => v !== value),
+            };
+          }
+          return filter;
+        })
+        .filter((filter) => filter.values.length > 0);
+
       setActiveFilters(updatedFilters);
     } else if (filterType === "price") {
       setPriceRange([0, 5000]);
-      
+
       // Remove price filter from active filters
-      const updatedFilters = activeFilters.filter(filter => filter.type !== "price");
+      const updatedFilters = activeFilters.filter(
+        (filter) => filter.type !== "price"
+      );
       setActiveFilters(updatedFilters);
     }
   };
 
   const toggleSizeSelection = (size) => {
     if (selectedSize.includes(size)) {
-      setSelectedSize(selectedSize.filter(s => s !== size));
+      setSelectedSize(selectedSize.filter((s) => s !== size));
     } else {
       setSelectedSize([...selectedSize, size]);
     }
@@ -93,29 +97,30 @@ const FilterSortBar = ({ onGridChange }) => {
         {activeFilters.map((filter) => {
           if (filter.type === "size") {
             return filter.values.map((size) => (
-              <div 
-                key={`size-${size}`} 
+              <div
+                key={`size-${size}`}
                 className="flex items-center bg-gray-100 px-3 py-1 mr-2 mb-2 text-sm"
               >
                 <span className="mr-1">Size: {size}</span>
-                <IoCloseOutline 
-                  className="cursor-pointer" 
-                  onClick={() => handleRemoveFilter("size", size)} 
+                <IoCloseOutline
+                  className="cursor-pointer"
+                  onClick={() => handleRemoveFilter("size", size)}
                 />
               </div>
             ));
           } else if (filter.type === "price") {
             return (
-              <div 
-                key="price-range" 
+              <div
+                key="price-range"
                 className="flex items-center bg-gray-100 px-3 py-1 mr-2 mb-2 text-sm"
               >
                 <span className="mr-1">
-                  Price: {formatPrice(filter.values[0])} - {formatPrice(filter.values[1])}
+                  Price: {formatPrice(filter.values[0])} -{" "}
+                  {formatPrice(filter.values[1])}
                 </span>
-                <IoCloseOutline 
-                  className="cursor-pointer" 
-                  onClick={() => handleRemoveFilter("price")} 
+                <IoCloseOutline
+                  className="cursor-pointer"
+                  onClick={() => handleRemoveFilter("price")}
                 />
               </div>
             );
@@ -123,8 +128,8 @@ const FilterSortBar = ({ onGridChange }) => {
           return null;
         })}
         {activeFilters.length > 0 && (
-          <button 
-            className="text-xs underline ml-2 mb-2" 
+          <button
+            className="text-xs underline ml-2 mb-2"
             onClick={handleClearFilters}
           >
             Clear All
@@ -142,11 +147,13 @@ const FilterSortBar = ({ onGridChange }) => {
       <div className="flex items-center justify-between p-4 border-b border-gray-300">
         <div className="flex items-center">
           <button
-            className="flex items-center text-gray-700 font-semibold focus:outline-none"
+            className="flex items-center text-gray-700 font-thin focus:outline-none"
             onClick={toggleFilter}
           >
-            <span className="mr-2">+</span>
-            <span>FILTER</span>
+            <div>
+              <span className="mr-2 tracking-wider text-sm">FILTER</span>
+              <span className="inline-flex">+</span>
+            </div>
           </button>
         </div>
 
@@ -219,7 +226,7 @@ const FilterSortBar = ({ onGridChange }) => {
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold">FILTER</h3>
-                <button 
+                <button
                   onClick={toggleFilter}
                   className="text-gray-600 hover:text-gray-900 focus:outline-none"
                 >
@@ -228,7 +235,9 @@ const FilterSortBar = ({ onGridChange }) => {
               </div>
 
               <div className="mb-8">
-                <h4 className="text-sm font-medium mb-4 uppercase tracking-wide">Size</h4>
+                <h4 className="text-sm font-medium mb-4 uppercase tracking-wide">
+                  Size
+                </h4>
                 <div className="flex flex-wrap gap-2">
                   {availableSizes.map((size) => (
                     <button
@@ -247,7 +256,9 @@ const FilterSortBar = ({ onGridChange }) => {
               </div>
 
               <div className="mb-8">
-                <h4 className="text-sm font-medium mb-4 uppercase tracking-wide">Price</h4>
+                <h4 className="text-sm font-medium mb-4 uppercase tracking-wide">
+                  Price
+                </h4>
                 <div className="px-2">
                   <div className="flex justify-between mb-2 text-sm">
                     <span>{formatPrice(priceRange[0])}</span>
@@ -259,7 +270,9 @@ const FilterSortBar = ({ onGridChange }) => {
                     max="5000"
                     step="100"
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      setPriceRange([priceRange[0], parseInt(e.target.value)])
+                    }
                     className="w-full"
                   />
                   <div className="mt-4 mb-2 text-sm font-medium">Range:</div>
@@ -269,7 +282,9 @@ const FilterSortBar = ({ onGridChange }) => {
                       min="0"
                       max={priceRange[1]}
                       value={priceRange[0]}
-                      onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+                      onChange={(e) =>
+                        setPriceRange([parseInt(e.target.value), priceRange[1]])
+                      }
                       className="w-full border border-gray-300 p-2 text-sm"
                     />
                     <span>to</span>
@@ -278,7 +293,9 @@ const FilterSortBar = ({ onGridChange }) => {
                       min={priceRange[0]}
                       max="5000"
                       value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                      onChange={(e) =>
+                        setPriceRange([priceRange[0], parseInt(e.target.value)])
+                      }
                       className="w-full border border-gray-300 p-2 text-sm"
                     />
                   </div>

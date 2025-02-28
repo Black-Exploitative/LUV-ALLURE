@@ -86,10 +86,10 @@ const ProductGrid = ({ gridType }) => {
     <motion.div
       ref={gridRef}
       className={`
-        max-w-[1440px] mx-auto px-4 sm:px-6 
+        max-w-[1440px] mx-2 sm:px-6 
         ${gridType === 2 
-          ? "grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" 
-          : "grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"}
+          ? "grid grid-cols-1 md:grid-cols-2 gap-[10px] md:gap-[10px] place-content-center" 
+          : "grid grid-cols-2 md:grid-cols-4 gap-[10px] md:gap-[10px] place-content-center"}
       `}
       variants={containerVariants}
       initial="hidden"
