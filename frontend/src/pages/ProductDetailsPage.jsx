@@ -4,7 +4,7 @@ import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import { useRecentlyViewed } from '../components/RecentlyViewedProducts';
 
@@ -12,11 +12,6 @@ const ProductDetailsPage = () => {
   const { addToRecentlyViewed } = useRecentlyViewed();
   
  
-  useEffect(() => {
-    if (product) {
-      addToRecentlyViewed(product);
-    }
-  }, [product, addToRecentlyViewed]);
 
   const location = useLocation();
   const product = location.state?.product || {
@@ -88,6 +83,13 @@ const ProductDetailsPage = () => {
     // The cart drawer or "already in cart" modal will be shown automatically by the context
     addToCart(productWithSize);
   };
+
+  
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed(product);
+    }
+  }, [product, addToRecentlyViewed]);
 
   return (
     <>
