@@ -6,7 +6,7 @@ import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
 import { useState, useEffect } from "react";
 import Footer from "../components/Footer";
-import { useRecentlyViewed } from '../components/RecentlyViewedProducts';
+import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
 
 const ProductDetailsPage = () => {
   

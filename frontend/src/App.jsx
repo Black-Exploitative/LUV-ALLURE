@@ -14,7 +14,7 @@ import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
 import ForgotPassword from "./auth/ForgotPassword";
 import UserAccount from "./auth/UserAccount";
-import { RecentlyViewedProvider } from "./components/RecentlyViewedProducts";
+import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 
 export default function App() {
   return (
