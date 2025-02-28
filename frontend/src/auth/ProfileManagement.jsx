@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 const ProfileManagement = ({ user, setUser }) => {
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-light">PERSONAL DETAILS</h2>
-      <p className="text-sm text-gray-600">Update your personal information.</p>
+      <h2 className="text-xl font-medium mb-4">PERSONAL DETAILS</h2>
+      <p className="text-xs text-gray-800 font-base font-[Raleway] mb-6">Update your personal information.</p>
 
       <form className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -93,7 +93,7 @@ const ProfileManagement = ({ user, setUser }) => {
       </form>
 
       <div className="pt-8 border-t border-gray-200">
-        <h3 className="text-lg font-light mb-4">CHANGE PASSWORD</h3>
+        <h3 className="text-xl font-medium mb-4">CHANGE PASSWORD</h3>
 
         <form className="space-y-4">
           <div>

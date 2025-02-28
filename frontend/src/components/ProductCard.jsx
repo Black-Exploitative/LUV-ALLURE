@@ -62,7 +62,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
 
   return (
     <motion.div
-      className={`${cardWidthClass} p-4 relative overflow-hidden group`}
+      className={`${cardWidthClass}  relative overflow-hidden group`}
       ref={cardRef}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -72,8 +72,8 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     >
       {/* Image Carousel Section */}
       <div 
-        className="relative overflow-hidden"
-        style={{ height: gridType === 2 ? "751px" : "500px" }}
+        className="relative overflow-hidden "
+        style={{ height: gridType === 2 ? "751px" : "500px", width: gridType === 2 ? "655px" : "325px"  }}
       >
         <AnimatePresence initial={false} custom={direction}>
           <motion.img

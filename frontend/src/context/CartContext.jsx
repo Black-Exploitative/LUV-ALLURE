@@ -4,6 +4,16 @@ import PropTypes from 'prop-types';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const updateCartItemQuantity = (productId, quantity) => {
+    setCartItems(prevItems => 
+      prevItems.map(item => 
+        generateProductId(item) === productId 
+          ? { ...item, quantity } 
+          : item
+      )
+    );
+  };
+
   const [cartItems, setCartItems] = useState([]);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [isAlreadyInCartModalOpen, setIsAlreadyInCartModalOpen] = useState(false);
@@ -110,6 +120,7 @@ export const CartProvider = ({ children }) => {
       setIsCartDrawerOpen,
       isAlreadyInCartModalOpen,
       setIsAlreadyInCartModalOpen,
+      updateCartItemQuantity,
       selectedProduct
     }}>
       {children}

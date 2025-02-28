@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useCart } from "../context/CartContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import MiniCartPreview from "../components/MiniCartPreview";
+import AnimatedCartBadge from "../components/AnimatedCartBadge";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [darkNavbar, setDarkNavbar] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { cartItemCount } = useCart();
+  const { cartItemCount, setIsCartDrawerOpen } = useCart();
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -41,7 +43,8 @@ export default function Navbar() {
     if (cartItemCount === 0) {
       toast.error("No item in cart yet!");
     } else {
-      navigate('/checkout');
+      
+      setIsCartDrawerOpen(true);
     }
   };
 
@@ -75,6 +78,30 @@ export default function Navbar() {
         duration: 0.5
       }
     })
+  };
+
+
+  const ThemedMiniCartPreview = () => {
+    return (
+      <div className="relative">
+        <div 
+          className="cart-icon-container relative cursor-pointer"
+          onClick={handleCartClick}
+        >
+          <img
+            src={darkNavbar ? "/icons/cart.svg" : "/icons/cart-black.svg"}
+            alt="Cart"
+            className="w-5 h-5"
+          />
+          <div className="relative">
+            {cartItemCount > 0 && <AnimatedCartBadge theme={darkNavbar ? "light" : "dark"} />}
+          </div>
+        </div>
+        
+        {/* Only render preview if there are items */}
+        {cartItemCount > 0 && <MiniCartPreview />}
+      </div>
+    );
   };
 
   return (
@@ -144,28 +171,12 @@ export default function Navbar() {
             whileTap={{ scale: 0.9 }}
           />
 
-          {/* Cart Icon */}
+          {/* Enhanced Cart Icon with Preview */}
           <motion.div 
-            className="relative"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <img
-              src={darkNavbar ? "/icons/cart.svg" : "/icons/cart-black.svg"}
-              alt="Cart"
-              className="w-5 h-5 cursor-pointer"
-              onClick={handleCartClick}
-            />
-            {cartItemCount > 0 && (
-              <motion.span 
-                className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 500, damping: 25 }}
-              >
-                {cartItemCount}
-              </motion.span>
-            )}
+            <ThemedMiniCartPreview />
           </motion.div>
         </div>
         
@@ -186,28 +197,12 @@ export default function Navbar() {
             whileTap={{ scale: 0.9 }}
           />
 
-          {/* Cart Icon */}
+          {/* Mobile Cart with Preview */}
           <motion.div 
-            className="relative"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <img
-              src={darkNavbar ? "/icons/cart.svg" : "/icons/cart-black.svg"}
-              alt="Cart"
-              className="w-5 h-5 cursor-pointer"
-              onClick={handleCartClick}
-            />
-            {cartItemCount > 0 && (
-              <motion.span 
-                className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 500, damping: 25 }}
-              >
-                {cartItemCount}
-              </motion.span>
-            )}
+            <ThemedMiniCartPreview />
           </motion.div>
         </div>
       </div>

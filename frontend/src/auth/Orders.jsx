@@ -5,8 +5,8 @@ import PropTypes from "prop-types";
 const Orders = ({ orders }) => {
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-light">ORDER HISTORY</h2>
-      <p className="text-sm text-gray-600">View and track all your orders.</p>
+      <h2 className="text-xl font-medium mb-4">ORDER HISTORY</h2>
+      <p className="text-xs text-gray-800 font-base font-[Raleway] mb-6">View and track all your orders.</p>
 
       {orders.length > 0 ? (
         <div className="border border-gray-200">
@@ -30,7 +30,7 @@ const Orders = ({ orders }) => {
               </div>
               <div className="text-sm">
                 <p className="font-medium">Items:</p>
-                <ul className="ml-4 list-disc">
+                <ul className="ml-4 list-disc font-normal font-[Raleway]">
                   {order.items.map((item, i) => (
                     <li key={i}>
                       {item.name} x{item.quantity} - {item.price}
