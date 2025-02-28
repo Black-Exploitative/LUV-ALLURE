@@ -175,6 +175,10 @@ const RecentlyViewedProductCard = ({ product, addToCart }) => {
   );
 };
 
+RecentlyViewedProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
+
 RecentlyViewedProductCard.propTypes = {
   product: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -182,7 +186,6 @@ RecentlyViewedProductCard.propTypes = {
     price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     image: PropTypes.string,
     images: PropTypes.arrayOf(PropTypes.string),
-    children: PropTypes.node,
   }).isRequired,
   addToCart: PropTypes.func.isRequired,
  
