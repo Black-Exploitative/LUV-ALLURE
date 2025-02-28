@@ -239,7 +239,7 @@ export default function UserAccount() {
 
               {activeSection === "wishlist" && (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-light">MY WISHLIST</h2>
+                  <h2 className="text-xl font-medium mb-4">MY WISHLIST</h2>
                   <p className="text-sm text-gray-600">
                     Items you&apos;ve saved for later.
                   </p>
@@ -261,7 +261,7 @@ export default function UserAccount() {
               {activeSection === "addresses" && (
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-light">MY ADDRESSES</h2>
+                    <h2 className="text-xl font-medium mb-4">MY ADDRESSES</h2>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.98 }}
@@ -285,11 +285,11 @@ export default function UserAccount() {
                         </span>
                       </div>
 
-                      <p className="text-sm">Emma Thompson</p>
-                      <p className="text-sm">135 W 50th Street</p>
-                      <p className="text-sm">New York, NY 10020</p>
-                      <p className="text-sm">United States</p>
-                      <p className="text-sm">Phone: +1 212 555 0123</p>
+                      <p className="text-sm font-normal  font-[Raleway]">Emma Thompson</p>
+                      <p className="text-sm font-normal  font-[Raleway]">135 W 50th Street</p>
+                      <p className="text-sm font-normal  font-[Raleway]">New York, NY 10020</p>
+                      <p className="text-sm font-normal  font-[Raleway]">United States</p>
+                      <p className="text-sm font-normal  font-[Raleway]">Phone: +1 212 555 0123</p>
                     </div>
 
                     <div className="p-6 border border-gray-200 relative">
@@ -299,11 +299,11 @@ export default function UserAccount() {
                       </div>
 
                       <h3 className="font-medium mb-2">OFFICE</h3>
-                      <p className="text-sm">Emma Thompson</p>
-                      <p className="text-sm">350 Fifth Avenue</p>
-                      <p className="text-sm">New York, NY 10118</p>
-                      <p className="text-sm">United States</p>
-                      <p className="text-sm">Phone: +1 212 555 4567</p>
+                      <p className="text-sm font-normal  font-[Raleway]">Emma Thompson</p>
+                      <p className="text-sm font-normal  font-[Raleway]">350 Fifth Avenue</p>
+                      <p className="text-sm font-normal  font-[Raleway]">New York, NY 10118</p>
+                      <p className="text-sm font-normal  font-[Raleway]">United States</p>
+                      <p className="text-sm font-normal  font-[Raleway]">Phone: +1 212 555 4567</p>
                     </div>
                   </div>
                 </div>
@@ -312,7 +312,7 @@ export default function UserAccount() {
               {activeSection === "payments" && (
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-light">PAYMENT METHODS</h2>
+                    <h2 className="text-xl font-medium mb-4">PAYMENT METHODS</h2>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.98 }}
@@ -336,9 +336,9 @@ export default function UserAccount() {
                         </span>
                       </div>
 
-                      <p className="text-sm">Emma Thompson</p>
-                      <p className="text-sm">Expiry: 05/27</p>
-                      <p className="text-sm">
+                      <p className="text-sm font-normal  font-[Raleway]">Emma Thompson</p>
+                      <p className="text-sm font-normal  font-[Raleway]">Expiry: 05/27</p>
+                      <p className="text-sm font-normal  font-[Raleway]">
                         Billing Address: 135 W 50th Street, New York
                       </p>
                     </div>
