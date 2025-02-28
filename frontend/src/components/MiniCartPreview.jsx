@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import AnimatedCartBadge from '../components/AnimatedCartBadge';
 
 const MiniCartPreview = () => {
   const [isHovering, setIsHovering] = useState(false);
@@ -53,7 +54,7 @@ const MiniCartPreview = () => {
         <div className="cart-icon-container">
           <img src="/icons/cart.svg" alt="Cart" className="w-6 h-6" />
           <span className="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-            0
+          <AnimatedCartBadge />
           </span>
         </div>
       </div>

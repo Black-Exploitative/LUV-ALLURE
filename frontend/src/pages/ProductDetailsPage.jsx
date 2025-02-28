@@ -6,8 +6,18 @@ import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
 import Footer from "../components/Footer";
+import { useRecentlyViewed } from '../components/RecentlyViewedProducts';
 
 const ProductDetailsPage = () => {
+  const { addToRecentlyViewed } = useRecentlyViewed();
+  
+ 
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed(product);
+    }
+  }, [product, addToRecentlyViewed]);
+
   const location = useLocation();
   const product = location.state?.product || {
     name: "SWIVEL ALLURE MAXI DRESS",

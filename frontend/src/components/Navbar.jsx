@@ -3,6 +3,8 @@ import { toast } from "react-hot-toast";
 import { useCart } from "../context/CartContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import MiniCartPreview from '../components/MiniCartPreview';
+
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
