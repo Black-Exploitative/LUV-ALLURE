@@ -28,6 +28,7 @@ const PaymentPage = () => {
     postalCode: '',
     
     // Packaging
+    packagingOption: 'standard', // New field for packaging options
     giftWrapping: false,
     giftMessage: '',
     
@@ -116,12 +117,12 @@ const PaymentPage = () => {
     return completedSections.includes(section - 1) || activeSection === section;
   };
 
-  // Get section status icon
+  // Get section status icon - Changed from green to black and made bigger
   const getSectionIcon = (section) => {
     if (completedSections.includes(section)) {
-      return <FaCheck className="w-5 h-5 text-green-500" />;
+      return <FaCheck className="w-6 h-6 text-black" />; // Changed from green to black and increased size
     }
-    return <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-800">{section}</span>;
+    return <span className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-800">{section}</span>; // Increased size to match
   };
 
   return (
@@ -364,7 +365,7 @@ const PaymentPage = () => {
               )}
             </div>
             
-            {/* Section 3: Packaging and Gifting */}
+            {/* Section 3: Packaging and Gifting - UPDATED with two packaging options and images */}
             <div className="bg-white shadow rounded-md overflow-hidden">
               <button 
                 className={`w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(3) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 3 ? 'bg-black text-white' : 'bg-white text-black'}`}
@@ -388,35 +389,102 @@ const PaymentPage = () => {
                     className="overflow-hidden"
                   >
                     <div className="p-6 border-t">
-                      <div className="mb-6 space-y-6">
-                        <div className="flex items-start space-x-3">
-                          <input
-                            type="checkbox"
-                            id="giftWrapping"
-                            name="giftWrapping"
-                            checked={formData.giftWrapping}
-                            onChange={handleInputChange}
-                            className="mt-1"
-                          />
-                          <div>
-                            <label htmlFor="giftWrapping" className="font-medium block mb-1">Gift Wrapping</label>
-                            <p className="text-sm text-gray-600">Add premium gift wrapping to your order for an additional ₦2,000.</p>
+                      <div className="mb-6">
+                        <h3 className="font-medium text-lg mb-4">Select Packaging Option</h3>
+                        
+                        {/* Standard Packaging Option */}
+                        <div className="flex flex-col md:flex-row border border-gray-200 rounded-md mb-4 hover:border-black transition-colors">
+                          <div className="md:w-1/2 p-4">
+                            <div className="flex items-start">
+                              <input
+                                type="radio"
+                                id="standardPackaging"
+                                name="packagingOption"
+                                value="standard"
+                                checked={formData.packagingOption === 'standard'}
+                                onChange={handleInputChange}
+                                className="mt-1 mr-3"
+                              />
+                              <div>
+                                <label htmlFor="standardPackaging" className="font-medium block mb-1">Standard Packaging</label>
+                                <p className="text-sm text-gray-600">Elegant standard packaging with branded tissue paper.</p>
+                                <p className="text-sm font-semibold mt-2">Free</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="md:w-1/2 p-4 flex space-x-2">
+                            {/* Standard Packaging Images */}
+                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
+                              <img src="../public/images/stylewith2.jpg" alt="Standard packaging front" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
+                              <img src="./public/images/stylewith2.jpg" alt="Standard packaging contents" className="w-full h-full object-cover" />
+                            </div>
                           </div>
                         </div>
                         
-                        {formData.giftWrapping && (
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Gift Message</label>
-                            <textarea
-                              name="giftMessage"
-                              value={formData.giftMessage}
-                              onChange={handleInputChange}
-                              rows="3"
-                              className="w-full p-2 border border-gray-300 rounded-md"
-                              placeholder="Write your gift message here..."
-                            ></textarea>
+                        {/* Premium Packaging Option */}
+                        <div className="flex flex-col md:flex-row border border-gray-200 rounded-md mb-4 hover:border-black transition-colors">
+                          <div className="md:w-1/2 p-4">
+                            <div className="flex items-start">
+                              <input
+                                type="radio"
+                                id="premiumPackaging"
+                                name="packagingOption"
+                                value="premium"
+                                checked={formData.packagingOption === 'premium'}
+                                onChange={handleInputChange}
+                                className="mt-1 mr-3"
+                              />
+                              <div>
+                                <label htmlFor="premiumPackaging" className="font-medium block mb-1">Premium Packaging</label>
+                                <p className="text-sm text-gray-600">Luxury box with satin ribbon and premium presentation.</p>
+                                <p className="text-sm font-semibold mt-2">₦5,000.00</p>
+                              </div>
+                            </div>
                           </div>
-                        )}
+                          <div className="md:w-1/2 p-4 flex space-x-2">
+                            {/* Premium Packaging Images */}
+                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
+                              <img src="./public/images/stylewith2.jpg" alt="Premium packaging box" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
+                              <img src="./public/images/stylewith2.jpg" alt="Premium packaging open" className="w-full h-full object-cover" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Gift Wrapping Option */}
+                        <div className="mt-8">
+                          <div className="flex items-start space-x-3">
+                            <input
+                              type="checkbox"
+                              id="giftWrapping"
+                              name="giftWrapping"
+                              checked={formData.giftWrapping}
+                              onChange={handleInputChange}
+                              className="mt-1"
+                            />
+                            <div>
+                              <label htmlFor="giftWrapping" className="font-medium block mb-1">Add Gift Wrapping</label>
+                              <p className="text-sm text-gray-600">Add premium gift wrapping to your order for an additional ₦2,000.</p>
+                            </div>
+                          </div>
+                          
+                          {formData.giftWrapping && (
+                            <div className="mt-4 ml-6">
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Gift Message</label>
+                              <textarea
+                                name="giftMessage"
+                                value={formData.giftMessage}
+                                onChange={handleInputChange}
+                                rows="3"
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                placeholder="Write your gift message here..."
+                              ></textarea>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       <button
@@ -433,7 +501,10 @@ const PaymentPage = () => {
               {/* Show summary when section is collapsed but completed */}
               {activeSection !== 3 && completedSections.includes(3) && (
                 <div className="px-6 py-3 border-t text-sm text-gray-600">
-                  <p>{formData.giftWrapping ? "Gift wrapping added" : "Standard packaging"}</p>
+                  <p>
+                    {formData.packagingOption === 'premium' ? 'Premium packaging' : 'Standard packaging'}
+                    {formData.giftWrapping ? ', Gift wrapped' : ''}
+                  </p>
                 </div>
               )}
             </div>
@@ -588,6 +659,13 @@ const PaymentPage = () => {
                 <span>{formData.shippingMethod === 'homeDelivery' ? '₦2,000.00' : 'Free'}</span>
               </div>
               
+              {formData.packagingOption === 'premium' && (
+                <div className="flex justify-between text-sm">
+                  <span>Premium Packaging:</span>
+                  <span>₦5,000.00</span>
+                </div>
+              )}
+              
               {formData.giftWrapping && (
                 <div className="flex justify-between text-sm">
                   <span>Gift Wrapping:</span>
@@ -606,6 +684,7 @@ const PaymentPage = () => {
                   <span>₦{(
                     subtotal + 
                     (formData.shippingMethod === 'homeDelivery' ? 2000 : 0) + 
+                    (formData.packagingOption === 'premium' ? 5000 : 0) + 
                     (formData.giftWrapping ? 2000 : 0) + 
                     (subtotal * 0.05)
                   ).toFixed(2)}</span>
