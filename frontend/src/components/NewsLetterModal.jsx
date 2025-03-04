@@ -82,7 +82,7 @@ const NewsletterModal = () => {
             <div className="flex flex-col items-center text-center">
               {!submitted ? (
                 <>
-                  <div className="font-serif tracking-wider text-xl mb-1">LUVS ALLURE</div>
+                  <div className="font-serif tracking-wider text-xl mb-1">LUV'S ALLURE</div>
                   {/* Border line */}
                   <div className="w-16 h-px bg-black my-3"></div>
                   {/* Modal header */}
