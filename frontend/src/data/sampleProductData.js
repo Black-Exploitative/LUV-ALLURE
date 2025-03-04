@@ -10,46 +10,47 @@ const sampleProductData = {
     
     // Default images to show before a color is selected
     defaultImages: [
-      "/images/swivel-black-1.jpg",
-      "/images/swivel-black-2.jpg",
-      "/images/swivel-black-3.jpg",
+      "../public/images/photo11.jpg",
+      "../public/images/photo12.jpg",
+      "../public/images/photo13.jpg",
+      "../public/images/photo7.jpg"
     ],
     
     // Color variant specific images
     colorVariants: {
       "Black": {
         images: [
-          "/images/swivel-black-1.jpg",
-          "/images/swivel-black-2.jpg",
-          "/images/swivel-black-3.jpg",
-          "/images/swivel-black-4.jpg"
+          "../public/images/photo13.jpg",
+          "../public/images/photo13.jpg",
+          "../public/images/photo13.jpg",
+          "../public/images/photo13.jpg"
         ],
         sku: "SWV-BLK",
         stock: 15
       },
       "White": {
         images: [
-          "/images/swivel-white-1.jpg",
-          "/images/swivel-white-2.jpg",
-          "/images/swivel-white-3.jpg"
+          "../public/images/photo3.jpg",
+          "../public/images/photo3.jpg",
+          "../public/images/photo3.jpg"
         ],
         sku: "SWV-WHT",
         stock: 8
       },
       "Beige": {
         images: [
-          "/images/swivel-beige-1.jpg",
-          "/images/swivel-beige-2.jpg",
-          "/images/swivel-beige-3.jpg"
+          "../public/images/photo7.jpg",
+          "../public/images/photo7.jpg",
+          "../public/images/photo7.jpg"
         ],
         sku: "SWV-BGE",
         stock: 12
       },
       "Pink": {
         images: [
-          "/images/swivel-pink-1.jpg",
-          "/images/swivel-pink-2.jpg",
-          "/images/swivel-pink-3.jpg"
+          "../public/images/photo4.jpg",
+          "../public/images/photo4.jpg",
+          "../public/images/photo4.jpg"
         ],
         sku: "SWV-PNK",
         stock: 5

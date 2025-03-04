@@ -1,18 +1,16 @@
-import ProductCarousel from "../components/ProductCarousel";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { FaCheck } from "react-icons/fa";
+import ProductCarousel from "../components/ProductCarousel";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
-import { useState, useEffect } from "react";
-import Footer from "../components/Footer";
 import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
-import { FaCheck } from "react-icons/fa";
+import Footer from "../components/Footer";
+import sampleProductData from "../data/sampleProductData"; 
 
-// Define available colors - moved outside component to ensure it's available
-const availableColors = ["Black", "White", "Red", "Blue", "Green", "Beige", "Pink", "Yellow"];
-
-// Color to hex mapping - moved outside component
+// Color to hex mapping
 const colorHexMap = {
   "Black": "#000000",
   "White": "#FFFFFF",
@@ -25,73 +23,93 @@ const colorHexMap = {
 };
 
 const ProductDetailsPage = () => {
-  
-  //TODO: #9 Do a use memo and solve the state reloading concurrently issue here 
-  const location = useLocation();
-  
-  // Ensure product includes colors array
-  const productFromLocation = location.state?.product || {};
-  const product = {
-    name: productFromLocation.name || "SWIVEL ALLURE MAXI DRESS",
-    price: productFromLocation.price || "300,000.00",
-    sizes: productFromLocation.sizes || ["S", "M", "L", "XL"],
-    colors: productFromLocation.colors || availableColors, // Fallback to all available colors
-    images: productFromLocation.images || [
-      "../public/images/photo6.jpg",
-      "../public/images/photo6.jpg",
-      "../public/images/photo11.jpg",
-      "../public/images/photo11.jpg",
-    ],
-  };
-
+  // State for selected options and current images
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+  const [currentImages, setCurrentImages] = useState([]);
+  
+  // Get product data from location or use default
+  const location = useLocation();
+  const productFromLocation = location.state?.product;
+  
+  // If no product in location, use sample data
+  const product = productFromLocation || sampleProductData;
+  
   const { addToCart } = useCart();
+  const { addToRecentlyViewed } = useRecentlyViewed();
 
+  // Related products data for "STYLE IT WITH" section
   const relatedProducts = [
     {
       name: "Sybil Scarf - Black",
       color: "BLACK",
       price: "78,000",
-      image: "../public/images/stylewith.jpg",
+      image: "/images/stylewith.jpg",
     },
     {
       name: "Sybil Scarf - Pink",
       color: "PINK",
       price: "56,000",
-      image: "../public/images/stylewith2.jpg",
+      image: "/images/stylewith2.jpg",
     },
   ];
 
+  // Sample data for "CUSTOMERS ALSO PURCHASED" section
   const purchasedProducts = [
     {
       name: "Purchased 1",
       price: 1000,
       color: "BEIGE",
-      images: "../public/images/photo6.jpg",
+      images: "/images/photo6.jpg",
     },
     {
       name: "Purchased 2",
       price: 1200,
       color: "MAROON",
-      images: "../public/images/photo11.jpg",
+      images: "/images/photo11.jpg",
     },
     {
       name: "Purchased 3",
       price: 800,
       color: "CORAL",
-      images: "../public/images/photo6.jpg",
+      images: "/images/photo6.jpg",
     },
     {
       name: "Purchased 4",
       price: 900,
       color: "BURGUNDY",
-      images: "../public/images/photo11.jpg",
+      images: "/images/photo11.jpg",
     },
   ];
 
+  // Initialize with default images
+  useEffect(() => {
+    setCurrentImages(product.defaultImages);
+    // Add to recently viewed products
+    addToRecentlyViewed(product);
+  }, [product, addToRecentlyViewed]);
+
+  // Handle color selection and update images
+  const handleColorSelect = (color) => {
+    // Toggle color selection
+    if (color === selectedColor) {
+      setSelectedColor("");
+      setCurrentImages(product.defaultImages);
+    } else {
+      setSelectedColor(color);
+      
+      // Update images based on selected color
+      if (product.colorVariants && product.colorVariants[color]) {
+        setCurrentImages(product.colorVariants[color].images);
+      } else {
+        // Fallback to default images if color variant not found
+        setCurrentImages(product.defaultImages);
+      }
+    }
+  };
+
+  // Add to cart with selected options
   const handleAddToCart = () => {
-    // Generate a unique ID for this product + size + color combination
     const productWithOptions = {
       ...product,
       id: `${product.name}-${selectedColor || "default"}-${selectedSize || "default"}`,
@@ -99,28 +117,16 @@ const ProductDetailsPage = () => {
       selectedColor,
     };
 
-    // Try to add to cart - returns false if already in cart
-    // The cart drawer or "already in cart" modal will be shown automatically by the context
     addToCart(productWithOptions);
   };
-
-  const { addToRecentlyViewed } = useRecentlyViewed();
-  useEffect(() => {
-    if (product) {
-      addToRecentlyViewed(product);
-    }
-  }, [product, addToRecentlyViewed]);
-
-  // Debug log to check colors
-  console.log("Product colors:", product.colors);
 
   return (
     <>
       <div className="max-w-screen-xl mx-auto">
         <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
-          {/* Left Side: Product Carousel - Now takes a bit more space on larger screens */}
+          {/* Left Side: Product Carousel - Now displays color-specific images */}
           <div className="w-full md:w-3/5 mb-8 md:mb-0">
-            <ProductCarousel images={product.images} />
+            <ProductCarousel images={currentImages} />
           </div>
 
           {/* Right Side: Product Details */}
@@ -135,21 +141,18 @@ const ProductDetailsPage = () => {
 
             <hr className="border-t border-gray-300 my-4" />
 
-            {/* Color Selection - Always show colors section */}
+            {/* Color Selection - Updated to call handleColorSelect */}
             <div>
               <p className="text-lg font-medium mb-2">COLOR:</p>
               <div className="flex flex-wrap gap-3 mb-4">
-                {/* Always render color options */}
                 {product.colors.map((color, index) => (
                   <button
                     key={index}
                     className={`relative h-10 w-10 rounded-full cursor-pointer flex items-center justify-center border ${
                       color === "White" ? "border-gray-300" : "border-transparent"
                     } ${selectedColor === color ? "ring-2 ring-black ring-offset-2" : ""}`}
-                    style={{ 
-                      backgroundColor: colorHexMap[color] || "#999999" // Fallback color if mapping not found
-                    }}
-                    onClick={() => setSelectedColor(color === selectedColor ? "" : color)}
+                    style={{ backgroundColor: colorHexMap[color] || color }}
+                    onClick={() => handleColorSelect(color)}
                     aria-label={`Select ${color} color`}
                   >
                     {selectedColor === color && color === "White" && (
@@ -210,11 +213,11 @@ const ProductDetailsPage = () => {
             {/* Expandable Sections */}
             <ExpandableSection
               title="PRODUCT DETAILS"
-              content="This is a beautiful Sybil Scarf made from high-quality materials. It's lightweight, breathable, and perfect for any season."
+              content="This is a beautiful dress made from high-quality materials. It's lightweight, breathable, and perfect for any occasion."
             />
             <ExpandableSection
               title="SIZE & FIT"
-              content="Our scarves are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
+              content="Our dresses are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
             />
             <ExpandableSection
               title="SHIPPING"
