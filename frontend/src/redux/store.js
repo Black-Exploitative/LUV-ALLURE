@@ -1,51 +1,39 @@
-// src/redux/store.js
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { 
-  persistStore, 
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER 
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; // Defaults to localStorage
+import authReducer from './authSlice';
+import productReducer from './productSlice';
+import cartReducer from './cartSlice';
+import wishlistReducer from './wishlistSlice';
+import orderHistoryReducer from './orderHistorySlice';
 
-import authReducer from './slices/authSlice';
-import productReducer from './slices/productSlice';
-import cartReducer from './slices/cartSlice';
-
+// Persist configuration
 const persistConfig = {
   key: 'root',
-  version: 1,
   storage,
-  whitelist: ['auth', 'cart']
+  whitelist: ['cart', 'wishlist', 'orderHistory'], // Persist only these slices
 };
 
-const persistedReducer = persistReducer(persistConfig, 
-  combineReducers({
+// Create persisted reducers
+const persistedCartReducer = persistReducer(persistConfig, cartReducer);
+const persistedWishlistReducer = persistReducer(persistConfig, wishlistReducer);
+const persistedOrderHistoryReducer = persistReducer(persistConfig, orderHistoryReducer);
+
+// Store setup
+const store = configureStore({
+  reducer: {
     auth: authReducer,
     products: productReducer,
-    cart: cartReducer
-  })
-);
-
-export const store = configureStore({
-  reducer: persistedReducer,
+    cart: persistedCartReducer,
+    wishlist: persistedWishlistReducer,
+    orderHistory: persistedOrderHistoryReducer,
+  },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [
-          FLUSH,
-          REHYDRATE,
-          PAUSE,
-          PERSIST,
-          PURGE,
-          REGISTER
-        ]
-      }
-    })
+      serializableCheck: false, // Required for Redux Persist
+    }),
 });
 
+// Persistor for store
 export const persistor = persistStore(store);
+export default store;
