@@ -7,6 +7,7 @@ import { useCart } from "../context/CartContext";
 import { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
+import { FaCheck } from "react-icons/fa";
 
 const ProductDetailsPage = () => {
   
@@ -16,6 +17,7 @@ const ProductDetailsPage = () => {
     name: "SWIVEL ALLURE MAXI DRESS",
     price: "300,000.00",
     sizes: ["S", "M", "L", "XL"],
+    colors: ["Black", "White", "Beige", "Pink"],
     images: [
       "../public/images/photo6.jpg",
       "../public/images/photo6.jpg",
@@ -25,7 +27,20 @@ const ProductDetailsPage = () => {
   };
 
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const { addToCart } = useCart();
+
+  // Color to hex mapping
+  const colorHexMap = {
+    "Black": "#000000",
+    "White": "#FFFFFF",
+    "Red": "#E53935",
+    "Blue": "#1E88E5",
+    "Green": "#43A047",
+    "Beige": "#D7CCC8",
+    "Pink": "#EC407A",
+    "Yellow": "#FDD835"
+  };
 
   const relatedProducts = [
     {
@@ -70,16 +85,17 @@ const ProductDetailsPage = () => {
   ];
 
   const handleAddToCart = () => {
-    // Generate a unique ID for this product + size combination
-    const productWithSize = {
+    // Generate a unique ID for this product + size + color combination
+    const productWithOptions = {
       ...product,
-      id: `${product.name}-${selectedSize || "default"}`,
+      id: `${product.name}-${selectedColor || "default"}-${selectedSize || "default"}`,
       selectedSize,
+      selectedColor,
     };
 
     // Try to add to cart - returns false if already in cart
     // The cart drawer or "already in cart" modal will be shown automatically by the context
-    addToCart(productWithSize);
+    addToCart(productWithOptions);
   };
 
   const { addToRecentlyViewed } = useRecentlyViewed();
@@ -93,7 +109,7 @@ const ProductDetailsPage = () => {
     <>
       <div className="max-w-screen-xl mx-auto">
         <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
-          {/* Left Side: Product Carousel - Now takes a bit more space on larger screens */}
+          {/* Left Side: Product Carousel */}
           <div className="w-full md:w-3/5 mb-8 md:mb-0">
             <ProductCarousel images={product.images} />
           </div>
@@ -110,6 +126,36 @@ const ProductDetailsPage = () => {
 
             <hr className="border-t border-gray-300 my-4" />
 
+            {/* Color Selection */}
+            {product.colors && product.colors.length > 0 && (
+              <div>
+                <p className="text-lg font-medium mb-2">COLOR:</p>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {product.colors.map((color, index) => (
+                    <button
+                      key={index}
+                      className={`relative h-10 w-10 rounded-full cursor-pointer flex items-center justify-center border ${
+                        color === "White" ? "border-gray-300" : "border-transparent"
+                      } ${selectedColor === color ? "ring-2 ring-black ring-offset-2" : ""}`}
+                      style={{ backgroundColor: colorHexMap[color] || color }}
+                      onClick={() => setSelectedColor(color === selectedColor ? "" : color)}
+                      aria-label={`Select ${color} color`}
+                    >
+                      {selectedColor === color && color === "White" && (
+                        <FaCheck className="text-black" />
+                      )}
+                      {selectedColor === color && color !== "White" && (
+                        <FaCheck className="text-white" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {selectedColor && (
+                  <p className="text-sm text-gray-600 mb-4">Selected: {selectedColor}</p>
+                )}
+              </div>
+            )}
+
             {/* Size Selection */}
             <div>
               <p className="text-lg font-medium mb-2">SIZE:</p>
@@ -122,7 +168,7 @@ const ProductDetailsPage = () => {
                         ? "border-black bg-black text-white"
                         : "border-gray-300 hover:bg-gray-100"
                     } px-4 py-2 rounded active:bg-gray-200 transition-colors`}
-                    onClick={() => setSelectedSize(size)}
+                    onClick={() => setSelectedSize(size === selectedSize ? "" : size)}
                   >
                     {size}
                   </button>
@@ -130,12 +176,23 @@ const ProductDetailsPage = () => {
               </div>
             </div>
 
-            {/* Add to Cart Button */}
+            {/* Add to Cart Button - Disabled if no color or size selected */}
             <button
-              className="w-full bg-black text-white py-3 hover:bg-gray-800 transition-colors"
+              className={`w-full py-3 transition-colors ${
+                !selectedColor || !selectedSize
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  : "bg-black text-white hover:bg-gray-800"
+              }`}
               onClick={handleAddToCart}
+              disabled={!selectedColor || !selectedSize}
             >
-              ADD TO SHOPPING BAG
+              {!selectedColor && !selectedSize
+                ? "SELECT COLOR AND SIZE"
+                : !selectedColor
+                ? "SELECT COLOR"
+                : !selectedSize
+                ? "SELECT SIZE"
+                : "ADD TO SHOPPING BAG"}
             </button>
 
             <hr className="border-t border-gray-300 my-4" />
