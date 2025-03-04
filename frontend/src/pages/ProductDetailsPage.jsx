@@ -9,16 +9,34 @@ import Footer from "../components/Footer";
 import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
 import { FaCheck } from "react-icons/fa";
 
+// Define available colors - moved outside component to ensure it's available
+const availableColors = ["Black", "White", "Red", "Blue", "Green", "Beige", "Pink", "Yellow"];
+
+// Color to hex mapping - moved outside component
+const colorHexMap = {
+  "Black": "#000000",
+  "White": "#FFFFFF",
+  "Red": "#E53935",
+  "Blue": "#1E88E5",
+  "Green": "#43A047",
+  "Beige": "#D7CCC8",
+  "Pink": "#EC407A",
+  "Yellow": "#FDD835"
+};
+
 const ProductDetailsPage = () => {
   
-//TODO: #9 Do a use memo and solve the state reloading concurrently issue here 
+  //TODO: #9 Do a use memo and solve the state reloading concurrently issue here 
   const location = useLocation();
-  const product = location.state?.product || {
-    name: "SWIVEL ALLURE MAXI DRESS",
-    price: "300,000.00",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Black", "White", "Beige", "Pink"],
-    images: [
+  
+  // Ensure product includes colors array
+  const productFromLocation = location.state?.product || {};
+  const product = {
+    name: productFromLocation.name || "SWIVEL ALLURE MAXI DRESS",
+    price: productFromLocation.price || "300,000.00",
+    sizes: productFromLocation.sizes || ["S", "M", "L", "XL"],
+    colors: productFromLocation.colors || availableColors, // Fallback to all available colors
+    images: productFromLocation.images || [
       "../public/images/photo6.jpg",
       "../public/images/photo6.jpg",
       "../public/images/photo11.jpg",
@@ -29,18 +47,6 @@ const ProductDetailsPage = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const { addToCart } = useCart();
-
-  // Color to hex mapping
-  const colorHexMap = {
-    "Black": "#000000",
-    "White": "#FFFFFF",
-    "Red": "#E53935",
-    "Blue": "#1E88E5",
-    "Green": "#43A047",
-    "Beige": "#D7CCC8",
-    "Pink": "#EC407A",
-    "Yellow": "#FDD835"
-  };
 
   const relatedProducts = [
     {
@@ -105,11 +111,14 @@ const ProductDetailsPage = () => {
     }
   }, [product, addToRecentlyViewed]);
 
+  // Debug log to check colors
+  console.log("Product colors:", product.colors);
+
   return (
     <>
       <div className="max-w-screen-xl mx-auto">
         <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
-          {/* Left Side: Product Carousel */}
+          {/* Left Side: Product Carousel - Now takes a bit more space on larger screens */}
           <div className="w-full md:w-3/5 mb-8 md:mb-0">
             <ProductCarousel images={product.images} />
           </div>
@@ -126,35 +135,36 @@ const ProductDetailsPage = () => {
 
             <hr className="border-t border-gray-300 my-4" />
 
-            {/* Color Selection */}
-            {product.colors && product.colors.length > 0 && (
-              <div>
-                <p className="text-lg font-medium mb-2">COLOR:</p>
-                <div className="flex flex-wrap gap-3 mb-4">
-                  {product.colors.map((color, index) => (
-                    <button
-                      key={index}
-                      className={`relative h-10 w-10 rounded-full cursor-pointer flex items-center justify-center border ${
-                        color === "White" ? "border-gray-300" : "border-transparent"
-                      } ${selectedColor === color ? "ring-2 ring-black ring-offset-2" : ""}`}
-                      style={{ backgroundColor: colorHexMap[color] || color }}
-                      onClick={() => setSelectedColor(color === selectedColor ? "" : color)}
-                      aria-label={`Select ${color} color`}
-                    >
-                      {selectedColor === color && color === "White" && (
-                        <FaCheck className="text-black" />
-                      )}
-                      {selectedColor === color && color !== "White" && (
-                        <FaCheck className="text-white" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-                {selectedColor && (
-                  <p className="text-sm text-gray-600 mb-4">Selected: {selectedColor}</p>
-                )}
+            {/* Color Selection - Always show colors section */}
+            <div>
+              <p className="text-lg font-medium mb-2">COLOR:</p>
+              <div className="flex flex-wrap gap-3 mb-4">
+                {/* Always render color options */}
+                {product.colors.map((color, index) => (
+                  <button
+                    key={index}
+                    className={`relative h-10 w-10 rounded-full cursor-pointer flex items-center justify-center border ${
+                      color === "White" ? "border-gray-300" : "border-transparent"
+                    } ${selectedColor === color ? "ring-2 ring-black ring-offset-2" : ""}`}
+                    style={{ 
+                      backgroundColor: colorHexMap[color] || "#999999" // Fallback color if mapping not found
+                    }}
+                    onClick={() => setSelectedColor(color === selectedColor ? "" : color)}
+                    aria-label={`Select ${color} color`}
+                  >
+                    {selectedColor === color && color === "White" && (
+                      <FaCheck className="text-black" />
+                    )}
+                    {selectedColor === color && color !== "White" && (
+                      <FaCheck className="text-white" />
+                    )}
+                  </button>
+                ))}
               </div>
-            )}
+              {selectedColor && (
+                <p className="text-sm text-gray-600 mb-4">Selected: {selectedColor}</p>
+              )}
+            </div>
 
             {/* Size Selection */}
             <div>
