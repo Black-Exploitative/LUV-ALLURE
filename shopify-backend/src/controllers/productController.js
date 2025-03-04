@@ -1,5 +1,6 @@
 // controllers/productController.js
 const shopifyConfig = require('../config/shopify');
+const shopifyService = require("../services/shopifyService");
 
 exports.createProduct = async (req, res) => {
   try {
@@ -38,5 +39,15 @@ exports.createProduct = async (req, res) => {
     res.status(201).json(newProduct);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.checkoutProduct = async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    const checkoutUrl = await shopifyService.createCheckout(productId, quantity);
+    res.json({ checkoutUrl });
+  } catch (error) {
+    res.status(500).json({ error: "Checkout failed" });
   }
 };

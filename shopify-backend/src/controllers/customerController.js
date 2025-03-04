@@ -1,6 +1,7 @@
 // controllers/customerController.js
 const User = require('../models/user');
 const shopifyConfig = require('../config/shopify');
+const shopifyService = require("../services/shopifyService");
 
 exports.registerCustomer = async (req, res) => {
   try {
@@ -55,5 +56,15 @@ exports.registerCustomer = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+
+exports.getCustomerSegments = async (req, res) => {
+  try {
+    const segments = await shopifyService.getCustomerSegments();
+    res.json(segments);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve customer segments" });
   }
 };
