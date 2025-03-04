@@ -10,7 +10,7 @@ import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
 
 const ProductDetailsPage = () => {
   
-
+//TODO: #9 Do a use memo and solve the state reloading concurrently issue here 
   const location = useLocation();
   const product = location.state?.product || {
     name: "SWIVEL ALLURE MAXI DRESS",
