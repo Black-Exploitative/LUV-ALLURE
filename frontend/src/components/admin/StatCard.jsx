@@ -1,5 +1,6 @@
+import PropTypes from "prop-types";
 
-const StatCard = ({ title, value, icon, change, changeType = 'increase' }) => {
+const StatCard = ({ title, value, icon, change, changeType = "increase" }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-start">
@@ -11,18 +12,26 @@ const StatCard = ({ title, value, icon, change, changeType = 'increase' }) => {
       </div>
       {change && (
         <div className="mt-4 flex items-center">
-          <span 
+          <span
             className={`mr-1 ${
-              changeType === 'increase' ? 'text-green-500' : 'text-red-500'
+              changeType === "increase" ? "text-green-500" : "text-red-500"
             }`}
           >
-            {changeType === 'increase' ? '↑' : '↓'} {change}
+            {changeType === "increase" ? "↑" : "↓"} {change}
           </span>
           <span className="text-gray-500 text-sm">vs. last month</span>
         </div>
       )}
     </div>
   );
+};
+
+StatCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  icon: PropTypes.node.isRequired,
+  change: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  changeType: PropTypes.oneOf(["increase", "decrease"]),
 };
 
 export default StatCard;

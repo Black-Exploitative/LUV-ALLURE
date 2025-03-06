@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const ProductsTable = ({ products, onEdit, onDelete }) => {

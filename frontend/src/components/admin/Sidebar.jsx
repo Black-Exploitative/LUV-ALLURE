@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import { FaShoppingBag, FaUsers, FaChartBar, FaCog, FaBox, FaCreditCard, FaTag, FaThLarge, FaSignOutAlt } from 'react-icons/fa';
 

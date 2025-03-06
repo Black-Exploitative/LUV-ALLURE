@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import  { useState } from 'react';
 import { FaBell, FaSearch, FaUser } from 'react-icons/fa';
 

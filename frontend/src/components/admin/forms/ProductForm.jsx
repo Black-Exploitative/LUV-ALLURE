@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { FaTimes, FaPlus } from 'react-icons/fa';
