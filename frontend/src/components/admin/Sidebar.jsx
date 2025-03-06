@@ -1,18 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Users, BarChart3, Settings, Package, CreditCard, Tag, Grid, LogOut } from 'lucide-react';
+import { FaShoppingBag, FaUsers, FaChartBar, FaCog, FaBox, FaCreditCard, FaTag, FaThLarge, FaSignOutAlt } from 'react-icons/fa';
 
 const Sidebar = () => {
   const location = useLocation();
   
   const navItems = [
-    { icon: <Grid className="w-5 h-5" />, label: 'Dashboard', path: '/admin/dashboard' },
-    { icon: <ShoppingBag className="w-5 h-5" />, label: 'Products', path: '/admin/products' },
-    { icon: <Tag className="w-5 h-5" />, label: 'Categories', path: '/admin/categories' },
-    { icon: <CreditCard className="w-5 h-5" />, label: 'Orders', path: '/admin/orders' },
-    { icon: <Users className="w-5 h-5" />, label: 'Customers', path: '/admin/customers' },
-    { icon: <Package className="w-5 h-5" />, label: 'Inventory', path: '/admin/inventory' },
-    { icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics', path: '/admin/analytics' },
-    { icon: <Settings className="w-5 h-5" />, label: 'Settings', path: '/admin/settings' },
+    { icon: <FaThLarge className="w-5 h-5" />, label: 'Dashboard', path: '/admin/dashboard' },
+    { icon: <FaShoppingBag className="w-5 h-5" />, label: 'Products', path: '/admin/products' },
+    { icon: <FaTag className="w-5 h-5" />, label: 'Categories', path: '/admin/categories' },
+    { icon: <FaCreditCard className="w-5 h-5" />, label: 'Orders', path: '/admin/orders' },
+    { icon: <FaUsers className="w-5 h-5" />, label: 'Customers', path: '/admin/customers' },
+    { icon: <FaBox className="w-5 h-5" />, label: 'Inventory', path: '/admin/inventory' },
+    { icon: <FaChartBar className="w-5 h-5" />, label: 'Analytics', path: '/admin/analytics' },
+    { icon: <FaCog className="w-5 h-5" />, label: 'Settings', path: '/admin/settings' },
   ];
 
   return (
@@ -39,7 +39,7 @@ const Sidebar = () => {
       </nav>
       <div className="absolute bottom-0 w-full p-6">
         <button className="flex items-center text-gray-400 hover:text-white transition-colors">
-          <LogOut className="w-5 h-5" />
+          <FaSignOutAlt className="w-5 h-5" />
           <span className="ml-3">Logout</span>
         </button>
       </div>
