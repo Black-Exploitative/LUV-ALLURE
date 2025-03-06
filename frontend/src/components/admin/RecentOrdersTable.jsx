@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const RecentOrdersTable = ({ orders }) => {
   const statusColors = {
-    completed: 'bg-green-100 text-green-800',
-    processing: 'bg-blue-100 text-blue-800',
-    cancelled: 'bg-red-100 text-red-800',
-    shipped: 'bg-purple-100 text-purple-800',
-    pending: 'bg-yellow-100 text-yellow-800',
+    completed: "bg-green-100 text-green-800",
+    processing: "bg-blue-100 text-blue-800",
+    cancelled: "bg-red-100 text-red-800",
+    shipped: "bg-purple-100 text-purple-800",
+    pending: "bg-yellow-100 text-yellow-800",
   };
 
   return (
@@ -55,7 +55,11 @@ const RecentOrdersTable = ({ orders }) => {
                     ${order.amount.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs ${statusColors[order.status]}`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        statusColors[order.status]
+                      }`}
+                    >
                       {order.status}
                     </span>
                   </td>
@@ -66,7 +70,10 @@ const RecentOrdersTable = ({ orders }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
+                <td
+                  colSpan="6"
+                  className="px-6 py-4 text-center text-sm text-gray-500"
+                >
                   No recent orders found
                 </td>
               </tr>
@@ -81,6 +88,24 @@ const RecentOrdersTable = ({ orders }) => {
       </div>
     </div>
   );
+};
+
+RecentOrdersTable.propTypes = {
+  orders: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      customer: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      amount: PropTypes.number.isRequired,
+      status: PropTypes.oneOf([
+        "completed",
+        "processing",
+        "cancelled",
+        "shipped",
+        "pending",
+      ]).isRequired,
+    })
+  ).isRequired,
 };
 
 export default RecentOrdersTable;
