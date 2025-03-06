@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import ProductCarousel from "../components/ProductCarousel";
@@ -8,7 +8,6 @@ import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
 import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
 import Footer from "../components/Footer";
-import sampleProductData from "../data/sampleProductData"; 
 
 // Color to hex mapping
 const colorHexMap = {
@@ -22,35 +21,83 @@ const colorHexMap = {
   "Yellow": "#FDD835"
 };
 
+// Hardcoded sample product with working image paths
+const sampleProductData = {
+  id: "prod_123456",
+  name: "SWIVEL ALLURE MAXI DRESS",
+  price: "300,000.00",
+  sizes: ["S", "M", "L", "XL"],
+  colors: ["Black", "White", "Beige", "Pink"],
+  defaultImages: [
+    "/images/photo6.jpg",
+    "/images/photo11.jpg",
+    "/images/photo6.jpg", 
+    "/images/photo11.jpg"
+  ],
+  colorVariants: {
+    "Black": {
+      images: [
+        "/images/photo6.jpg",
+        "/images/photo11.jpg",
+        "/images/photo6.jpg",
+        "/images/photo11.jpg"
+      ]
+    },
+    "White": {
+      images: [
+        "/images/photo11.jpg",
+        "/images/photo6.jpg",
+        "/images/photo11.jpg",
+        "/images/photo6.jpg"
+      ]
+    },
+    "Beige": {
+      images: [
+        "/images/photo6.jpg",
+        "/images/photo11.jpg",
+        "/images/photo6.jpg",
+        "/images/photo11.jpg"
+      ]
+    },
+    "Pink": {
+      images: [
+        "/images/photo11.jpg",
+        "/images/photo6.jpg",
+        "/images/photo11.jpg",
+        "/images/photo6.jpg"
+      ]
+    }
+  }
+};
+
 const ProductDetailsPage = () => {
+  const initialRenderRef = useRef(true);
+  const location = useLocation();
+  
+  // Use location state product or fallback to sample data
+  const productData = location.state?.product || sampleProductData;
+  
   // State for selected options and current images
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const [currentImages, setCurrentImages] = useState([]);
-  
-  // Get product data from location or use default
-  const location = useLocation();
-  const productFromLocation = location.state?.product;
-  
-  // If no product in location, use sample data
-  const product = productFromLocation || sampleProductData;
+  const [currentImages, setCurrentImages] = useState(productData.defaultImages);
   
   const { addToCart } = useCart();
   const { addToRecentlyViewed } = useRecentlyViewed();
 
-  // Related products data for "STYLE IT WITH" section
+  // Sample data for related products
   const relatedProducts = [
     {
       name: "Sybil Scarf - Black",
       color: "BLACK",
       price: "78,000",
-      image: "/images/stylewith.jpg",
+      image: "/images/photo6.jpg",
     },
     {
       name: "Sybil Scarf - Pink",
       color: "PINK",
       price: "56,000",
-      image: "/images/stylewith2.jpg",
+      image: "/images/photo11.jpg",
     },
   ];
 
@@ -82,28 +129,33 @@ const ProductDetailsPage = () => {
     },
   ];
 
-  // Initialize with default images
+  // Run only on first render to avoid infinite loop
   useEffect(() => {
-    setCurrentImages(product.defaultImages);
-    // Add to recently viewed products
-    addToRecentlyViewed(product);
-  }, [product, addToRecentlyViewed]);
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      
+      if (typeof addToRecentlyViewed === 'function') {
+        addToRecentlyViewed(productData);
+      }
+    }
+  }, [productData, addToRecentlyViewed]);
 
   // Handle color selection and update images
   const handleColorSelect = (color) => {
     // Toggle color selection
     if (color === selectedColor) {
       setSelectedColor("");
-      setCurrentImages(product.defaultImages);
+      setCurrentImages(productData.defaultImages);
     } else {
       setSelectedColor(color);
       
       // Update images based on selected color
-      if (product.colorVariants && product.colorVariants[color]) {
-        setCurrentImages(product.colorVariants[color].images);
+      if (productData.colorVariants && 
+          productData.colorVariants[color] && 
+          productData.colorVariants[color].images) {
+        setCurrentImages(productData.colorVariants[color].images);
       } else {
-        // Fallback to default images if color variant not found
-        setCurrentImages(product.defaultImages);
+        setCurrentImages(productData.defaultImages);
       }
     }
   };
@@ -111,8 +163,8 @@ const ProductDetailsPage = () => {
   // Add to cart with selected options
   const handleAddToCart = () => {
     const productWithOptions = {
-      ...product,
-      id: `${product.name}-${selectedColor || "default"}-${selectedSize || "default"}`,
+      ...productData,
+      id: `${productData.name}-${selectedColor || "default"}-${selectedSize || "default"}`,
       selectedSize,
       selectedColor,
     };
@@ -132,20 +184,20 @@ const ProductDetailsPage = () => {
           {/* Right Side: Product Details */}
           <div className="w-full md:w-2/5 space-y-4">
             {/* Product Name */}
-            <h1 className="text-2xl font-bold">{product.name}</h1>
+            <h1 className="text-2xl font-bold">{productData.name}</h1>
 
             {/* Product Price */}
             <p className="text-xl font-semibold text-gray-700">
-              ₦{product.price}
+              ₦{productData.price}
             </p>
 
             <hr className="border-t border-gray-300 my-4" />
 
-            {/* Color Selection - Updated to call handleColorSelect */}
+            {/* Color Selection */}
             <div>
               <p className="text-lg font-medium mb-2">COLOR:</p>
               <div className="flex flex-wrap gap-3 mb-4">
-                {product.colors.map((color, index) => (
+                {productData.colors.map((color, index) => (
                   <button
                     key={index}
                     className={`relative h-10 w-10 rounded-full cursor-pointer flex items-center justify-center border ${
@@ -173,7 +225,7 @@ const ProductDetailsPage = () => {
             <div>
               <p className="text-lg font-medium mb-2">SIZE:</p>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size, index) => (
+                {productData.sizes.map((size, index) => (
                   <button
                     key={index}
                     className={`border ${
@@ -213,11 +265,11 @@ const ProductDetailsPage = () => {
             {/* Expandable Sections */}
             <ExpandableSection
               title="PRODUCT DETAILS"
-              content="This is a beautiful dress made from high-quality materials. It's lightweight, breathable, and perfect for any occasion."
+              content="This is a beautiful Sybil Scarf made from high-quality materials. It's lightweight, breathable, and perfect for any season."
             />
             <ExpandableSection
               title="SIZE & FIT"
-              content="Our dresses are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
+              content="Our scarves are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
             />
             <ExpandableSection
               title="SHIPPING"
