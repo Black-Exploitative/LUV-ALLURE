@@ -1,9 +1,10 @@
-import PropTypes from 'prop-types';
-import  { useState } from 'react';
-import { FaBell, FaSearch, FaUser } from 'react-icons/fa';
+import PropTypes from "prop-types";
+
+import { useState } from "react";
+import { FaBell, FaSearch, FaUser } from "react-icons/fa";
 
 const Header = ({ user }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <header className="h-16 bg-white shadow-sm px-6 flex items-center justify-between">
@@ -31,12 +32,18 @@ const Header = ({ user }) => {
             <FaUser className="w-5 h-5 text-gray-500" />
           </div>
           <div className="ml-2">
-            <p className="text-sm font-medium">{user?.name || 'Admin User'}</p>
+            <p className="text-sm font-medium">{user?.name || "Admin User"}</p>
           </div>
         </div>
       </div>
     </header>
   );
+};
+
+Header.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  }),
 };
 
 export default Header;
