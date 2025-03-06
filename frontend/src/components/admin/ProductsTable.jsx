@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const ProductsTable = ({ products, onEdit, onDelete }) => {
   return (
@@ -73,13 +73,13 @@ const ProductsTable = ({ products, onEdit, onDelete }) => {
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
                         product.stock > 10
-                          ? 'bg-green-100 text-green-800'
+                          ? "bg-green-100 text-green-800"
                           : product.stock > 0
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {product.stock > 0 ? product.stock : 'Out of stock'}
+                      {product.stock > 0 ? product.stock : "Out of stock"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -102,7 +102,10 @@ const ProductsTable = ({ products, onEdit, onDelete }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                <td
+                  colSpan="7"
+                  className="px-6 py-4 text-center text-sm text-gray-500"
+                >
                   No products found
                 </td>
               </tr>
@@ -122,13 +125,19 @@ const ProductsTable = ({ products, onEdit, onDelete }) => {
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-gray-700">
-              Showing <span className="font-medium">1</span> to{' '}
-              <span className="font-medium">10</span> of{' '}
-              <span className="font-medium">{products ? products.length : 0}</span> results
+              Showing <span className="font-medium">1</span> to{" "}
+              <span className="font-medium">10</span> of{" "}
+              <span className="font-medium">
+                {products ? products.length : 0}
+              </span>{" "}
+              results
             </p>
           </div>
           <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <nav
+              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              aria-label="Pagination"
+            >
               <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                 Previous
               </button>
@@ -147,6 +156,22 @@ const ProductsTable = ({ products, onEdit, onDelete }) => {
       </div>
     </div>
   );
+};
+
+ProductsTable.propTypes = {
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      sku: PropTypes.string,
+      category: PropTypes.string,
+      price: PropTypes.number.isRequired,
+      stock: PropTypes.number.isRequired,
+      image: PropTypes.string,
+    })
+  ).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default ProductsTable;
