@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+
 import { Link, useLocation } from 'react-router-dom';
 import { FaShoppingBag, FaUsers, FaChartBar, FaCog, FaBox, FaCreditCard, FaTag, FaThLarge, FaSignOutAlt } from 'react-icons/fa';
 
@@ -19,7 +19,7 @@ const Sidebar = () => {
   return (
     <div className="w-64 h-screen bg-black text-white fixed left-0 top-0 overflow-y-auto">
       <div className="p-6">
-        <h2 className="text-2xl font-bold">LUXURY ADMIN</h2>
+        <h2 className="text-2xl font-bold">LUVS ALLURE ADMIN</h2>
       </div>
       <nav className="mt-6">
         <ul>
