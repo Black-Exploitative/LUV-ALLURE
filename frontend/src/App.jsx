@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
@@ -17,22 +17,10 @@ import UserAccount from "./auth/UserAccount";
 import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 
+// Admin imports
 import { AuthProvider } from "./context/authContext";
-import Dashboard from "./pages/admin/Dashboard";
-import Products from "./pages/admin/Products";
 import AdminLogin from "./pages/admin/Login";
-import { useAuth } from "./context/authContext"; 
-
-// Protected route component for admin routes
-const ProtectedAdminRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
-  }
-  
-  return children;
-};
+import Dashboard from "./pages/admin/Dashboard";
 
 export default function App() {
   return (
@@ -40,16 +28,10 @@ export default function App() {
       <RecentlyViewedProvider>
         <AuthProvider>
           <Router>
-            {/* Show Navbar only on non-admin routes */}
+            {/* Conditionally render Navbar for non-admin routes */}
             <Routes>
-              <Route
-                path="/admin/*"
-                element={null} // No Navbar for admin routes
-              />
-              <Route
-                path="*"
-                element={<Navbar />}
-              />
+              <Route path="/admin/*" element={null} />
+              <Route path="*" element={<Navbar />} />
             </Routes>
             
             <Toaster />
@@ -58,7 +40,7 @@ export default function App() {
             <NewsletterModal />
             
             <Routes>
-              {/* Customer routes */}
+              {/* Customer-facing routes */}
               <Route path="/" element={<Home />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/product/:productId" element={<ProductDetailsPage />} />
@@ -72,74 +54,11 @@ export default function App() {
               
               {/* Admin routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route 
-                path="/admin/dashboard" 
-                element={
-                  <ProtectedAdminRoute>
-                    <Dashboard />
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/products" 
-                element={
-                  <ProtectedAdminRoute>
-                    <Products />
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/categories" 
-                element={
-                  <ProtectedAdminRoute>
-                    <div>Categories Page</div>
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/orders" 
-                element={
-                  <ProtectedAdminRoute>
-                    <div>Orders Page</div>
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/customers" 
-                element={
-                  <ProtectedAdminRoute>
-                    <div>Customers Page</div>
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/inventory" 
-                element={
-                  <ProtectedAdminRoute>
-                    <div>Inventory Page</div>
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/analytics" 
-                element={
-                  <ProtectedAdminRoute>
-                    <div>Analytics Page</div>
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin/settings" 
-                element={
-                  <ProtectedAdminRoute>
-                    <div>Settings Page</div>
-                  </ProtectedAdminRoute>
-                } 
-              />
-              <Route 
-                path="/admin" 
-                element={<Navigate to="/admin/dashboard" replace />} 
-              />
+              <Route path="/admin/dashboard" element={<Dashboard />} />
+              {/* Add other admin routes directly */}
+              
+              {/* Default admin route */}
+              <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             </Routes>
           </Router>
         </AuthProvider>
