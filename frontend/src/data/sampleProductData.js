@@ -8,7 +8,7 @@ const sampleProductData = {
     sizes: [ "XS", "S", "M", "L", "XL", "XXL"],
     colors: ["Black", "White", "Beige", "Pink"],
     
-    // Default images to show before a color is selected
+    
     defaultImages: [
       "/images/photo11.jpg",
       "/images/photo12.jpg",
@@ -16,7 +16,7 @@ const sampleProductData = {
       "/images/photo7.jpg"
     ],
     
-    // Color variant specific images
+
     colorVariants: {
       "Black": {
         images: [
