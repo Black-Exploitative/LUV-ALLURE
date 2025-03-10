@@ -15,6 +15,7 @@ import SignUp from "./auth/SignUp";
 import ForgotPassword from "./auth/ForgotPassword";
 import UserAccount from "./auth/UserAccount";
 import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
+import NewsletterModal from "./components/NewsLetterModal";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Toaster />
           <CartDrawer />
           <AlreadyInCartModal />
+          <NewsletterModal />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />

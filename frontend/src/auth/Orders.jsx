@@ -24,7 +24,7 @@ const Orders = ({ orders }) => {
                 </div>
                 <div className="mt-2 md:mt-0">
                   <span className="inline-block px-3 py-1 text-xs bg-green-50 text-green-800">
-                    {order.status}
+                    {order.status} 
                   </span>
                 </div>
               </div>

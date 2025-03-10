@@ -5,18 +5,16 @@ const ProductCarousel = ({ images }) => {
   const [primaryImageIndex, setPrimaryImageIndex] = useState(0);
   const [secondaryImageIndex, setSecondaryImageIndex] = useState(1);
   
-  
+  // Extend images array if it's too short
   const extendedImages = images.length < 6 
     ? [...images, ...images, ...images].slice(0, Math.max(6, images.length))
     : images;
 
- 
+  // Ensure secondary image is always different from primary
   useEffect(() => {
-    
     if (extendedImages.length === 1) {
       setSecondaryImageIndex(0);
     } 
-   
     else if (secondaryImageIndex >= extendedImages.length || secondaryImageIndex === primaryImageIndex) {
       setSecondaryImageIndex((primaryImageIndex + 1) % extendedImages.length);
     }
