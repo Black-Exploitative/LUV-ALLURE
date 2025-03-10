@@ -1,132 +1,101 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { FaCheck } from "react-icons/fa";
 import ProductCarousel from "../components/ProductCarousel";
+import { useLocation } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
-import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
+import { useState, useEffect } from "react";
 import Footer from "../components/Footer";
-import sampleProductData from "../data/sampleProductData"; 
-
-// Color to hex mapping
-const colorHexMap = {
-  "Black": "#000000",
-  "White": "#FFFFFF",
-  "Red": "#E53935",
-  "Blue": "#1E88E5",
-  "Green": "#43A047",
-  "Beige": "#D7CCC8",
-  "Pink": "#EC407A",
-  "Yellow": "#FDD835"
-};
+import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
 
 const ProductDetailsPage = () => {
-  // State for selected options and current images
-  const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const [currentImages, setCurrentImages] = useState([]);
   
-  // Get product data from location or use default
-  const location = useLocation();
-  const productFromLocation = location.state?.product;
-  
-  // If no product in location, use sample data
-  const product = productFromLocation || sampleProductData;
-  
-  const { addToCart } = useCart();
-  const { addToRecentlyViewed } = useRecentlyViewed();
 
-  // Related products data for "STYLE IT WITH" section
+  const location = useLocation();
+  const product = location.state?.product || {
+    name: "SWIVEL ALLURE MAXI DRESS",
+    price: "300,000.00",
+    sizes: ["S", "M", "L", "XL"],
+    images: [
+      "../public/images/photo6.jpg",
+      "../public/images/photo6.jpg",
+      "../public/images/photo11.jpg",
+      "../public/images/photo11.jpg",
+    ],
+  };
+
+  const [selectedSize, setSelectedSize] = useState("");
+  const { addToCart } = useCart();
+
   const relatedProducts = [
     {
       name: "Sybil Scarf - Black",
       color: "BLACK",
       price: "78,000",
-      image: "/images/stylewith.jpg",
+      image: "../public/images/stylewith.jpg",
     },
     {
       name: "Sybil Scarf - Pink",
       color: "PINK",
       price: "56,000",
-      image: "/images/stylewith2.jpg",
+      image: "../public/images/stylewith2.jpg",
     },
   ];
 
-  // Sample data for "CUSTOMERS ALSO PURCHASED" section
   const purchasedProducts = [
     {
       name: "Purchased 1",
       price: 1000,
       color: "BEIGE",
-      images: "/images/photo6.jpg",
+      images: "../public/images/photo6.jpg",
     },
     {
       name: "Purchased 2",
       price: 1200,
       color: "MAROON",
-      images: "/images/photo11.jpg",
+      images: "../public/images/photo11.jpg",
     },
     {
       name: "Purchased 3",
       price: 800,
       color: "CORAL",
-      images: "/images/photo6.jpg",
+      images: "../public/images/photo6.jpg",
     },
     {
       name: "Purchased 4",
       price: 900,
       color: "BURGUNDY",
-      images: "/images/photo11.jpg",
+      images: "../public/images/photo11.jpg",
     },
   ];
 
-  // Initialize with default images
-  useEffect(() => {
-    setCurrentImages(product.defaultImages);
-    // Add to recently viewed products
-    addToRecentlyViewed(product);
-  }, [product, addToRecentlyViewed]);
-
-  // Handle color selection and update images
-  const handleColorSelect = (color) => {
-    // Toggle color selection
-    if (color === selectedColor) {
-      setSelectedColor("");
-      setCurrentImages(product.defaultImages);
-    } else {
-      setSelectedColor(color);
-      
-      // Update images based on selected color
-      if (product.colorVariants && product.colorVariants[color]) {
-        setCurrentImages(product.colorVariants[color].images);
-      } else {
-        // Fallback to default images if color variant not found
-        setCurrentImages(product.defaultImages);
-      }
-    }
-  };
-
-  // Add to cart with selected options
   const handleAddToCart = () => {
-    const productWithOptions = {
+    // Generate a unique ID for this product + size combination
+    const productWithSize = {
       ...product,
-      id: `${product.name}-${selectedColor || "default"}-${selectedSize || "default"}`,
+      id: `${product.name}-${selectedSize || "default"}`,
       selectedSize,
-      selectedColor,
     };
 
-    addToCart(productWithOptions);
+    // Try to add to cart - returns false if already in cart
+    // The cart drawer or "already in cart" modal will be shown automatically by the context
+    addToCart(productWithSize);
   };
+
+  const { addToRecentlyViewed } = useRecentlyViewed();
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed(product);
+    }
+  }, [product, addToRecentlyViewed]);
 
   return (
     <>
       <div className="max-w-screen-xl mx-auto">
         <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
-          {/* Left Side: Product Carousel - Now displays color-specific images */}
+          {/* Left Side: Product Carousel - Now takes a bit more space on larger screens */}
           <div className="w-full md:w-3/5 mb-8 md:mb-0">
-            <ProductCarousel images={currentImages} />
+            <ProductCarousel images={product.images} />
           </div>
 
           {/* Right Side: Product Details */}
@@ -141,34 +110,6 @@ const ProductDetailsPage = () => {
 
             <hr className="border-t border-gray-300 my-4" />
 
-            {/* Color Selection - Updated to call handleColorSelect */}
-            <div>
-              <p className="text-lg font-medium mb-2">COLOR:</p>
-              <div className="flex flex-wrap gap-3 mb-4">
-                {product.colors.map((color, index) => (
-                  <button
-                    key={index}
-                    className={`relative h-10 w-10 rounded-full cursor-pointer flex items-center justify-center border ${
-                      color === "White" ? "border-gray-300" : "border-transparent"
-                    } ${selectedColor === color ? "ring-2 ring-black ring-offset-2" : ""}`}
-                    style={{ backgroundColor: colorHexMap[color] || color }}
-                    onClick={() => handleColorSelect(color)}
-                    aria-label={`Select ${color} color`}
-                  >
-                    {selectedColor === color && color === "White" && (
-                      <FaCheck className="text-black" />
-                    )}
-                    {selectedColor === color && color !== "White" && (
-                      <FaCheck className="text-white" />
-                    )}
-                  </button>
-                ))}
-              </div>
-              {selectedColor && (
-                <p className="text-sm text-gray-600 mb-4">Selected: {selectedColor}</p>
-              )}
-            </div>
-
             {/* Size Selection */}
             <div>
               <p className="text-lg font-medium mb-2">SIZE:</p>
@@ -181,7 +122,7 @@ const ProductDetailsPage = () => {
                         ? "border-black bg-black text-white"
                         : "border-gray-300 hover:bg-gray-100"
                     } px-4 py-2 rounded active:bg-gray-200 transition-colors`}
-                    onClick={() => setSelectedSize(size === selectedSize ? "" : size)}
+                    onClick={() => setSelectedSize(size)}
                   >
                     {size}
                   </button>
@@ -189,23 +130,12 @@ const ProductDetailsPage = () => {
               </div>
             </div>
 
-            {/* Add to Cart Button - Disabled if no color or size selected */}
+            {/* Add to Cart Button */}
             <button
-              className={`w-full py-3 transition-colors ${
-                !selectedColor || !selectedSize
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-black text-white hover:bg-gray-800"
-              }`}
+              className="w-full bg-black text-white py-3 hover:bg-gray-800 transition-colors"
               onClick={handleAddToCart}
-              disabled={!selectedColor || !selectedSize}
             >
-              {!selectedColor && !selectedSize
-                ? "SELECT COLOR AND SIZE"
-                : !selectedColor
-                ? "SELECT COLOR"
-                : !selectedSize
-                ? "SELECT SIZE"
-                : "ADD TO SHOPPING BAG"}
+              ADD TO SHOPPING BAG
             </button>
 
             <hr className="border-t border-gray-300 my-4" />
@@ -213,11 +143,11 @@ const ProductDetailsPage = () => {
             {/* Expandable Sections */}
             <ExpandableSection
               title="PRODUCT DETAILS"
-              content="This is a beautiful dress made from high-quality materials. It's lightweight, breathable, and perfect for any occasion."
+              content="This is a beautiful Sybil Scarf made from high-quality materials. It's lightweight, breathable, and perfect for any season."
             />
             <ExpandableSection
               title="SIZE & FIT"
-              content="Our dresses are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
+              content="Our scarves are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
             />
             <ExpandableSection
               title="SHIPPING"

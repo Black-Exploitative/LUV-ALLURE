@@ -88,7 +88,7 @@ const NewsletterModal = () => {
                   {/* Modal header */}
                   <h2 className="font-serif text-2xl mb-6 uppercase tracking-widest">Join the exclusive list</h2>
                   {/* Message */}
-                  <p className="text-sm text-gray-700 mb-8 max-w-xs font-light">
+                  <p className="text-sm  mb-8 max-w-xs font-light  text-gray-800 font-base font-[Raleway] ">
                     Be the first to know about new collections, and the latest in high fashion.
                   </p>
                   {/* Form */}
@@ -125,7 +125,7 @@ const NewsletterModal = () => {
                   <div className="py-6">
                     <h2 className="font-serif text-2xl mb-3 uppercase tracking-widest">Thank You</h2>
                     <div className="w-16 h-px bg-black my-3 mx-auto"></div>
-                    <p className="text-sm text-gray-700 mt-4">
+                    <p className="text-sm text-gray-700 mt-4 font-[Raleway]">
                       You've been added to our exclusive list. Expect the unexpected.
                     </p>
                   </div>
