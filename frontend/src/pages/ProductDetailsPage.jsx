@@ -61,7 +61,7 @@ const ProductDetailsPage = () => {
         "../public/images/photo6.jpg",
       ]
     },
-    description: originalProduct.description || "Elegant maxi dress with a sophisticated swivel design, perfect for formal events and special occasions. Features a flattering silhouette and premium fabric.",
+    description: originalProduct.description || "Make a bold statement with the Swivel Allure Maxi Dress in pastel pink. This striking piece features a high-low hem with a frilled skirt and thigh-high split with cascading ruffle detail, creating a dramatic and elegant silhouette. The crossover lace-up back offers adjustability for a perfect fit, ensuring comfort throughout the night. Ideal for formal events, cocktail parties, or a romantic evening out, this dress is a showstopper for any occasion. Style it with strappy heels and statement accessories for a head-turning look.",
     material: originalProduct.material || "95% Polyester, 5% Elastane",
     care: originalProduct.care || "Hand wash cold, Do not bleach, Line dry, Iron on low heat"
   };
