@@ -227,20 +227,20 @@ const ProductDetailsPage = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-[300px]">
+      <div className="max-w-screen-xl mx-[50px]">
         <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
           {/* Left Side: Product Carousel */}
-          <div className="w-[1400px] md:w-7/9 mb-8 md:mb-0">
+          <div className="w-[1400px] md:w-[1400px] mb-8 md:mb-0">
             <ProductCarousel images={product.images} />
           </div>
 
           {/* Right Side: Product Details */}
-          <div className="w-[400px] md:w-2/9 space-y-4">
+          <div className="w-[600px] md:w-[600px] space-y-4">
             {/* Product Name */}
-            <h1 className="text-2xl font-bold">{product.name}</h1>
+            <h1 className="text-xl font-normal">{product.name}</h1>
 
             {/* Product Price */}
-            <p className="text-xl font-semibold text-gray-700">
+            <p className="text-lg font-semibold text-gray-700">
               ₦{product.price}
             </p>
 
@@ -250,47 +250,35 @@ const ProductDetailsPage = () => {
             {product.colors && product.colors.length > 0 && (
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="text-lg font-medium">COLOR:</p>
-                  {selectedColor && (
-                    <p className="text-sm text-gray-600">{selectedColor}</p>
-                  )}
+                  <p className="text-xs font-medium">COLOR:</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {product.colors.map((color, index) => (
                     <button
                       key={index}
-                      className={`w-8 h-8 transition-all duration-300 ${
+                      className={`w-[30px] h-[30px] flex transition-all duration-300  bg-white items-center justify-center ${
                         selectedColor === color.name
-                          ? "border-2 border-black"
+                          ? "border-[0.3px] border-black"
                           : "border border-gray-300"
                       } ${color.inStock ? "" : "opacity-40 cursor-not-allowed"}`}
-                      style={{ 
-                        backgroundColor: color.code,
-                      }}
+                      
                       onClick={() => color.inStock && setSelectedColor(color.name)}
                       disabled={!color.inStock}
                     >
-                      {!color.inStock && (
-                        <div className="relative w-full h-full">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-10 h-px bg-gray-400 rotate-45"></div>
-                          </div>
-                        </div>
-                      )}
+                      <button className={`w-[24px] h-[24px] flex items-center justify-center `}>
+                        <img src="../public/images/stylewith2.jpg" alt="" className="object-cover w-full h-full " />
+                      </button>
                     </button>
                   ))}
                 </div>
-                {selectedColor === "" && product.colors.length > 0 && (
-                  <p className="text-red-500 text-sm mt-2">Please select a color</p>
-                )}
               </div>
             )}
 
             {/* Size Selection */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
-                <p className="text-lg font-medium">SIZE:</p>
-                <button className="text-sm underline" onClick={() => console.log("Size guide clicked")}>
+                <p className="text-xs font-medium">SIZE:</p>
+                <button className="text-[10px] underline" onClick={() => console.log("Size guide clicked")}>
                   Size Guide
                 </button>
               </div>
@@ -298,11 +286,11 @@ const ProductDetailsPage = () => {
                 {product.sizes.map((size, index) => (
                   <button
                     key={index}
-                    className={`border min-w-[50px] ${
+                    className={`border w-[30px] h-[30px] text-[10px] font-normal items-center ${
                       selectedSize === size
-                        ? "border-black bg-black text-white"
+                        ? "border-black border-width-[0.5px]"
                         : "border-gray-300 hover:bg-gray-100"
-                    } px-4 py-2 transition-colors`}
+                    } transition-colors`}
                     onClick={() => setSelectedSize(size)}
                   >
                     {size}

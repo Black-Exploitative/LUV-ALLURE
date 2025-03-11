@@ -1,12 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@100&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@100&display=swap");
 @import "tailwindcss";
 
 body {
-  font-family: 'Helvetica Neue', sans-serif;
+  font-family: "Helvetica Neue", sans-serif;
   font-weight: 400;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   letter-spacing: 20%;
   overflow-x: hidden;
+  @apply antialiased;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

@@ -59,7 +59,7 @@ const ProductCarousel = ({ images }) => {
             key={index}
             src={image}
             alt={`Thumbnail ${index + 1}`}
-            className={`w-30 h-40 object-cover cursor-pointer border-2 flex-shrink-0 ${
+            className={`w-30 h-40 object-cover cursor-pointer border-2 flex-shrink-0 overflow-x-hidden ${
               index === primaryImageIndex || index === secondaryImageIndex
                 ? "border-black" 
                 : "border-gray-300"
