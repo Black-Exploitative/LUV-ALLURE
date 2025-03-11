@@ -32,13 +32,13 @@ const ProductCarousel = ({ images }) => {
   return (
     <div className="flex flex-col">
       {/* Main Images Section - Two side by side */}
-      <div className="flex flex-col md:flex-row mb-4">
+      <div className="flex flex-col md:flex-row mb-2">
         {/* Primary Image */}
         <div className="w-full md:w-1/2 mb-2 md:mb-0">
           <img
             src={extendedImages[primaryImageIndex]}
             alt={`Main Image ${primaryImageIndex + 1}`}
-            className="w-full h-[400px] md:h-[500px] object-cover"
+            className="w-full h-[700px] md:h-[700px] object-cover"
           />
         </div>
 
@@ -47,19 +47,19 @@ const ProductCarousel = ({ images }) => {
           <img
             src={extendedImages[secondaryImageIndex]}
             alt={`Secondary Image ${secondaryImageIndex + 1}`}
-            className="w-full h-[400px] md:h-[500px] object-cover"
+            className="w-full h-[700px] md:h-[700px] object-cover"
           />
         </div>
       </div>
 
       {/* Thumbnails at the bottom */}
-      <div className="flex mt-4 gap-2 overflow-x-auto justify-center">
+      <div className="flex mt-4 gap-0.5 overflow-x-auto justify-center">
         {extendedImages.map((image, index) => (
           <img
             key={index}
             src={image}
             alt={`Thumbnail ${index + 1}`}
-            className={`w-20 h-20 object-cover cursor-pointer border-2 flex-shrink-0 ${
+            className={`w-30 h-40 object-cover cursor-pointer border-2 flex-shrink-0 ${
               index === primaryImageIndex || index === secondaryImageIndex
                 ? "border-black" 
                 : "border-gray-300"

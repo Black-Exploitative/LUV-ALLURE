@@ -227,15 +227,15 @@ const ProductDetailsPage = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto">
+      <div className="max-w-screen-xl mx-[300px]">
         <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
           {/* Left Side: Product Carousel */}
-          <div className="w-full md:w-3/5 mb-8 md:mb-0">
+          <div className="w-[1400px] md:w-7/9 mb-8 md:mb-0">
             <ProductCarousel images={product.images} />
           </div>
 
           {/* Right Side: Product Details */}
-          <div className="w-full md:w-2/5 space-y-4">
+          <div className="w-[400px] md:w-2/9 space-y-4">
             {/* Product Name */}
             <h1 className="text-2xl font-bold">{product.name}</h1>
 

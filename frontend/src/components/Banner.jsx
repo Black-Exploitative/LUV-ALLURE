@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 const Banner = ({ imageUrl, title, description }) => {
   return (
     <div
-      className="relative w-full h-96 bg-cover bg-center"
+      className="relative w-full h-70 bg-cover bg-center"
       style={{ backgroundImage: `url(${imageUrl})` }}
     >
       {/* Overlay for better text visibility */}
