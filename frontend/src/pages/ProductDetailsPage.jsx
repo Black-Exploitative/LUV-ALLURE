@@ -22,6 +22,7 @@ const ProductDetailsPage = () => {
     setIsInWishlist(!isInWishlist);
   };
 
+ 
   // Fallback product if none is passed
   const defaultProduct = {
     title: "SWIVEL ALLURE MAXI DRESS",
