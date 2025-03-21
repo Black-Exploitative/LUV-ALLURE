@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
-import  { useState } from "react";
+import { useState } from "react";
 
-const ExpandableSection = ({ title, content }) => {
+const ExpandableSection = ({ title, content, isTable, tableData }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpansion = () => {
@@ -21,7 +21,18 @@ const ExpandableSection = ({ title, content }) => {
       </div>
       {isExpanded && (
         <div className="mt-4 text-gray-700">
-          <p>{content}</p>
+          {isTable && tableData ? (
+            <div className="divide-y">
+              {tableData.map((row, index) => (
+                <div key={index} className="flex py-2">
+                  <div className="w-1/3 bg-gray-100 p-2 uppercase text-xs font-medium">{row.label}</div>
+                  <div className="w-2/3 p-2">{row.value}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>{content}</p>
+          )}
         </div>
       )}
     </div>
@@ -29,8 +40,21 @@ const ExpandableSection = ({ title, content }) => {
 };
 
 ExpandableSection.propTypes = {
-    title: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired
-}
+  title: PropTypes.string.isRequired,
+  content: PropTypes.string,
+  isTable: PropTypes.bool,
+  tableData: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.string
+    })
+  )
+};
+
+ExpandableSection.defaultProps = {
+  content: "",
+  isTable: false,
+  tableData: []
+};
 
 export default ExpandableSection;
