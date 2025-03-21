@@ -53,13 +53,13 @@ const ProductCarousel = ({ images }) => {
       </div>
 
       {/* Thumbnails at the bottom */}
-      <div className="flex mt-4 gap-0.5 overflow-x-auto justify-center">
+      <div className="flex mt-4 gap-[5px] overflow-x-auto justify-center">
         {extendedImages.map((image, index) => (
           <img
             key={index}
             src={image}
             alt={`Thumbnail ${index + 1}`}
-            className={`w-30 h-40 object-cover cursor-pointer border-2 flex-shrink-0 overflow-x-hidden ${
+            className={`w-[114px] h-40 object-cover cursor-pointer border-2 flex-shrink-0 overflow-x-hidden ${
               index === primaryImageIndex || index === secondaryImageIndex
                 ? "border-black" 
                 : "border-gray-300"

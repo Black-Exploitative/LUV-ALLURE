@@ -227,21 +227,21 @@ const ProductDetailsPage = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-[50px]">
-        <div className="p-4 md:p-6 mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-8">
+      <div className="max-w-screen-xl">
+        <div className="mt-16 md:mt-[72px] flex flex-col md:flex-row justify-between">
           {/* Left Side: Product Carousel */}
-          <div className="w-[1400px] md:w-[1400px] mb-8 md:mb-0">
+          <div className="w-[1200px] md:w-[1200px] mb-8 md:mb-0">
             <ProductCarousel images={product.images} />
           </div>
 
           {/* Right Side: Product Details */}
-          <div className="w-[600px] md:w-[600px] space-y-4">
+          <div className="w-[600px] md:w-[600px]">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
 
             {/* Product Price */}
             <p className="text-lg font-semibold text-gray-700">
-              ₦{product.price}
+              ₦ {product.price}
             </p>
 
             <hr className="border-t border-gray-300 my-4" />
