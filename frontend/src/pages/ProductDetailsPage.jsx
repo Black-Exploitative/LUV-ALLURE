@@ -6,13 +6,22 @@ import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
 import { useState, useEffect, useMemo } from "react";
 import Footer from "../components/Footer";
-import { useRecentlyViewed } from '../context/RecentlyViewedProducts';
+import { useRecentlyViewed } from "../context/RecentlyViewedProducts";
 import { motion } from "framer-motion";
+import { FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
+import { FaStar, FaRegStar } from "react-icons/fa";
 
 const ProductDetailsPage = () => {
   const location = useLocation();
   const rawProduct = location.state?.product;
-  
+
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  const toggleWishlist = () => {
+    setIsInWishlist(!isInWishlist);
+  };
+
   // Fallback product if none is passed
   const defaultProduct = {
     title: "SWIVEL ALLURE MAXI DRESS",
@@ -29,57 +38,61 @@ const ProductDetailsPage = () => {
   // Process the product from Shopify API format
   const processShopifyProduct = (rawProduct) => {
     if (!rawProduct) return defaultProduct;
-    
+
     console.log("Raw product from navigation:", rawProduct);
-    
+
     // Extract images
     let productImages = [];
     if (rawProduct.images) {
       // Direct array format
       if (Array.isArray(rawProduct.images)) {
         productImages = rawProduct.images;
-      } 
+      }
       // Edges format from Shopify API
       else if (rawProduct.images.edges) {
-        productImages = rawProduct.images.edges.map(edge => edge.node.url);
+        productImages = rawProduct.images.edges.map((edge) => edge.node.url);
       }
     }
-    
+
     // If no images found, use the ones from the transformed product
     if (productImages.length === 0 && rawProduct.priceValue !== undefined) {
       productImages = rawProduct.images || [];
     }
-    
+
     // Extract sizes and colors from variants
     let productSizes = [];
     let productColors = [];
-    
+
     // Extract from variants structure provided
     if (rawProduct.variants && Array.isArray(rawProduct.variants)) {
       // Get unique sizes
-      productSizes = [...new Set(rawProduct.variants.map(variant => variant.size))];
+      productSizes = [
+        ...new Set(rawProduct.variants.map((variant) => variant.size)),
+      ];
       // Get unique colors
-      productColors = [...new Set(rawProduct.variants.map(variant => variant.color))].map(colorName => ({
+      productColors = [
+        ...new Set(rawProduct.variants.map((variant) => variant.color)),
+      ].map((colorName) => ({
         name: colorName,
         code: getColorCode(colorName),
-        inStock: true
+        inStock: true,
       }));
-    } 
+    }
     // Extract from other potential structures
     else if (rawProduct.options) {
-      const sizeOption = rawProduct.options.find(opt => 
-        opt.name.toLowerCase() === "size"
+      const sizeOption = rawProduct.options.find(
+        (opt) => opt.name.toLowerCase() === "size"
       );
       productSizes = sizeOption?.values || [];
-      
-      const colorOption = rawProduct.options.find(opt => 
-        opt.name.toLowerCase() === "color"
+
+      const colorOption = rawProduct.options.find(
+        (opt) => opt.name.toLowerCase() === "color"
       );
       if (colorOption?.values) {
-        productColors = colorOption.values.map(color => ({
+        productColors = colorOption.values.map((color) => ({
           name: color,
           code: getColorCode(color),
-          inStock: true
+          inStock: true,
         }));
       }
     }
@@ -87,7 +100,7 @@ const ProductDetailsPage = () => {
     else if (rawProduct.sizes) {
       productSizes = rawProduct.sizes;
     }
-    
+
     // Format price
     let formattedPrice = "0.00";
     if (rawProduct.priceValue) {
@@ -101,13 +114,13 @@ const ProductDetailsPage = () => {
       }
     } else if (rawProduct.price) {
       // Direct price property
-      if (typeof rawProduct.price === 'number') {
+      if (typeof rawProduct.price === "number") {
         formattedPrice = rawProduct.price.toLocaleString();
       } else {
         formattedPrice = rawProduct.price;
       }
     }
-    
+
     return {
       id: rawProduct.id,
       name: rawProduct.title || rawProduct.name,
@@ -115,34 +128,40 @@ const ProductDetailsPage = () => {
       images: productImages.length > 0 ? productImages : defaultProduct.images,
       description: rawProduct.description || "No description available",
       sizes: productSizes.length > 0 ? productSizes : defaultProduct.sizes,
-      colors: productColors.length > 0 ? productColors : [{ name: "Blue", code: "#0000FF", inStock: true }]
+      colors:
+        productColors.length > 0
+          ? productColors
+          : [{ name: "Blue", code: "#0000FF", inStock: true }],
     };
   };
 
   // Helper function to convert color names to color codes
   const getColorCode = (colorName) => {
     const colorMap = {
-      "Black": "#000000",
-      "White": "#FFFFFF",
-      "Red": "#FF0000",
-      "Green": "#008000",
-      "Blue": "#0000FF",
-      "Yellow": "#FFFF00",
-      "Pink": "#FFC0CB",
-      "Purple": "#800080",
-      "Orange": "#FFA500",
-      "Gray": "#808080",
-      "Brown": "#A52A2A",
-      "Beige": "#F5F5DC",
-      "Maroon": "#800000",
-      "Coral": "#FF7F50",
-      "Burgundy": "#800020",
+      Black: "#000000",
+      White: "#FFFFFF",
+      Red: "#FF0000",
+      Green: "#008000",
+      Blue: "#0000FF",
+      Yellow: "#FFFF00",
+      Pink: "#FFC0CB",
+      Purple: "#800080",
+      Orange: "#FFA500",
+      Gray: "#808080",
+      Brown: "#A52A2A",
+      Beige: "#F5F5DC",
+      Maroon: "#800000",
+      Coral: "#FF7F50",
+      Burgundy: "#800020",
     };
-    
+
     return colorMap[colorName] || "#000000";
   };
 
-  const product = useMemo(() => processShopifyProduct(rawProduct), [rawProduct]);
+  const product = useMemo(
+    () => processShopifyProduct(rawProduct),
+    [rawProduct]
+  );
   console.log("Processed product:", product);
 
   const [selectedSize, setSelectedSize] = useState("");
@@ -152,7 +171,10 @@ const ProductDetailsPage = () => {
 
   // Determine if product can be added to cart
   const canAddToCart = useMemo(() => {
-    return selectedSize !== "" && (product.colors.length === 0 || selectedColor !== "");
+    return (
+      selectedSize !== "" &&
+      (product.colors.length === 0 || selectedColor !== "")
+    );
   }, [selectedSize, selectedColor, product.colors]);
 
   const relatedProducts = [
@@ -199,20 +221,22 @@ const ProductDetailsPage = () => {
 
   const handleAddToCart = () => {
     if (!canAddToCart) return;
-    
+
     setIsAddingToCart(true);
-    
+
     // Generate a unique ID for this product + size + color combination
     const productWithOptions = {
       ...product,
-      id: `${product.id || product.name}-${selectedColor || "default"}-${selectedSize || "default"}`,
+      id: `${product.id || product.name}-${selectedColor || "default"}-${
+        selectedSize || "default"
+      }`,
       selectedSize,
-      selectedColor
+      selectedColor,
     };
 
     // Try to add to cart - returns false if already in cart
     addToCart(productWithOptions);
-    
+
     setTimeout(() => {
       setIsAddingToCart(false);
     }, 800);
@@ -233,19 +257,19 @@ const ProductDetailsPage = () => {
           <div className="w-full md:w-7/12 lg:w-8/12 mb-8 md:mb-0">
             <ProductCarousel images={product.images} />
           </div>
-  
+
           {/* Right Side: Product Details */}
           <div className="w-full md:w-5/12 lg:w-4/12">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
-  
+
             {/* Product Price */}
             <p className="text-lg font-semibold text-gray-700">
               ₦ {product.price}
             </p>
-  
+
             <hr className="border-t border-gray-300 my-4" />
-  
+
             {/* Color Selection - Only show if there are colors */}
             {product.colors && product.colors.length > 0 && (
               <div className="mb-6">
@@ -260,25 +284,37 @@ const ProductDetailsPage = () => {
                         selectedColor === color.name
                           ? "border-[0.3px] border-black"
                           : "border border-gray-300"
-                      } ${color.inStock ? "" : "opacity-40 cursor-not-allowed"}`}
-                      
-                      onClick={() => color.inStock && setSelectedColor(color.name)}
+                      } ${
+                        color.inStock ? "" : "opacity-40 cursor-not-allowed"
+                      }`}
+                      onClick={() =>
+                        color.inStock && setSelectedColor(color.name)
+                      }
                       disabled={!color.inStock}
                     >
-                      <button className={`w-[24px] h-[24px] flex items-center justify-center`}>
-                        <img src="../public/images/stylewith2.jpg" alt="" className="object-cover w-full h-full" />
+                      <button
+                        className={`w-[24px] h-[24px] flex items-center justify-center`}
+                      >
+                        <img
+                          src="../public/images/stylewith2.jpg"
+                          alt=""
+                          className="object-cover w-full h-full"
+                        />
                       </button>
                     </button>
                   ))}
                 </div>
               </div>
             )}
-  
+
             {/* Size Selection */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-xs font-medium">SIZE:</p>
-                <button className="text-[10px] underline" onClick={() => console.log("Size guide clicked")}>
+                <button
+                  className="text-[10px] underline"
+                  onClick={() => console.log("Size guide clicked")}
+                >
                   Size Guide
                 </button>
               </div>
@@ -298,38 +334,48 @@ const ProductDetailsPage = () => {
                 ))}
               </div>
               {selectedSize === "" && (
-                <p className="text-red-500 text-sm mt-2">Please select a size</p>
+                <p className="text-red-500 text-sm mt-2">
+                  Please select a size
+                </p>
               )}
             </div>
-  
+
             {/* Add to Cart Button */}
             <motion.button
               className={`w-full py-3 transition-colors ${
-                canAddToCart 
+                canAddToCart
                   ? "bg-black text-white hover:bg-gray-800"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
               onClick={handleAddToCart}
               disabled={!canAddToCart || isAddingToCart}
               whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
-              animate={{ 
-                opacity: isAddingToCart ? 0.7 : 1
+              animate={{
+                opacity: isAddingToCart ? 0.7 : 1,
               }}
             >
-              {isAddingToCart 
-                ? "ADDING TO BAG..." 
-                : canAddToCart 
-                  ? "ADD TO SHOPPING BAG" 
-                  : `SELECT ${product.colors.length > 0 ? "COLOR AND " : ""}SIZE`}
+              {isAddingToCart
+                ? "ADDING TO BAG..."
+                : canAddToCart
+                ? "ADD TO SHOPPING BAG"
+                : `SELECT ${product.colors.length > 0 ? "COLOR AND " : ""}SIZE`}
             </motion.button>
-  
+
             {/* Wishlist Button */}
-            <button className="w-full border border-black py-3 mt-2 hover:bg-gray-100 transition-colors">
-              ADD TO WISHLIST
-            </button>
-  
+            <div
+              className="flex items-center justify-start gap-2 mt-4 mb-2 cursor-pointer"
+              onClick={toggleWishlist}
+            >
+              {isInWishlist ? (
+                <FaHeart className="h-5 w-5 text-black" />
+              ) : (
+                <FiHeart className="h-5 w-5" />
+              )}
+              <span>Add to Wishlist</span>
+            </div>
+
             <hr className="border-t border-gray-300 my-4" />
-  
+
             {/* Expandable Sections */}
             <ExpandableSection
               title="PRODUCT DETAILS"
@@ -345,7 +391,10 @@ const ProductDetailsPage = () => {
             />
             <ExpandableSection
               title="CARE INSTRUCTIONS"
-              content={product.care || "Handle with care. See label for detailed instructions."}
+              content={
+                product.care ||
+                "Handle with care. See label for detailed instructions."
+              }
             />
             <ExpandableSection
               title="SHIPPING"
@@ -357,7 +406,7 @@ const ProductDetailsPage = () => {
             />
           </div>
         </div>
-  
+
         {/* Related Products - Also inside the max-w-screen-xl container */}
         <div className="mt-12">
           <h2 className="text-xl mb-4">STYLE IT WITH</h2>
@@ -373,7 +422,7 @@ const ProductDetailsPage = () => {
               />
             ))}
           </div>
-  
+
           {/* Purchased Products Section */}
           <h2 className="text-xl font-semibold mt-8 mb-4">
             CUSTOMERS ALSO PURCHASED
@@ -383,7 +432,7 @@ const ProductDetailsPage = () => {
               <PurchasedCard key={index} product={product} />
             ))}
           </div>
-  
+
           <h2 className="text-xl font-semibold mt-8 mb-4">
             CUSTOMERS ALSO VIEWED
           </h2>
@@ -397,6 +446,6 @@ const ProductDetailsPage = () => {
       <Footer />
     </>
   );
-}
+};
 
 export default ProductDetailsPage;
