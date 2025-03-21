@@ -227,25 +227,25 @@ const ProductDetailsPage = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl">
-        <div className="mt-16 md:mt-[72px] flex flex-col md:flex-row justify-between">
+      <div className="max-w-screen-xl mx-auto">
+        <div className="mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-12">
           {/* Left Side: Product Carousel */}
-          <div className="w-[1200px] md:w-[1200px] mb-8 md:mb-0">
+          <div className="w-full md:w-7/12 lg:w-8/12 mb-8 md:mb-0">
             <ProductCarousel images={product.images} />
           </div>
-
+  
           {/* Right Side: Product Details */}
-          <div className="w-[600px] md:w-[600px]">
+          <div className="w-full md:w-5/12 lg:w-4/12">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
-
+  
             {/* Product Price */}
             <p className="text-lg font-semibold text-gray-700">
               ₦ {product.price}
             </p>
-
+  
             <hr className="border-t border-gray-300 my-4" />
-
+  
             {/* Color Selection - Only show if there are colors */}
             {product.colors && product.colors.length > 0 && (
               <div className="mb-6">
@@ -256,7 +256,7 @@ const ProductDetailsPage = () => {
                   {product.colors.map((color, index) => (
                     <button
                       key={index}
-                      className={`w-[30px] h-[30px] flex transition-all duration-300  bg-white items-center justify-center ${
+                      className={`w-[30px] h-[30px] flex transition-all duration-300 bg-white items-center justify-center ${
                         selectedColor === color.name
                           ? "border-[0.3px] border-black"
                           : "border border-gray-300"
@@ -265,15 +265,15 @@ const ProductDetailsPage = () => {
                       onClick={() => color.inStock && setSelectedColor(color.name)}
                       disabled={!color.inStock}
                     >
-                      <button className={`w-[24px] h-[24px] flex items-center justify-center `}>
-                        <img src="../public/images/stylewith2.jpg" alt="" className="object-cover w-full h-full " />
+                      <button className={`w-[24px] h-[24px] flex items-center justify-center`}>
+                        <img src="../public/images/stylewith2.jpg" alt="" className="object-cover w-full h-full" />
                       </button>
                     </button>
                   ))}
                 </div>
               </div>
             )}
-
+  
             {/* Size Selection */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
@@ -301,7 +301,7 @@ const ProductDetailsPage = () => {
                 <p className="text-red-500 text-sm mt-2">Please select a size</p>
               )}
             </div>
-
+  
             {/* Add to Cart Button */}
             <motion.button
               className={`w-full py-3 transition-colors ${
@@ -322,14 +322,14 @@ const ProductDetailsPage = () => {
                   ? "ADD TO SHOPPING BAG" 
                   : `SELECT ${product.colors.length > 0 ? "COLOR AND " : ""}SIZE`}
             </motion.button>
-
+  
             {/* Wishlist Button */}
             <button className="w-full border border-black py-3 mt-2 hover:bg-gray-100 transition-colors">
               ADD TO WISHLIST
             </button>
-
+  
             <hr className="border-t border-gray-300 my-4" />
-
+  
             {/* Expandable Sections */}
             <ExpandableSection
               title="PRODUCT DETAILS"
@@ -357,9 +357,9 @@ const ProductDetailsPage = () => {
             />
           </div>
         </div>
-
-        {/* Related Products */}
-        <div className="p-4 md:p-6">
+  
+        {/* Related Products - Also inside the max-w-screen-xl container */}
+        <div className="mt-12">
           <h2 className="text-xl mb-4">STYLE IT WITH</h2>
           <div className="grid gap-4 md:gap-6">
             {relatedProducts.map((product, index) => (
@@ -373,7 +373,7 @@ const ProductDetailsPage = () => {
               />
             ))}
           </div>
-
+  
           {/* Purchased Products Section */}
           <h2 className="text-xl font-semibold mt-8 mb-4">
             CUSTOMERS ALSO PURCHASED
@@ -383,7 +383,7 @@ const ProductDetailsPage = () => {
               <PurchasedCard key={index} product={product} />
             ))}
           </div>
-
+  
           <h2 className="text-xl font-semibold mt-8 mb-4">
             CUSTOMERS ALSO VIEWED
           </h2>
@@ -397,6 +397,6 @@ const ProductDetailsPage = () => {
       <Footer />
     </>
   );
-};
+}
 
 export default ProductDetailsPage;
