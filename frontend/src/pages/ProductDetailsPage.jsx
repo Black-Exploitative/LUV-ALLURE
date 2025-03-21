@@ -10,7 +10,7 @@ import { useRecentlyViewed } from "../context/RecentlyViewedProducts";
 import { motion } from "framer-motion";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
-import { FaStar, FaRegStar } from "react-icons/fa";
+import StarRating from "../components/StarRating";
 
 const ProductDetailsPage = () => {
   const location = useLocation();
@@ -262,6 +262,8 @@ const ProductDetailsPage = () => {
           <div className="w-full md:w-5/12 lg:w-4/12">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
+            {/*  Star Rating */}
+            <StarRating onChange={(value) => console.log(`Rated: ${value} stars`)} />
 
             {/* Product Price */}
             <p className="text-lg font-semibold text-gray-700">
