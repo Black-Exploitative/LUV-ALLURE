@@ -19,7 +19,7 @@ const ProductCard = ({ src, title, index }) => {
   return (
     <motion.div
       ref={cardRef}
-      className="w-[280px] h-auto rounded-none overflow-hidden"
+      className="w-[380px] h-auto rounded-none overflow-hidden"
       variants={{
         hidden: { opacity: 0, y: 50 },
         visible: { opacity: 1, y: 0 },
@@ -35,11 +35,11 @@ const ProductCard = ({ src, title, index }) => {
       <AnimatedImage
         src={src}
         alt={title}
-        className="w-full h-80 object-cover"
+        className="w-full h-[500px] object-cover"
       />
 
       <motion.h3
-        className="text-xl font-medium text-black mt-3"
+        className="text-[15px] text-center font-medium text-black mt-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 + index * 0.15 }}
@@ -138,11 +138,11 @@ const ServiceCard = ({ src, title, description, index }) => {
       <AnimatedImage
         src={src}
         alt={title}
-        className="w-full h-[400px] object-cover"
+        className="w-[400px] h-[400px] object-cover"
       />
 
       <motion.h3
-        className="text-xl font-medium tracking-wide mt-6"
+        className="text-[18px] font-medium tracking-wide mt-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 + index * 0.2 }}
@@ -151,7 +151,7 @@ const ServiceCard = ({ src, title, description, index }) => {
       </motion.h3>
 
       <motion.p
-        className="mt-2 text-base text-[#5F6368]"
+        className="mt-2 text-[14px] font-normal text-[#5F6368] max-w-[350px] mx-auto" 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 + index * 0.2 }}
@@ -209,14 +209,14 @@ export default function OfferSection() {
     <div className="overflow-x-hidden w-full">
       <section className="py-16 mt-[90px]">
         {/* Section Heading */}
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <AnimatedHeading className="text-3xl font-thin text-black mb-[103px]">
+        <div className=" mx-[100px] text-center">
+          <AnimatedHeading className="tracking-wider text-[30px] font-normal text-black mb-[103px]">
             HERE’S WHAT THE SEASON OFFERS
           </AnimatedHeading>
         </div>
 
         {/* Card Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mx-[100px]">
           {products.map((product, index) => (
             <div key={product.id} className="flex justify-center">
               <ProductCard
@@ -227,28 +227,10 @@ export default function OfferSection() {
             </div>
           ))}
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-0 max-w-7xl mx-auto mt-[100px] sm:mt-[162px]">
-          {/* Rectangle 1 */}
-          <img
-            src="/images/photo1.jpg"
-            alt="Rectangle 1"
-            className="h-[400px] sm:h-[600px] md:h-[800px] flex items-center justify-center overflow-hidden"
-            direction="left"
-          />
-
-          {/* Rectangle 2 */}
-          <img
-            src="/images/photo2.jpg"
-            alt="Rectangle 2"
-            className="h-[400px] sm:h-[600px] md:h-[800px] flex items-center justify-center overflow-hidden"
-            direction="right"
-          />
-        </div>
       </section>
 
       <AnimatedSection delay={0.2}>
-        <div className="relative w-full h-screen">
+        <div className="relative w-full h-screen mt-[90px]">
           {/* Background Image */}
           <div className="absolute inset-0">
             <AnimatedImage
@@ -274,63 +256,78 @@ export default function OfferSection() {
       </AnimatedSection>
 
       <AnimatedSection delay={0.3}>
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 mt-[103px] mb-[162px]">
-          {/* Left Image Section */}
-          <motion.div
-            className="pl-8 flex items-center justify-center h-full"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <AnimatedImage
-              src="/images/grid1.avif"
-              alt="Left Side Image"
-              className="w-full max-h-[400px] object-cover"
-            />
-          </motion.div>
+        <div className="w-full mt-[103px] mb-[162px] px-4 md:px-8 lg:px-16">
+          <div className="flex flex-col md:flex-row items-center justify-center max-w-6xl mx-auto gap-8">
+            {/* Left Image Section */}
+            <motion.div
+              className="w-full md:w-1/2"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <AnimatedImage
+                src="/images/grid1.avif"
+                alt="Left Side Image"
+                className="w-full max-w-[500px] h-[600px] object-cover mx-auto"
+              />
+            </motion.div>
 
-          {/* Right Content Section */}
-          <motion.div
-            className="flex items-center justify-center p-10 w-full"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <div className="text-center md:text-left max-w-lg">
-              <motion.h2
-                className="text-4xl mb-[40px]"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              >
-                We Share the Love of Valentine
-              </motion.h2>
-              <motion.p
-                className="text-lg mb-[30px] font-medium"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.8 }}
-              >
-                As the lofty and flory presence of valentine ensumes the air and
-                fills our heart. We bring you a subtlyty of blah blah blah this
-                that that.
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 0.9, duration: 0.8 }}
-              >
-                <p className="text-lg">Explore Collection</p>
-                <hr className="my-2 w-[2ch] border-t border-black/50 mx-auto ml-3" />
-              </motion.div>
-            </div>
-          </motion.div>
+            {/* Right Content Section */}
+            <motion.div
+              className="w-full md:w-1/2 px-4"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <div className="text-center max-w-lg mx-auto">
+                <motion.h2
+                  className="text-[30px] font-extralight mb-[40px] text-center"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                >
+                  We Share the Love of Valentine
+                </motion.h2>
+                <motion.p
+                  className="text-[20px] mb-[20px] font-medium text-center"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.7, duration: 0.8 }}
+                >
+                  As the lofty and flory presence of valentine ensumes the air and
+                  fills our heart. We bring you a subtlyty of blah blah blah this
+                  that that.
+                </motion.p>
+                
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.9, duration: 0.8 }}
+                  className="flex justify-center"
+                >
+                  <a href='#'>
+                    <p className="text-[15px] text-center relative group inline-block">
+                      <span className="border-b-[3px] pb-[3px] group-hover:border-b-0">Ex</span>
+                      <span>plore Collection</span>
+                      <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-current group-hover:w-full transition-all duration-300"></span>
+                    </p>
+                  </a>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </AnimatedSection>
 
       <AnimatedSection delay={0.4}>
-        <div className="w-full py-16 mt-[162px]">
+        <div className="w-full my-[100px]">
           <div className="max-w-7xl mx-auto px-4">
+           <div className="text-center">
+            <AnimatedHeading className="tracking-wider text-[25px] font-normal text-black mb-[50px]">
+              LUV'S ALLURE SERVICES
+            </AnimatedHeading>
+            </div>
+       
             {/* Card Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {services.map((service, index) => (
