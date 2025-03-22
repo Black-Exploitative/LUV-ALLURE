@@ -78,7 +78,7 @@ export default function ForgotPassword() {
                   type="submit"
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent cursor-pointer text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150"
                 >
                   RESET PASSWORD
                 </motion.button>

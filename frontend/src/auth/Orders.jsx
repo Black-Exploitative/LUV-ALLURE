@@ -43,14 +43,14 @@ const Orders = ({ orders }) => {
                 <motion.button
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.98 }}
-                  className="text-xs underline"
+                  className="text-xs underline cursor-pointer"
                 >
                   VIEW ORDER DETAILS
                 </motion.button>
                 <motion.button
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.98 }}
-                  className="text-xs underline"
+                  className="text-xs underline cursor-pointer"
                 >
                   TRACK PACKAGE
                 </motion.button>

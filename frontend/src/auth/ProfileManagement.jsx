@@ -85,7 +85,7 @@ const ProfileManagement = ({ user, setUser }) => {
             type="submit"
             whileHover={{ backgroundColor: "#333" }}
             whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 border border-transparent text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150"
+            className="px-6 py-3 cursor-pointer border border-transparent text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150"
           >
             SAVE CHANGES
           </motion.button>
@@ -149,7 +149,7 @@ const ProfileManagement = ({ user, setUser }) => {
               type="submit"
               whileHover={{ backgroundColor: "#333" }}
               whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 border border-transparent text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150"
+              className="px-6 py-3 border cursor-pointer border-transparent text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150"
             >
               UPDATE PASSWORD
             </motion.button>

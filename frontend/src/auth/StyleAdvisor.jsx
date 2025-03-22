@@ -130,7 +130,7 @@ const StyleAdvisor = ({ user }) => {
             <motion.button
               whileHover={{ x: 5, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center space-x-2 px-4 py-2 border border-white/20 rounded-sm text-sm"
+              className="flex items-center space-x-2 px-4 py-2 cursor-pointer border border-white/20 rounded-sm text-sm"
             >
               <span>REFINE YOUR STYLE</span>
               <svg
@@ -189,7 +189,7 @@ const StyleAdvisor = ({ user }) => {
                   <span className="text-4xl">✨</span>
                 </div>
                 <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <button className="px-6 py-2 bg-white text-black text-sm">
+                  <button className="px-6 py-2 bg-white text-black text-sm cursor-pointer">
                     EXPLORE
                   </button>
                 </div>
@@ -221,7 +221,7 @@ const StyleAdvisor = ({ user }) => {
           <motion.button
             whileHover={{ scale: 1.02, backgroundColor: "#333" }}
             whileTap={{ scale: 0.98 }}
-            className="mt-4 md:mt-0 px-6 py-3 bg-black text-white text-sm flex items-center space-x-2"
+            className="mt-4 md:mt-0 px-6 py-3 bg-black text-white text-sm flex items-center cursor-pointer space-x-2"
           >
             <span>BOOK A SESSION</span>
             <svg
@@ -352,7 +352,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
                   onClick={() => {
                     if (styleInspiration && statementPiece) {
                       setQuizStep(2);
@@ -467,7 +467,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black text-black text-sm tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black text-black text-sm cursor-pointer tracking-wide hover:bg-gray-100"
                   onClick={() => setQuizStep(1)}
                 >
                   BACK
@@ -476,7 +476,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white text-sm cursor-pointer tracking-wide"
                   onClick={() => {
                     if (colorPalette && silhouette) {
                       setQuizStep(3);
@@ -576,7 +576,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black text-black text-sm tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black text-black text-sm cursor-pointer tracking-wide hover:bg-gray-100"
                   onClick={() => setQuizStep(2)}
                 >
                   BACK
@@ -585,7 +585,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white text-sm cursor-pointer tracking-wide"
                   onClick={() => {
                     if (selectedStyles.length > 0) {
                       setQuizStep(4);
@@ -718,7 +718,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black text-black text-sm tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black cursor-pointer text-black text-sm tracking-wide hover:bg-gray-100"
                   onClick={() => setQuizStep(3)}
                 >
                   BACK
@@ -727,7 +727,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
                   onClick={() => {
                     if (occasions.length > 0 && designers.length > 0) {
                       setQuizStep(5);
@@ -854,7 +854,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black text-black text-sm tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black text-black cursor-pointer text-sm tracking-wide hover:bg-gray-100"
                   onClick={() => setQuizStep(4)}
                 >
                   BACK
@@ -863,7 +863,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
                   onClick={() => {
                     setShowConfetti(true);
                     setTimeout(() => {
@@ -965,7 +965,7 @@ const StyleAdvisor = ({ user }) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-6 py-3 bg-black text-white text-sm tracking-wide"
+                      className="px-6 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
                       onClick={() => setQuizCompleted(false)}
                     >
                       CLOSE
