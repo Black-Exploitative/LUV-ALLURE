@@ -77,7 +77,7 @@ export default function UserAccount() {
                     <motion.button
                       key={section.id}
                       onClick={() => setActiveSection(section.id)}
-                      className={`block w-full text-left py-3 px-4 transition duration-150 ${
+                      className={`block w-full text-left py-3 px-4 transition cursor-pointer duration-150 ${
                         activeSection === section.id
                           ? "bg-black text-white"
                           : "text-gray-800 hover:bg-gray-100"
@@ -90,7 +90,7 @@ export default function UserAccount() {
                   ))}
 
                   <motion.button
-                    className="block w-full text-left py-3 px-4 transition duration-150 text-gray-800 hover:bg-gray-100"
+                    className="block w-full text-left py-3 px-4 cursor-pointer transition duration-150 text-gray-800 hover:bg-gray-100"
                     whileHover={{ x: 5 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -126,7 +126,7 @@ export default function UserAccount() {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="mt-4 text-xs underline font-normal"
+                          className="mt-4 text-xs underline font-normal cursor-pointer"
                           onClick={() => setActiveSection("profile")}
                         >
                           EDIT
@@ -140,7 +140,7 @@ export default function UserAccount() {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="mt-4 text-xs underline"
+                          className="mt-4 text-xs underline cursor-pointer"
                           onClick={() => setActiveSection("addresses")}
                         >
                           EDIT
@@ -194,7 +194,7 @@ export default function UserAccount() {
                               <motion.button
                                 whileHover={{ x: 5 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="text-xs underline"
+                                className="text-xs underline cursor-pointer"
                               >
                                 VIEW ORDER DETAILS
                               </motion.button>
@@ -213,7 +213,7 @@ export default function UserAccount() {
                         <motion.button
                           whileHover={{ x: 5 }}
                           whileTap={{ scale: 0.98 }}
-                          className="text-sm underline"
+                          className="text-sm underline cursor-pointer"
                           onClick={() => setActiveSection("orders")}
                         >
                           VIEW ALL ORDERS
@@ -265,7 +265,7 @@ export default function UserAccount() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.98 }}
-                      className="px-4 py-2 border border-black text-sm font-medium text-black hover:bg-black hover:text-white focus:outline-none transition duration-150"
+                      className="px-4 py-2 border cursor-pointer border-black text-sm font-medium text-black hover:bg-black hover:text-white focus:outline-none transition duration-150"
                     >
                       ADD NEW ADDRESS
                     </motion.button>
@@ -274,8 +274,8 @@ export default function UserAccount() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-6 border border-gray-200 relative">
                       <div className="absolute top-4 right-4 flex space-x-2">
-                        <button className="text-xs underline">EDIT</button>
-                        <button className="text-xs underline">DELETE</button>
+                        <button className="text-xs underline cursor-pointer">EDIT</button>
+                        <button className="text-xs underline cursor-pointer">DELETE</button>
                       </div>
 
                       <div className="mb-2 flex items-center">
@@ -294,8 +294,8 @@ export default function UserAccount() {
 
                     <div className="p-6 border border-gray-200 relative">
                       <div className="absolute top-4 right-4 flex space-x-2">
-                        <button className="text-xs underline">EDIT</button>
-                        <button className="text-xs underline">DELETE</button>
+                        <button className="text-xs underline cursor-pointer">EDIT</button>
+                        <button className="text-xs underline cursor-pointer">DELETE</button>
                       </div>
 
                       <h3 className="font-medium mb-2">OFFICE</h3>
@@ -316,7 +316,7 @@ export default function UserAccount() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.98 }}
-                      className="px-4 py-2 border border-black text-sm font-medium text-black hover:bg-black hover:text-white focus:outline-none transition duration-150"
+                      className="px-4 py-2 border border-black cursor-pointer text-sm font-medium text-black hover:bg-black hover:text-white focus:outline-none transition duration-150"
                     >
                       ADD PAYMENT METHOD
                     </motion.button>
@@ -325,8 +325,8 @@ export default function UserAccount() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-6 border border-gray-200 relative">
                       <div className="absolute top-4 right-4 flex space-x-2">
-                        <button className="text-xs underline">EDIT</button>
-                        <button className="text-xs underline">DELETE</button>
+                        <button className="text-xs underline cursor-pointer">EDIT</button>
+                        <button className="text-xs underline cursor-pointer">DELETE</button>
                       </div>
 
                       <div className="mb-2 flex items-center">

@@ -15,7 +15,7 @@ export default function Footer() {
           <p className="text-sm text-gray-400">Need help? Our team is here for you.</p>
           <p className="text-sm mt-2">Call: <a href="tel:+11234567890" className="underline">+234 80534455</a></p>
           <p className="text-sm">Email: <a href="mailto:support@luvallure.com" className="underline">support@luvallure.com</a></p>
-          <button className="mt-4 border border-white px-4 py-2 text-sm hover:bg-white hover:text-black transition">
+          <button className="mt-4 border border-white px-4 py-2 text-sm hover:bg-white hover:text-black transition cursor-pointer">
             Live Chat
           </button>
         </motion.div>

@@ -86,7 +86,7 @@ export default function Checkout() {
                   {/* Quantity Controls */}
                   <div className="flex items-center space-x-2">
                     <button
-                      className="px-3 py-1 bg-gray-300"
+                      className="px-3 py-1 bg-gray-300 cursor-pointer"
                       onClick={() =>
                         updateQuantity(
                           generateProductId(item),
@@ -100,7 +100,7 @@ export default function Checkout() {
                       {item.quantity || 1}
                     </span>
                     <button
-                      className="px-3 py-1 bg-gray-300"
+                      className="px-3 py-1 bg-gray-300 cursor-pointer"
                       onClick={() =>
                         updateQuantity(
                           generateProductId(item),
@@ -114,7 +114,7 @@ export default function Checkout() {
 
                   {/* Remove Button */}
                   <button
-                    className="text-red-500 ml-4"
+                    className="text-red-500 ml-4 cursor-pointer"
                     onClick={() => {
                       removeFromCart(generateProductId(item));
                       toast.success("Item removed from cart");
@@ -153,7 +153,7 @@ export default function Checkout() {
               <p>₦{total.toFixed(2)}</p>
             </div>
 
-            <button className="w-full bg-black text-white py-3 mt-4">
+            <button className="w-full bg-black text-white py-3 mt-4 cursor-pointer">
               Checkout
             </button>
           </div>

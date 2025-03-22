@@ -93,7 +93,7 @@ const RecentlyViewedProducts = () => {
           </h2>
           <button
             onClick={clearRecentlyViewed}
-            className="text-xs text-gray-500 underline hover:text-black transition-colors"
+            className="cursor-pointer text-xs text-gray-500 underline hover:text-black transition-colors"
           >
             Clear All
           </button>
@@ -155,7 +155,7 @@ const RecentlyViewedProductCard = ({ product, addToCart }) => {
               >
                 <button
                   onClick={handleAddToCart}
-                  className="w-full bg-black text-white text-xs uppercase tracking-wider py-2 hover:bg-gray-900 transition-colors"
+                  className="w-full bg-black text-white text-xs uppercase tracking-wider py-2 hover:bg-gray-900 transition-colors cursor-pointer"
                 >
                   Quick Add
                 </button>

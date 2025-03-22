@@ -138,7 +138,7 @@ const PaymentPage = () => {
             {/* Section 1: Personal Information */}
             <div className="bg-white shadow rounded-md overflow-hidden">
               <button 
-                className={`w-full px-6 py-4 flex items-center justify-between ${activeSection === 1 ? 'bg-black text-white' : 'bg-white text-black'}`}
+                className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${activeSection === 1 ? 'bg-black text-white' : 'bg-white text-black'}`}
                 onClick={() => canOpenSection(1) && setActiveSection(1)}
               >
                 <div className="flex items-center space-x-3">
@@ -198,7 +198,7 @@ const PaymentPage = () => {
                       
                       <button
                         onClick={() => handleContinue(1)}
-                        className="w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+                        className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
                       >
                         Continue to Shipping
                       </button>
@@ -219,7 +219,7 @@ const PaymentPage = () => {
             {/* Section 2: Shipping */}
             <div className="bg-white shadow rounded-md overflow-hidden">
               <button 
-                className={`w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(2) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 2 ? 'bg-black text-white' : 'bg-white text-black'}`}
+                className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(2) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 2 ? 'bg-black text-white' : 'bg-white text-black'}`}
                 onClick={() => canOpenSection(2) && setActiveSection(2)}
                 disabled={!canOpenSection(2)}
               >
@@ -344,7 +344,7 @@ const PaymentPage = () => {
                       
                       <button
                         onClick={() => handleContinue(2)}
-                        className="w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+                        className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
                       >
                         Continue to Packaging
                       </button>
@@ -368,7 +368,7 @@ const PaymentPage = () => {
             {/* Section 3: Packaging and Gifting - UPDATED with two packaging options and images */}
             <div className="bg-white shadow rounded-md overflow-hidden">
               <button 
-                className={`w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(3) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 3 ? 'bg-black text-white' : 'bg-white text-black'}`}
+                className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(3) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 3 ? 'bg-black text-white' : 'bg-white text-black'}`}
                 onClick={() => canOpenSection(3) && setActiveSection(3)}
                 disabled={!canOpenSection(3)}
               >
@@ -489,7 +489,7 @@ const PaymentPage = () => {
                       
                       <button
                         onClick={() => handleContinue(3)}
-                        className="w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+                        className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
                       >
                         Continue to Payment
                       </button>
@@ -512,7 +512,7 @@ const PaymentPage = () => {
             {/* Section 4: Payment */}
             <div className="bg-white shadow rounded-md overflow-hidden">
               <button 
-                className={`w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(4) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 4 ? 'bg-black text-white' : 'bg-white text-black'}`}
+                className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(4) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 4 ? 'bg-black text-white' : 'bg-white text-black'}`}
                 onClick={() => canOpenSection(4) && setActiveSection(4)}
                 disabled={!canOpenSection(4)}
               >
@@ -633,7 +633,7 @@ const PaymentPage = () => {
                             alert('Order placed successfully!');
                           }
                         }}
-                        className="w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+                        className="w-full py-3 bg-black text-white cursor-pointer font-medium hover:bg-gray-800 transition-colors"
                       >
                         Place Order
                       </button>

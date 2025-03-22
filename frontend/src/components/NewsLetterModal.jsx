@@ -72,7 +72,7 @@ const NewsletterModal = () => {
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors"
+              className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors cursor-pointer"
               aria-label="Close"
             >
               <FaTimes  size={24} />
@@ -109,7 +109,7 @@ const NewsletterModal = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      className="w-full bg-black text-white py-3 uppercase text-sm tracking-widest hover:bg-gray-900 transition-colors"
+                      className="w-full cursor-pointer bg-black text-white py-3 uppercase text-sm tracking-widest hover:bg-gray-900 transition-colors"
                     >
                       Subscribe
                     </motion.button>

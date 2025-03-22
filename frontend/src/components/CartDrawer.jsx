@@ -79,7 +79,7 @@ const CartDrawer = () => {
                   </h2>
                   <button
                     onClick={() => setIsCartDrawerOpen(false)}
-                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                    className="p-1 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <img src="/icons/close-menu.svg" alt="Close" className="w-5 h-5" />
                   </button>
@@ -126,7 +126,7 @@ const CartDrawer = () => {
                                 </div>
                                 <button 
                                   onClick={() => removeFromCart(item.id)}
-                                  className="text-gray-400 hover:text-gray-700 h-6 w-6 flex items-center justify-center"
+                                  className="text-gray-400 hover:text-gray-700 h-6 w-6 flex items-center justify-center cursor-pointer"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -158,7 +158,7 @@ const CartDrawer = () => {
                                         updateQuantity(item.id, itemQuantity - 1);
                                       }
                                     }}
-                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
                                     disabled={itemQuantity <= 1}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,7 +170,7 @@ const CartDrawer = () => {
                                   </span>
                                   <button 
                                     onClick={() => updateQuantity(item.id, itemQuantity + 1)}
-                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -218,7 +218,7 @@ const CartDrawer = () => {
                 {/* Buttons */}
                 <div className="space-y-3">
                   <button 
-                    className="w-full bg-black text-white py-3 hover:bg-gray-900 transition-colors text-sm uppercase tracking-wider"
+                    className="w-full bg-black text-white py-3 hover:bg-gray-900 transition-colors text-sm uppercase tracking-wider cursor-pointer"
                     onClick={() => {
                       setIsCartDrawerOpen(false);
                       navigate('/checkout');
@@ -227,7 +227,7 @@ const CartDrawer = () => {
                     Checkout
                   </button>
                   <button 
-                    className="w-full bg-white text-black border border-black py-3 hover:bg-gray-50 transition-colors text-sm uppercase tracking-wider"
+                    className="w-full bg-white text-black border border-black py-3 hover:bg-gray-50 transition-colors text-sm uppercase tracking-wider cursor-pointer"
                     onClick={() => {
                       setIsCartDrawerOpen(false);
                       navigate('/shopping-bag');

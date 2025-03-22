@@ -283,7 +283,7 @@ const ProductDetailsPage = () => {
                   {product.colors.map((color, index) => (
                     <button
                       key={index}
-                      className={`w-[30px] h-[30px] flex transition-all duration-300 bg-white items-center justify-center ${
+                      className={`w-[30px] h-[30px] flex transition-all cursor-pointer duration-300 bg-white items-center justify-center ${
                         selectedColor === color.name
                           ? "border-[0.3px] border-black"
                           : "border border-gray-300"
@@ -296,7 +296,7 @@ const ProductDetailsPage = () => {
                       disabled={!color.inStock}
                     >
                       <button
-                        className={`w-[24px] h-[24px] flex items-center justify-center`}
+                        className={`w-[24px] h-[24px] flex items-center cursor-pointer justify-center`}
                       >
                         <img
                           src="../public/images/stylewith2.jpg"
@@ -315,7 +315,7 @@ const ProductDetailsPage = () => {
               <div className="flex justify-between items-center mb-2">
                 <p className="text-xs font-medium">SIZE:</p>
                 <button
-                  className="text-[10px] underline"
+                  className="text-[10px] underline cursor-pointer"
                   onClick={() => console.log("Size guide clicked")}
                 >
                   Size Guide
@@ -325,7 +325,7 @@ const ProductDetailsPage = () => {
                 {product.sizes.map((size, index) => (
                   <button
                     key={index}
-                    className={`border w-[30px] h-[30px] text-[10px] font-normal items-center ${
+                    className={`border w-[30px] h-[30px] text-[10px] font-normal items-center cursor-pointer ${
                       selectedSize === size
                         ? "border-black border-width-[0.5px]"
                         : "border-gray-300 hover:bg-gray-100"
@@ -345,7 +345,7 @@ const ProductDetailsPage = () => {
 
             {/* Add to Cart Button */}
             <motion.button
-              className={`w-full py-3 transition-colors ${
+              className={`w-full py-3 transition-colors cursor-pointer ${
                 canAddToCart
                   ? "bg-black text-white hover:bg-gray-800"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"

@@ -40,7 +40,7 @@ const AlreadyInCartModal = () => {
               <h2 className="text-lg font-medium">Item Already In Cart</h2>
               <button
                 onClick={() => setIsAlreadyInCartModalOpen(false)}
-                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-1 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <img src="/icons/close-menu.svg" alt="Close" className="w-5 h-5" />
               </button>
@@ -53,13 +53,13 @@ const AlreadyInCartModal = () => {
             <div className="space-y-3">
               <button 
                 onClick={handleProceedToCheckout}
-                className="w-full bg-black text-white py-3 hover:bg-gray-800 transition-colors"
+                className="w-full bg-black text-white py-3 hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 PROCEED TO CHECKOUT
               </button>
               <button 
                 onClick={() => setIsAlreadyInCartModalOpen(false)}
-                className="w-full bg-white text-black border border-black py-3 hover:bg-gray-100 transition-colors"
+                className="w-full bg-white text-black border border-black py-3 hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 CONTINUE SHOPPING
               </button>

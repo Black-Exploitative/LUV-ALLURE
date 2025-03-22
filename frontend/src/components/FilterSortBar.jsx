@@ -177,7 +177,7 @@ const FilterSortBar = ({ onGridChange }) => {
         })}
         {activeFilters.length > 0 && (
           <button
-            className="text-xs underline ml-2 mb-2"
+            className="text-xs underline ml-2 mb-2 cursor-pointer"
             onClick={handleClearFilters}
           >
             Clear All
@@ -227,7 +227,7 @@ const FilterSortBar = ({ onGridChange }) => {
         {filterOptions.colour.map((color) => (
           <button
             key={color}
-            className={`flex flex-col items-center ${
+            className={`flex flex-col items-center cursor-pointer ${
               selectedFilters.colour.includes(color)
                 ? "opacity-100"
                 : "opacity-70"
@@ -259,7 +259,7 @@ const FilterSortBar = ({ onGridChange }) => {
         {filterOptions[type].map((option) => (
           <button
             key={option}
-            className={`px-3 py-2 text-xs border ${
+            className={`px-3 py-2 text-xs border cursor-pointer ${
               selectedFilters[type].includes(option)
                 ? "border-black bg-black text-white"
                 : "border-gray-300 text-gray-700 hover:border-gray-400"
@@ -280,7 +280,7 @@ const FilterSortBar = ({ onGridChange }) => {
     return (
       <div className="border-b border-gray-200">
         <button
-          className="w-full py-4 px-1 flex justify-between items-center text-left focus:outline-none"
+          className="w-full py-4 px-1 flex justify-between items-center text-left focus:outline-none cursor-pointer"
           onClick={() => toggleAccordion(type)}
         >
           <h4 className="text-sm font-medium uppercase tracking-wide">
@@ -361,7 +361,7 @@ const FilterSortBar = ({ onGridChange }) => {
           <span className="text-gray-400">|</span>
           <div className="relative">
             <button
-              className="flex items-center text-gray-800 uppercase text-sm font-light tracking-wider focus:outline-none"
+              className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-light tracking-wider focus:outline-none"
               onClick={toggleDropdown}
             >
               Sort <IoMdArrowDropdown className="ml-1" />
@@ -415,7 +415,7 @@ const FilterSortBar = ({ onGridChange }) => {
                   </h3>
                   <button
                     onClick={toggleFilter}
-                    className="text-gray-600 hover:text-gray-900 focus:outline-none"
+                    className="text-gray-600 hover:text-gray-900 focus:outline-none cursor-pointer"
                   >
                     <IoCloseOutline size={24} />
                   </button>
@@ -549,13 +549,13 @@ const FilterSortBar = ({ onGridChange }) => {
               <div className="p-6 border-t border-gray-200">
                 <button
                   onClick={handleApplyFilters}
-                  className="w-full py-3 bg-black text-white text-xs uppercase tracking-widest font-light hover:bg-gray-900 transition-colors"
+                  className="w-full py-3 bg-black text-white text-xs uppercase tracking-widest cursor-pointer font-light hover:bg-gray-900 transition-colors"
                 >
                   See Results
                 </button>
                 <button
                   onClick={handleClearFilters}
-                  className="w-full mt-3 text-xs text-gray-700 underline font-light tracking-wide"
+                  className="w-full mt-3 text-xs text-gray-700 underline cursor-pointer font-light tracking-wide"
                 >
                   Clear All Filters
                 </button>

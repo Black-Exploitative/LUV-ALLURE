@@ -437,7 +437,7 @@ export default function Navbar() {
 
         {/* Hamburger Menu Button (Mobile only, Left) */}
         <motion.button 
-          className="md:hidden relative z-50"
+          className="md:hidden relative z-50 cursor-pointer"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           whileTap={{ scale: 0.9 }}
         >
