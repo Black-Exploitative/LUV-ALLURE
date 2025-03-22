@@ -172,30 +172,27 @@ export default function Navbar() {
             { name: "Knitwear", href: "#" },
             { name: "Coats + Jackets", href: "#" },
             { name: "Loungewear", href: "#" },
-            { name: "All Clothing", href: "#" }
+            { name: "All Clothing", href: "shop" }
           ]
         },
         {
-          title: "ALL ACCESSORIES",
+          title: "ALL GIFTING",
           links: [
-            { name: "Earrings", href: "#" },
-            { name: "Jewellery", href: "#" },
-            { name: "Gloves", href: "#" },
-            { name: "Shoes", href: "#" },
-            { name: "Bags", href: "#" },
-            { name: "Lingerie", href: "#" },
-            { name: "All Accessories", href: "#" }
+            { name: "Gift Cards", href: "#" },
+            { name: "Vouchers", href: "#" },
+            { name: "Membership", href: "#" },
+            { name: "All Gifting", href: "#" }
           ]
         }
       ],
       featuredItems: [
         {
-          image: "/api/placeholder/400/500",
+          image: "https://plus.unsplash.com/premium_photo-1682097559861-d5d5027868b5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fE1heGklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MAXI DRESSES",
           href: "#"
         },
         {
-          image: "/api/placeholder/400/500",
+          image: "https://images.unsplash.com/photo-1719610894782-7b376085e200?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG1pbmklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MINI DRESSES",
           href: "#"
         }
@@ -240,7 +237,7 @@ export default function Navbar() {
       ],
       featuredItems: [
         {
-          image: "/api/placeholder/400/500",
+          image: "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "SHOP ALL DRESSES",
           href: "#"
         }
@@ -259,7 +256,7 @@ export default function Navbar() {
             { name: "Novella", href: "#" },
             { name: "Mon Chéri", href: "#" },
             { name: "Noir", href: "#" },
-            { name: "All Collections", href: "#" }
+            { name: "All Collections", href: "#s" }
           ]
         },
         {
@@ -290,7 +287,7 @@ export default function Navbar() {
       ],
       featuredItems: [
         {
-          image: "/api/placeholder/400/500",
+          image: "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "THE WEDDING EDIT",
           href: "#"
         }
@@ -311,12 +308,12 @@ export default function Navbar() {
       ],
       featuredItems: [
         {
-          image: "/api/placeholder/400/500",
+          image: "https://images.unsplash.com/photo-1642447411662-59ab77473a8d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "NEW ARRIVALS",
           href: "#"
         },
         {
-          image: "/api/placeholder/400/500",
+          image: "https://images.unsplash.com/photo-1626818590159-04cb9274a5e0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDJ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "SEASONAL SALE | 25% OFF",
           href: "#"
         }

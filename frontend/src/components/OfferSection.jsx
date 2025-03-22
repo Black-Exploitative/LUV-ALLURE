@@ -184,21 +184,21 @@ export default function OfferSection() {
   const services = [
     {
       id: 1,
-      src: "/images/photo11.jpg",
+      src: "https://plus.unsplash.com/premium_photo-1661578500173-608987c20fc8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29uYWwlMjBzaG9waW5nfGVufDB8fDB8fHww",
       title: "EXCLUSIVE PERSONAL SHOPPING",
       description:
         "Looking for something special that's not in our collection? Share your vision, and we'll find it or curate a perfect alternative just for you.",
     },
     {
       id: 2,
-      src: "/images/photo12.jpg",
+      src: "https://images.unsplash.com/photo-1551232864-3f0890e580d9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3R5bGluZ3xlbnwwfHwwfHx8MA%3D%3D",
       title: "SIGNATURE STYLING SERVICE",
       description:
         "From birthdays to galas, our expert stylists create personalized looks tailored to your unique style and any occasion.",
     },
     {
       id: 3,
-      src: "/images/photo13.jpg",
+      src: "https://plus.unsplash.com/premium_photo-1664530452424-2bc239d787d8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZHJlc3MlMjBmaXR0aW5nfGVufDB8fDB8fHww",
       title: "PERFECT FIT TAILORING",
       description:
         "Ensure every piece fits perfectly. Our tailoring service adjusts garments from our collection to match your exact measurements.",

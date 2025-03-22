@@ -9,7 +9,7 @@ export default function Hero() {
         playsInline
         preload="auto"
       >
-        <source src="/videos/video.mp4" type="video/mp4" />
+        <source src="https://cdn.pixabay.com/video/2023/05/15/163117-827112884_large.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
