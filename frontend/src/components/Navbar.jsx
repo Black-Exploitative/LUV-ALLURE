@@ -454,7 +454,9 @@ export default function Navbar() {
         </motion.button>
 
         {/* Logo (Center) */}
+        
         <div className="text-xl font-bold absolute left-1/2 transform -translate-x-1/2">
+        <a href="/">
           <motion.img 
             src={darkNavbar ? "/images/LA-2.png" : "/images/LA-1.png"} 
             alt="Logo" 
@@ -462,17 +464,18 @@ export default function Navbar() {
             initial={{ opacity: 0.8 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-          />
+          /></a>
         </div>
 
         {/* Right-side Navigation (Desktop and Tablet) */}
         <div className={`hidden md:flex items-center space-x-6 text-xs lg:text-[12px] ${darkNavbar ? "text-white" : "text-black"}`}>
           {/* Show these links only on larger screens */}
-          <a href="#" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">CONTACT US</a>
+          <a href="/contact-us" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">CONTACT US</a>
           <a href="#" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">SERVICES</a>
           
           {/* Icons - wrapped in a flex container with consistent alignment */}
           <div className="flex items-center space-x-6">
+            
             <motion.div className="flex items-center h-full"> 
               <motion.img 
                 src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
@@ -483,6 +486,7 @@ export default function Navbar() {
               />
             </motion.div>
             
+            <a href="/user-account">
             <motion.div className="flex items-center h-full">
               <motion.img 
                 src={darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"} 
@@ -492,6 +496,7 @@ export default function Navbar() {
                 whileTap={{ scale: 0.9 }}
               />
             </motion.div>
+            </a>
 
             {/* Enhanced Cart Icon with Preview */}
             <motion.div 
@@ -596,7 +601,7 @@ export default function Navbar() {
           >
             <div className="flex flex-col space-y-8 text-black text-2xl font-medium">
               {[
-                { name: "SHOP", link: "#" },
+                { name: "SHOP", link: "shop" },
                 { name: "DRESSES", link: "#" },
                 { name: "COLLECTIONS", link: "#" },
                 { name: "NEW IN", link: "#" },
