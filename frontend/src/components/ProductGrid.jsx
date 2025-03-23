@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchProducts } from "../services/api";
 import ProductCard from "./ProductCard";
+import ProductSkeletonLoader from "./ProductSkeletonLoader";
 
 const ProductGrid = ({ gridType }) => {
   const navigate = useNavigate();
@@ -12,19 +13,15 @@ const ProductGrid = ({ gridType }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
         const data = await fetchProducts();
-        console.log("Raw API response:", data); // Debug log
         
         // Transform the response data to match component expectations
         if (data && data.products) {
           const transformedProducts = data.products.map(product => {
-            console.log("Processing product:", product); // Debug log
-            
             // Parse variant options (which contain color/size combinations)
             let variants = [];
             if (product.options) {
@@ -85,7 +82,10 @@ const ProductGrid = ({ gridType }) => {
         console.error("Error fetching products:", error);
         setError(error.message || "Failed to load products.");
       } finally {
-        setLoading(false);
+        // Simulate a minimum loading time for a better UX
+        setTimeout(() => {
+          setLoading(false);
+        }, 800);
       }
     };
     loadProducts();
@@ -131,40 +131,45 @@ const ProductGrid = ({ gridType }) => {
     });
   });
 
+  if (error) {
+    return <div className="text-red-500 text-center py-8">{error}</div>;
+  }
+
   return (
-    <div>
-      {loading && <p>Loading products...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-      <motion.div
-        ref={gridRef}
-        className={`
-          max-w-[1440px] mx-2 sm:px-6 
-          ${gridType === 2 
-            ? "grid grid-cols-1 md:grid-cols-2 gap-[10px] md:gap-[10px] place-content-center" 
-            : "grid grid-cols-2 md:grid-cols-4 gap-[10px] md:gap-[10px] place-content-center"}
-        `}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {groupedProducts.map((product) => (
-          <div key={product.id} className="overflow-hidden">
-            <ProductCard
-              product={{
-                id: product.id,
-                name: product.displayName || product.title,
-                price: product.priceValue,
-                sizes: product.sizes,
-                images: product.images,
-                color: product.color,
-                description: product.description
-              }}
-              gridType={gridType}
-              onProductClick={() => handleProductClick(product.originalProduct || product)}
-            />
-          </div>
-        ))}
-      </motion.div>
+    <div className="mx-[20px]">
+      {loading ? (
+        <ProductSkeletonLoader gridType={gridType} count={gridType === 2 ? 6 : 8} />
+      ) : (
+        <motion.div
+          ref={gridRef}
+          className={`
+            ${gridType === 2 
+              ? "grid grid-cols-1 md:grid-cols-2 gap-x-[10px] gap-y-[30px]" 
+              : "grid grid-cols-2 md:grid-cols-4 gap-x-[10px] md:gap-x-[10px] gap-y-[30px]"}
+          `}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {groupedProducts.map((product) => (
+            <div key={product.id} className="overflow-hidden w-full">
+              <ProductCard
+                product={{
+                  id: product.id,
+                  name: product.displayName || product.title,
+                  price: product.priceValue,
+                  sizes: product.sizes,
+                  images: product.images,
+                  color: product.color,
+                  description: product.description
+                }}
+                gridType={gridType}
+                onProductClick={() => handleProductClick(product.originalProduct || product)}
+              />
+            </div>
+          ))}
+        </motion.div>
+      )}
     </div>
   );
 };

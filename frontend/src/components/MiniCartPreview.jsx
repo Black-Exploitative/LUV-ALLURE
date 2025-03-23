@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import AnimatedCartBadge from '../components/AnimatedCartBadge';
 
 const MiniCartPreview = () => {
   const [isHovering, setIsHovering] = useState(false);
@@ -43,19 +42,17 @@ const MiniCartPreview = () => {
     };
   }, []);
 
+  // Format currency
+  const formatCurrency = (amount) => {
+    return `₦${parseFloat(amount).toLocaleString()}`;
+  };
+
   // Don't show preview if cart is empty
   if (cartItems.length === 0) {
     return (
-      <div 
-        className="relative"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div className="relative cursor-pointer">
         <div className="cart-icon-container">
-          <img src="/icons/cart.svg" alt="Cart" className="w-6 h-6" />
-          <span className="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-          <AnimatedCartBadge />
-          </span>
+          {/* We're not using the cart badge here as it's handled by the parent component */}
         </div>
       </div>
     );
@@ -68,18 +65,6 @@ const MiniCartPreview = () => {
       onMouseLeave={handleMouseLeave}
       ref={previewRef}
     >
-      {/* Cart Icon with Badge */}
-      <div className="cart-icon-container relative cursor-pointer">
-        <img src="/icons/cart.svg" alt="Cart" className="w-6 h-6" />
-        <motion.span 
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          className="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
-        >
-          {cartItems.length}
-        </motion.span>
-      </div>
-
       {/* Mini Cart Preview Popup */}
       <AnimatePresence>
         {isHovering && (
@@ -112,7 +97,7 @@ const MiniCartPreview = () => {
                         {item.selectedSize && <span className="mr-2">Size: {item.selectedSize}</span>}
                         {item.quantity && <span>Qty: {item.quantity}</span>}
                       </div>
-                      <p className="text-xs font-medium mt-1">₦{item.price}</p>
+                      <p className="text-xs font-medium mt-1">{formatCurrency(item.price)}</p>
                     </div>
                     <button 
                       onClick={(e) => {
@@ -138,7 +123,7 @@ const MiniCartPreview = () => {
               {/* Subtotal */}
               <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
                 <span className="text-xs uppercase font-medium">Subtotal</span>
-                <span className="text-sm font-medium">₦{subtotal.toLocaleString()}</span>
+                <span className="text-sm font-medium">{formatCurrency(subtotal)}</span>
               </div>
 
               {/* Buttons */}
@@ -155,7 +140,7 @@ const MiniCartPreview = () => {
                 <button 
                   onClick={() => {
                     setIsHovering(false);
-                    navigate('/bag');
+                    navigate('/shopping-bag');
                   }}
                   className="w-full cursor-pointer bg-white text-black border border-black text-xs uppercase tracking-wider py-2 hover:bg-gray-50 transition-colors"
                 >

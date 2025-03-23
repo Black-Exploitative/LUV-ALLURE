@@ -143,7 +143,7 @@ export default function Navbar() {
           <img
             src={darkNavbar ? "/icons/cart.svg" : "/icons/cart-black.svg"}
             alt="Cart"
-            className="w-[11px] h-[12px]"
+            className="w-[15px] h-[15px]"
           />
           <div className="relative">
             {cartItemCount > 0 && <AnimatedCartBadge theme={darkNavbar ? "light" : "dark"} />}
@@ -477,7 +477,7 @@ export default function Navbar() {
               <motion.img 
                 src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
                 alt="Search" 
-                className="w-[12px] h-[12px] cursor-pointer" 
+                className="w-[15px] h-[15px] cursor-pointer" 
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               />
@@ -487,7 +487,7 @@ export default function Navbar() {
               <motion.img 
                 src={darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"} 
                 alt="Phone" 
-                className="w-[9.6px] h-[12px] cursor-pointer"
+                className="w-[12.6px] h-[15px] cursor-pointer"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               />

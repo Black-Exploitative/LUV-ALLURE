@@ -334,7 +334,7 @@ const FilterSortBar = ({ onGridChange }) => {
             className="flex items-center text-gray-800 focus:outline-none cursor-pointer"
             onClick={toggleFilter}
           >
-            <span className="tracking-wider text-sm uppercase font-light">
+            <span className="tracking-wider text-sm uppercase font-thin">
               Filter
             </span>
             <span className="ml-2 text-sm leading-none">+</span>
@@ -361,7 +361,7 @@ const FilterSortBar = ({ onGridChange }) => {
           <span className="text-gray-400">|</span>
           <div className="relative">
             <button
-              className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-light tracking-wider focus:outline-none"
+              className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-thin tracking-wider focus:outline-none"
               onClick={toggleDropdown}
             >
               Sort <IoMdArrowDropdown className="ml-1" />

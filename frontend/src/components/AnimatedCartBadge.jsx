@@ -4,21 +4,18 @@ import { useCart } from "../context/CartContext";
 import PropTypes from "prop-types"; 
 
 const AnimatedCartBadge = ({ theme = "dark" }) => {
-  const { cartItems } = useCart();
-  const [prevCount, setPrevCount] = useState(cartItems.length);
+  const { cartItemCount } = useCart();
+  const [prevCount, setPrevCount] = useState(cartItemCount);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  
   const bgColor = theme === "dark" ? "bg-black" : "bg-white";
   const textColor = theme === "dark" ? "text-white" : "text-black";
   const borderStyle = theme === "light" ? "border border-white" : "";
 
   // Detect changes in cart item count
   useEffect(() => {
-    const currentCount = cartItems.length;
-
     // Only animate if items were added (not removed)
-    if (currentCount > prevCount) {
+    if (cartItemCount > prevCount) {
       setIsAnimating(true);
 
       // Reset animation state after a delay
@@ -30,16 +27,16 @@ const AnimatedCartBadge = ({ theme = "dark" }) => {
     }
 
     // Update the previous count
-    setPrevCount(currentCount);
-  }, [cartItems.length, prevCount]);
+    setPrevCount(cartItemCount);
+  }, [cartItemCount, prevCount]);
 
   return (
     <>
-      {/* Static Badge */}
+      {/* Main Badge - Shows only the count, not duplicated */}
       <span
-        className={`absolute -top-2 -right-2 ${bgColor} ${textColor} ${borderStyle} text-xs w-5 h-5 flex items-center justify-center rounded-full`}
+        className={`absolute -top-2 -right-2 ${bgColor} ${textColor} ${borderStyle} text-xs w-[10px] h-[10px] flex items-center justify-center rounded-full`}
       >
-        {cartItems.length}
+        {cartItemCount}
       </span>
 
       {/* Animation Layer */}
@@ -50,7 +47,7 @@ const AnimatedCartBadge = ({ theme = "dark" }) => {
             animate={{ scale: 2.5, opacity: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className={`absolute -top-2 -right-2 ${bgColor} ${textColor} ${borderStyle} text-xs w-5 h-5 flex items-center justify-center rounded-full pointer-events-none`}
+            className={`absolute -top-2 -right-2 ${bgColor} ${textColor} ${borderStyle} text-xs w-[10px] h-[10px] flex items-center justify-center rounded-full pointer-events-none`}
           />
         )}
       </AnimatePresence>
