@@ -16,6 +16,7 @@ import ForgotPassword from "./auth/ForgotPassword";
 import UserAccount from "./auth/UserAccount";
 import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
+import SearchResults from "./pages/SearchResults"; // Import the new search results page
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/user-account" element={<UserAccount />} />
+            <Route path="/search" element={<SearchResults />} />
           </Routes>
         </Router>
       </RecentlyViewedProvider>

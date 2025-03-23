@@ -1,4 +1,4 @@
-// server.js - Entry point
+// server.js - Entry point with search routes added
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const searchRoutes = require('./routes/searchRoutes'); // Add search routes
 
 dotenv.config();
 const app = express();
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/search', searchRoutes); // Mount search routes
 
 // Error handling middleware
 app.use(errorHandler);

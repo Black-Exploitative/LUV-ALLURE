@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import MiniCartPreview from "../components/MiniCartPreview";
 import AnimatedCartBadge from "../components/AnimatedCartBadge";
+import SearchBar from "./SearchBar";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -477,13 +478,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-6">
             
             <motion.div className="flex items-center h-full"> 
-              <motion.img 
-                src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
-                alt="Search" 
-                className="w-[15px] h-[15px] cursor-pointer" 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              />
+              <SearchBar />
             </motion.div>
             
             <a href="/user-account">
