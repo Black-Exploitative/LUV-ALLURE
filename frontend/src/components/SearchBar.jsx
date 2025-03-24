@@ -1,4 +1,3 @@
-// components/SearchBar.jsx
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaSearch, FaTimes, FaHistory, FaStar } from "react-icons/fa";

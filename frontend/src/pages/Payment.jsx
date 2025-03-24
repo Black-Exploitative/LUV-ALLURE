@@ -385,7 +385,7 @@ const PaymentPage = () => {
                         onClick={() => handleContinue(1)}
                         className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
                       >
-                        Continue to Shipping
+                        CONTINUE TO SHIPPING
                       </button>
                     </div>
                   </motion.div>
