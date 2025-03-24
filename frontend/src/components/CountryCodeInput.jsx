@@ -1,8 +1,9 @@
 import { useState } from "react";
-import countryCodes from "./countryCodes"; 
+import countryCodes from "../data/countryCodes";
+import PropTypes from "prop-types";
 
 export default function CountryCodeInput({ value, onChange }) {
-  const [countryCode, setCountryCode] = useState("+234"); 
+  const [countryCode, setCountryCode] = useState("+234");
 
   return (
     <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
@@ -28,3 +29,8 @@ export default function CountryCodeInput({ value, onChange }) {
     </div>
   );
 }
+
+CountryCodeInput.propTypes = {
+  value: PropTypes.string.isRequired, 
+  onChange: PropTypes.func.isRequired,
+};
