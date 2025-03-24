@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronDown, FaChevronUp, FaCheck } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
-import CheckoutNavbar from '../components/CheckOutNavbar';
+// import CheckoutNavbar from '../components/CheckOutNavbar';
 
 const PaymentPage = () => {
   const { cartItems, getCartTotals } = useCart();
@@ -117,20 +117,99 @@ const PaymentPage = () => {
     return completedSections.includes(section - 1) || activeSection === section;
   };
 
-  // Get section status icon - Changed from green to black and made bigger
+  
   const getSectionIcon = (section) => {
     if (completedSections.includes(section)) {
-      return <FaCheck className="w-6 h-6 text-black" />; // Changed from green to black and increased size
+      return <FaCheck className="w-6 h-6 text-black" />; 
     }
     return <span className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-800">{section}</span>; // Increased size to match
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <CheckoutNavbar />
       
       <div className="container mx-auto px-4 py-12 pt-24">
-        <h1 className="text-2xl font-bold mb-8">Checkout</h1>
+        {/* Checkout Header and Order Summary in a row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* Checkout Header Box */}
+          <div className="md:col-span-2 border border-gray-300 rounded-none p-4">
+            <p className="text-gray-700 font-thin">You are checking out as: <br /> <span className="font-thin">{formData.firstName ? `${formData.firstName}@example.com` : 'guest@example.com'}</span></p>
+          </div>
+          
+          {/* Order Summary - with thin grey border */}
+          <div className="border border-gray-300 rounded-none p-6">
+            <h2 className="text-lg font-bold mb-4">Order Summary</h2>
+            
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between text-sm">
+                <span>Items ({itemCount}):</span>
+                <span>₦{subtotal.toFixed(2)}</span>
+              </div>
+              
+              <div className="flex justify-between text-sm">
+                <span>Shipping:</span>
+                <span>{formData.shippingMethod === 'homeDelivery' ? '₦2,000.00' : 'Free'}</span>
+              </div>
+              
+              {formData.packagingOption === 'premium' && (
+                <div className="flex justify-between text-sm">
+                  <span>Premium Packaging:</span>
+                  <span>₦5,000.00</span>
+                </div>
+              )}
+              
+              {formData.giftWrapping && (
+                <div className="flex justify-between text-sm">
+                  <span>Gift Wrapping:</span>
+                  <span>₦2,000.00</span>
+                </div>
+              )}
+              
+              <div className="flex justify-between text-sm">
+                <span>Tax:</span>
+                <span>₦{(subtotal * 0.05).toFixed(2)}</span>
+              </div>
+              
+              <div className="border-t pt-3 mt-3">
+                <div className="flex justify-between font-bold">
+                  <span>Total:</span>
+                  <span>₦{(
+                    subtotal + 
+                    (formData.shippingMethod === 'homeDelivery' ? 2000 : 0) + 
+                    (formData.packagingOption === 'premium' ? 5000 : 0) + 
+                    (formData.giftWrapping ? 2000 : 0) + 
+                    (subtotal * 0.05)
+                  ).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Cart Items Summary */}
+            <div>
+              <h3 className="font-medium mb-3">Your Items</h3>
+              <div className="space-y-3">
+                {cartItems.map((item, index) => (
+                  <div key={index} className="flex items-center text-sm">
+                    <div className="w-10 h-10 bg-gray-200 mr-3">
+                      <img 
+                        src={item.images?.[0] || item.image || "/images/placeholder.jpg"} 
+                        alt={item.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{item.name}</p>
+                      {item.selectedSize && <p className="text-gray-500">Size: {item.selectedSize}</p>}
+                    </div>
+                    <span>₦{typeof item.price === 'string' 
+                      ? parseFloat(item.price.replace(/,/g, '')).toFixed(2)
+                      : parseFloat(item.price || 0).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Checkout Sections */}
@@ -365,7 +444,7 @@ const PaymentPage = () => {
               )}
             </div>
             
-            {/* Section 3: Packaging and Gifting - UPDATED with two packaging options and images */}
+            {/* Section 3: Packaging and Gifting */}
             <div className="bg-white shadow rounded-md overflow-hidden">
               <button 
                 className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${!canOpenSection(3) ? 'opacity-50 cursor-not-allowed' : ''} ${activeSection === 3 ? 'bg-black text-white' : 'bg-white text-black'}`}
@@ -644,79 +723,8 @@ const PaymentPage = () => {
             </div>
           </div>
           
-          {/* Order Summary */}
-          <div className="bg-white shadow rounded-md p-6">
-            <h2 className="text-lg font-bold mb-4">Order Summary</h2>
-            
-            <div className="space-y-4 mb-6">
-              <div className="flex justify-between text-sm">
-                <span>Items ({itemCount}):</span>
-                <span>₦{subtotal.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex justify-between text-sm">
-                <span>Shipping:</span>
-                <span>{formData.shippingMethod === 'homeDelivery' ? '₦2,000.00' : 'Free'}</span>
-              </div>
-              
-              {formData.packagingOption === 'premium' && (
-                <div className="flex justify-between text-sm">
-                  <span>Premium Packaging:</span>
-                  <span>₦5,000.00</span>
-                </div>
-              )}
-              
-              {formData.giftWrapping && (
-                <div className="flex justify-between text-sm">
-                  <span>Gift Wrapping:</span>
-                  <span>₦2,000.00</span>
-                </div>
-              )}
-              
-              <div className="flex justify-between text-sm">
-                <span>Tax:</span>
-                <span>₦{(subtotal * 0.05).toFixed(2)}</span>
-              </div>
-              
-              <div className="border-t pt-3 mt-3">
-                <div className="flex justify-between font-bold">
-                  <span>Total:</span>
-                  <span>₦{(
-                    subtotal + 
-                    (formData.shippingMethod === 'homeDelivery' ? 2000 : 0) + 
-                    (formData.packagingOption === 'premium' ? 5000 : 0) + 
-                    (formData.giftWrapping ? 2000 : 0) + 
-                    (subtotal * 0.05)
-                  ).toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Cart Items Summary */}
-            <div>
-              <h3 className="font-medium mb-3">Your Items</h3>
-              <div className="space-y-3">
-                {cartItems.map((item, index) => (
-                  <div key={index} className="flex items-center text-sm">
-                    <div className="w-10 h-10 bg-gray-200 mr-3">
-                      <img 
-                        src={item.images?.[0] || item.image || "/images/placeholder.jpg"} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">{item.name}</p>
-                      {item.selectedSize && <p className="text-gray-500">Size: {item.selectedSize}</p>}
-                    </div>
-                    <span>₦{typeof item.price === 'string' 
-                      ? parseFloat(item.price.replace(/,/g, '')).toFixed(2)
-                      : parseFloat(item.price || 0).toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          {/* Column spacer for layout balance - the order summary is now at the top */}
+          <div className="hidden md:block"></div>
         </div>
       </div>
     </div>
