@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronDown, FaChevronUp, FaCheck } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
-// import CheckoutNavbar from '../components/CheckOutNavbar';
+import CountryCodeInput from "../components/CountryCodeInput";
 
 const PaymentPage = () => {
   const { cartItems, getCartTotals } = useCart();
@@ -332,16 +332,9 @@ const PaymentPage = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Contact Number
                         </label>
-                        <input
-                          type="tel"
-                          name="contactNumber"
+                        <CountryCodeInput
                           value={formData.contactNumber}
                           onChange={handleInputChange}
-                          className={`w-full p-2 border ${
-                            errors.contactNumber
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } rounded-md`}
                         />
                         {errors.contactNumber && (
                           <p className="text-red-500 text-xs mt-1">
