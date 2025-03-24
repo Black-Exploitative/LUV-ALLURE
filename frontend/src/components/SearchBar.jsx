@@ -36,10 +36,14 @@ const SearchBar = ({ darkNavbar }) => {
       setTimeout(() => {
         inputRef.current.focus();
       }, 300); // Small delay to ensure animation has started
-    }
-    
-    // Load recent searches from localStorage
-    if (isOpen) {
+      
+      // Lock body scroll
+      document.body.style.overflow = 'hidden';
+      
+      // Add blur class to the main content
+      document.body.classList.add('search-open');
+      
+      // Load recent searches from localStorage
       const savedSearches = localStorage.getItem('recentSearches');
       if (savedSearches) {
         try {
@@ -49,16 +53,17 @@ const SearchBar = ({ darkNavbar }) => {
           setRecentSearches([]);
         }
       }
-    }
-    
-    // When search opens, add a blur class to the main content
-    if (isOpen) {
-      document.body.classList.add('search-open');
     } else {
+      // Restore body scroll
+      document.body.style.overflow = '';
+      
+      // Remove blur class
       document.body.classList.remove('search-open');
     }
     
+    // Cleanup function
     return () => {
+      document.body.style.overflow = '';
       document.body.classList.remove('search-open');
     };
   }, [isOpen]);
