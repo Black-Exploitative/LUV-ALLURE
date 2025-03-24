@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronDown, FaChevronUp, FaCheck } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
-import Navbar from '../components/Navbar';
+import CheckoutNavbar from '../components/CheckOutNavbar';
 
 const PaymentPage = () => {
   const { cartItems, getCartTotals } = useCart();
@@ -127,7 +127,7 @@ const PaymentPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      <CheckoutNavbar />
       
       <div className="container mx-auto px-4 py-12 pt-24">
         <h1 className="text-2xl font-bold mb-8">Checkout</h1>
