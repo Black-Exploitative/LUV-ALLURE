@@ -1,8 +1,8 @@
 // components/SearchBar.jsx
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaSearch, FaTimes, FaHistory, FaStar } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaHistory } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
 import searchService from "../services/searchApi";
 
 const SearchBar = () => {
@@ -18,6 +18,21 @@ const SearchBar = () => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Detect if we're on the home page to set dark navbar
+  useEffect(() => {
+    setDarkNavbar(location.pathname === "/" && window.scrollY <= 50);
+    
+    const handleScroll = () => {
+      if (location.pathname === "/") {
+        setDarkNavbar(window.scrollY <= 50);
+      }
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location.pathname]);
 
   // Categories for filtering results
   const categories = [
@@ -138,8 +153,6 @@ const SearchBar = () => {
 
   const handleCloseSearch = () => {
     setIsOpen(false);
-    setSearchQuery("");
-    setSearchResults([]);
   };
 
   const handleCategoryChange = (category) => {
@@ -147,14 +160,13 @@ const SearchBar = () => {
   };
 
   const handleResultClick = (productId) => {
-    setIsOpen(false);
-    
     // Save search before navigating
     if (searchQuery.trim()) {
       saveRecentSearch(searchQuery);
     }
     
     navigate(`/product/${productId}`);
+    setIsOpen(false);
   };
   
   const handleSuggestionClick = (suggestion) => {
@@ -166,6 +178,14 @@ const SearchBar = () => {
   const handleRecentSearchClick = (searchTerm) => {
     setSearchQuery(searchTerm);
     performSearch();
+  };
+  
+  const handleSeeAllResults = () => {
+    if (searchQuery.trim()) {
+      saveRecentSearch(searchQuery);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${selectedCategory}`);
+      setIsOpen(false);
+    }
   };
   
   const clearRecentSearches = () => {
@@ -189,15 +209,13 @@ const SearchBar = () => {
         className="focus:outline-none"
         aria-label="Search"
       >
-        
-            <motion.img 
-              src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
-              alt="Search" 
-              className="w-5 h-5 cursor-pointer" 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            />
-        
+        <motion.img 
+          src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
+          alt="Search" 
+          className="w-[15px] h-[15px] cursor-pointer" 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        />
       </button>
 
       {/* Search overlay and panel */}
@@ -216,16 +234,20 @@ const SearchBar = () => {
 
             {/* Search panel */}
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 left-0 right-0 bg-white z-50 shadow-lg"
+              initial={{ y: "-100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "-100%" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="fixed top-0 left-0 right-0 bg-white z-50 shadow-lg max-h-[85vh] overflow-auto"
             >
               <div className="container mx-auto px-4 py-4">
                 {/* Search input and close button */}
                 <div className="flex items-center border-b border-gray-300 pb-4">
-                  <FaSearch className="text-gray-400 mr-3" />
+                  <img 
+                    src={"/icons/search-black.svg"} 
+                    alt="Search" 
+                    className="w-5 h-5 mr-3 text-gray-400" 
+                  />
                   <input
                     ref={inputRef}
                     type="text"
@@ -241,7 +263,9 @@ const SearchBar = () => {
                       className="mr-3 text-gray-400 hover:text-gray-600"
                       aria-label="Clear search"
                     >
-                      <FaTimes />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   )}
                   <button 
@@ -249,7 +273,9 @@ const SearchBar = () => {
                     className="ml-2 text-gray-600 hover:text-black"
                     aria-label="Close search"
                   >
-                    <FaTimes className="w-5 h-5" />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
 
@@ -281,7 +307,11 @@ const SearchBar = () => {
                           className="px-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
                           onClick={() => handleSuggestionClick(suggestion)}
                         >
-                          <FaSearch className="text-gray-400 mr-3 text-xs" />
+                          <img 
+                            src={"/icons/search-black.svg"} 
+                            alt="Search" 
+                            className="w-4 h-4 mr-3 text-gray-400" 
+                          />
                           <span className="text-sm">{suggestion}</span>
                         </div>
                       ))}
@@ -366,10 +396,7 @@ const SearchBar = () => {
                         <div className="text-center mt-6">
                           <button 
                             className="text-black underline hover:text-gray-600 text-sm"
-                            onClick={() => {
-                              navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${selectedCategory}`);
-                              handleCloseSearch();
-                            }}
+                            onClick={handleSeeAllResults}
                           >
                             See all results
                           </button>
