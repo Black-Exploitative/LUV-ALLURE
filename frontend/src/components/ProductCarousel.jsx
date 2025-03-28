@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 
 const ProductCarousel = ({ images }) => {
-  const [primaryImageIndex, setPrimaryImageIndex] = useState(0);
-  const [secondaryImageIndex, setSecondaryImageIndex] = useState(1);
+  const [currentPair, setCurrentPair] = useState([0, 1]);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState(1); // 1 for right, -1 for left
+  const [showArrows, setShowArrows] = useState(false);
   const thumbnailsContainerRef = useRef(null);
+  const dragX = useMotionValue(0);
+  const opacity = useTransform(dragX, [-100, 0, 100], [0.5, 1, 0.5]);
   
   // Extend images array if it's too short
   const extendedImages = images.length < 6 
@@ -15,148 +18,196 @@ const ProductCarousel = ({ images }) => {
     : images;
 
   // Max number of thumbnails visible at once
-  const maxVisibleThumbnails = 5;
+  const maxVisibleThumbnails = 7;
   
-  // Number of thumbnails (max 6 or image count, whichever is higher)
+  // Number of thumbnails
   const thumbnailCount = extendedImages.length;
 
-  // Ensure secondary image is always different from primary
+  // Ensure we always have a valid pair of images
   useEffect(() => {
     if (extendedImages.length === 1) {
-      setSecondaryImageIndex(0);
-    } 
-    else if (secondaryImageIndex >= extendedImages.length || secondaryImageIndex === primaryImageIndex) {
-      setSecondaryImageIndex((primaryImageIndex + 1) % extendedImages.length);
+      setCurrentPair([0, 0]);
+    } else if (currentPair[1] >= extendedImages.length) {
+      setCurrentPair([currentPair[0], (currentPair[0] + 1) % extendedImages.length]);
     }
-  }, [extendedImages.length, primaryImageIndex, secondaryImageIndex]);
+  }, [extendedImages.length, currentPair]);
 
   const handleThumbnailClick = (index) => {
     // Only update if clicking a different image than the current primary
-    if (index !== primaryImageIndex) {
-      setPrimaryImageIndex(index);
+    if (index !== currentPair[0]) {
+      // Determine slide direction based on the clicked index
+      if (index > currentPair[0] && !(currentPair[0] === extendedImages.length - 1 && index === 0)) {
+        setSlideDirection(1); // slide from right
+      } else if (index < currentPair[0] && !(currentPair[0] === 0 && index === extendedImages.length - 1)) {
+        setSlideDirection(-1); // slide from left
+      } else if (currentPair[0] === extendedImages.length - 1 && index === 0) {
+        setSlideDirection(1); // Wrap forward
+      } else if (currentPair[0] === 0 && index === extendedImages.length - 1) {
+        setSlideDirection(-1); // Wrap backward
+      }
       
-      // Update secondary image to be the next one after the clicked one
-      if (extendedImages.length > 1) {
-        setSecondaryImageIndex((index + 1) % extendedImages.length);
-      }
+      // Update current pair - make the selected image the primary, and the next one secondary
+      const nextIndex = (index + 1) % extendedImages.length;
+      setCurrentPair([index, nextIndex]);
     }
   };
 
-  // Navigate thumbnails - moving one at a time
+  // Navigate thumbnails with smooth continuous flow
   const navigateThumbnails = (direction) => {
-    if (direction > 0) {
-      // Forward navigation: don't go past the end
-      if (thumbnailStartIndex + maxVisibleThumbnails < thumbnailCount) {
-        setThumbnailStartIndex(prev => prev + 1);
+    setSlideDirection(direction);
+    
+    setThumbnailStartIndex((prevIndex) => {
+      let nextIndex = prevIndex + direction;
+      
+      // Create a circular buffer effect
+      if (nextIndex < 0) {
+        nextIndex = thumbnailCount - 1;
+      } else if (nextIndex >= thumbnailCount) {
+        nextIndex = 0;
       }
-    } else {
-      // Backward navigation: don't go before the start
-      if (thumbnailStartIndex > 0) {
-        setThumbnailStartIndex(prev => prev - 1);
-      }
+      
+      return nextIndex;
+    });
+  };
+
+  // Handle drag end for thumbnail carousel
+  const handleDragEnd = (info) => {
+    const dragThreshold = 50;
+    if (Math.abs(info.offset.x) > dragThreshold) {
+      navigateThumbnails(info.offset.x > 0 ? -1 : 1);
     }
+    dragX.set(0);
   };
 
-  // Calculate which thumbnails to show based on start index and max visible
-  const visibleThumbnails = extendedImages.slice(
-    thumbnailStartIndex, 
-    thumbnailStartIndex + maxVisibleThumbnails
-  );
-
-  // Animation variants for the thumbnail container
-  const thumbnailContainerVariants = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 0.3 } },
-    exit: { opacity: 0, transition: { duration: 0.3 } }
+  // Calculate visible thumbnails with a circular buffer approach
+  const getVisibleThumbnails = () => {
+    const visibleThumbs = [];
+    
+    for (let i = 0; i < maxVisibleThumbnails; i++) {
+      const index = (thumbnailStartIndex + i) % thumbnailCount;
+      visibleThumbs.push({
+        image: extendedImages[index],
+        index: index
+      });
+    }
+    
+    return visibleThumbs;
   };
+
+  const visibleThumbnails = getVisibleThumbnails();
 
   return (
-    <div className="flex flex-col">
-      {/* Main Images Section - Two side by side */}
-      <div className="flex flex-col md:flex-row mb-2">
-        {/* Primary Image */}
-        <div className="w-full md:w-1/2 mb-2 md:mb-0 md:pr-1">
-          <div className="relative h-[700px]">
-            <img
-              src={extendedImages[primaryImageIndex]}
-              alt={`Main Image ${primaryImageIndex + 1}`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
+    <div 
+      className="flex flex-col"
+      onMouseEnter={() => setShowArrows(true)}
+      onMouseLeave={() => setShowArrows(false)}
+    >
+      {/* Main Images Section */}
+      <div className="relative mb-[5px] overflow-hidden" style={{ width: "1040px", height: "800px" }}>
+        <AnimatePresence initial={false} custom={slideDirection}>
+          <motion.div
+            key={`pair-${currentPair[0]}`}
+            className="absolute top-0 left-0 flex"
+            custom={slideDirection}
+            initial={{ x: slideDirection * 1040 }}
+            animate={{ x: 0 }}
+            exit={{ x: -slideDirection * 1040 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            style={{ width: "1040px" }}
+          >
+            {/* Primary Image */}
+            <div className="w-[520px]">
+              <div className="relative h-[800px]">
+                <img
+                  src={extendedImages[currentPair[0]]}
+                  alt={`Main Image ${currentPair[0] + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
 
-        {/* Secondary Image */}
-        <div className="w-full md:w-1/2 md:pl-1">
-          <div className="relative h-[700px]">
-            <img
-              src={extendedImages[secondaryImageIndex]}
-              alt={`Secondary Image ${secondaryImageIndex + 1}`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
+            {/* Secondary Image */}
+            <div className="w-[520px]">
+              <div className="relative h-[800px]">
+                <img
+                  src={extendedImages[currentPair[1]]}
+                  alt={`Secondary Image ${currentPair[1] + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Thumbnails carousel with navigation arrows */}
-      <div className="relative mt-4">
+      <div className="relative">
         {/* Left Navigation Arrow */}
-        {thumbnailStartIndex > 0 && (
-          <button 
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full w-8 h-8 flex items-center justify-center shadow-md"
-            onClick={() => navigateThumbnails(-1)}
-          >
-            <FaChevronLeft className="text-black text-sm" />
-          </button>
-        )}
+        <AnimatePresence>
+          {showArrows && (
+            <motion.button 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full w-8 h-8 flex items-center justify-center shadow-md"
+              onClick={() => navigateThumbnails(-1)}
+            >
+              <FaChevronLeft className="text-black text-sm" />
+            </motion.button>
+          )}
+        </AnimatePresence>
         
-        {/* Thumbnails Container */}
+        {/* Thumbnails Container with drag functionality */}
         <div 
           ref={thumbnailsContainerRef} 
-          className="flex mx-10 justify-center" 
+          className="relative overflow-hidden" 
+          style={{ height: "202px" }}
         >
-          <AnimatePresence initial={false}>
-            <motion.div 
-              className="flex space-x-[5px] overflow-hidden"
-              key={thumbnailStartIndex} 
-              variants={thumbnailContainerVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
-              {visibleThumbnails.map((image, i) => {
-                // Calculate the actual index in the full array
-                const actualIndex = thumbnailStartIndex + i;
-                
-                return (
-                  <div 
-                    key={`thumb-${actualIndex}`}
-                    className={`w-[114px] h-40 flex-shrink-0 cursor-pointer transition-all duration-200
-                      ${actualIndex === primaryImageIndex || actualIndex === secondaryImageIndex 
-                        ? "opacity-100 ring-2 ring-black" 
-                        : "opacity-70 hover:opacity-100"}`}
-                    onClick={() => handleThumbnailClick(actualIndex)}
-                  >
-                    <img
-                      src={image}
-                      alt={`Thumbnail ${actualIndex + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                );
-              })}
-            </motion.div>
-          </AnimatePresence>
+          <motion.div 
+            className="flex space-x-[5px]"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.1}
+            style={{ x: dragX, opacity }}
+            onDragEnd={handleDragEnd}
+          >
+            {visibleThumbnails.map((item, i) => (
+              <motion.div 
+                key={`thumb-${i}-${item.index}`}
+                className={`w-[144.5px] flex-shrink-0 cursor-pointer transition-all duration-200
+                  ${item.index === currentPair[0]
+                    ? "border-[0.3px] border-black h-[202px]" 
+                    : "border-transparent h-[200px]"}`}
+                onClick={() => handleThumbnailClick(item.index)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <img
+                  src={item.image}
+                  alt={`Thumbnail ${item.index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
         
         {/* Right Navigation Arrow */}
-        {thumbnailStartIndex + maxVisibleThumbnails < thumbnailCount && (
-          <button 
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full w-8 h-8 flex items-center justify-center shadow-md"
-            onClick={() => navigateThumbnails(1)}
-          >
-            <FaChevronRight className="text-black text-sm" />
-          </button>
-        )}
+        <AnimatePresence>
+          {showArrows && (
+            <motion.button 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white/90 rounded-full w-8 h-8 flex items-center justify-center shadow-md"
+              onClick={() => navigateThumbnails(1)}
+            >
+              <FaChevronRight className="text-black text-sm" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

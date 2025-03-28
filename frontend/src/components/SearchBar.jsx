@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaHistory } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaSearch, FaTimes, FaHistory } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import searchService from "../services/searchApi";
@@ -15,6 +17,15 @@ const SearchBar = ({ darkNavbar }) => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const navigate = useNavigate();
+
+  // Categories for filtering results
+  const categories = [
+    { id: "all", name: "All" },
+    { id: "dresses", name: "Dresses" },
+    { id: "tops", name: "Tops" },
+    { id: "bottoms", name: "Bottoms" },
+    { id: "accessories", name: "Accessories" },
+  ];
 
   // Close search when clicking outside
   useEffect(() => {
@@ -148,19 +159,18 @@ const SearchBar = ({ darkNavbar }) => {
 
   const handleCloseSearch = () => {
     setIsOpen(false);
-    setSearchQuery("");
-    setSearchResults([]);
   };
 
   const handleResultClick = (productId) => {
     setIsOpen(false);
-
+    
     // Save search before navigating
     if (searchQuery.trim()) {
       saveRecentSearch(searchQuery);
     }
 
     navigate(`/product/${productId}`);
+    setIsOpen(false);
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -173,7 +183,7 @@ const SearchBar = ({ darkNavbar }) => {
     setSearchQuery(searchTerm);
     performSearch();
   };
-
+  
   const clearRecentSearches = () => {
     setRecentSearches([]);
     localStorage.removeItem("recentSearches");
@@ -228,13 +238,15 @@ const SearchBar = ({ darkNavbar }) => {
         className="focus:outline-none transition-opacity duration-300"
         aria-label="Search"
       >
-        <motion.img
-          src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"}
-          alt="Search"
-          className="w-5 h-5 cursor-pointer"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        />
+        
+            <motion.img 
+              src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
+              alt="Search" 
+              className="w-5 h-5 cursor-pointer" 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            />
+        
       </button>
 
       {/* Search overlay and panel */}
@@ -253,16 +265,16 @@ const SearchBar = ({ darkNavbar }) => {
 
             {/* Search panel - Fixed position below navbar */}
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={searchPanelVariants}
-              className="fixed left-0 right-0 top-[70px] bg-white z-50 overflow-hidden border-t border-gray-200"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed top-0 left-0 right-0 bg-white z-50 shadow-lg"
             >
-              {/* Search input container */}
-              <div className="container mx-auto border-b border-gray-200">
-                <div className="px-6 py-4 flex items-center">
-                  <FaSearch className="text-gray-400 mr-4 text-lg" />
+              <div className="container mx-auto px-4 py-4">
+                {/* Search input and close button */}
+                <div className="flex items-center border-b border-gray-300 pb-4">
+                  <FaSearch className="text-gray-400 mr-3" />
                   <input
                     ref={inputRef}
                     type="text"
@@ -272,66 +284,72 @@ const SearchBar = ({ darkNavbar }) => {
                     className="flex-grow text-base font-light focus:outline-none"
                     autoComplete="off"
                   />
-                  <button
+                  {searchQuery && (
+                    <button 
+                      onClick={handleClearSearch}
+                      className="mr-3 text-gray-400 hover:text-gray-600"
+                      aria-label="Clear search"
+                    >
+                      <FaTimes />
+                    </button>
+                  )}
+                  <button 
                     onClick={handleCloseSearch}
                     className="ml-4 text-gray-500 hover:text-black transition-colors duration-300"
                     aria-label="Close search"
                   >
-                    <FaTimes className="w-5 h-5" />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
               </div>
 
-              {/* Results container with scrolling */}
-              <div className="container mx-auto">
-                <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
-                  {/* Search suggestions */}
-                  {showSuggestions && suggestions.length > 0 && !loading && (
-                    <div className="mb-8">
-                      <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-3 font-medium">
-                        Popular Searches
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {suggestions.map((suggestion, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleSuggestionClick(suggestion)}
-                            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-sm rounded-sm transition-colors"
-                          >
-                            {suggestion}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Recent searches */}
-                  {searchQuery.length < 2 && recentSearches.length > 0 && (
-                    <div className="mb-8">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="text-xs uppercase tracking-wider text-gray-500 font-medium">
-                          Recent Searches
-                        </h3>
-                        <button
-                          className="text-xs text-gray-500 hover:text-black transition-colors"
-                          onClick={clearRecentSearches}
+                {/* Search suggestions */}
+                {showSuggestions && suggestions.length > 0 && !loading && (
+                  <div className="mt-2">
+                    <h3 className="text-xs font-medium text-gray-500 mb-2">SUGGESTIONS</h3>
+                    <div className="space-y-1">
+                      {suggestions.map((suggestion, index) => (
+                        <div 
+                          key={index}
+                          className="px-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                          onClick={() => handleSuggestionClick(suggestion)}
                         >
-                          Clear
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {recentSearches.map((search, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleRecentSearchClick(search)}
-                            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-sm rounded-sm transition-colors"
-                          >
-                            {search}
-                          </button>
-                        ))}
-                      </div>
+                          <FaSearch className="text-gray-400 mr-3 text-xs" />
+                          <span className="text-sm">{suggestion}</span>
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </div>
+                )}
+                
+                {/* Recent searches */}
+                {searchQuery.length < 2 && recentSearches.length > 0 && (
+                  <div className="mt-4 mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-xs font-medium text-gray-500">RECENT SEARCHES</h3>
+                      <button 
+                        className="text-xs text-gray-500 hover:text-black"
+                        onClick={clearRecentSearches}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {recentSearches.map((search, index) => (
+                        <div 
+                          key={index}
+                          className="px-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                          onClick={() => handleRecentSearchClick(search)}
+                        >
+                          <FaHistory className="text-gray-400 mr-3 text-xs" />
+                          <span className="text-sm">{search}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                   {/* Search results */}
                   <div className="mb-6">
@@ -359,164 +377,51 @@ const SearchBar = ({ darkNavbar }) => {
                         </div>
                       )}
 
-                    {!loading && searchResults.length > 0 && (
-                      <div>
-                        <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-4 font-medium">
-                          Results
-                        </h3>
-
-                        {/* Replace the existing search results section with this */}
-                        <div>
-                          {/* Top divider line */}
-                          <div className="border-t border-gray-200 my-4"></div>
-
-                          {/* Filter sections */}
-                          <div className="mb-8">
-                            {/* Color filter */}
-                            <div className="mb-6">
-                              <h3 className="text-xs uppercase tracking-wider font-medium pb-2 inline-block border-b border-black">
-                                COLOUR
-                              </h3>
-
-                              <div className="mt-4 grid grid-cols-3 gap-6 max-w-[320px]">
-                                {/* Color circles - first row */}
-                                <button className="w-12 h-12 rounded-full bg-black border border-gray-200 hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all duration-200"></button>
-                                <button className="w-12 h-12 rounded-full bg-white border border-gray-200 hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all duration-200"></button>
-                                <button className="w-12 h-12 rounded-full bg-red-500 border border-gray-200 hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all duration-200"></button>
-
-                                {/* Color circles - second row */}
-                                <button className="w-12 h-12 rounded-full bg-blue-500 border border-gray-200 hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all duration-200"></button>
-                                <button className="w-12 h-12 rounded-full bg-green-500 border border-gray-200 hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all duration-200"></button>
-                                <button className="w-12 h-12 rounded-full bg-yellow-400 border border-gray-200 hover:ring-2 hover:ring-offset-2 hover:ring-black transition-all duration-200"></button>
-                              </div>
+                  {!loading && searchResults.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium text-gray-500">SEARCH RESULTS</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {searchResults.map(product => (
+                          <div 
+                            key={product.id}
+                            className="flex items-center border border-gray-200 p-3 cursor-pointer hover:border-gray-400 transition-colors"
+                            onClick={() => handleResultClick(product.id)}
+                          >
+                            {/* Product Image */}
+                            <div className="w-16 h-20 bg-gray-100 mr-3 flex-shrink-0">
+                              <img
+                                src={product.image || product.images?.[0] || "/images/placeholder.jpg"}
+                                alt={product.title}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-
-                            {/* Divider line between filters */}
-                            <div className="border-t border-gray-200 my-4"></div>
-
-                            {/* Size filter */}
-                            <div>
-                              <h3 className="text-xs uppercase tracking-wider font-medium pb-2">
-                                SIZE
-                              </h3>
-
-                              <div className="mt-4 grid grid-cols-3 gap-4 max-w-[320px]">
-                                {/* Size options - first row */}
-                                <button className="py-2 px-4 border border-gray-300 text-sm hover:border-black transition-colors duration-200">
-                                  XS
-                                </button>
-                                <button className="py-2 px-4 border border-gray-300 text-sm hover:border-black transition-colors duration-200">
-                                  S
-                                </button>
-                                <button className="py-2 px-4 border border-gray-300 text-sm hover:border-black transition-colors duration-200">
-                                  M
-                                </button>
-
-                                {/* Size options - second row */}
-                                <button className="py-2 px-4 border border-gray-300 text-sm hover:border-black transition-colors duration-200">
-                                  L
-                                </button>
-                                <button className="py-2 px-4 border border-gray-300 text-sm hover:border-black transition-colors duration-200">
-                                  XL
-                                </button>
-                                <button className="py-2 px-4 border border-gray-300 text-sm hover:border-black transition-colors duration-200">
-                                  XXL
-                                </button>
-                              </div>
+                            
+                            {/* Product Info */}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium truncate">{product.title}</h4>
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-1">{product.productType}</p>
+                              <p className="text-sm text-gray-800 mt-1 font-medium">₦{parseFloat(product.price).toLocaleString()}</p>
                             </div>
                           </div>
-
-                          {/* Search results title with View All button on right */}
-                          <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xs uppercase tracking-wider text-gray-500 font-medium">
-                              RESULTS
-                            </h3>
-
-                            {searchResults.length > 0 && (
-                              <button
-                                className="text-xs uppercase tracking-wider text-black hover:text-gray-700 transition-colors duration-200 flex items-center"
-                                onClick={() => {
-                                  navigate(
-                                    `/search?q=${encodeURIComponent(
-                                      searchQuery
-                                    )}`
-                                  );
-                                  handleCloseSearch();
-                                }}
-                              >
-                                View All Results
-                                <svg
-                                  className="ml-1 w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M9 5l7 7-7 7"
-                                  ></path>
-                                </svg>
-                              </button>
-                            )}
-                          </div>
-
-                          {/* Products grid - 6 per row on desktop */}
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                            {searchResults.map((product) => (
-                              <div
-                                key={product.id}
-                                className="cursor-pointer group"
-                                onClick={() => handleResultClick(product.id)}
-                              >
-                                {/* Product Image */}
-                                <div className="aspect-[3/4] overflow-hidden mb-2">
-                                  <img
-                                    src={
-                                      product.image ||
-                                      product.images?.[0] ||
-                                      "/images/placeholder.jpg"
-                                    }
-                                    alt={product.title}
-                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 ease-out"
-                                  />
-                                </div>
-
-                                {/* Product Info */}
-                                <div>
-                                  <h4 className="text-xs text-gray-800 line-clamp-1">
-                                    {product.title}
-                                  </h4>
-                                  <p className="text-xs text-black font-medium mt-1">
-                                    ₦
-                                    {parseFloat(product.price).toLocaleString()}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {searchResults.length > 0 && (
-                          <div className="text-center mt-8">
-                            <button
-                              className="text-black border-b border-black hover:text-gray-600 text-sm transition-colors duration-300 pb-1"
-                              onClick={() => {
-                                navigate(
-                                  `/search?q=${encodeURIComponent(searchQuery)}`
-                                );
-                                handleCloseSearch();
-                              }}
-                            >
-                              View All Results
-                            </button>
-                          </div>
-                        )}
+                        ))}
                       </div>
-                    )}
-                  </div>
+                      
+                      {searchResults.length > 0 && (
+                        <div className="text-center mt-6">
+                          <button 
+                            className="text-black underline hover:text-gray-600 text-sm"
+                            onClick={() => {
+                              navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${selectedCategory}`);
+                              handleCloseSearch();
+                            }}
+                          >
+                            See all results
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>

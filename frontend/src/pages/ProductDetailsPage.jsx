@@ -252,15 +252,15 @@ const ProductDetailsPage = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto">
-        <div className="mt-16 md:mt-[72px] flex flex-col md:flex-row md:space-x-12">
+      <div className="mx-[80px]">
+        <div className="mt-[100px] md:mt-[100px] flex flex-col md:flex-row">
           {/* Left Side: Product Carousel */}
-          <div className="w-full md:w-7/12 lg:w-8/12 mb-8 md:mb-0">
+          <div className="mb-8 md:mb-0 mr-[50px]">
             <ProductCarousel images={product.images} />
           </div>
 
           {/* Right Side: Product Details */}
-          <div className="w-full md:w-5/12 lg:w-4/12">
+          <div className="w-[400px] flex flex-col justify-start">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
             {/*  Star Rating */}
@@ -283,7 +283,7 @@ const ProductDetailsPage = () => {
                   {product.colors.map((color, index) => (
                     <button
                       key={index}
-                      className={`w-[30px] h-[30px] flex transition-all cursor-pointer duration-300 bg-white items-center justify-center ${
+                      className={`w-[35px] h-[35px] flex transition-all cursor-pointer duration-300 bg-white items-center justify-center ${
                         selectedColor === color.name
                           ? "border-[0.3px] border-black"
                           : "border border-gray-300"
@@ -296,7 +296,7 @@ const ProductDetailsPage = () => {
                       disabled={!color.inStock}
                     >
                       <button
-                        className={`w-[24px] h-[24px] flex items-center cursor-pointer justify-center`}
+                        className={`w-[29px] h-[29px] flex items-center cursor-pointer justify-center`}
                       >
                         <img
                           src="../public/images/stylewith2.jpg"
@@ -315,7 +315,7 @@ const ProductDetailsPage = () => {
               <div className="flex justify-between items-center mb-2">
                 <p className="text-xs font-medium">SIZE:</p>
                 <button
-                  className="text-[10px] underline cursor-pointer"
+                  className="text-[12px] underline cursor-pointer"
                   onClick={() => console.log("Size guide clicked")}
                 >
                   Size Guide
@@ -325,7 +325,7 @@ const ProductDetailsPage = () => {
                 {product.sizes.map((size, index) => (
                   <button
                     key={index}
-                    className={`border w-[30px] h-[30px] text-[10px] font-normal items-center cursor-pointer ${
+                    className={`border w-[40px] h-[40px] text-[10px] font-normal items-center cursor-pointer ${
                       selectedSize === size
                         ? "border-black border-width-[0.5px]"
                         : "border-gray-300 hover:bg-gray-100"
@@ -336,16 +336,11 @@ const ProductDetailsPage = () => {
                   </button>
                 ))}
               </div>
-              {selectedSize === "" && (
-                <p className="text-red-500 text-sm mt-2">
-                  Please select a size
-                </p>
-              )}
             </div>
 
             {/* Add to Cart Button */}
             <motion.button
-              className={`w-full py-3 transition-colors cursor-pointer ${
+              className={`w-full py-3 transition-colors cursor-pointer text-[13.7px] ${
                 canAddToCart
                   ? "bg-black text-white hover:bg-gray-800"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -366,13 +361,13 @@ const ProductDetailsPage = () => {
 
             {/* Wishlist Button */}
             <div
-              className="flex items-center justify-start gap-2 mt-4 mb-2 cursor-pointer"
+              className="flex items-center justify-start gap-2 text-[13px] mt-4 mb-2 cursor-pointer"
               onClick={toggleWishlist}
             >
               {isInWishlist ? (
-                <FaHeart className="h-5 w-5 text-black" />
+                <FaHeart className="h-[15px] w-[15px] text-black" />
               ) : (
-                <FiHeart className="h-5 w-5" />
+                <FiHeart className="h-[15px] w-[15px]" />
               )}
               <span>Add to Wishlist</span>
             </div>
