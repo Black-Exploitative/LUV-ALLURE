@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaHistory } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaSearch, FaTimes, FaHistory } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import searchService from "../services/searchApi";
 
 const SearchBar = ({ darkNavbar }) => {
@@ -14,6 +12,7 @@ const SearchBar = ({ darkNavbar }) => {
   const [recentSearches, setRecentSearches] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const navigate = useNavigate();
@@ -170,7 +169,6 @@ const SearchBar = ({ darkNavbar }) => {
     }
 
     navigate(`/product/${productId}`);
-    setIsOpen(false);
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -238,15 +236,13 @@ const SearchBar = ({ darkNavbar }) => {
         className="focus:outline-none transition-opacity duration-300"
         aria-label="Search"
       >
-        
-            <motion.img 
-              src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
-              alt="Search" 
-              className="w-5 h-5 cursor-pointer" 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            />
-        
+        <motion.img 
+          src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
+          alt="Search" 
+          className="w-5 h-5 cursor-pointer" 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        />
       </button>
 
       {/* Search overlay and panel */}
@@ -303,7 +299,6 @@ const SearchBar = ({ darkNavbar }) => {
                     </svg>
                   </button>
                 </div>
-              </div>
 
                 {/* Search suggestions */}
                 {showSuggestions && suggestions.length > 0 && !loading && (
@@ -351,31 +346,31 @@ const SearchBar = ({ darkNavbar }) => {
                   </div>
                 )}
 
-                  {/* Search results */}
-                  <div className="mb-6">
-                    {loading && (
+                {/* Search results */}
+                <div className="mb-6">
+                  {loading && (
+                    <div className="text-center py-10">
+                      <div className="inline-block h-6 w-6 border-2 border-t-black border-gray-200 rounded-full animate-spin"></div>
+                      <p className="mt-3 text-gray-500 text-sm">
+                        Searching...
+                      </p>
+                    </div>
+                  )}
+
+                  {!loading &&
+                    searchQuery.length >= 2 &&
+                    searchResults.length === 0 &&
+                    !showSuggestions && (
                       <div className="text-center py-10">
-                        <div className="inline-block h-6 w-6 border-2 border-t-black border-gray-200 rounded-full animate-spin"></div>
-                        <p className="mt-3 text-gray-500 text-sm">
-                          Searching...
+                        <p className="text-gray-700">
+                          No results found for `{searchQuery}`
+                        </p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Try a different search term or browse our
+                          collections
                         </p>
                       </div>
                     )}
-
-                    {!loading &&
-                      searchQuery.length >= 2 &&
-                      searchResults.length === 0 &&
-                      !showSuggestions && (
-                        <div className="text-center py-10">
-                          <p className="text-gray-700">
-                            No results found for `{searchQuery}`
-                          </p>
-                          <p className="text-sm text-gray-500 mt-2">
-                            Try a different search term or browse our
-                            collections
-                          </p>
-                        </div>
-                      )}
 
                   {!loading && searchResults.length > 0 && (
                     <div className="space-y-4">
@@ -433,7 +428,3 @@ const SearchBar = ({ darkNavbar }) => {
 };
 
 export default SearchBar;
-
-
-    
-
