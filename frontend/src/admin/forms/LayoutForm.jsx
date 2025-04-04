@@ -1,9 +1,10 @@
 // frontend/src/admin/forms/LayoutForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiSave, FiPlus, FiTrash, FiMove } from 'react-icons/fi';
+import { FiArrowLeft, FiSave, FiPlus, FiTrash } from 'react-icons/fi';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const LayoutForm = () => {
   const { id } = useParams();
@@ -166,6 +167,12 @@ const LayoutForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate the form
+    if (!formData.name.trim()) {
+      setError('Layout name is required');
+      return;
+    }
+    
     try {
       setLoading(true);
       setError('');
@@ -178,17 +185,22 @@ const LayoutForm = () => {
       
       const method = isEditing ? 'put' : 'post';
       
-      await axios[method](url, formData);
+      const response = await axios[method](url, formData);
       
-      setSuccess(isEditing 
-        ? 'Layout updated successfully!' 
-        : 'Layout created successfully!');
-      
-      // Redirect after short delay
-      setTimeout(() => {
-        navigate('/admin');
-      }, 1500);
-      
+      if (response.data.success) {
+        setSuccess(isEditing 
+          ? 'Layout updated successfully!' 
+          : 'Layout created successfully!');
+        
+        toast.success(isEditing ? 'Layout updated!' : 'Layout created!');
+        
+        // Redirect after short delay
+        setTimeout(() => {
+          navigate('/admin');
+        }, 1500);
+      } else {
+        setError(response.data.message || 'An error occurred');
+      }
     } catch (err) {
       setError('Failed to save layout. Please try again.');
       console.error(err);
@@ -493,7 +505,7 @@ const LayoutForm = () => {
               </>
             ) : (
               <>
-                <FiSave />
+                <FiSave className="mr-2" />
                 <span>Save Layout</span>
               </>
             )}
@@ -504,33 +516,4 @@ const LayoutForm = () => {
   );
 };
 
-export default LayoutForm;}
-          <div className="md:col-span-2">
-            <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
-              <div className="p-6">
-                <h2 className="text-lg font-medium mb-4">Layout Design</h2>
-                
-                {formData.sections.length === 0 ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center">
-                    <p className="text-gray-500">
-                      Add sections from the left panel to start building your layout
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {formData.sections
-                      .slice() // Create a copy to avoid mutation
-                      .sort((a, b) => a.order - b.order) // Sort by order
-                      .map((section, index) => (
-                        <motion.div 
-                          key={index}
-                          className="border border-gray-200 p-4 rounded-md bg-white"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <div className="flex justify-between items-center mb-3">
-                            <h3 className="font-medium">
-                              {getSectionName(section.sectionId)}
-                            </h3>
-                            <div className="flex space-x-1"></div>
+export default LayoutForm;

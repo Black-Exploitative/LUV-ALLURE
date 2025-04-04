@@ -26,11 +26,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Check authentication
-    const token = localStorage.getItem('token');
+   /* const token = localStorage.getItem('token');
     if (!token) {
       navigate('/signin');
       return;
-    }
+    } */
 
     // Load initial data based on active section
     loadData(activeSection);
@@ -249,14 +249,14 @@ const Dashboard = () => {
           <FiPlus className="mr-2" /> Create New Layout
         </Link>
       </div>
-
-      {layouts.length === 0 ? (
+  
+      {!layouts || layouts.length === 0 ? ( // Fixed with null check
         <p>No layouts found. Create your first layout.</p>
       ) : (
         <div className="grid gap-4">
           {layouts.map(layout => (
             <div
-              key={layout._id}
+              key={layout._id || index}
               className={`border p-4 ${layout.isActive ? 'border-black' : 'border-gray-200'}`}
             >
               <div className="flex justify-between items-center">

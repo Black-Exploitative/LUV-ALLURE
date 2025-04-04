@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
+import SectionPreview from '../components/SectionPreview';
+import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
 const SectionForm = () => {
@@ -36,6 +38,7 @@ const SectionForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [errors, setErrors] = useState({});
   
   // Section types
   const sectionTypes = [
@@ -97,6 +100,49 @@ const SectionForm = () => {
     loadProducts();
     loadMedia();
   }, []);
+
+  // Enhanced form validation with detailed error messages
+    const validateForm = () => {
+        const newErrors = {};
+        
+        // Basic validations
+        if (!formData.name.trim()) {
+        newErrors.name = 'Section name is required';
+        }
+        
+        // Type-specific validations
+        switch (formData.type) {
+        case 'hero':
+            if (!formData.content.title) {
+            newErrors['content.title'] = 'Hero title is required';
+            }
+            if (!formData.media.imageUrl) {
+            newErrors['media.imageUrl'] = 'Background image is required for hero sections';
+            }
+            break;
+            
+        case 'banner':
+            if (!formData.content.title) {
+            newErrors['content.title'] = 'Banner title is required';
+            }
+            if (!formData.media.imageUrl) {
+            newErrors['media.imageUrl'] = 'Banner image is required';
+            }
+            break;
+            
+        case 'featured-products':
+            if (!formData.content.title) {
+            newErrors['content.title'] = 'Section title is required';
+            }
+            if (formData.products.length === 0) {
+            newErrors.products = 'Please select at least one product';
+            }
+            break;
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
   
   // Handle form input changes
   const handleChange = (e) => {
@@ -152,6 +198,33 @@ const SectionForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate the form
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Section name is required';
+    }
+    
+    // Type-specific validations
+    if (formData.type === 'hero' || formData.type === 'banner') {
+      if (!formData.content.title) {
+        newErrors['content.title'] = 'Title is required for this section type';
+      }
+      if (!formData.media.imageUrl && formData.type === 'hero') {
+        newErrors['media.imageUrl'] = 'Background image is required for hero sections';
+      }
+    }
+    
+    if (formData.type === 'featured-products' && formData.products.length === 0) {
+      newErrors.products = 'Please select at least one product';
+    }
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    
     try {
       setLoading(true);
       setError('');
@@ -164,25 +237,69 @@ const SectionForm = () => {
       
       const method = isEditing ? 'put' : 'post';
       
-      await axios[method](url, formData);
+      const response = await axios[method](url, formData);
       
-      setSuccess(isEditing 
-        ? 'Section updated successfully!' 
-        : 'Section created successfully!');
-      
-      // Redirect after short delay
-      setTimeout(() => {
-        navigate('/admin');
-      }, 1500);
-      
+      if (response.data.success) {
+        setSuccess(isEditing 
+          ? 'Section updated successfully!' 
+          : 'Section created successfully!');
+        
+        toast.success(isEditing ? 'Section updated!' : 'Section created!');
+        
+        // Redirect after short delay
+        setTimeout(() => {
+          navigate('/admin');
+        }, 1500);
+      } else {
+        setError(response.data.message || 'An error occurred');
+        toast.error('Failed to save section');
+      }
     } catch (err) {
       setError('Failed to save section. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to save section');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
   
+
+  // Add this error display component
+    /*const FormFieldError = ({ name }) => {
+  if (!errors[name]) return null;
+  
+  return (
+    <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
+  );
+};*/
+
+    const renderSectionPreview = () => {
+        // Only show preview if we have enough data
+        if (!formData.name || !formData.type) {
+          return (
+            <div className="text-center py-6 bg-gray-50 border border-gray-200 rounded-md">
+              <p className="text-gray-500">
+                Fill in the section details to see a preview
+              </p>
+            </div>
+          );
+        }
+      
+        return (
+          <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
+            <div className="p-6">
+              <h3 className="text-md font-medium mb-4">Section Preview</h3>
+              <div className="mx-auto max-w-md">
+                <SectionPreview section={formData} />
+              </div>
+              <p className="text-xs text-gray-500 text-center mt-4">
+                This is a simplified preview. The actual section may appear differently on the website.
+              </p>
+            </div>
+          </div>
+        );
+      };
+    
   // Render different fields based on section type
   const renderTypeSpecificFields = () => {
     switch (formData.type) {
@@ -200,6 +317,7 @@ const SectionForm = () => {
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-md"
               />
+              
             </div>
             
             <div className="col-span-2">
@@ -592,7 +710,7 @@ const SectionForm = () => {
           {success}
         </div>
       )}
-      
+      {renderSectionPreview()}
       <form onSubmit={handleSubmit}>
         <div className="bg-white border border-gray-200 rounded-md overflow-hidden">
           <div className="p-6">

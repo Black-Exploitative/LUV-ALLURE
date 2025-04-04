@@ -2,8 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaHistory } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaSearch, FaTimes, FaHistory } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaSearch, FaTimes } from "react-icons/fa";
 import searchService from "../services/searchApi";
 
 const SearchBar = ({ darkNavbar }) => {
@@ -423,7 +422,7 @@ const SearchBar = ({ darkNavbar }) => {
                     </div>
                   )}
                 </div>
-              </div>
+            
             </motion.div>
           </>
         )}
