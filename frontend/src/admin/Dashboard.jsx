@@ -312,7 +312,7 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {sections.length === 0 ? (
+      {!sections || sections.length === 0 ?(
         <p>No content sections found. Create your first section.</p>
       ) : (
         <div className="grid gap-4">
@@ -385,7 +385,7 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {banners.length === 0 ? (
+      {!banners || banners.length === 0 ? (
         <p>No banners found. Create your first banner.</p>
       ) : (
         <div className="grid gap-4">
@@ -485,7 +485,7 @@ const Dashboard = () => {
         </select>
       </div>
 
-      {navImages.length === 0 ? (
+      {!navImages || navImages.length === 0 ? (
         <p>No navigation images found. Add your first image.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -599,7 +599,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {media.length === 0 ? (
+      {!media || media.length === 0 ? (
         <p>No media found. Upload your first file.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -656,7 +656,7 @@ const Dashboard = () => {
       )}
 
       {/* Pagination */}
-      {media.length > 0 && (
+      {!media || media.length > 0 && (
         <div className="flex justify-center mt-8">
           <nav className="flex items-center space-x-2">
             <button className="px-3 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
@@ -709,7 +709,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {relationships.length === 0 ? (
+      {!relationships || relationships.length === 0 ? (
         <div className="text-center py-8 border border-gray-200 rounded">
           <p className="text-gray-500 mb-4">No {relationshipType.replace('-', ' ')} relationships found.</p>
           <Link
