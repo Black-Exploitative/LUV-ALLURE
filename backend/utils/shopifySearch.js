@@ -34,12 +34,12 @@ export const buildProductSearchQuery = (searchQuery, options = {}) => {
     
     // Build the GraphQL query
     return `
-      query ProductSearch($first: Int!) {
+      query ProductSearch($first: Int!, $query: String, $sortKey: ProductSortKeys, $reverse: Boolean) {
         products(
           first: $first
-          ${filters.length > 0 ? filters.join(', ') : ''}
-          sortKey: ${sortKey}
-          reverse: ${sortDirection === 'DESC' ? 'true' : 'false'}
+          query: $query
+          sortKey: $sortKey
+          reverse: $reverse
         ) {
           edges {
             node {
