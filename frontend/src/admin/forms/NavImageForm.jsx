@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
 import axios from 'axios';
+import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const NavImageForm = () => {
   const { id } = useParams();
@@ -95,6 +97,16 @@ const NavImageForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!formData.name.trim()) {
+      setError('Navigation image name is required');
+      return;
+    }
+    
+    if (!formData.imageUrl.trim()) {
+      setError('Image is required');
+      return;
+    }
+    
     try {
       setLoading(true);
       setError('');
@@ -112,6 +124,8 @@ const NavImageForm = () => {
       setSuccess(isEditing 
         ? 'Navigation image updated successfully!' 
         : 'Navigation image created successfully!');
+      
+      toast.success(isEditing ? 'Navigation image updated!' : 'Navigation image created!');
       
       // Redirect after short delay
       setTimeout(() => {
@@ -306,7 +320,7 @@ const NavImageForm = () => {
             <div className="grid grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Order
+                  Display Order
                 </label>
                 <input
                   type="number"
@@ -317,11 +331,11 @@ const NavImageForm = () => {
                   className="w-full p-2 border border-gray-300 rounded-md"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Display order (lower numbers appear first)
+                  Order in which this image appears (lower numbers first)
                 </p>
               </div>
               
-              <div className="flex items-center">
+              <div className="flex items-center self-end mb-1">
                 <input
                   type="checkbox"
                   id="isActive"
@@ -333,6 +347,9 @@ const NavImageForm = () => {
                 <label htmlFor="isActive" className="ml-2 text-sm text-gray-700">
                   Active
                 </label>
+                <p className="ml-2 text-xs text-gray-500">
+                  Show this image in navigation
+                </p>
               </div>
             </div>
           </div>
@@ -340,15 +357,28 @@ const NavImageForm = () => {
         
         <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
           <div className="p-6">
-            <h3 className="text-md font-medium mb-4">Image Preview</h3>
+            <h3 className="text-md font-medium mb-4">Preview</h3>
             {formData.imageUrl ? (
               <div className="w-full flex justify-center">
-                <div className="h-64 w-48 bg-gray-100 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={formData.imageUrl}
-                    alt={formData.altText || "Navigation image preview"}
-                    className="max-w-full max-h-full object-cover"
-                  />
+                <div className="flex flex-col items-center">
+                  <div className="w-64 h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={formData.imageUrl}
+                      alt={formData.altText || "Navigation image preview"}
+                      className="max-w-full max-h-full object-cover"
+                    />
+                  </div>
+                  <div className="mt-3 text-center">
+                    <p className="font-medium">{formData.name}</p>
+                    <p className="text-sm text-gray-500">
+                      Category: {navCategories.find(c => c.value === formData.category)?.label || formData.category}
+                    </p>
+                    {formData.link && (
+                      <p className="text-sm text-gray-500">
+                        Links to: {formData.link}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -367,10 +397,12 @@ const NavImageForm = () => {
           >
             Cancel
           </button>
-          <button
+          <motion.button
             type="submit"
             disabled={loading}
             className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 flex items-center justify-center space-x-2 disabled:opacity-50"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             {loading ? (
               <>
@@ -379,11 +411,11 @@ const NavImageForm = () => {
               </>
             ) : (
               <>
-                <FiSave />
+                <FiSave className="mr-2" />
                 <span>Save Image</span>
               </>
             )}
-          </button>
+          </motion.button>
         </div>
       </form>
       

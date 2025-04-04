@@ -1,8 +1,10 @@
 // frontend/src/admin/forms/ProductRelationshipForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiSave, FiSearch } from 'react-icons/fi';
+import { FiArrowLeft, FiSave, FiSearch, FiPlus, FiTrash } from 'react-icons/fi';
 import axios from 'axios';
+import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const ProductRelationshipForm = () => {
   const { id } = useParams();
@@ -11,7 +13,7 @@ const ProductRelationshipForm = () => {
   
   const [formData, setFormData] = useState({
     sourceProductId: '',
-    relatedProductId: '',
+    relatedProductIds: [], // Allow multiple related products
     relationType: 'style-with',
     order: 0,
     isActive: true
@@ -20,8 +22,9 @@ const ProductRelationshipForm = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sourceProduct, setSourceProduct] = useState(null);
-  const [relatedProduct, setRelatedProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchMode, setSearchMode] = useState('source'); // 'source' or 'related'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -29,9 +32,9 @@ const ProductRelationshipForm = () => {
   // Relationship types
   const relationshipTypes = [
     { value: 'style-with', label: 'Style It With' },
-    { value: 'also-purchased', label: 'Also Purchased' },
-    { value: 'also-viewed', label: 'Also Viewed' },
-    { value: 'recommended', label: 'Recommended' }
+    { value: 'also-purchased', label: 'Customers Also Purchased' },
+    { value: 'also-viewed', label: 'Customers Also Viewed' },
+    { value: 'recommended', label: 'Recommended For You' }
   ];
   
   // Load relationship data if editing
@@ -41,17 +44,29 @@ const ProductRelationshipForm = () => {
         try {
           setLoading(true);
           const response = await axios.get(`/api/cms/product-relationships/${id}`);
-          setFormData(response.data.data);
           
-          // Load source and related product details
-          if (response.data.data.sourceProductId) {
-            const sourceResponse = await axios.get(`/api/products/${response.data.data.sourceProductId}`);
+          // Get the relationship data
+          const relationshipData = response.data.data;
+          
+          // Set form data
+          setFormData({
+            sourceProductId: relationshipData.sourceProductId,
+            relatedProductIds: [relationshipData.relatedProductId], // Start with the single related product
+            relationType: relationshipData.relationType,
+            order: relationshipData.order,
+            isActive: relationshipData.isActive
+          });
+          
+          // Load source product details
+          if (relationshipData.sourceProductId) {
+            const sourceResponse = await axios.get(`/api/products/${relationshipData.sourceProductId}`);
             setSourceProduct(sourceResponse.data.product);
           }
           
-          if (response.data.data.relatedProductId) {
-            const relatedResponse = await axios.get(`/api/products/${response.data.data.relatedProductId}`);
-            setRelatedProduct(relatedResponse.data.product);
+          // Load related product details
+          if (relationshipData.relatedProductId) {
+            const relatedResponse = await axios.get(`/api/products/${relationshipData.relatedProductId}`);
+            setRelatedProducts([relatedResponse.data.product]);
           }
         } catch (err) {
           setError('Failed to load relationship data');
@@ -88,7 +103,8 @@ const ProductRelationshipForm = () => {
     }
     
     const filtered = products.filter(product => 
-      product.title.toLowerCase().includes(searchQuery.toLowerCase())
+      product.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
     setFilteredProducts(filtered);
@@ -99,12 +115,18 @@ const ProductRelationshipForm = () => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value
     });
     
     // Clear any previous error/success messages
     setError('');
     setSuccess('');
+  };
+  
+  // Set the search mode and clear the search query
+  const setSearchModeAndClear = (mode) => {
+    setSearchMode(mode);
+    setSearchQuery('');
   };
   
   // Handle source product selection
@@ -115,29 +137,52 @@ const ProductRelationshipForm = () => {
       sourceProductId: product.id
     });
     setSearchQuery('');
+    // Switch to related product search after selecting source
+    setSearchMode('related');
   };
   
   // Handle related product selection
   const handleRelatedProductSelect = (product) => {
-    setRelatedProduct(product);
+    // Check if product is already selected
+    if (formData.relatedProductIds.includes(product.id)) {
+      return;
+    }
+    
+    // Check if product is the source product
+    if (product.id === formData.sourceProductId) {
+      toast.error("Source and related product cannot be the same");
+      return;
+    }
+    
+    // Add to related products
+    setRelatedProducts([...relatedProducts, product]);
     setFormData({
       ...formData,
-      relatedProductId: product.id
+      relatedProductIds: [...formData.relatedProductIds, product.id]
     });
     setSearchQuery('');
+  };
+  
+  // Remove a related product
+  const handleRemoveRelatedProduct = (productId) => {
+    setRelatedProducts(relatedProducts.filter(p => p.id !== productId));
+    setFormData({
+      ...formData,
+      relatedProductIds: formData.relatedProductIds.filter(id => id !== productId)
+    });
   };
   
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.sourceProductId || !formData.relatedProductId) {
-      setError('Please select both source and related products');
+    if (!formData.sourceProductId) {
+      setError('Please select a source product');
       return;
     }
     
-    if (formData.sourceProductId === formData.relatedProductId) {
-      setError('Source and related products cannot be the same');
+    if (formData.relatedProductIds.length === 0) {
+      setError('Please select at least one related product');
       return;
     }
     
@@ -146,18 +191,35 @@ const ProductRelationshipForm = () => {
       setError('');
       setSuccess('');
       
-      // API endpoint and method based on editing or creating
-      const url = isEditing 
-        ? `/api/cms/product-relationships/${id}` 
-        : '/api/cms/product-relationships';
-      
-      const method = isEditing ? 'put' : 'post';
-      
-      await axios[method](url, formData);
-      
-      setSuccess(isEditing 
-        ? 'Relationship updated successfully!' 
-        : 'Relationship created successfully!');
+      if (isEditing) {
+        // Update existing relationship
+        await axios.put(`/api/cms/product-relationships/${id}`, {
+          sourceProductId: formData.sourceProductId,
+          relatedProductId: formData.relatedProductIds[0], // Use first related product for backwards compatibility
+          relationType: formData.relationType,
+          order: formData.order,
+          isActive: formData.isActive
+        });
+        
+        setSuccess('Relationship updated successfully!');
+        toast.success('Relationship updated!');
+      } else {
+        // Create multiple relationships, one for each related product
+        const relationshipPromises = formData.relatedProductIds.map(relatedId => 
+          axios.post('/api/cms/product-relationships', {
+            sourceProductId: formData.sourceProductId,
+            relatedProductId: relatedId,
+            relationType: formData.relationType,
+            order: formData.order,
+            isActive: formData.isActive
+          })
+        );
+        
+        await Promise.all(relationshipPromises);
+        
+        setSuccess('Relationships created successfully!');
+        toast.success('Relationships created!');
+      }
       
       // Redirect after short delay
       setTimeout(() => {
@@ -167,101 +229,67 @@ const ProductRelationshipForm = () => {
     } catch (err) {
       setError('Failed to save relationship. Please try again.');
       console.error(err);
+      
+      // More detailed error message if available
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      }
     } finally {
       setLoading(false);
     }
   };
   
   // Product selection UI
-  const renderProductSelection = (title, selectedProduct, onSelect, excludeId = null) => (
+  const renderProductSearch = (title, placeholder, onSelectProduct) => (
     <div className="mb-6">
       <h3 className="text-sm font-medium text-gray-700 mb-2">{title}</h3>
       
-      {selectedProduct ? (
-        <div className="border border-gray-200 p-3 rounded-md mb-4">
-          <div className="flex items-center">
-            {selectedProduct.images && selectedProduct.images[0] && (
-              <div className="w-16 h-16 bg-gray-100 mr-3">
-                <img 
-                  src={selectedProduct.images[0]} 
-                  alt={selectedProduct.title} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            <div>
-              <h4 className="font-medium">{selectedProduct.title}</h4>
-              <p className="text-xs text-gray-500">ID: {selectedProduct.id}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                if (title.includes('Source')) {
-                  setSourceProduct(null);
-                  setFormData({...formData, sourceProductId: ''});
-                } else {
-                  setRelatedProduct(null);
-                  setFormData({...formData, relatedProductId: ''});
-                }
-              }}
-              className="ml-auto text-gray-400 hover:text-gray-600"
-            >
-              Change
-            </button>
+      <div className="flex mb-2">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={placeholder}
+            className="w-full p-2 pr-10 border border-gray-300 rounded-md"
+          />
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <FiSearch className="text-gray-400" />
           </div>
         </div>
-      ) : (
-        <div>
-          <div className="flex mb-2">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for products..."
-                className="w-full p-2 pr-10 border border-gray-300 rounded-md"
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <FiSearch className="text-gray-400" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="border border-gray-200 rounded-md h-64 overflow-y-auto">
-            {filteredProducts.length === 0 ? (
-              <p className="text-center text-gray-500 p-4">No products found</p>
-            ) : (
-              <div className="divide-y divide-gray-200">
-                {filteredProducts
-                  .filter(product => !excludeId || product.id !== excludeId)
-                  .map(product => (
-                    <div 
-                      key={product.id}
-                      className="p-3 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => onSelect(product)}
-                    >
-                      <div className="flex items-center">
-                        {product.images && product.images[0] && (
-                          <div className="w-10 h-10 bg-gray-100 mr-3">
-                            <img 
-                              src={product.images[0]} 
-                              alt={product.title} 
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <div>
-                          <h4 className="text-sm font-medium">{product.title}</h4>
-                          <p className="text-xs text-gray-500">ID: {product.id}</p>
-                        </div>
-                      </div>
+      </div>
+      
+      <div className="border border-gray-200 rounded-md h-64 overflow-y-auto">
+        {filteredProducts.length === 0 ? (
+          <p className="text-center text-gray-500 p-4">No products found</p>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {filteredProducts.map(product => (
+              <div 
+                key={product.id}
+                className="p-3 hover:bg-gray-50 cursor-pointer"
+                onClick={() => onSelectProduct(product)}
+              >
+                <div className="flex items-center">
+                  {product.images && product.images[0] && (
+                    <div className="w-10 h-10 bg-gray-100 mr-3">
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.title} 
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  ))}
+                  )}
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium">{product.title}</h4>
+                    <p className="text-xs text-gray-500">ID: {product.id}</p>
+                  </div>
+                </div>
               </div>
-            )}
+            ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
   
@@ -351,19 +379,152 @@ const ProductRelationshipForm = () => {
             
             <div className="border-t border-gray-200 pt-6">
               {/* Source Product Selection */}
-              {renderProductSelection(
-                'Source Product (displayed on this product page)',
-                sourceProduct,
-                handleSourceProductSelect,
-                formData.relatedProductId
+              {!sourceProduct ? (
+                <>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-md font-medium">Source Product</h3>
+                    <button 
+                      type="button"
+                      className={`text-sm ${searchMode === 'source' ? 'text-black font-medium' : 'text-gray-500'}`}
+                      onClick={() => setSearchModeAndClear('source')}
+                    >
+                      Search Products
+                    </button>
+                  </div>
+                  
+                  {searchMode === 'source' && renderProductSearch(
+                    "Select Source Product",
+                    "Search for a product to display relationships on...",
+                    handleSourceProductSelect
+                  )}
+                </>
+              ) : (
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-md font-medium">Source Product</h3>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSourceProduct(null);
+                        setFormData({...formData, sourceProductId: ''});
+                      }}
+                      className="text-sm text-black underline"
+                    >
+                      Change
+                    </button>
+                  </div>
+                  
+                  <div className="border border-gray-200 p-4 rounded-md">
+                    <div className="flex items-center">
+                      {sourceProduct.images && sourceProduct.images[0] && (
+                        <div className="w-16 h-16 bg-gray-100 mr-4">
+                          <img 
+                            src={sourceProduct.images[0]} 
+                            alt={sourceProduct.title} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-medium">{sourceProduct.title}</h4>
+                        <p className="text-xs text-gray-500">ID: {sourceProduct.id}</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          This is the product page where related items will appear
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
               
-              {/* Related Product Selection */}
-              {renderProductSelection(
-                'Related Product (shown as suggestion)',
-                relatedProduct,
-                handleRelatedProductSelect,
-                formData.sourceProductId
+              {/* Related Products Selection */}
+              {sourceProduct && (
+                <>
+                  <div className="mt-8 border-t border-gray-200 pt-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-md font-medium">Related Products</h3>
+                      <button 
+                        type="button"
+                        className={`text-sm ${searchMode === 'related' ? 'text-black font-medium' : 'text-gray-500'}`}
+                        onClick={() => setSearchModeAndClear('related')}
+                      >
+                        Add Products
+                      </button>
+                    </div>
+                    
+                    {/* Selected related products list */}
+                    {relatedProducts.length > 0 && (
+                      <div className="mb-6">
+                        <h4 className="text-sm font-medium mb-2">Selected Products</h4>
+                        <div className="space-y-2">
+                          {relatedProducts.map(product => (
+                            <div 
+                              key={product.id}
+                              className="flex items-center justify-between border border-gray-200 p-3 rounded-md"
+                            >
+                              <div className="flex items-center">
+                                {product.images && product.images[0] && (
+                                  <div className="w-12 h-12 bg-gray-100 mr-3">
+                                    <img 
+                                      src={product.images[0]} 
+                                      alt={product.title} 
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                )}
+                                <div>
+                                  <h4 className="text-sm font-medium">{product.title}</h4>
+                                  <p className="text-xs text-gray-500">ID: {product.id}</p>
+                                </div>
+                              </div>
+                              
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveRelatedProduct(product.id)}
+                                className="text-gray-400 hover:text-red-500"
+                              >
+                                <FiTrash size={18} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {!isEditing && (
+                          <button
+                            type="button"
+                            onClick={() => setSearchModeAndClear('related')}
+                            className="mt-4 flex items-center text-sm text-black"
+                          >
+                            <FiPlus className="mr-1" />
+                            Add More Products
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Search for related products */}
+                    {searchMode === 'related' && renderProductSearch(
+                      relatedProducts.length === 0 ? "Select Related Products" : "Add More Related Products",
+                      "Search for products to recommend...",
+                      handleRelatedProductSelect
+                    )}
+                    
+                    {/* Prompt if no related products selected */}
+                    {relatedProducts.length === 0 && searchMode !== 'related' && (
+                      <div className="border border-gray-200 rounded-md p-6 text-center">
+                        <p className="text-gray-500 mb-4">No related products selected</p>
+                        <button
+                          type="button"
+                          onClick={() => setSearchModeAndClear('related')}
+                          className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                          <FiPlus className="mr-2" />
+                          Add Related Products
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -377,10 +538,12 @@ const ProductRelationshipForm = () => {
           >
             Cancel
           </button>
-          <button
+          <motion.button
             type="submit"
             disabled={loading}
             className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 flex items-center justify-center space-x-2 disabled:opacity-50"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             {loading ? (
               <>
@@ -389,11 +552,11 @@ const ProductRelationshipForm = () => {
               </>
             ) : (
               <>
-                <FiSave />
+                <FiSave className="mr-2" />
                 <span>Save Relationship</span>
               </>
             )}
-          </button>
+          </motion.button>
         </div>
       </form>
     </div>
