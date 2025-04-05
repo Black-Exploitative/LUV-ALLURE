@@ -1,5 +1,5 @@
 import ProductCarousel from "../components/ProductCarousel";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
@@ -15,6 +15,7 @@ import cmsService from "../services/cmsService";
 
 const ProductDetailsPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const rawProduct = location.state?.product;
 
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -30,15 +31,18 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
-      if (!product || !product.id) return;
+      if (!rawProduct || !rawProduct.id) return;
       
       try {
         setLoadingRelated(true);
         
+        // Get product ID safely
+        const productId = rawProduct.id;
+        
         // Fetch each type of related product
-        const styleWith = await cmsService.getProductRelationships(product.id, 'style-with');
-        const alsoPurchased = await cmsService.getProductRelationships(product.id, 'also-purchased');
-        const alsoViewed = await cmsService.getProductRelationships(product.id, 'also-viewed');
+        const styleWith = await cmsService.getProductRelationships(productId, 'style-with');
+        const alsoPurchased = await cmsService.getProductRelationships(productId, 'also-purchased');
+        const alsoViewed = await cmsService.getProductRelationships(productId, 'also-viewed');
         
         // Update state with fetched products
         setStyleWithProducts(styleWith || []);
@@ -52,7 +56,7 @@ const ProductDetailsPage = () => {
     };
     
     fetchRelatedProducts();
-  }, [product]);
+  }, [rawProduct]);
  
   // Fallback product if none is passed
   const defaultProduct = {

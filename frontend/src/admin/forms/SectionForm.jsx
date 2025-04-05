@@ -303,117 +303,144 @@ const SectionForm = () => {
   // Render different fields based on section type
   const renderTypeSpecificFields = () => {
     switch (formData.type) {
-      case 'hero':
-        return (
-          <>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Hero Title
-              </label>
-              <input
-                type="text"
-                name="content.title"
-                value={formData.content.title}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-              
-            </div>
-            
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Subtitle
-              </label>
-              <input
-                type="text"
-                name="content.subtitle"
-                value={formData.content.subtitle}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                name="content.description"
-                value={formData.content.description}
-                onChange={handleChange}
-                rows="3"
-                className="w-full p-2 border border-gray-300 rounded-md"
-              ></textarea>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Button Text
-              </label>
-              <input
-                type="text"
-                name="content.buttonText"
-                value={formData.content.buttonText}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Button Link
-              </label>
-              <input
-                type="text"
-                name="content.buttonLink"
-                value={formData.content.buttonLink}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Background Image
-              </label>
-              <div className="flex">
-                <input
-                  type="text"
-                  name="media.imageUrl"
-                  value={formData.media.imageUrl}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-l-md"
-                  placeholder="Image URL"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowMediaLibrary(true)}
-                  className="bg-gray-200 px-4 flex items-center rounded-r-md"
-                >
-                  <FiImage />
-                </button>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Text Alignment
-              </label>
-              <select
-                name="content.alignment"
-                value={formData.content.alignment}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              >
-                {alignmentOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </>
-        );
+        case 'hero':
+            return (
+              <>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Hero Title
+                  </label>
+                  <input
+                    type="text"
+                    name="content.title"
+                    value={formData.content.title}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Title text that appears on the hero section (e.g., "EXPLORE")
+                  </p>
+                </div>
+                
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subtitle
+                  </label>
+                  <input
+                    type="text"
+                    name="content.subtitle"
+                    value={formData.content.subtitle}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    name="content.description"
+                    value={formData.content.description}
+                    onChange={handleChange}
+                    rows="3"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  ></textarea>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Button Text
+                  </label>
+                  <input
+                    type="text"
+                    name="content.buttonText"
+                    value={formData.content.buttonText}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Button Link
+                  </label>
+                  <input
+                    type="text"
+                    name="content.buttonLink"
+                    value={formData.content.buttonLink}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Where the hero button should link to (e.g., "#shop-now", "/collections")
+                  </p>
+                </div>
+                
+                {/* Background Image Field */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Background Image
+                  </label>
+                  <div className="flex">
+                    <input
+                      type="text"
+                      name="media.imageUrl"
+                      value={formData.media.imageUrl}
+                      onChange={handleChange}
+                      className="w-full p-2 border border-gray-300 rounded-l-md"
+                      placeholder="Image URL"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowMediaLibrary(true)}
+                      className="bg-gray-200 px-4 flex items-center rounded-r-md"
+                    >
+                      <FiImage />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    If no video is set, this image will be used as the background
+                  </p>
+                </div>
+                
+                {/* NEW: Background Video Field */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Background Video URL
+                  </label>
+                  <input
+                    type="text"
+                    name="media.videoUrl"
+                    value={formData.media.videoUrl || ''}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    placeholder="https://example.com/video.mp4"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    MP4 video URL - will take precedence over image if provided
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Text Alignment
+                  </label>
+                  <select
+                    name="content.alignment"
+                    value={formData.content.alignment}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  >
+                    {alignmentOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            );
         
       case 'featured-products':
         return (

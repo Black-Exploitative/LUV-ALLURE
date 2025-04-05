@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 // Create multer upload instance
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 30 * 1024 * 1024 }, // 5MB limit
   fileFilter: function(req, file, cb) {
     // Accept images and videos only
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|mp4|webm)$/)) {
@@ -181,14 +181,21 @@ exports.deleteBanner = async (req, res, next) => {
 };
 
 // Navigation Images Controller
+// Backend/controllers/cmsController.js
 exports.getAllNavImages = async (req, res, next) => {
-  try {
-    const navImages = await NavigationImage.find().sort({ category: 1, order: 1 });
-    res.status(200).json({ success: true, data: navImages });
-  } catch (error) {
-    next(error);
-  }
-};
+    try {
+      const { category } = req.query;
+      
+      // Create a filter query object
+      const query = category ? { category } : {};
+      
+      // Use the query to filter results
+      const navImages = await NavigationImage.find(query).sort({ category: 1, order: 1 });
+      res.status(200).json({ success: true, data: navImages });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 exports.getNavImage = async (req, res, next) => {
   try {

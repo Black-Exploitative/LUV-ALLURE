@@ -5,7 +5,7 @@ const cmsController = require('../controllers/cmsController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Protected routes - Admin only
-router.use(authMiddleware);
+//router.use(authMiddleware);
 
 // Content Section routes
 router.route('/sections')

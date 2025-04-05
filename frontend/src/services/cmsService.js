@@ -102,12 +102,17 @@ const cmsService = {
         return contentCache.navImages[category].data;
       }
       
-      const response = await axios.get(`/api/cms/nav-images?category=${category}`);
+      // Make sure category is included in the query string
+      const response = await axios.get(`/api/cms/nav-images`, {
+        params: { category }
+      });
       
       // Get active navigation images sorted by order
       const activeNavImages = response.data.data
         .filter(image => image.isActive)
         .sort((a, b) => a.order - b.order);
+      
+      console.log(`Images for ${category}:`, activeNavImages); // Add for debugging
       
       // Cache the result
       contentCache.navImages[category] = {
