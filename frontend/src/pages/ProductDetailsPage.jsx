@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import StarRating from "../components/StarRating";
+import cmsService from "../services/cmsService";
 
 const ProductDetailsPage = () => {
   const location = useLocation();
@@ -22,6 +23,36 @@ const ProductDetailsPage = () => {
     setIsInWishlist(!isInWishlist);
   };
 
+  const [styleWithProducts, setStyleWithProducts] = useState([]);
+  const [alsoPurchasedProducts, setAlsoPurchasedProducts] = useState([]);
+  const [alsoViewedProducts, setAlsoViewedProducts] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(true);
+
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product || !product.id) return;
+      
+      try {
+        setLoadingRelated(true);
+        
+        // Fetch each type of related product
+        const styleWith = await cmsService.getProductRelationships(product.id, 'style-with');
+        const alsoPurchased = await cmsService.getProductRelationships(product.id, 'also-purchased');
+        const alsoViewed = await cmsService.getProductRelationships(product.id, 'also-viewed');
+        
+        // Update state with fetched products
+        setStyleWithProducts(styleWith || []);
+        setAlsoPurchasedProducts(alsoPurchased || []);
+        setAlsoViewedProducts(alsoViewed || []);
+      } catch (error) {
+        console.error('Error fetching related products:', error);
+      } finally {
+        setLoadingRelated(false);
+      }
+    };
+    
+    fetchRelatedProducts();
+  }, [product]);
  
   // Fallback product if none is passed
   const defaultProduct = {
@@ -408,39 +439,109 @@ const ProductDetailsPage = () => {
         {/* Related Products - Also inside the max-w-screen-xl container */}
         <div className="mt-12">
           <h2 className="text-xl mb-4">STYLE IT WITH</h2>
-          <div className="grid gap-4 md:gap-6">
-            {relatedProducts.map((product, index) => (
-              <SmallProductCard
-                key={index}
-                image={product.image}
-                name={product.name}
-                color={product.color}
-                price={product.price}
-                onViewProduct={() => console.log(`Viewing ${product.name}`)}
-              />
-            ))}
-          </div>
-
-          {/* Purchased Products Section */}
-          <h2 className="text-xl font-semibold mt-8 mb-4">
-            CUSTOMERS ALSO PURCHASED
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {purchasedProducts.map((product, index) => (
-              <PurchasedCard key={index} product={product} />
-            ))}
-          </div>
-
-          <h2 className="text-xl font-semibold mt-8 mb-4">
-            CUSTOMERS ALSO VIEWED
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {purchasedProducts.map((product, index) => (
-              <PurchasedCard key={index} product={product} />
-            ))}
-          </div>
+          {loadingRelated ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+            </div>
+          ) : styleWithProducts.length > 0 ? (
+            <div className="grid gap-4 md:gap-6">
+              {styleWithProducts.map((product, index) => (
+                <SmallProductCard
+                  key={product.id || index}
+                  image={product.images?.[0] || product.image || "/images/placeholder.jpg"}
+                  name={product.title || product.name}
+                  color={product.color || "Default"}
+                  price={`₦${parseFloat(product.price).toLocaleString()}`}
+                  onViewProduct={() => navigate(`/product/${product.id}`)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-4 md:gap-6">
+              {relatedProducts.map((product, index) => (
+                <SmallProductCard
+                  key={index}
+                  image={product.image}
+                  name={product.name}
+                  color={product.color}
+                  price={product.price}
+                  onViewProduct={() => console.log(`Viewing ${product.name}`)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      </div>
+
+        {/* Customers Also Purchased Section */}
+        {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
+          <>
+            <h2 className="text-xl font-semibold mt-8 mb-4">
+              CUSTOMERS ALSO PURCHASED
+            </h2>
+            {loadingRelated ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+              </div>
+            ) : alsoPurchasedProducts.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                {alsoPurchasedProducts.map((product) => (
+                  <PurchasedCard
+                    key={product.id}
+                    product={{
+                      id: product.id,
+                      name: product.title || product.name,
+                      price: parseFloat(product.price),
+                      color: product.color || "DEFAULT",
+                      images: product.images?.[0] || product.image || "/images/placeholder.jpg"
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                {purchasedProducts.map((product, index) => (
+                  <PurchasedCard key={index} product={product} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Customers Also Viewed Section */}
+        {(alsoViewedProducts.length > 0 || !loadingRelated) && (
+          <>
+            <h2 className="text-xl font-semibold mt-8 mb-4">
+              CUSTOMERS ALSO VIEWED
+            </h2>
+            {loadingRelated ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+              </div>
+            ) : alsoViewedProducts.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                {alsoViewedProducts.map((product) => (
+                  <PurchasedCard
+                    key={product.id}
+                    product={{
+                      id: product.id,
+                      name: product.title || product.name,
+                      price: parseFloat(product.price),
+                      color: product.color || "DEFAULT",
+                      images: product.images?.[0] || product.image || "/images/placeholder.jpg"
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                {purchasedProducts.map((product, index) => (
+                  <PurchasedCard key={index} product={product} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+              </div>
       <Footer />
     </>
   );

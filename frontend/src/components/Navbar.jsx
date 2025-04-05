@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import MiniCartPreview from "../components/MiniCartPreview";
 import AnimatedCartBadge from "../components/AnimatedCartBadge";
 import SearchBar from "./SearchBar";
+import cmsService from "../services/cmsService";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,10 +17,43 @@ export default function Navbar() {
   const location = useLocation();
   const navRef = useRef(null);
   const dropdownRefs = useRef({});
+
+  const [navImages, setNavImages] = useState({
+    shop: [],
+    dresses: [],
+    collections: [],
+    newin: []
+  });
   
   // New state to track screen size for responsive behavior
   const [isMobileView, setIsMobileView] = useState(false);
   const [isTabletView, setIsTabletView] = useState(false);
+
+
+  // Load navigation images from CMS
+  useEffect(() => {
+    const loadNavigationImages = async () => {
+      try {
+        // Load images for each category
+        const shopImages = await cmsService.getNavigationImages('shop');
+        const dressesImages = await cmsService.getNavigationImages('dresses');
+        const collectionsImages = await cmsService.getNavigationImages('collections');
+        const newinImages = await cmsService.getNavigationImages('newin');
+        
+        setNavImages({
+          shop: shopImages,
+          dresses: dressesImages,
+          collections: collectionsImages,
+          newin: newinImages
+        });
+      } catch (error) {
+        console.error("Error loading navigation images:", error);
+      }
+    };
+  
+  loadNavigationImages();
+}, []);
+
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -322,13 +356,29 @@ export default function Navbar() {
     }
   };
 
+  // Update how featured items are generated in the dropdownContent object
+  const getDropdownFeaturedItems = (category) => {
+    // If CMS images are available for this category
+    if (navImages[category] && navImages[category].length > 0) {
+      return navImages[category].map(image => ({
+        image: image.imageUrl,
+        title: image.name.toUpperCase(),
+        href: image.link || "#"
+      }));
+
+    }
+    
+    // Fallback to the default items if no CMS images
+    return dropdownContent[category].featuredItems;
+  };
+
   return (
     <nav
       ref={navRef}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         isScrolled || location.pathname !== "/" ? "bg-white shadow-lg" : "bg-transparent"
       }`}
-    >
+    >                                      
       <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
         {/* Left-side Navigation Links (Desktop and Tablet) */}
         <div className={`hidden md:flex space-x-2 lg:space-x-6 text-xs lg:text-[12px] ${darkNavbar ? "text-white" : "text-black"}`}>
@@ -564,8 +614,8 @@ export default function Navbar() {
                 </div>
               ))}
               
-              {/* Right Side - Featured Images */}
-              {dropdownContent[activeDropdown].featuredItems.map((item, itemIndex) => (
+              {/* Right Side - Featured Images from CMS */}
+              {getDropdownFeaturedItems(activeDropdown).map((item, itemIndex) => (
                 <div key={itemIndex} className="col-span-3">
                   <a href={item.href} className="block">
                     <div className="aspect-[3/4] overflow-hidden">

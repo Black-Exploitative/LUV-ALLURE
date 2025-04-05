@@ -418,7 +418,7 @@ const SearchBar = ({ darkNavbar }) => {
                     </div>
                   )}
                 </div>
-              </div>
+            
             </motion.div>
           </>
         )}

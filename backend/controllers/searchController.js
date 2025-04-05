@@ -63,11 +63,11 @@ exports.searchProducts = async (req, res, next) => {
     const query = `
       {
         products(
-          first: ${first}
-          ${after ? `after: "${after}"` : ''}
-          ${filters.length > 0 ? filters.join(', ') : ''}
-          sortKey: ${sortKey}
-          reverse: ${sortDirection === 'DESC' ? 'true' : 'false'}
+          first: $first,
+          after: $after,
+          query: $query,
+          sortKey: $sortKey,
+          reverse: $reverse
         ) {
           edges {
             node {
