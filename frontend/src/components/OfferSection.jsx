@@ -1,56 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
 import Button from "./Button";
 import AnimatedImage from "./AnimatedImage";
 import PropTypes from "prop-types";
+import EnhancedProductCard from "./EnhancedProductCard";
+import FeaturedProductService from "../services/featuredProductService";
+import { useNavigate } from "react-router-dom"; 
 
-// Enhanced ProductCard component with animations
-const ProductCard = ({ src, title, index }) => {
-  const controls = useAnimation();
-  const cardRef = useRef(null);
-  const isInView = useInView(cardRef, { once: false, amount: 0.3 });
-
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible");
-    }
-  }, [controls, isInView]);
-
-  return (
-    <motion.div
-      ref={cardRef}
-      className="w-[380px] h-auto rounded-none overflow-hidden"
-      variants={{
-        hidden: { opacity: 0, y: 50 },
-        visible: { opacity: 1, y: 0 },
-      }}
-      initial="hidden"
-      animate={controls}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.15,
-        ease: "easeOut",
-      }}
-    >
-      <AnimatedImage
-        src={src}
-        alt={title}
-        className="w-full h-[500px] object-cover"
-      />
-
-      <motion.h3
-        className="text-[15px] text-center font-medium text-black mt-3"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 + index * 0.15 }}
-      >
-        {title}
-      </motion.h3>
-    </motion.div>
-  );
-};
-
-// Section component with animations
+// Animated Section component with animations
 const AnimatedSection = ({ children, delay = 0 }) => {
   const controls = useAnimation();
   const sectionRef = useRef(null);
@@ -108,9 +65,6 @@ const AnimatedHeading = ({ children, className }) => {
   );
 };
 
-
-// Proptype validation
-
 // Service card component
 const ServiceCard = ({ src, title, description, index }) => {
   const controls = useAnimation();
@@ -163,6 +117,11 @@ const ServiceCard = ({ src, title, description, index }) => {
 };
 
 export default function OfferSection() {
+  const [sectionTitle, setSectionTitle] = useState("HERE'S WHAT THE SEASON OFFERS");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  
   useEffect(() => {
     document.body.style.overflowX = "hidden";
 
@@ -170,16 +129,55 @@ export default function OfferSection() {
       document.body.style.overflowX = "";
     };
   }, []);
-  const products = [
-    { id: 1, src: "/images/photo4.jpg", title: "Crimson Allure" },
-    { id: 2, src: "/images/photo5.jpg", title: "L'dact Allure" },
-    { id: 3, src: "/images/photo6.jpg", title: "Novo Amor Allure" },
-    {
-      id: 4,
-      src: "/images/man-wearing-blank-shirt.jpg",
-      title: "Swivel Allure",
-    },
-  ];
+  
+  // Fetch featured products and section configuration
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        // Fetch products from our service
+        const fetchedProducts = await FeaturedProductService.getFeaturedProducts();
+        setProducts(fetchedProducts);
+        
+        // You would also fetch section title from CMS here
+        // For now, we'll use the default or mock a CMS response
+        setSectionTitle("HERE'S WHAT THE SEASON OFFERS");
+      } catch (error) {
+        console.error("Error fetching featured products:", error);
+        // Fallback data
+        setProducts([
+          { 
+            id: 1, 
+            title: "Crimson Allure", 
+            images: ["/images/photo4.jpg", "/images/photo5.jpg"],
+            price: 250000
+          },
+          { 
+            id: 2, 
+            title: "L'dact Allure", 
+            images: ["/images/photo5.jpg", "/images/photo4.jpg"],
+            price: 180000
+          },
+          { 
+            id: 3, 
+            title: "Novo Amor Allure", 
+            images: ["/images/photo6.jpg", "/images/photo3.jpg"],
+            price: 210000
+          },
+          { 
+            id: 4, 
+            title: "Swivel Allure", 
+            images: ["/images/man-wearing-blank-shirt.jpg", "/images/photo4.jpg"],
+            price: 195000
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchFeaturedProducts();
+  }, []);
 
   const services = [
     {
@@ -205,27 +203,40 @@ export default function OfferSection() {
     },
   ];
 
+  const handleProductClick = (product) => {
+    navigate(`/product/${product.id}`, { state: { product } });
+  };
+
   return (
     <div className="overflow-x-hidden w-full">
       <section className="py-16 mt-[90px]">
-        {/* Section Heading */}
-        <div className=" mx-[100px] text-center">
+        {/* Dynamic Section Heading */}
+        <div className="mx-[100px] text-center">
           <AnimatedHeading className="tracking-wider text-[30px] font-normal text-black mb-[103px]">
-            HERE’S WHAT THE SEASON OFFERS
+            {sectionTitle}
           </AnimatedHeading>
         </div>
 
-        {/* Card Grid */}
+        {/* Enhanced Product Grid with Auto-Carousel Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mx-[100px]">
-          {products.map((product, index) => (
-            <div key={product.id} className="flex justify-center">
-              <ProductCard
-                src={product.src}
-                title={product.title}
-                index={index}
-              />
-            </div>
-          ))}
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="flex justify-center">
+                <div className="w-[380px] h-[500px] bg-gray-200 animate-pulse"></div>
+              </div>
+            ))
+          ) : (
+            products.map((product, index) => (
+              <div key={product.id} className="flex justify-center">
+                <EnhancedProductCard 
+                  product={product}
+                  index={index}
+                  onProductClick={() => handleProductClick(product)}
+                />
+              </div>
+            ))
+          )}
         </div>
       </section>
 
@@ -322,10 +333,10 @@ export default function OfferSection() {
       <AnimatedSection delay={0.4}>
         <div className="w-full my-[100px]">
           <div className="max-w-7xl mx-auto px-4">
-           <div className="text-center">
-            <AnimatedHeading className="tracking-wider text-[25px] font-normal text-black mb-[50px]">
-              LUV'S ALLURE SERVICES
-            </AnimatedHeading>
+            <div className="text-center">
+              <AnimatedHeading className="tracking-wider text-[25px] font-normal text-black mb-[50px]">
+                LUV'S ALLURE SERVICES
+              </AnimatedHeading>
             </div>
        
             {/* Card Grid */}
@@ -347,12 +358,6 @@ export default function OfferSection() {
   );
 }
 
-ProductCard.propTypes = {
-  src: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
-};
-
 AnimatedSection.propTypes = {
   children: PropTypes.node.isRequired,
   delay: PropTypes.number,
@@ -362,7 +367,6 @@ AnimatedHeading.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string.isRequired,
 };
-
 
 ServiceCard.propTypes = {
   src: PropTypes.string.isRequired,

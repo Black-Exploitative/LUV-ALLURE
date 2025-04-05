@@ -1,3 +1,4 @@
+// utils/shopifyClient.js - Enhanced version with getProductById
 const fetch = require('node-fetch');
 const shopifyConfig = require('../config/shopify');
 
@@ -142,6 +143,64 @@ class ShopifyClient {
     return this.query(query, { handle });
   }
 
+  // New method to get a product by ID
+  async getProductById(productId) {
+    // If the ID is a Shopify GraphQL ID (starts with "gid://"), use it directly
+    // Otherwise, convert it to a GraphQL ID format
+    const formattedId = productId.startsWith('gid://') 
+      ? productId 
+      : `gid://shopify/Product/${productId}`;
+
+    const query = `
+      query GetProductById($id: ID!) {
+        product(id: $id) {
+          id
+          title
+          handle
+          description
+          featuredImage {
+            url
+            altText
+          }
+          images(first: 100) {
+            edges {
+              node {
+                url
+                altText
+              }
+            }
+          }
+          options {
+            id
+            name
+            values
+          }
+          variants(first: 10) {
+            edges {
+              node {
+                id
+                title
+                price {
+                  amount
+                  currencyCode
+                }
+                selectedOptions {
+                  name
+                  value
+                }
+                inventoryQuantity: quantityAvailable
+                availableForSale
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const result = await this.query(query, { id: formattedId });
+    return result.product;
+  }
+
   async createCheckout(lineItems, email) {
     const query = `
       mutation CheckoutCreate($input: CheckoutCreateInput!) {
@@ -149,11 +208,11 @@ class ShopifyClient {
           checkout {
             id
             webUrl
-            subtotalprice {
+            subtotalPrice {
               amount
               currencyCode
             }
-            totalprice {
+            totalPrice {
               amount
               currencyCode
             }
@@ -254,6 +313,55 @@ class ShopifyClient {
     };
 
     return this.query(query, variables);
+  }
+  
+  // Get products from a specific collection
+  async getProductsByCollection(collectionId, first = 10) {
+    const formattedId = collectionId.startsWith('gid://') 
+      ? collectionId 
+      : `gid://shopify/Collection/${collectionId}`;
+      
+    const query = `
+      query GetProductsByCollection($collectionId: ID!, $first: Int!) {
+        collection(id: $collectionId) {
+          title
+          products(first: $first) {
+            edges {
+              node {
+                id
+                title
+                handle
+                description
+                featuredImage {
+                  url
+                  altText
+                }
+                images(first: 10) {
+                  edges {
+                    node {
+                      url
+                      altText
+                    }
+                  }
+                }
+                variants(first: 1) {
+                  edges {
+                    node {
+                      price {
+                        amount
+                        currencyCode
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    return this.query(query, { collectionId: formattedId, first });
   }
 }
 

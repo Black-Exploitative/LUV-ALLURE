@@ -7,7 +7,7 @@ export default function Hero() {
     mediaType: "video", // "video" or "image"
     mediaUrl: "https://cdn.pixabay.com/video/2023/05/15/163117-827112884_large.mp4",
     title: "EXPLORE",
-    buttonLink: "#shop-now",
+    buttonLink: "shop",
     backgroundColor: "rgba(0, 0, 0, 0.3)"
   });
   const [loading, setLoading] = useState(true);

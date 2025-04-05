@@ -64,6 +64,10 @@ export default function Footer() {
           </div>
         </motion.div>
       </div>
+
+      <div>
+        <img src="../../public/images/LA-2.png" alt="Logo" className="mx-auto mt-8 w-[500px] h-auto" />
+      </div>
       
       {/* Bottom */}
       <motion.div 
@@ -72,7 +76,7 @@ export default function Footer() {
         transition={{ duration: 0.5, delay: 0.8 }}
         className="text-center text-sm text-gray-500 mt-8"
       >
-        © {new Date().getFullYear()} LUV ALLURE. All Rights Reserved.
+        © {new Date().getFullYear()} LUV'S ALLURE. All Rights Reserved.
       </motion.div>
     </footer>
   );

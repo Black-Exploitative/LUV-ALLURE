@@ -2,36 +2,37 @@ import PropTypes from "prop-types";
 
 const SmallProductCard = ({ image, name, color, price, onViewProduct }) => {
   return (
-    <div className="flex items-start p-4">
+    <div className="flex flex-row items-center justify-center">
       {/* Image */}
       <div className="flex-shrink-0">
         <img
           src={image}
           alt={name}
-          className="w-[130px] h-[200px] object-cover"
+          className="w-[140px] h-[200px] object-cover"
         />
       </div>
 
       {/* Product Info */}
-      <div className="ml-4  flex flex-1 items-center">
-        <div className="flex flex-col mt-18">
+      
+        <div className="flex flex-col ml-[50px] mr-[170px] space-y-[15px]">
           {/* Product Name */}
-          <h2 className="text-lg font-semibold text-gray-900">{name}</h2>
+          <h2 className="text-[12px] text-gray-900 uppercase ">{name}</h2>
 
           {/* Product Color */}
-          <p className="text-sm text-gray-600">{color}</p>
+          <p className="text-[10px] text-gray-600 uppercase">{color}</p>
 
           {/* Product Price */}
-          <p className="text-sm text-gray-600">{price}</p>
+          <p className="text-[10px] text-gray-600">{price}</p>
         </div>
         {/* View Product Button */}
-        <button
+        
+ 
+      <button
           onClick={onViewProduct}
-          className="w-fit border border-gray-500 text-black px-4 py-2 ml-4 mt-10 cursor-pointer"
+          className="uppercase border border-gray-500 text-gray-500 text-[12px] w-[154px] h-[50px] cursor-pointer"
         >
-          View Product
+          VIEW PRODUCT
         </button>
-      </div>
     </div>
   );
 };
