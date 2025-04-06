@@ -28,6 +28,9 @@ import NavImageForm from "./admin/forms/NavImageForm";
 import LayoutForm from "./admin/forms/LayoutForm";
 import MediaForm from "./admin/forms/MediaForm";
 import ProductRelationshipForm from "./admin/forms/ProductRelationshipForm";
+import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
+
+// Add these routes in the admin routes section
 
 const AppContent = () => {
   const location = useLocation();
@@ -52,6 +55,8 @@ const AppContent = () => {
           <Route path="/admin/sections/edit/:id" element={<SectionForm />} />
           <Route path="/admin/banners/new" element={<BannerForm />} />
           <Route path="/admin/banners/edit/:id" element={<BannerForm />} />
+          <Route path="/admin/featured-products/new" element={<FeaturedProductsForm />} />
+          <Route path="/admin/featured-products/edit/:sectionId" element={<FeaturedProductsForm />} />
           <Route path="/admin/nav-images/new" element={<NavImageForm />} />
           <Route path="/admin/nav-images/edit/:id" element={<NavImageForm />} />
           <Route path="/admin/layouts/new" element={<LayoutForm />} />

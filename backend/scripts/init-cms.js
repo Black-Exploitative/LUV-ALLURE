@@ -30,16 +30,17 @@ const defaultSections = [
     name: 'Hero Section',
     type: 'hero',
     content: {
-      title: 'Luxury Fashion for Every Occasion',
-      subtitle: 'Spring/Summer Collection 2025',
-      description: 'Discover the perfect style that speaks to your unique personality.',
-      buttonText: 'SHOP NOW',
-      buttonLink: '/shop',
+      title: 'EXPLORE',
+      subtitle: '', // Not needed for current design
+      description: '', // Not needed for current design
+      buttonText: '', // Not shown in current design
+      buttonLink: '#shop',
       alignment: 'center'
     },
     media: {
-      imageUrl: '/images/photo3.jpg',
-      altText: 'Spring Collection Hero Image'
+      imageUrl: '/images/photo3.jpg', // Fallback image
+      videoUrl: 'https://cdn.pixabay.com/video/2023/05/15/163117-827112884_large.mp4', // Default video
+      altText: 'Hero Background'
     },
     isActive: true,
     order: 0

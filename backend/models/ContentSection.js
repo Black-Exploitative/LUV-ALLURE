@@ -1,4 +1,5 @@
-// models/ContentSection.js
+// Highlight of the changes needed in backend/models/ContentSection.js
+
 const mongoose = require('mongoose');
 
 const ContentSectionSchema = new mongoose.Schema({
@@ -27,13 +28,10 @@ const ContentSectionSchema = new mongoose.Schema({
   },
   media: {
     imageUrl: String,
-    videoUrl: String,
+    videoUrl: String, // Added to support video backgrounds
     altText: String
   },
-  products: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
-  }],
+  ShopifyProductsIDs: [String], 
   isActive: {
     type: Boolean,
     default: true

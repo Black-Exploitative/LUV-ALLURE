@@ -174,12 +174,12 @@ const Dashboard = () => {
     { id: 'homepage', label: 'Homepage Layouts', icon: FiHome },
     { id: 'sections', label: 'Content Sections', icon: FiGrid },
     { id: 'banners', label: 'Banners', icon: FiLayers },
+    { id: 'featured', label: 'Featured Products', icon: FiShoppingBag }, // New item
     { id: 'navigation', label: 'Navigation Images', icon: FiLayout },
     { id: 'relationships', label: 'Product Relationships', icon: FiLink },
     { id: 'media', label: 'Media Library', icon: FiImage },
     { id: 'settings', label: 'Settings', icon: FiSettings }
   ];
-
   // Animation variants
   const sidebarItemVariants = {
     hover: { x: 10, transition: { duration: 0.2 } }
@@ -226,6 +226,8 @@ const Dashboard = () => {
         return renderBanners();
       case 'navigation':
         return renderNavImages();
+      case 'featured':
+        return renderFeaturedProducts();
       case 'media':
         return renderMedia();
       case 'relationships':
@@ -670,6 +672,60 @@ const Dashboard = () => {
               Next
             </button>
           </nav>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderFeaturedProducts = () => (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Featured Products Sections</h2>
+        <Link
+          to="/admin/featured-products/new"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiPlus className="mr-2" /> Create New Section
+        </Link>
+      </div>
+  
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 p-4 rounded-md">
+          <p className="text-red-700">{error}</p>
+          <button
+            onClick={() => loadData('featured')}
+            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {/* Season Offers Section */}
+          <div className="border border-gray-200 p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium">Season Offers</h3>
+                <p className="text-sm text-gray-600">
+                  Featured products shown in the "Season Offers" section
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <Link 
+                  to="/admin/featured-products/edit/season-offers"
+                  className="px-3 py-1 text-xs bg-black text-white hover:bg-gray-800"
+                >
+                  Edit Products
+                </Link>
+              </div>
+            </div>
+          </div>
+          
+          {/* You can add more predefined sections here */}
         </div>
       )}
     </div>

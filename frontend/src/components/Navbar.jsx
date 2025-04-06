@@ -31,28 +31,33 @@ export default function Navbar() {
 
 
   // Load navigation images from CMS
-  useEffect(() => {
-    const loadNavigationImages = async () => {
-      try {
-        // Load images for each category
-        const shopImages = await cmsService.getNavigationImages('shop');
-        const dressesImages = await cmsService.getNavigationImages('dresses');
-        const collectionsImages = await cmsService.getNavigationImages('collections');
-        const newinImages = await cmsService.getNavigationImages('newin');
-        
-        setNavImages({
-          shop: shopImages,
-          dresses: dressesImages,
-          collections: collectionsImages,
-          newin: newinImages
-        });
-      } catch (error) {
-        console.error("Error loading navigation images:", error);
-      }
-    };
-  
-  loadNavigationImages();
-}, []);
+  const loadNavigationImages = async () => {
+    try {
+      console.log("Fetching nav images...");
+      
+      // Load images for each category
+      const shopImages = await cmsService.getNavigationImages('shop');
+      console.log("Shop images:", shopImages);
+      
+      const dressesImages = await cmsService.getNavigationImages('dresses');
+      console.log("Dresses images:", dressesImages);
+      
+      const collectionsImages = await cmsService.getNavigationImages('collections');
+      console.log("Collections images:", collectionsImages);
+      
+      const newinImages = await cmsService.getNavigationImages('newin');
+      console.log("New In images:", newinImages);
+      
+      setNavImages({
+        shop: shopImages,
+        dresses: dressesImages,
+        collections: collectionsImages,
+        newin: newinImages
+      });
+    } catch (error) {
+      console.error("Error loading navigation images:", error);
+    }
+  };
 
 
   // Lock body scroll when mobile menu is open
@@ -74,6 +79,11 @@ export default function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Load navigation images on mount
+  useEffect(() => {
+    loadNavigationImages();
   }, []);
 
   // Add responsive breakpoint detection

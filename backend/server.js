@@ -1,4 +1,4 @@
-// server.js - Entry point with CMS routes added
+// server.js - Entry point with Featured Products routes added
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -13,6 +13,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const cmsRoutes = require('./routes/cmsRoutes');
+const featuredProductsRoutes = require('./routes/featuredProductsRoutes');
 
 dotenv.config();
 const app = express();
@@ -36,6 +37,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/cms', cmsRoutes);
+app.use('/api/cms/featured-products', featuredProductsRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

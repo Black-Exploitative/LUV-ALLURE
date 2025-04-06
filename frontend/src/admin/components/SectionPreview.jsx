@@ -11,35 +11,45 @@ const SectionPreview = ({ section }) => {
   // Handle different section types
   switch (section.type) {
     case 'hero':
-      return (
-        <div className="relative w-full h-40 overflow-hidden border border-gray-300 rounded">
-          {section.media?.imageUrl ? (
-            <img 
-              src={section.media.imageUrl} 
-              alt={section.content?.title || 'Hero background'} 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-              No image set
+        return (
+            <div className="relative w-full h-40 overflow-hidden border border-gray-300 rounded">
+            {section.media?.videoUrl ? (
+                // Show video preview if available
+                <div className="relative w-full h-full">
+                <div className="absolute inset-0 flex items-center justify-center bg-black">
+                    <span className="text-white text-xs">Video: {section.media.videoUrl}</span>
+                    <span className="absolute top-1 right-1 bg-black text-white text-xs px-1 rounded">
+                    VIDEO
+                    </span>
+                </div>
+                </div>
+            ) : section.media?.imageUrl ? (
+                // Otherwise show image
+                <img 
+                src={section.media.imageUrl} 
+                alt={section.content?.title || 'Hero background'} 
+                className="w-full h-full object-cover"
+                />
+            ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                No media set
+                </div>
+            )}
+            <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center p-4">
+                {section.content?.title && (
+                <h3 className="text-white text-lg font-medium text-center">{section.content.title}</h3>
+                )}
+                {section.content?.subtitle && (
+                <p className="text-white text-xs mt-1 text-center">{section.content.subtitle}</p>
+                )}
+                {section.content?.buttonText && (
+                <span className="mt-2 px-3 py-1 bg-white text-black text-xs inline-block">
+                    {section.content.buttonText}
+                </span>
+                )}
             </div>
-          )}
-          <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center p-4">
-            {section.content?.title && (
-              <h3 className="text-white text-lg font-medium text-center">{section.content.title}</h3>
-            )}
-            {section.content?.subtitle && (
-              <p className="text-white text-xs mt-1 text-center">{section.content.subtitle}</p>
-            )}
-            {section.content?.buttonText && (
-              <span className="mt-2 px-3 py-1 bg-white text-black text-xs inline-block">
-                {section.content.buttonText}
-              </span>
-            )}
-          </div>
-        </div>
-      );
-
+            </div>
+        );
     case 'banner':
       return (
         <div className="relative w-full h-32 overflow-hidden border border-gray-300 rounded">

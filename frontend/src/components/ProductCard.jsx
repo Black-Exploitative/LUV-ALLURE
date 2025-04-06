@@ -4,7 +4,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
 
-const ProductCard = ({ product, gridType, onProductClick }) => {
+const   ProductCard = ({ product, gridType, onProductClick }) => {
   // Add safe defaults and error handling
   const { 
     id,
@@ -119,7 +119,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
   return (
     <motion.div
       className={`${cardWidthClass} relative overflow-hidden group`}
-      ref={cardRef}
+      ref={cardRef} 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}

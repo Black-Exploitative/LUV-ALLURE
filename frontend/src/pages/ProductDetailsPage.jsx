@@ -1,5 +1,5 @@
 import ProductCarousel from "../components/ProductCarousel";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
 import PurchasedCard from "../components/PurchasedCard";
@@ -15,6 +15,7 @@ import cmsService from "../services/cmsService";
 
 const ProductDetailsPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const rawProduct = location.state?.product;
 
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -30,15 +31,18 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
-      if (!product || !product.id) return;
+      if (!rawProduct || !rawProduct.id) return;
       
       try {
         setLoadingRelated(true);
         
+        // Get product ID safely
+        const productId = rawProduct.id;
+        
         // Fetch each type of related product
-        const styleWith = await cmsService.getProductRelationships(product.id, 'style-with');
-        const alsoPurchased = await cmsService.getProductRelationships(product.id, 'also-purchased');
-        const alsoViewed = await cmsService.getProductRelationships(product.id, 'also-viewed');
+        const styleWith = await cmsService.getProductRelationships(productId, 'style-with');
+        const alsoPurchased = await cmsService.getProductRelationships(productId, 'also-purchased');
+        const alsoViewed = await cmsService.getProductRelationships(productId, 'also-viewed');
         
         // Update state with fetched products
         setStyleWithProducts(styleWith || []);
@@ -52,7 +56,7 @@ const ProductDetailsPage = () => {
     };
     
     fetchRelatedProducts();
-  }, [product]);
+  }, [rawProduct]);
  
   // Fallback product if none is passed
   const defaultProduct = {
@@ -288,6 +292,42 @@ const ProductDetailsPage = () => {
           {/* Left Side: Product Carousel */}
           <div className="mb-8 md:mb-0 mr-[50px]">
             <ProductCarousel images={product.images} />
+
+            {/* Related Products - Also inside the max-w-screen-xl container */}
+        <div className="mt-[50px]">
+          <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
+          {loadingRelated ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+            </div>
+          ) : styleWithProducts.length > 0 ? (
+            <div className="grid gap-4 md:gap-6">
+              {styleWithProducts.map((product, index) => (
+                <SmallProductCard
+                  key={product.id || index}
+                  image={product.images?.[0] || product.image || "/images/placeholder.jpg"}
+                  name={product.title || product.name}
+                  color={product.color || "Default"}
+                  price={`₦${parseFloat(product.price).toLocaleString()}`}
+                  onViewProduct={() => navigate(`/product/${product.id}`)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-4 md:gap-6">
+              {relatedProducts.map((product, index) => (
+                <SmallProductCard
+                  key={index}
+                  image={product.image}
+                  name={product.name}
+                  color={product.color}
+                  price={product.price}
+                  onViewProduct={() => console.log(`Viewing ${product.name}`)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
           </div>
 
           {/* Right Side: Product Details */}
@@ -436,54 +476,21 @@ const ProductDetailsPage = () => {
           </div>
         </div>
 
-        {/* Related Products - Also inside the max-w-screen-xl container */}
-        <div className="mt-12">
-          <h2 className="text-xl mb-4">STYLE IT WITH</h2>
-          {loadingRelated ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-            </div>
-          ) : styleWithProducts.length > 0 ? (
-            <div className="grid gap-4 md:gap-6">
-              {styleWithProducts.map((product, index) => (
-                <SmallProductCard
-                  key={product.id || index}
-                  image={product.images?.[0] || product.image || "/images/placeholder.jpg"}
-                  name={product.title || product.name}
-                  color={product.color || "Default"}
-                  price={`₦${parseFloat(product.price).toLocaleString()}`}
-                  onViewProduct={() => navigate(`/product/${product.id}`)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid gap-4 md:gap-6">
-              {relatedProducts.map((product, index) => (
-                <SmallProductCard
-                  key={index}
-                  image={product.image}
-                  name={product.name}
-                  color={product.color}
-                  price={product.price}
-                  onViewProduct={() => console.log(`Viewing ${product.name}`)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+      </div>
+      <div className="mx-[20px] mt-[50px] mb-[100px]">
 
         {/* Customers Also Purchased Section */}
         {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
           <>
-            <h2 className="text-xl font-semibold mt-8 mb-4">
-              CUSTOMERS ALSO PURCHASED
+            <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
+              ALLURVERS ALSO PURCHASED
             </h2>
             {loadingRelated ? (
               <div className="flex justify-center items-center py-8">
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
             ) : alsoPurchasedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
                 {alsoPurchasedProducts.map((product) => (
                   <PurchasedCard
                     key={product.id}
@@ -498,7 +505,8 @@ const ProductDetailsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]
+              ">
                 {purchasedProducts.map((product, index) => (
                   <PurchasedCard key={index} product={product} />
                 ))}
@@ -510,15 +518,16 @@ const ProductDetailsPage = () => {
         {/* Customers Also Viewed Section */}
         {(alsoViewedProducts.length > 0 || !loadingRelated) && (
           <>
-            <h2 className="text-xl font-semibold mt-8 mb-4">
-              CUSTOMERS ALSO VIEWED
+            <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
+              aLLURVERS ALSO VIEWED
             </h2>
             {loadingRelated ? (
               <div className="flex justify-center items-center py-8">
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
             ) : alsoViewedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+           
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
                 {alsoViewedProducts.map((product) => (
                   <PurchasedCard
                     key={product.id}
@@ -533,7 +542,7 @@ const ProductDetailsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
                 {purchasedProducts.map((product, index) => (
                   <PurchasedCard key={index} product={product} />
                 ))}
@@ -541,7 +550,7 @@ const ProductDetailsPage = () => {
             )}
           </>
         )}
-              </div>
+      </div>      
       <Footer />
     </>
   );

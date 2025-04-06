@@ -5,6 +5,7 @@ import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import api from '../../services/api';
 
 const NavImageForm = () => {
   const { id } = useParams();
@@ -114,12 +115,12 @@ const NavImageForm = () => {
       
       // API endpoint and method based on editing or creating
       const url = isEditing 
-        ? `/api/cms/nav-images/${id}` 
-        : '/api/cms/nav-images';
+        ? `/cms/nav-images/${id}` 
+        : '/cms/nav-images';
       
       const method = isEditing ? 'put' : 'post';
       
-      await axios[method](url, formData);
+      await api[method](url, formData);
       
       setSuccess(isEditing 
         ? 'Navigation image updated successfully!' 
