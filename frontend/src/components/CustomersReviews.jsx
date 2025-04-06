@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import PropTypes from 'prop-types';
 
 const CustomerReviews = ({ averageRating = 4.9, totalReviews = 90, ratingCounts = { 5: 83, 4: 5, 3: 2, 2: 0, 1: 0 } }) => {
   const [qualityRating, setQualityRating] = useState('Very High');
@@ -86,5 +88,23 @@ const CustomerReviews = ({ averageRating = 4.9, totalReviews = 90, ratingCounts 
     </div>
   );
 };
+
+CustomerReviews.propTypes = {
+    averageRating: PropTypes.number,
+    totalReviews: PropTypes.number,
+    ratingCounts: PropTypes.shape({
+      1: PropTypes.number,
+      2: PropTypes.number,
+      3: PropTypes.number,
+      4: PropTypes.number,
+      5: PropTypes.number,
+    }),
+  };
+  
+  CustomerReviews.defaultProps = {
+    averageRating: 4.9,
+    totalReviews: 90,
+    ratingCounts: { 5: 83, 4: 5, 3: 2, 2: 0, 1: 0 },
+  };
 
 export default CustomerReviews;
