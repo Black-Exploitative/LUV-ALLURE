@@ -30,7 +30,7 @@ const PaymentPage = () => {
     postalCode: "",
 
     // Packaging
-    packagingOption: "standard", // New field for packaging options
+    packagingOption: "standard", 
     giftWrapping: false,
     giftMessage: "",
 
@@ -130,13 +130,17 @@ const PaymentPage = () => {
 
   const getSectionIcon = (section) => {
     if (completedSections.includes(section)) {
-      return <FaCheck className="w-6 h-6 text-black" />;
+      return (
+        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white">
+          <FaCheck className="w-5 h-5" />
+        </div>
+      );
     }
     return (
-      <span className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-800">
+      <div className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-black text-black font-bold text-lg">
         {section}
-      </span>
-    ); // Increased size to match
+      </div>
+    );
   };
 
   return (
@@ -256,9 +260,9 @@ const PaymentPage = () => {
             <div className="mb-8">
               {/* Section header  */}
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-4">
                   {getSectionIcon(1)}
-                  <span className="font-medium">Personal Information</span>
+                  <span className="font-medium text-xl">Personal Information</span>
                 </div>
 
                 {/* Only show Edit when completed and not active */}
@@ -328,14 +332,37 @@ const PaymentPage = () => {
                         </div>
                       </div>
 
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {/* Fixed Contact Number Field with more space */}
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
                           Contact Number
                         </label>
-                        <CountryCodeInput
-                          value={formData.contactNumber}
-                          onChange={handleInputChange}
-                        />
+                        <div className="flex gap-4">
+                          <div className="w-1/3">
+                            <select 
+                              className="w-full p-2 border border-gray-300 rounded-md"
+                              defaultValue="+234"
+                            >
+                              <option value="+234">+234 (Nigeria)</option>
+                              <option value="+1">+1 (USA)</option>
+                              <option value="+44">+44 (UK)</option>
+                              <option value="+33">+33 (France)</option>
+                            </select>
+                          </div>
+                          <div className="w-2/3">
+                            <input
+                              type="tel"
+                              name="contactNumber"
+                              value={formData.contactNumber}
+                              onChange={handleInputChange}
+                              className={`w-full p-2 border ${
+                                errors.contactNumber
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              } rounded-md`}
+                            />
+                          </div>
+                        </div>
                         {errors.contactNumber && (
                           <p className="text-red-500 text-xs mt-1">
                             {errors.contactNumber}
@@ -352,7 +379,7 @@ const PaymentPage = () => {
                             type="checkbox"
                             checked={formData.alternateContact || false}
                             onChange={handleInputChange}
-                            className="focus:ring-black h-4 w-4 text-black border-gray-300 rounded"
+                            className="focus:ring-black h-5 w-5 text-black border-gray-300 rounded"
                           />
                         </div>
                         <div className="ml-3 text-sm">
@@ -365,21 +392,34 @@ const PaymentPage = () => {
                         </div>
                       </div>
 
-
-
-                      {/* Alternate Contact Field - conditionally rendered */}
+                      {/* Alternate Contact Field - with country code */}
                       {formData.alternateContact && (
                         <div className="mb-6">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-3">
                             Alternate Contact
                           </label>
-                          <input
-                            type="tel"
-                            name="alternateContactNumber"
-                            value={formData.alternateContactNumber || ""}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                          />
+                          <div className="flex gap-4">
+                            <div className="w-1/3">
+                              <select 
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                defaultValue="+234"
+                              >
+                                <option value="+234">+234 (Nigeria)</option>
+                                <option value="+1">+1 (USA)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+33">+33 (France)</option>
+                              </select>
+                            </div>
+                            <div className="w-2/3">
+                              <input
+                                type="tel"
+                                name="alternateContactNumber"
+                                value={formData.alternateContactNumber || ""}
+                                onChange={handleInputChange}
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                              />
+                            </div>
+                          </div>
                         </div>
                       )}
 
@@ -408,639 +448,690 @@ const PaymentPage = () => {
               )}
             </div>
 
-            {/* Section 2: Shipping */}
-            <div className="bg-white shadow rounded-md overflow-hidden">
-              <button
-                className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${
-                  !canOpenSection(2) ? "opacity-50 cursor-not-allowed" : ""
-                } ${
-                  activeSection === 2
-                    ? "bg-black text-white"
-                    : "bg-white text-black"
-                }`}
-                onClick={() => canOpenSection(2) && setActiveSection(2)}
-                disabled={!canOpenSection(2)}
-              >
-                <div className="flex items-center space-x-3">
-                  {getSectionIcon(2)}
-                  <span className="font-medium">Shipping</span>
-                </div>
-                {activeSection === 2 ? (
-                  <FaChevronUp className="w-4 h-4" />
-                ) : (
-                  <FaChevronDown className="w-4 h-4" />
-                )}
-              </button>
+{/* Section 2: Shipping */}
+<div className="mb-8">
+  {/* When not completed or when active, show the normal section header and content */}
+  {(!completedSections.includes(2) || activeSection === 2) && (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          {getSectionIcon(2)}
+          <span className="font-medium text-xl">SHIPPING</span>
+        </div>
+      </div>
 
-              <AnimatePresence>
-                {activeSection === 2 && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="p-6 border-t">
-                      <div className="mb-6 space-y-4">
-                        <div className="flex items-start space-x-3">
-                          <input
-                            type="radio"
-                            id="homeDelivery"
-                            name="shippingMethod"
-                            value="homeDelivery"
-                            checked={formData.shippingMethod === "homeDelivery"}
-                            onChange={handleInputChange}
-                            className="mt-1"
-                          />
-                          <div>
-                            <label
-                              htmlFor="homeDelivery"
-                              className="font-medium block mb-1"
-                            >
-                              Home Delivery
-                            </label>
-                            <p className="text-sm text-gray-600">
-                              Delivered to your address within 3-5 business
-                              days.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3">
-                          <input
-                            type="radio"
-                            id="collectInStore"
-                            name="shippingMethod"
-                            value="collectInStore"
-                            checked={
-                              formData.shippingMethod === "collectInStore"
-                            }
-                            onChange={handleInputChange}
-                            className="mt-1"
-                          />
-                          <div>
-                            <label
-                              htmlFor="collectInStore"
-                              className="font-medium block mb-1"
-                            >
-                              Collect in Store
-                            </label>
-                            <p className="text-sm text-gray-600">
-                              Pick up your order from our store at no extra
-                              cost.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {formData.shippingMethod === "homeDelivery" && (
-                        <div className="space-y-4 mb-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Address Line 1
-                            </label>
-                            <input
-                              type="text"
-                              name="addressLine1"
-                              value={formData.addressLine1}
-                              onChange={handleInputChange}
-                              className={`w-full p-2 border ${
-                                errors.addressLine1
-                                  ? "border-red-500"
-                                  : "border-gray-300"
-                              } rounded-md`}
-                            />
-                            {errors.addressLine1 && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.addressLine1}
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Country
-                              </label>
-                              <input
-                                type="text"
-                                name="country"
-                                value={formData.country}
-                                onChange={handleInputChange}
-                                className={`w-full p-2 border ${
-                                  errors.country
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                                } rounded-md`}
-                              />
-                              {errors.country && (
-                                <p className="text-red-500 text-xs mt-1">
-                                  {errors.country}
-                                </p>
-                              )}
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                City
-                              </label>
-                              <input
-                                type="text"
-                                name="city"
-                                value={formData.city}
-                                onChange={handleInputChange}
-                                className={`w-full p-2 border ${
-                                  errors.city
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                                } rounded-md`}
-                              />
-                              {errors.city && (
-                                <p className="text-red-500 text-xs mt-1">
-                                  {errors.city}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                State/Province
-                              </label>
-                              <input
-                                type="text"
-                                name="state"
-                                value={formData.state}
-                                onChange={handleInputChange}
-                                className={`w-full p-2 border ${
-                                  errors.state
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                                } rounded-md`}
-                              />
-                              {errors.state && (
-                                <p className="text-red-500 text-xs mt-1">
-                                  {errors.state}
-                                </p>
-                              )}
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Postal Code
-                              </label>
-                              <input
-                                type="text"
-                                name="postalCode"
-                                value={formData.postalCode}
-                                onChange={handleInputChange}
-                                className={`w-full p-2 border ${
-                                  errors.postalCode
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                                } rounded-md`}
-                              />
-                              {errors.postalCode && (
-                                <p className="text-red-500 text-xs mt-1">
-                                  {errors.postalCode}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => handleContinue(2)}
-                        className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
-                      >
-                        Continue to Packaging
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Show summary when section is collapsed but completed */}
-              {activeSection !== 2 && completedSections.includes(2) && (
-                <div className="px-6 py-3 border-t text-sm text-gray-600">
-                  {formData.shippingMethod === "homeDelivery" ? (
-                    <p>
-                      {formData.addressLine1}, {formData.city}, {formData.state}
-                      , {formData.country}
+      <AnimatePresence>
+        {activeSection === 2 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2">
+              {/* Shipping method in a row layout */}
+              <div className="mb-6 grid grid-cols-2 gap-4">
+                <div className="flex items-start border border-gray-200 p-4 rounded hover:border-black transition-colors">
+                  <input
+                    type="radio"
+                    id="homeDelivery"
+                    name="shippingMethod"
+                    value="homeDelivery"
+                    checked={formData.shippingMethod === "homeDelivery"}
+                    onChange={handleInputChange}
+                    className="mt-1 mr-3 h-5 w-5"
+                  />
+                  <div>
+                    <label
+                      htmlFor="homeDelivery"
+                      className="font-medium block mb-1"
+                    >
+                      Home Delivery
+                    </label>
+                    <p className="text-sm text-gray-600">
+                      Delivered within 3-5 days
                     </p>
-                  ) : (
-                    <p>Collect in Store</p>
-                  )}
+                  </div>
+                </div>
+
+                <div className="flex items-start border border-gray-200 p-4 rounded hover:border-black transition-colors">
+                  <input
+                    type="radio"
+                    id="collectInStore"
+                    name="shippingMethod"
+                    value="collectInStore"
+                    checked={
+                      formData.shippingMethod === "collectInStore"
+                    }
+                    onChange={handleInputChange}
+                    className="mt-1 mr-3 h-5 w-5"
+                  />
+                  <div>
+                    <label
+                      htmlFor="collectInStore"
+                      className="font-medium block mb-1"
+                    >
+                      Collect in Store
+                    </label>
+                    <p className="text-sm text-gray-600">
+                      Free pickup available
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {formData.shippingMethod === "homeDelivery" && (
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Address Line 1
+                    </label>
+                    <input
+                      type="text"
+                      name="addressLine1"
+                      value={formData.addressLine1}
+                      onChange={handleInputChange}
+                      className={`w-full p-2 border ${
+                        errors.addressLine1
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } rounded-md`}
+                    />
+                    {errors.addressLine1 && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.addressLine1}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        className={`w-full p-2 border ${
+                          errors.country
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md`}
+                      />
+                      {errors.country && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.country}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        className={`w-full p-2 border ${
+                          errors.city
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md`}
+                      />
+                      {errors.city && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.city}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        State/Province
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleInputChange}
+                        className={`w-full p-2 border ${
+                          errors.state
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md`}
+                      />
+                      {errors.state && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.state}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Postal Code
+                      </label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handleInputChange}
+                        className={`w-full p-2 border ${
+                          errors.postalCode
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md`}
+                      />
+                      {errors.postalCode && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.postalCode}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
+
+              <button
+                onClick={() => handleContinue(2)}
+                className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+              >
+                Continue to Packaging
+              </button>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  )}
+
+  {/* When completed and not active, show the summary view with underlined Edit */}
+  {activeSection !== 2 && completedSections.includes(2) && (
+    <div className="mb-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center">
+            <FaCheck className="text-white w-5 h-5" />
+          </div>
+          <span className="font-medium text-xl">SHIPPING ADDRESS</span>
+        </div>
+        <button
+          onClick={() => setActiveSection(2)}
+          className="text-sm text-black underline"
+        >
+          Edit
+        </button>
+      </div>
+      <div className="ml-14 mt-3">
+        <div className="text-sm text-gray-600">
+          {formData.firstName} {formData.lastName}
+        </div>
+        <div className="text-sm text-gray-600">
+          {formData.addressLine1}
+        </div>
+        <div className="text-sm text-gray-600">
+          {formData.city}, {formData.state} {formData.postalCode}
+        </div>
+        <div className="text-sm text-gray-600">
+          {formData.country}
+        </div>
+        <div className="mt-2">
+          {formData.shippingMethod === "homeDelivery" ? (
+            <div>
+              <div className="text-sm font-medium">Premium Express</div>
+              <div className="text-sm text-gray-600">$0</div>
+              <div className="text-sm text-gray-600">
+                Estimated delivery within 2-3 business days. Delivery between 9am - 8pm, Monday to Friday. A signature will be required upon delivery.
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-600">Collect in Store</div>
+          )}
+        </div>
+      </div>
+    </div>
+  )}
+</div>
 
             {/* Section 3: Packaging and Gifting */}
-            <div className="bg-white shadow rounded-md overflow-hidden">
-              <button
-                className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${
-                  !canOpenSection(3) ? "opacity-50 cursor-not-allowed" : ""
-                } ${
-                  activeSection === 3
-                    ? "bg-black text-white"
-                    : "bg-white text-black"
-                }`}
-                onClick={() => canOpenSection(3) && setActiveSection(3)}
-                disabled={!canOpenSection(3)}
-              >
-                <div className="flex items-center space-x-3">
-                  {getSectionIcon(3)}
-                  <span className="font-medium">Packaging and Gifting</span>
-                </div>
-                {activeSection === 3 ? (
-                  <FaChevronUp className="w-4 h-4" />
-                ) : (
-                  <FaChevronDown className="w-4 h-4" />
-                )}
-              </button>
+<div className="mb-8">
+  {/* When not completed or when active, show the normal section header and content */}
+  {(!completedSections.includes(3) || activeSection === 3) && (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          {getSectionIcon(3)}
+          <span className="font-medium text-xl">PACKAGING & GIFTING</span>
+        </div>
+      </div>
 
-              <AnimatePresence>
-                {activeSection === 3 && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="p-6 border-t">
-                      <div className="mb-6">
-                        <h3 className="font-medium text-lg mb-4">
-                          Select Packaging Option
-                        </h3>
+      <AnimatePresence>
+        {activeSection === 3 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2">
+              <div className="mb-6">
+                <h3 className="font-medium text-xl mb-4">
+                  Select Packaging Option
+                </h3>
 
-                        {/* Standard Packaging Option */}
-                        <div className="flex flex-col md:flex-row border border-gray-200 rounded-md mb-4 hover:border-black transition-colors">
-                          <div className="md:w-1/2 p-4">
-                            <div className="flex items-start">
-                              <input
-                                type="radio"
-                                id="standardPackaging"
-                                name="packagingOption"
-                                value="standard"
-                                checked={
-                                  formData.packagingOption === "standard"
-                                }
-                                onChange={handleInputChange}
-                                className="mt-1 mr-3"
-                              />
-                              <div>
-                                <label
-                                  htmlFor="standardPackaging"
-                                  className="font-medium block mb-1"
-                                >
-                                  Standard Packaging
-                                </label>
-                                <p className="text-sm text-gray-600">
-                                  Elegant standard packaging with branded tissue
-                                  paper.
-                                </p>
-                                <p className="text-sm font-semibold mt-2">
-                                  Free
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="md:w-1/2 p-4 flex space-x-2">
-                            {/* Standard Packaging Images */}
-                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
-                              <img
-                                src="../public/images/stylewith2.jpg"
-                                alt="Standard packaging front"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
-                              <img
-                                src="./public/images/stylewith2.jpg"
-                                alt="Standard packaging contents"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Premium Packaging Option */}
-                        <div className="flex flex-col md:flex-row border border-gray-200 rounded-md mb-4 hover:border-black transition-colors">
-                          <div className="md:w-1/2 p-4">
-                            <div className="flex items-start">
-                              <input
-                                type="radio"
-                                id="premiumPackaging"
-                                name="packagingOption"
-                                value="premium"
-                                checked={formData.packagingOption === "premium"}
-                                onChange={handleInputChange}
-                                className="mt-1 mr-3"
-                              />
-                              <div>
-                                <label
-                                  htmlFor="premiumPackaging"
-                                  className="font-medium block mb-1"
-                                >
-                                  Premium Packaging
-                                </label>
-                                <p className="text-sm text-gray-600">
-                                  Luxury box with satin ribbon and premium
-                                  presentation.
-                                </p>
-                                <p className="text-sm font-semibold mt-2">
-                                  ₦5,000.00
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="md:w-1/2 p-4 flex space-x-2">
-                            {/* Premium Packaging Images */}
-                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
-                              <img
-                                src="./public/images/stylewith2.jpg"
-                                alt="Premium packaging box"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="w-1/2 h-32 bg-gray-100 rounded-md overflow-hidden">
-                              <img
-                                src="./public/images/stylewith2.jpg"
-                                alt="Premium packaging open"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Gift Wrapping Option */}
-                        <div className="mt-8">
-                          <div className="flex items-start space-x-3">
-                            <input
-                              type="checkbox"
-                              id="giftWrapping"
-                              name="giftWrapping"
-                              checked={formData.giftWrapping}
-                              onChange={handleInputChange}
-                              className="mt-1"
-                            />
-                            <div>
-                              <label
-                                htmlFor="giftWrapping"
-                                className="font-medium block mb-1"
-                              >
-                                Add Gift Wrapping
-                              </label>
-                              <p className="text-sm text-gray-600">
-                                Add premium gift wrapping to your order for an
-                                additional ₦2,000.
-                              </p>
-                            </div>
-                          </div>
-
-                          {formData.giftWrapping && (
-                            <div className="mt-4 ml-6">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Gift Message
-                              </label>
-                              <textarea
-                                name="giftMessage"
-                                value={formData.giftMessage}
-                                onChange={handleInputChange}
-                                rows="3"
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                placeholder="Write your gift message here..."
-                              ></textarea>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => handleContinue(3)}
-                        className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+                {/* Standard Packaging Option - Gucci style with thick border */}
+                <div className={`border-2 ${formData.packagingOption === "standard" ? "border-black" : "border-gray-200"} rounded-none mb-6 hover:border-black transition-colors`}>
+                  <div className="p-4 flex flex-row items-start">
+                    <input
+                      type="radio"
+                      id="standardPackaging"
+                      name="packagingOption"
+                      value="standard"
+                      checked={formData.packagingOption === "standard"}
+                      onChange={handleInputChange}
+                      className="mt-1 mr-4 h-5 w-5"
+                    />
+                    <div className="flex-1">
+                      <label
+                        htmlFor="standardPackaging"
+                        className="font-medium text-lg block mb-2"
                       >
-                        Continue to Payment
-                      </button>
+                        Standard Packaging
+                      </label>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Elegant standard packaging with branded tissue paper.
+                      </p>
+                      <p className="text-sm font-semibold">
+                        Free
+                      </p>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <div className="flex space-x-2">
+                      {/* Standard Packaging Images */}
+                      <div className="w-24 h-24 bg-gray-100">
+                        <img
+                          src="/api/placeholder/96/96"
+                          alt="Standard packaging"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              {/* Show summary when section is collapsed but completed */}
-              {activeSection !== 3 && completedSections.includes(3) && (
-                <div className="px-6 py-3 border-t text-sm text-gray-600">
-                  <p>
-                    {formData.packagingOption === "premium"
-                      ? "Premium packaging"
-                      : "Standard packaging"}
-                    {formData.giftWrapping ? ", Gift wrapped" : ""}
-                  </p>
+                {/* Premium Packaging Option - Gucci style */}
+                <div className={`border-2 ${formData.packagingOption === "premium" ? "border-black" : "border-gray-200"} rounded-none mb-6 hover:border-black transition-colors`}>
+                  <div className="p-4 flex flex-row items-start">
+                    <input
+                      type="radio"
+                      id="premiumPackaging"
+                      name="packagingOption"
+                      value="premium"
+                      checked={formData.packagingOption === "premium"}
+                      onChange={handleInputChange}
+                      className="mt-1 mr-4 h-5 w-5"
+                    />
+                    <div className="flex-1">
+                      <label
+                        htmlFor="premiumPackaging"
+                        className="font-medium text-lg block mb-2"
+                      >
+                        Premium Packaging
+                      </label>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Luxury box with satin ribbon and premium presentation.
+                      </p>
+                      <p className="text-sm font-semibold">
+                        ₦5,000.00
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      {/* Premium Packaging Images */}
+                      <div className="w-24 h-24 bg-gray-100">
+                        <img
+                          src="/api/placeholder/96/96"
+                          alt="Premium packaging"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gift Wrapping Option */}
+                <div className="mt-8">
+                  <div className="flex items-start space-x-4">
+                    <input
+                      type="checkbox"
+                      id="giftWrapping"
+                      name="giftWrapping"
+                      checked={formData.giftWrapping}
+                      onChange={handleInputChange}
+                      className="mt-1 h-5 w-5"
+                    />
+                    <div>
+                      <label
+                        htmlFor="giftWrapping"
+                        className="font-medium text-lg block mb-1"
+                      >
+                        Add Gift Wrapping
+                      </label>
+                      <p className="text-sm text-gray-600">
+                        Add premium gift wrapping to your order for an
+                        additional ₦4,000.
+                      </p>
+                    </div>
+                  </div>
+
+                  {formData.giftWrapping && (
+                    <div className="mt-4 ml-9">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Gift Message
+                      </label>
+                      <textarea
+                        name="giftMessage"
+                        value={formData.giftMessage}
+                        onChange={handleInputChange}
+                        rows="3"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="Write your gift message here..."
+                      ></textarea>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleContinue(3)}
+                className="cursor-pointer w-full py-3 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+              >
+                Continue to Payment
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  )}
+
+  {/* When completed and not active, show the summary view */}
+  {activeSection !== 3 && completedSections.includes(3) && (
+    <div className="mb-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center">
+            <FaCheck className="text-white w-5 h-5" />
+          </div>
+          <span className="font-medium text-xl">PACKAGING & GIFTING</span>
+        </div>
+        <button
+          onClick={() => setActiveSection(3)}
+          className="text-sm text-black underline"
+        >
+          Edit
+        </button>
+      </div>
+      <div className="ml-14 mt-3">
+        <div className="text-sm text-gray-600">
+          {formData.packagingOption === "premium" ? "Premium packaging" : "Standard packaging"}
+        </div>
+        {formData.giftWrapping && (
+          <>
+            <div className="text-sm text-gray-600">Gift wrapped</div>
+            {formData.giftMessage && (
+              <div className="text-sm text-gray-600">
+                Gift message: "{formData.giftMessage}"
+              </div>
+            )}
+          </>
+        )}
+        <div className="mt-2">
+          <div className="text-sm text-gray-600">
+            {formData.packagingOption === "premium" ? "₦5,000.00" : "Free"}
+            {formData.giftWrapping ? " + ₦4,000.00 for gift wrapping" : ""}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+           {/* Section 4: Payment */}
+<div className="mb-8">
+  {/* When not completed or when active, show the normal section header and content */}
+  {(!completedSections.includes(4) || activeSection === 4) && (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          {getSectionIcon(4)}
+          <span className="font-medium text-xl">PAYMENT</span>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {activeSection === 4 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2">
+              <div className="mb-6 grid grid-cols-2 gap-4">
+                <div className="flex items-start border border-gray-200 p-4 rounded hover:border-black transition-colors">
+                  <input
+                    type="radio"
+                    id="cardPayment"
+                    name="paymentMethod"
+                    value="card"
+                    checked={formData.paymentMethod === "card"}
+                    onChange={handleInputChange}
+                    className="mt-1 mr-3 h-5 w-5"
+                  />
+                  <div>
+                    <label
+                      htmlFor="cardPayment"
+                      className="font-medium block mb-1"
+                    >
+                      Credit/Debit Card
+                    </label>
+                    <p className="text-sm text-gray-600">
+                      Pay securely with your card.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start border border-gray-200 p-4 rounded hover:border-black transition-colors">
+                  <input
+                    type="radio"
+                    id="bankTransfer"
+                    name="paymentMethod"
+                    value="bankTransfer"
+                    checked={formData.paymentMethod === "bankTransfer"}
+                    onChange={handleInputChange}
+                    className="mt-1 mr-3 h-5 w-5"
+                  />
+                  <div>
+                    <label
+                      htmlFor="bankTransfer"
+                      className="font-medium block mb-1"
+                    >
+                      Bank Transfer
+                    </label>
+                    <p className="text-sm text-gray-600">
+                      Payment instructions will be sent to your email.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {formData.paymentMethod === "card" && (
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Card Number
+                    </label>
+                    <input
+                      type="text"
+                      name="cardNumber"
+                      value={formData.cardNumber}
+                      onChange={handleInputChange}
+                      placeholder="1234 5678 9012 3456"
+                      className={`w-full p-2 border ${
+                        errors.cardNumber
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } rounded-md`}
+                    />
+                    {errors.cardNumber && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.cardNumber}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Name on Card
+                    </label>
+                    <input
+                      type="text"
+                      name="cardName"
+                      value={formData.cardName}
+                      onChange={handleInputChange}
+                      className={`w-full p-2 border ${
+                        errors.cardName
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } rounded-md`}
+                    />
+                    {errors.cardName && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.cardName}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Expiry Date
+                      </label>
+                      <input
+                        type="text"
+                        name="expiryDate"
+                        value={formData.expiryDate}
+                        onChange={handleInputChange}
+                        placeholder="MM/YY"
+                        className={`w-full p-2 border ${
+                          errors.expiryDate
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md`}
+                      />
+                      {errors.expiryDate && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.expiryDate}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        CVV
+                      </label>
+                      <input
+                        type="text"
+                        name="cvv"
+                        value={formData.cvv}
+                        onChange={handleInputChange}
+                        placeholder="123"
+                        className={`w-full p-2 border ${
+                          errors.cvv
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md`}
+                      />
+                      {errors.cvv && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.cvv}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* Section 4: Payment */}
-            <div className="bg-white shadow rounded-md overflow-hidden">
               <button
-                className={`cursor-pointer w-full px-6 py-4 flex items-center justify-between ${
-                  !canOpenSection(4) ? "opacity-50 cursor-not-allowed" : ""
-                } ${
-                  activeSection === 4
-                    ? "bg-black text-white"
-                    : "bg-white text-black"
-                }`}
-                onClick={() => canOpenSection(4) && setActiveSection(4)}
-                disabled={!canOpenSection(4)}
+                onClick={() => {
+                  if (validateSection(4)) {
+                    if (!completedSections.includes(4)) {
+                      setCompletedSections([...completedSections, 4]);
+                    }
+                    alert("Order placed successfully!");
+                  }
+                }}
+                className="w-full py-3 bg-black text-white cursor-pointer font-medium hover:bg-gray-800 transition-colors"
               >
-                <div className="flex items-center space-x-3">
-                  {getSectionIcon(4)}
-                  <span className="font-medium">Payment</span>
-                </div>
-                {activeSection === 4 ? (
-                  <FaChevronUp className="w-4 h-4" />
-                ) : (
-                  <FaChevronDown className="w-4 h-4" />
-                )}
+                Place Order
               </button>
-
-              <AnimatePresence>
-                {activeSection === 4 && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="p-6 border-t">
-                      <div className="mb-6 space-y-4">
-                        <div className="flex items-start space-x-3">
-                          <input
-                            type="radio"
-                            id="cardPayment"
-                            name="paymentMethod"
-                            value="card"
-                            checked={formData.paymentMethod === "card"}
-                            onChange={handleInputChange}
-                            className="mt-1"
-                          />
-                          <div>
-                            <label
-                              htmlFor="cardPayment"
-                              className="font-medium block mb-1"
-                            >
-                              Credit/Debit Card
-                            </label>
-                            <p className="text-sm text-gray-600">
-                              Pay securely with your card.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3">
-                          <input
-                            type="radio"
-                            id="bankTransfer"
-                            name="paymentMethod"
-                            value="bankTransfer"
-                            checked={formData.paymentMethod === "bankTransfer"}
-                            onChange={handleInputChange}
-                            className="mt-1"
-                          />
-                          <div>
-                            <label
-                              htmlFor="bankTransfer"
-                              className="font-medium block mb-1"
-                            >
-                              Bank Transfer
-                            </label>
-                            <p className="text-sm text-gray-600">
-                              Payment instructions will be sent to your email.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {formData.paymentMethod === "card" && (
-                        <div className="space-y-4 mb-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Card Number
-                            </label>
-                            <input
-                              type="text"
-                              name="cardNumber"
-                              value={formData.cardNumber}
-                              onChange={handleInputChange}
-                              placeholder="1234 5678 9012 3456"
-                              className={`w-full p-2 border ${
-                                errors.cardNumber
-                                  ? "border-red-500"
-                                  : "border-gray-300"
-                              } rounded-md`}
-                            />
-                            {errors.cardNumber && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.cardNumber}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Name on Card
-                            </label>
-                            <input
-                              type="text"
-                              name="cardName"
-                              value={formData.cardName}
-                              onChange={handleInputChange}
-                              className={`w-full p-2 border ${
-                                errors.cardName
-                                  ? "border-red-500"
-                                  : "border-gray-300"
-                              } rounded-md`}
-                            />
-                            {errors.cardName && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.cardName}
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Expiry Date
-                              </label>
-                              <input
-                                type="text"
-                                name="expiryDate"
-                                value={formData.expiryDate}
-                                onChange={handleInputChange}
-                                placeholder="MM/YY"
-                                className={`w-full p-2 border ${
-                                  errors.expiryDate
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                                } rounded-md`}
-                              />
-                              {errors.expiryDate && (
-                                <p className="text-red-500 text-xs mt-1">
-                                  {errors.expiryDate}
-                                </p>
-                              )}
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                CVV
-                              </label>
-                              <input
-                                type="text"
-                                name="cvv"
-                                value={formData.cvv}
-                                onChange={handleInputChange}
-                                placeholder="123"
-                                className={`w-full p-2 border ${
-                                  errors.cvv
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                                } rounded-md`}
-                              />
-                              {errors.cvv && (
-                                <p className="text-red-500 text-xs mt-1">
-                                  {errors.cvv}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => {
-                          if (validateSection(4)) {
-                            if (!completedSections.includes(4)) {
-                              setCompletedSections([...completedSections, 4]);
-                            }
-                            alert("Order placed successfully!");
-                          }
-                        }}
-                        className="w-full py-3 bg-black text-white cursor-pointer font-medium hover:bg-gray-800 transition-colors"
-                      >
-                        Place Order
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  )}
+
+  {/* When completed and not active, show the summary view */}
+  {activeSection !== 4 && completedSections.includes(4) && (
+    <div className="mb-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center">
+            <FaCheck className="text-white w-5 h-5" />
+          </div>
+          <span className="font-medium text-xl">PAYMENT</span>
+        </div>
+        <button
+          onClick={() => setActiveSection(4)}
+          className="text-sm text-black underline"
+        >
+          Edit
+        </button>
+      </div>
+      <div className="ml-14 mt-3">
+        {formData.paymentMethod === "card" ? (
+          <>
+            <div className="text-sm text-gray-600">
+              Credit/Debit Card payment
+            </div>
+            <div className="text-sm text-gray-600">
+              Card ending in {formData.cardNumber.slice(-4)}
+            </div>
+            <div className="text-sm text-gray-600">
+              {formData.cardName}
+            </div>
+          </>
+        ) : (
+          <div className="text-sm text-gray-600">
+            Bank Transfer - Payment instructions sent to your email
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
+
+
           </div>
 
           {/* Column spacer for layout balance - the order summary is now at the top */}
