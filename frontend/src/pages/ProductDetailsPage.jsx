@@ -12,7 +12,7 @@ import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import StarRating from "../components/StarRating";
 import cmsService from "../services/cmsService";
-import CustomerReviews from "../components/CustomerReviews";
+import CustomersReviews from "../components/CustomersReviews";
 import { useRef } from "react";
 
 const ProductDetailsPage = () => {
@@ -587,7 +587,7 @@ const ProductDetailsPage = () => {
       </div>
 
       <div ref={reviewsRef}>
-        <CustomerReviews />
+        <CustomersReviews />
       </div>
 
       <Footer />

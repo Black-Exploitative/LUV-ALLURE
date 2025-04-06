@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 
-const CustomerReviews = ({ averageRating = 4.9, totalReviews = 90, ratingCounts = { 5: 83, 4: 5, 3: 2, 2: 0, 1: 0 } }) => {
+const CustomersReviews = ({ averageRating = 4.9, totalReviews = 90, ratingCounts = { 5: 83, 4: 5, 3: 2, 2: 0, 1: 0 } }) => {
   const [qualityRating, setQualityRating] = useState('Very High');
   const [fitRating, setFitRating] = useState('True to size');
 
@@ -23,17 +23,7 @@ const CustomerReviews = ({ averageRating = 4.9, totalReviews = 90, ratingCounts 
             ))}
           </div>
           <div className="text-sm text-gray-700">Based on {totalReviews} reviews</div>
-          
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="mt-4 flex items-center text-sm font-medium border border-gray-300 rounded-none px-4 py-2"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            See reviews summary
-          </motion.button>
+
         </div>
         
         {/* Middle: Rating breakdown */}
@@ -89,7 +79,11 @@ const CustomerReviews = ({ averageRating = 4.9, totalReviews = 90, ratingCounts 
   );
 };
 
-CustomerReviews.propTypes = {
+
+
+
+
+CustomersReviews.propTypes = {
     averageRating: PropTypes.number,
     totalReviews: PropTypes.number,
     ratingCounts: PropTypes.shape({
@@ -101,10 +95,10 @@ CustomerReviews.propTypes = {
     }),
   };
   
-  CustomerReviews.defaultProps = {
+  CustomersReviews.defaultProps = {
     averageRating: 4.9,
     totalReviews: 90,
     ratingCounts: { 5: 83, 4: 5, 3: 2, 2: 0, 1: 0 },
   };
 
-export default CustomerReviews;
+export default CustomersReviews;
