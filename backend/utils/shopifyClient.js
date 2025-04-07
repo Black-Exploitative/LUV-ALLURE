@@ -1,4 +1,4 @@
-// utils/shopifyClient.js - Enhanced version with getProductById
+// utils/shopifyClient.js - Updated with password management methods
 const fetch = require('node-fetch');
 const shopifyConfig = require('../config/shopify');
 
@@ -143,7 +143,7 @@ class ShopifyClient {
     return this.query(query, { handle });
   }
 
-  // New method to get a product by ID
+  // Method to get a product by ID
   async getProductById(productId) {
     // If the ID is a Shopify GraphQL ID (starts with "gid://"), use it directly
     // Otherwise, convert it to a GraphQL ID format
@@ -313,6 +313,140 @@ class ShopifyClient {
     };
 
     return this.query(query, variables);
+  }
+  
+  // Method to get customer by access token
+  async getCustomer(customerAccessToken) {
+    const query = `
+      query GetCustomer($customerAccessToken: String!) {
+        customer(customerAccessToken: $customerAccessToken) {
+          id
+          email
+          firstName
+          lastName
+          phone
+          defaultAddress {
+            id
+            address1
+            address2
+            city
+            province
+            country
+            zip
+            phone
+          }
+          addresses(first: 10) {
+            edges {
+              node {
+                id
+                address1
+                address2
+                city
+                province
+                country
+                zip
+                phone
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    return this.query(query, { customerAccessToken });
+  }
+
+  // Method to update customer profile
+  async updateCustomer(customerAccessToken, customer) {
+    const query = `
+      mutation CustomerUpdate($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
+        customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
+          customer {
+            id
+            email
+            firstName
+            lastName
+            phone
+          }
+          customerUserErrors {
+            code
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    return this.query(query, { customerAccessToken, customer });
+  }
+
+  // Method to update customer password - new method for updating password directly
+  async customerUpdatePassword(customerAccessToken, password) {
+    // In Shopify Storefront API, password updating is done through the customerUpdate mutation
+    const query = `
+      mutation CustomerUpdate($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
+        customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
+          customer {
+            id
+          }
+          customerUserErrors {
+            code
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      customerAccessToken,
+      customer: {
+        password
+      }
+    };
+
+    return this.query(query, variables);
+  }
+
+  // Method to recover customer password - send reset email
+  async customerRecover(email) {
+    const query = `
+      mutation CustomerRecover($email: String!) {
+        customerRecover(email: $email) {
+          customerUserErrors {
+            code
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    return this.query(query, { email });
+  }
+
+  // Method to reset customer password with reset token
+  async customerResetByUrl(resetUrl, password) {
+    const query = `
+      mutation CustomerResetByUrl($resetUrl: URL!, $password: String!) {
+        customerResetByUrl(resetUrl: $resetUrl, password: $password) {
+          customer {
+            id
+          }
+          customerUserErrors {
+            code
+            field
+            message
+          }
+          customerAccessToken {
+            accessToken
+            expiresAt
+          }
+        }
+      }
+    `;
+
+    return this.query(query, { resetUrl, password });
   }
   
   // Get products from a specific collection
