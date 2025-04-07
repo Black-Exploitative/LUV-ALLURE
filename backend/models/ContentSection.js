@@ -1,6 +1,4 @@
 // backend/models/ContentSection.js
-// Update the ContentSection model to include a 'shop-banner' type
-
 const mongoose = require('mongoose');
 
 const ContentSectionSchema = new mongoose.Schema({
@@ -12,7 +10,19 @@ const ContentSectionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['hero', 'featured-products', 'banner', 'collection', 'testimonial', 'shop-banner', 'custom'],
+    enum: [
+      'hero', 
+      'featured-products', 
+      'banner', 
+      'collection',
+      'testimonial', 
+      'shop-banner',
+      'collection-hero',  // New type for the collection hero (renamed from shop-banner)
+      'promo-section',    // New type for the promo section
+      'shop-header',      // New type for the shop page header
+      'services',         // Type for services section
+      'custom'            // For any custom section type
+    ],
     default: 'custom'
   },
   content: {
@@ -21,6 +31,8 @@ const ContentSectionSchema = new mongoose.Schema({
     description: String,
     buttonText: String,
     buttonLink: String,
+    linkText: String,    // For promo section explore link text
+    linkUrl: String,     // For promo section explore link URL
     alignment: {
       type: String,
       enum: ['left', 'center', 'right'],
@@ -36,10 +48,21 @@ const ContentSectionSchema = new mongoose.Schema({
       min: 0,
       max: 1,
       default: 0.4
+    },
+    mediaType: {
+      type: String,
+      enum: ['image', 'video'],
+      default: 'image'
     }
   },
-  ShopifyProductsIDs: [String],
-  products: [String],
+  shopifyProductIds: [String],  // For linking to Shopify products
+  products: [String],           // Generic products field
+  services: [{                  // For the services section
+    title: String,
+    description: String,
+    iconUrl: String,
+    imageUrl: String
+  }],
   isActive: {
     type: Boolean,
     default: true
@@ -56,6 +79,12 @@ const ContentSectionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+});
+
+// Update timestamp when modified
+ContentSectionSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
 });
 
 module.exports = mongoose.model('ContentSection', ContentSectionSchema);

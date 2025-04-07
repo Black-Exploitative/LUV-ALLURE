@@ -134,8 +134,41 @@ const ShopBannerForm = () => {
       
       const method = isEditing ? 'put' : 'post';
       
-      await api[method](url, formData);
+      const response = await api[method](url, formData);
       
+      // If creating a new section (not editing), add it to the active homepage layout
+      if (!isEditing && response.data && response.data.data && response.data.data._id) {
+        try {
+          // Get the active layout
+          const layoutResponse = await api.get('/cms/homepage');
+          const layout = layoutResponse.data.data;
+          
+          // Check if this section already exists in the layout
+          const sectionExists = layout.sections.some(section => 
+            section.sectionId && section.sectionId._id === response.data.data._id);
+          
+          // If it doesn't exist, add it to the layout
+          if (!sectionExists && layout._id) {
+            const updatedSections = [...layout.sections, {
+              sectionId: response.data.data._id,
+              order: layout.sections.length,
+              column: 0,
+              width: 12
+            }];
+            
+            // Update the layout
+            await api.put(`/cms/layouts/${layout._id}`, {
+              ...layout,
+              sections: updatedSections
+            });
+            
+            console.log("Added shop banner to homepage layout");
+          }
+        } catch (layoutErr) {
+          console.error("Failed to update homepage layout:", layoutErr);
+          // Still consider the operation successful even if layout update fails
+        }
+      }
       
       setSuccess(isEditing 
         ? 'Shop banner updated successfully!' 
