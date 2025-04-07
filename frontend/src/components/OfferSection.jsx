@@ -203,8 +203,9 @@ export default function OfferSection() {
     },
   ];
 
-  const handleProductClick = (product) => {
-    navigate(`/product/${product.id}`, { state: { product } });
+  const handleProductClick = (productId, productSlug) => {
+    navigate(`/product/${productSlug}_${productId}`);
+    // No state is being passed, which is good
   };
 
   return (
@@ -232,7 +233,7 @@ export default function OfferSection() {
                 <EnhancedProductCard 
                   product={product}
                   index={index}
-                  onProductClick={() => handleProductClick(product)}
+                  onProductClick={(id, slug) => handleProductClick(id, slug)}
                 />
               </div>
             ))

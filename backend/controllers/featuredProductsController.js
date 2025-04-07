@@ -43,15 +43,19 @@ exports.getFeaturedProducts = async (req, res, next) => {
             handle: product.handle,
             description: product.description,
             images: product.images.edges.map(imgEdge => ({
-                src: imgEdge.node.url,
-                altText: imgEdge.node.altText
-              })),
-            price: product.variants.edges[0]?.node.price?.amount || '0',
-            variants: product.variants.edges.map(edge => ({
-              id: edge.node.id,
-              title: edge.node.title,
-              price: edge.node.price.amount,
-              available: edge.node.availableForSale
+              src: imgEdge.node.url,
+              altText: imgEdge.node.altText
+            })),
+            variants: product.variants.edges.map(variantEdge => ({
+              id: variantEdge.node.id.split('/').pop(),
+              title: variantEdge.node.title,
+              price: variantEdge.node.price,
+              selectedOptions: variantEdge.node.selectedOptions,
+              inventoryQuantity: variantEdge.node.inventoryQuantity
+            })),
+            options: product.variants.edges.map(variantEdge => ({
+              name: variantEdge.node.title,
+              values: [variantEdge.node.title]
             }))
           };
           

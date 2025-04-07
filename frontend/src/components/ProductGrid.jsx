@@ -88,13 +88,14 @@ const ProductGrid = ({ gridType }) => {
         }, 800);
       }
     };
+    
     loadProducts();
   }, []);
 
-  const handleProductClick = (product) => {
-    navigate(`/product/${product.id}`, { state: { product } });
+  // Updated to only pass productId to handle navigation
+  const handleProductClick = (productId, productSlug) => {
+    navigate(`/product/${productSlug}_${productId}`);
   };
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -119,6 +120,7 @@ const ProductGrid = ({ gridType }) => {
       
       groupedProducts.push({
         id: `${product.id}-${color}`,
+        originalId: product.id, // Store the original product ID for navigation
         title: product.title,
         displayName: `${product.title} - ${color}`,
         description: product.description,
@@ -155,7 +157,7 @@ const ProductGrid = ({ gridType }) => {
             <div key={product.id} className="overflow-hidden w-full">
               <ProductCard
                 product={{
-                  id: product.id,
+                  id: product.originalId, // Use the original product ID for API fetching
                   name: product.displayName || product.title,
                   price: product.priceValue,
                   sizes: product.sizes,
@@ -164,7 +166,7 @@ const ProductGrid = ({ gridType }) => {
                   description: product.description
                 }}
                 gridType={gridType}
-                onProductClick={() => handleProductClick(product.originalProduct || product)}
+                onProductClick={handleProductClick}
               />
             </div>
           ))}

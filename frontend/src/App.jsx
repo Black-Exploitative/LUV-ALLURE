@@ -80,7 +80,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
-        <Route path="/product/:productId" element={<ProductDetailsPage />} />
+        <Route path="/product/:slug" element={<ProductDetailsPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/payment" element={<Payment />} />

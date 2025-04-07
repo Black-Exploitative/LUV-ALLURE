@@ -52,60 +52,13 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
     return ''; // Return empty string or a placeholder image URL
   };
 
-  // Prepare product data in the same format as ProductGrid
+  // Simplified click handler - just passes the product ID
+  // Update the handleClick function
   const handleClick = () => {
-    // First, ensure the images are properly formatted
-    const formattedImages = [];
-    
-    if (images && images.length > 0) {
-      // Make sure we're adding properly formatted images
-      images.forEach(img => {
-        if (typeof img === 'string') {
-          formattedImages.push(img);
-        } else if (img && img.src) {
-          formattedImages.push(img.src);
-        }
-      });
-    }
-    
-    // If we still have no images, add a placeholder
-    if (formattedImages.length === 0) {
-      formattedImages.push("/images/placeholder.jpg");
-    }
-    
-    // Log the formatted images for debugging
-    console.log("EnhancedProductCard - Formatted Images:", formattedImages);
-    
-    // Transform the product to match the expected format in product detail page
-    const formattedProduct = {
-      id: id,
-      title: title,
-      description: product.description || "",
-      priceValue: typeof price === 'number' ? price : (parseFloat(price) || 0),
-      // Add default variants if none exist
-      variants: product.variants || [
-        { 
-          id: `${id}-default`, 
-          color: "Default", 
-          size: "One Size", 
-          fullOption: "Default", 
-          values: ["Default"] 
-        }
-      ],
-      // Use our carefully formatted images
-      images: formattedImages,
-      // Do NOT spread product at the end, as it might override our formatted properties
-    };
-    
-    // Add any additional properties that don't conflict with what we've set
-    Object.keys(product).forEach(key => {
-      if (!formattedProduct.hasOwnProperty(key) && key !== 'images') {
-        formattedProduct[key] = product[key];
-      }
-    });
-    
     if (onProductClick) {
-      onProductClick(formattedProduct);
+      // Pass both id and a URL-friendly version of the title
+      const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      onProductClick(id, slug);
     }
   };
 
@@ -185,7 +138,7 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
         {title}
       </motion.h3>
       
-      {/*{price && (
+      {price && (
         <motion.p
           className="text-[14px] text-center font-normal text-gray-700 mt-1"
           initial={{ opacity: 0 }}
@@ -194,7 +147,7 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
         >
           {typeof price === 'number' ? `₦${price.toLocaleString()}` : price}
         </motion.p>
-      )}*/}
+      )}
     </motion.div>
   );
 };
@@ -205,14 +158,13 @@ EnhancedProductCard.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     images: PropTypes.oneOfType([
-          PropTypes.arrayOf(PropTypes.string),
-          PropTypes.arrayOf(PropTypes.shape({
-            src: PropTypes.string,
-            alt: PropTypes.string
-          }))
-        ]),
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.arrayOf(PropTypes.shape({
+        src: PropTypes.string,
+        alt: PropTypes.string
+      }))
+    ]),
     price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    variants: PropTypes.array
   }).isRequired,
   index: PropTypes.number.isRequired,
   onProductClick: PropTypes.func,

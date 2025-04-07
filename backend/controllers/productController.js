@@ -80,3 +80,58 @@ exports.getProductByHandle = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getProductById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    console.log('Fetching product with ID:', id);
+
+    // Format ID for Shopify if needed
+    const formattedId = id.includes('gid://') 
+      ? id 
+      : `gid://shopify/Product/${id}`;
+    
+    // Get product from Shopify
+    const product = await shopifyClient.getProductById(formattedId);
+    
+    if (!product) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Product not found' 
+      });
+    }
+    
+    // Transform the product for frontend
+    const transformedProduct = {
+      id: product.id.split('/').pop() || id,
+      title: product.title,
+      handle: product.handle,
+      description: product.description,
+      images: product.images.edges.map(imgEdge => ({
+        src: imgEdge.node.url,
+        altText: imgEdge.node.altText
+      })),
+      variants: product.variants.edges.map(variantEdge => ({
+        id: variantEdge.node.id.split('/').pop(),
+        title: variantEdge.node.title,
+        price: variantEdge.node.price.amount,
+        selectedOptions: variantEdge.node.selectedOptions,
+        inventoryQuantity: variantEdge.node.inventoryQuantity,
+        availableForSale: variantEdge.node.availableForSale
+      })),
+      options: product.options.map(option => ({
+        name: option.name,
+        values: option.values
+      }))
+    };
+    
+    res.status(200).json({ 
+      success: true,
+      product: transformedProduct 
+    });
+  } catch (error) {
+    console.error(`Error fetching product ${req.params.id}:`, error);
+    next(error);
+  }
+};
