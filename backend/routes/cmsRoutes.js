@@ -68,4 +68,71 @@ router.route('/media/:id')
   .put(cmsController.updateMedia)
   .delete(cmsController.deleteMedia);
 
+  router.route('/shop-headers')
+  .get(async (req, res, next) => {
+    try {
+      const shopHeaders = await ContentSection.find({ type: 'shop-header' })
+        .sort({ order: 1, createdAt: -1 });
+      
+      res.status(200).json({ 
+        success: true, 
+        count: shopHeaders.length,
+        data: shopHeaders 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+// Promo Section routes
+router.route('/promo-sections')
+  .get(async (req, res, next) => {
+    try {
+      const promoSections = await ContentSection.find({ type: 'promo-section' })
+        .sort({ order: 1, createdAt: -1 });
+      
+      res.status(200).json({ 
+        success: true, 
+        count: promoSections.length,
+        data: promoSections 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+// Collection Hero routes
+router.route('/collection-heroes')
+  .get(async (req, res, next) => {
+    try {
+      const collectionHeroes = await ContentSection.find({ type: 'collection-hero' })
+        .sort({ order: 1, createdAt: -1 });
+      
+      res.status(200).json({ 
+        success: true, 
+        count: collectionHeroes.length,
+        data: collectionHeroes 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+// Services routes
+router.route('/services')
+  .get(async (req, res, next) => {
+    try {
+      const services = await ContentSection.find({ type: 'services' })
+        .sort({ order: 1, createdAt: -1 });
+      
+      res.status(200).json({ 
+        success: true, 
+        count: services.length,
+        data: services 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
 module.exports = router;
