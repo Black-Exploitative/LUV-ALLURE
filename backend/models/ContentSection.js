@@ -1,4 +1,5 @@
-// Highlight of the changes needed in backend/models/ContentSection.js
+// backend/models/ContentSection.js
+// Update the ContentSection model to include a 'shop-banner' type
 
 const mongoose = require('mongoose');
 
@@ -11,7 +12,7 @@ const ContentSectionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['hero', 'featured-products', 'banner', 'collection', 'testimonial', 'custom'],
+    enum: ['hero', 'featured-products', 'banner', 'collection', 'testimonial', 'shop-banner', 'custom'],
     default: 'custom'
   },
   content: {
@@ -28,10 +29,17 @@ const ContentSectionSchema = new mongoose.Schema({
   },
   media: {
     imageUrl: String,
-    videoUrl: String, // Added to support video backgrounds
-    altText: String
+    videoUrl: String,
+    altText: String,
+    overlayOpacity: {
+      type: Number,
+      min: 0,
+      max: 1,
+      default: 0.4
+    }
   },
-  ShopifyProductsIDs: [String], 
+  ShopifyProductsIDs: [String],
+  products: [String],
   isActive: {
     type: Boolean,
     default: true

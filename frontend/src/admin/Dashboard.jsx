@@ -7,8 +7,8 @@ import {
   FiSettings, FiLogOut, FiEdit, FiTrash, FiPlus,
   FiLink, FiShoppingBag, FiEye, FiStar
 } from 'react-icons/fi';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import api from '../services/api';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('homepage');
@@ -45,28 +45,28 @@ const Dashboard = () => {
       let response;
       switch (section) {
         case 'homepage':
-          response = await axios.get('/api/cms/layouts');
+          response = await api.get('/cms/layouts');
           setLayouts(response.data.data);
           break;
         case 'sections':
-          response = await axios.get('/api/cms/sections');
+          response = await api.get('/cms/sections');
           setSections(response.data.data);
           break;
         case 'banners':
-          response = await axios.get('/api/cms/banners');
+          response = await api.get('/cms/banners');
           setBanners(response.data.data);
           break;
         case 'navigation':
-          response = await axios.get('/api/cms/nav-images');
+          response = await api.get('/cms/nav-images');
           setNavImages(response.data.data);
           break;
         case 'media':
-          response = await axios.get('/api/cms/media');
+          response = await api.get('/cms/media');
           setMedia(response.data.data);
           break;
         case 'relationships':
           // Add query parameter for relationship type
-          response = await axios.get(`/api/cms/product-relationships?relationType=${relationshipType}`);
+          response = await api.get(`/cms/product-relationships?relationType=${relationshipType}`);
           setRelationships(response.data.data);
           break;
         default:
@@ -88,28 +88,28 @@ const Dashboard = () => {
       let endpoint;
       switch (section) {
         case 'homepage':
-          endpoint = `/api/cms/layouts/${id}`;
+          endpoint = `/cms/layouts/${id}`;
           break;
         case 'sections':
-          endpoint = `/api/cms/sections/${id}`;
+          endpoint = `/cms/sections/${id}`;
           break;
         case 'banners':
-          endpoint = `/api/cms/banners/${id}`;
+          endpoint = `/cms/banners/${id}`;
           break;
         case 'navigation':
-          endpoint = `/api/cms/nav-images/${id}`;
+          endpoint = `/cms/nav-images/${id}`;
           break;
         case 'media':
-          endpoint = `/api/cms/media/${id}`;
+          endpoint = `/cms/media/${id}`;
           break;
         case 'relationships':
-          endpoint = `/api/cms/product-relationships/${id}`;
+          endpoint = `/cms/product-relationships/${id}`;
           break;
         default:
           throw new Error('Invalid section');
       }
 
-      await axios.delete(endpoint);
+      await api.delete(endpoint);
       toast.success('Item deleted successfully');
       loadData(section); // Reload data after deletion
     } catch (err) {
@@ -126,22 +126,22 @@ const Dashboard = () => {
       
       switch (section) {
         case 'banners':
-          endpoint = `/api/cms/banners/${id}`;
+          endpoint = `/cms/banners/${id}`;
           break;
         case 'sections':
-          endpoint = `/api/cms/sections/${id}`;
+          endpoint = `/cms/sections/${id}`;
           break;
         case 'navigation':
-          endpoint = `/api/cms/nav-images/${id}`;
+          endpoint = `/cms/nav-images/${id}`;
           break;
         case 'relationships':
-          endpoint = `/api/cms/product-relationships/${id}`;
+          endpoint = `/cms/product-relationships/${id}`;
           break;
         default:
           throw new Error('Invalid section');
       }
 
-      await axios.put(endpoint, data);
+      await api.put(endpoint, data);
       toast.success(`Item ${!currentState ? 'activated' : 'deactivated'} successfully`);
       loadData(section); // Reload data
     } catch (err) {
@@ -153,7 +153,7 @@ const Dashboard = () => {
   // Set a layout as active
   const setLayoutActive = async (id) => {
     try {
-      await axios.put(`/api/cms/layouts/${id}`, { isActive: true });
+      await api.put(`/cms/layouts/${id}`, { isActive: true });
       toast.success('Layout set as active');
       loadData('homepage'); // Reload data
     } catch (err) {
@@ -174,7 +174,8 @@ const Dashboard = () => {
     { id: 'homepage', label: 'Homepage Layouts', icon: FiHome },
     { id: 'sections', label: 'Content Sections', icon: FiGrid },
     { id: 'banners', label: 'Banners', icon: FiLayers },
-    { id: 'featured', label: 'Featured Products', icon: FiShoppingBag }, // New item
+    { id: 'shop-banner', label: 'Shop Banner', icon: FiShoppingBag }, // New item
+    { id: 'featured', label: 'Featured Products', icon: FiShoppingBag },
     { id: 'navigation', label: 'Navigation Images', icon: FiLayout },
     { id: 'relationships', label: 'Product Relationships', icon: FiLink },
     { id: 'media', label: 'Media Library', icon: FiImage },
@@ -224,6 +225,8 @@ const Dashboard = () => {
         return renderSections();
       case 'banners':
         return renderBanners();
+      case 'shop-banner':
+        return renderShopBanner();
       case 'navigation':
         return renderNavImages();
       case 'featured':
@@ -865,6 +868,85 @@ const Dashboard = () => {
       )}
     </div>
   );
+
+  // Add this function to Dashboard.jsx
+
+const renderShopBanner = () => {
+  // Filter sections to find shop banner sections
+  const shopBannerSections = sections.filter(section => section.type === 'shop-banner');
+  
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Shop Banner</h2>
+        <Link
+          to="/admin/shop-banner/new"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiPlus className="mr-2" /> Create New Shop Banner
+        </Link>
+      </div>
+
+      {!shopBannerSections || shopBannerSections.length === 0 ? (
+        <p>No shop banners found. Create your first shop banner.</p>
+      ) : (
+        <div className="grid gap-4">
+          {shopBannerSections.map(section => (
+            <div
+              key={section._id}
+              className={`border ${section.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+            >
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <h3 className="font-medium">{section.name}</h3>
+                  <div className="flex items-center mt-1">
+                    <span className={`inline-block w-2 h-2 rounded-full ${section.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                    <p className="text-sm text-gray-600">
+                      {section.isActive ? 'Active' : 'Inactive'}
+                    </p>
+                  </div>
+                </div>
+                <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
+                  {section.media?.imageUrl && (
+                    <img 
+                      src={section.media.imageUrl} 
+                      alt={section.media.altText || section.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-2">
+                <button
+                  onClick={() => toggleActive('sections', section._id, section.isActive)}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    section.isActive 
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  {section.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <Link 
+                  to={`/admin/shop-banner/edit/${section._id}`}
+                  className="p-2 text-gray-600 hover:text-black"
+                >
+                  <FiEdit />
+                </Link>
+                <button 
+                  onClick={() => handleDelete('sections', section._id)}
+                  className="p-2 text-gray-600 hover:text-red-600"
+                >
+                  <FiTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
   const renderSettings = () => (
     <div>

@@ -57,6 +57,22 @@ const defaultSections = [
     order: 1
   },
   {
+    name: 'Shop Now Banner',
+    type: 'shop-banner',
+    content: {
+      buttonText: 'SHOP NOW',
+      buttonLink: '/collections',
+      alignment: 'center'
+    },
+    media: {
+      imageUrl: '/images/photo3.jpg',
+      altText: 'Fashion Model',
+      overlayOpacity: 0.4
+    },
+    isActive: true,
+    order: 2
+  },
+  {
     name: 'Promo Banner',
     type: 'banner',
     content: {
@@ -71,7 +87,7 @@ const defaultSections = [
       altText: 'Spring Sale Banner'
     },
     isActive: true,
-    order: 2
+    order: 3
   }
 ];
 

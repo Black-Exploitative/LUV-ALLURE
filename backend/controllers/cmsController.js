@@ -41,38 +41,63 @@ const upload = multer({
 });
 
 // Content Sections Controller
+// In controllers/cmsController.js
 exports.getAllSections = async (req, res, next) => {
   try {
-    const sections = await ContentSection.find()
-      .sort({ order: 1 })
-      .populate('products');
+    console.log("Getting all sections with query:", req.query);
+    
+    // Create query object based on request
+    const query = {};
+    if (req.query.type) {
+      query.type = req.query.type;
+    }
+    
+    console.log("Query object:", query);
+    
+    const sections = await ContentSection.find(query)
+      .populate({ path: 'products', strictPopulate: false })
+      .sort({ order: 1 });
+    
+    console.log(`Found ${sections.length} sections matching query`);
     
     res.status(200).json({ success: true, data: sections });
   } catch (error) {
-    next(error);
+    console.error("Error in getAllSections:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Internal server error",
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
 exports.getSection = async (req, res, next) => {
   try {
+    console.log(`Getting section with ID: ${req.params.id}`);
     const section = await ContentSection.findById(req.params.id)
-      .populate('products');
+      .populate({ path: 'products', strictPopulate: false });
     
     if (!section) {
+      console.log(`Section not found: ${req.params.id}`);
       return res.status(404).json({ success: false, message: 'Section not found' });
     }
     
+    console.log(`Found section:`, section);
     res.status(200).json({ success: true, data: section });
   } catch (error) {
+    console.error(`Error retrieving section ${req.params.id}:`, error);
     next(error);
   }
 };
 
 exports.createSection = async (req, res, next) => {
   try {
+    console.log("Creating section with data:", req.body);
     const section = await ContentSection.create(req.body);
+    console.log("Section created with ID:", section._id);
     res.status(201).json({ success: true, data: section });
   } catch (error) {
+    console.error("Error creating section:", error);
     next(error);
   }
 };

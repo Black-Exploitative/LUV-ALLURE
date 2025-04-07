@@ -5,6 +5,7 @@ import AnimatedImage from "./AnimatedImage";
 import PropTypes from "prop-types";
 import EnhancedProductCard from "./EnhancedProductCard";
 import FeaturedProductService from "../services/featuredProductService";
+import cmsService from "../services/cmsService";
 import { useNavigate } from "react-router-dom"; 
 
 // Animated Section component with animations
@@ -120,6 +121,15 @@ export default function OfferSection() {
   const [sectionTitle, setSectionTitle] = useState("HERE'S WHAT THE SEASON OFFERS");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [shopBanner, setShopBanner] = useState({
+    imageUrl: "/images/photo3.jpg",
+    altText: "Fashion Model",
+    overlayOpacity: 0.4,
+    buttonText: "SHOP NOW",
+    buttonLink: "#shop-now"
+  });
+  const [shopBannerLoading, setShopBannerLoading] = useState(true);
+  
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -128,6 +138,45 @@ export default function OfferSection() {
     return () => {
       document.body.style.overflowX = "";
     };
+  }, []);
+  
+  // Fetch shop banner data from CMS
+  useEffect(() => {
+    const fetchShopBanner = async () => {
+      try {
+        setShopBannerLoading(true);
+        console.log("Fetching shop banner...");
+        
+        const shopBannerData = await cmsService.getShopBanner();
+        console.log("Shop banner data received:", shopBannerData);
+        
+        if (shopBannerData) {
+          console.log("Setting shop banner with:", {
+            imageUrl: shopBannerData.media?.imageUrl || shopBanner.imageUrl,
+            altText: shopBannerData.media?.altText || "Fashion Model",
+            overlayOpacity: shopBannerData.media?.overlayOpacity || 0.4,
+            buttonText: shopBannerData.content?.buttonText || "SHOP NOW",
+            buttonLink: shopBannerData.content?.buttonLink || "#shop-now"
+          });
+          
+          setShopBanner({
+            imageUrl: shopBannerData.media?.imageUrl || shopBanner.imageUrl,
+            altText: shopBannerData.media?.altText || "Fashion Model",
+            overlayOpacity: shopBannerData.media?.overlayOpacity || 0.4,
+            buttonText: shopBannerData.content?.buttonText || "SHOP NOW",
+            buttonLink: shopBannerData.content?.buttonLink || "#shop-now"
+          });
+        } else {
+          console.log("No shop banner data received, using defaults");
+        }
+      } catch (error) {
+        console.error("Error fetching shop banner:", error);
+      } finally {
+        setShopBannerLoading(false);
+      }
+    };
+    
+    fetchShopBanner();
   }, []);
   
   // Fetch featured products and section configuration
@@ -203,9 +252,8 @@ export default function OfferSection() {
     },
   ];
 
-  const handleProductClick = (productId, productSlug) => {
-    navigate(`/product/${productSlug}_${productId}`);
-    // No state is being passed, which is good
+  const handleProductClick = (product) => {
+    navigate(`/product/${product.id}`, { state: { product } });
   };
 
   return (
@@ -233,7 +281,7 @@ export default function OfferSection() {
                 <EnhancedProductCard 
                   product={product}
                   index={index}
-                  onProductClick={(id, slug) => handleProductClick(id, slug)}
+                  onProductClick={() => handleProductClick(product)}
                 />
               </div>
             ))
@@ -243,27 +291,36 @@ export default function OfferSection() {
 
       <AnimatedSection delay={0.2}>
         <div className="relative w-full h-screen mt-[90px]">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <AnimatedImage
-              src="/images/photo3.jpg"
-              alt="Fashion Model"
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {/* CMS-Controlled Background Image */}
+          {shopBannerLoading ? (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+          ) : (
+            <>
+              <div className="absolute inset-0">
+                <AnimatedImage
+                  src={shopBanner.imageUrl}
+                  alt={shopBanner.altText}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-          <div className="absolute inset-0 bg-black opacity-40"></div>
+              <div 
+                className="absolute inset-0 bg-black"
+                style={{ opacity: shopBanner.overlayOpacity }}
+              ></div>
 
-          <motion.div
-            className="absolute inset-0 flex flex-col justify-end items-center z-10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            <div className="mb-8">
-              <Button href="#shop-now">SHOP NOW</Button>
-            </div>
-          </motion.div>
+              <motion.div
+                className="absolute inset-0 flex flex-col justify-end items-center z-10"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                <div className="mb-8">
+                  <Button href={shopBanner.buttonLink}>{shopBanner.buttonText}</Button>
+                </div>
+              </motion.div>
+            </>
+          )}
         </div>
       </AnimatedSection>
 

@@ -29,6 +29,7 @@ import LayoutForm from "./admin/forms/LayoutForm";
 import MediaForm from "./admin/forms/MediaForm";
 import ProductRelationshipForm from "./admin/forms/ProductRelationshipForm";
 import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
+import ShopBannerForm from "./admin/forms/ShopBannerForm";
 
 // Add these routes in the admin routes section
 
@@ -65,6 +66,8 @@ const AppContent = () => {
           <Route path="/admin/media/edit/:id" element={<MediaForm />} />
           <Route path="/admin/product-relationships/new" element={<ProductRelationshipForm />} />
           <Route path="/admin/product-relationships/edit/:id" element={<ProductRelationshipForm />} />
+          <Route path="/admin/shop-banner/new" element={<ShopBannerForm />} />
+          <Route path="/admin/shop-banner/edit/:id" element={<ShopBannerForm />} />
         </Routes>
       </>
     );
