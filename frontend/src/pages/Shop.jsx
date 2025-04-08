@@ -17,7 +17,7 @@ const ShopPage = () => {
   return (
     <div>
       <Navbar />
-      <ShopHeader /> {/* Replaced Banner with ShopHeader */}
+      <ShopHeader /> 
       <FilterSortBar onGridChange={handleGridChange} />
 
       <ProductGrid gridType={gridType} />

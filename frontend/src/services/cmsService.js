@@ -139,7 +139,7 @@ const cmsService = {
         return contentCache.productRelationships[cacheKey].data;
       }
       
-      const response = await axios.get(`/api/cms/product-relationships?sourceProductId=${productId}&relationType=${relationType}`);
+      const response = await api.get(`/cms/product-relationships?sourceProductId=${productId}&relationType=${relationType}`);
       
       // Get active relationships sorted by order
       const activeRelationships = response.data.data
@@ -155,7 +155,7 @@ const cmsService = {
       
       // For each related product ID, fetch product details
       const productPromises = relatedProductIds.map(id => 
-        axios.get(`/api/products/${id}`)
+        api.get(`/products/${id}`)
           .then(res => res.data.product)
           .catch(err => {
             console.error(`Error fetching product ${id}:`, err);

@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { IoCloseOutline } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,9 @@ const FilterSortBar = ({ onGridChange }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [gridType, setGridType] = useState(4);
   const [activeFilters, setActiveFilters] = useState([]);
+  const [isSticky, setIsSticky] = useState(false);
+  const filterBarRef = useRef(null);
+  const stickyWrapperRef = useRef(null);
 
   // Filter state management
   const [expandedFilter, setExpandedFilter] = useState(null);
@@ -24,6 +27,27 @@ const FilterSortBar = ({ onGridChange }) => {
     fabric: [],
     price: [0, 5000],
   });
+
+  // Setup scroll event listener to detect when to make the filter bar sticky
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!filterBarRef.current || !stickyWrapperRef.current) return;
+
+      const navbarHeight = 100; // Approximate height of your navbar
+      const filterBarTop = stickyWrapperRef.current.getBoundingClientRect().top;
+      
+      if (filterBarTop <= navbarHeight) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
@@ -326,77 +350,95 @@ const FilterSortBar = ({ onGridChange }) => {
     );
   };
 
-  return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between p-4 border-b border-gray-300">
-        <div className="flex items-center">
-          <button
-            className="flex items-center text-gray-800 focus:outline-none cursor-pointer"
-            onClick={toggleFilter}
-          >
-            <span className="tracking-wider text-sm uppercase font-thin">
-              Filter
-            </span>
-            <span className="ml-2 text-sm leading-none">+</span>
-          </button>
-        </div>
+  // Calculate the height of the filter bar to use for the placeholder div
+  useEffect(() => {
+    if (filterBarRef.current) {
+      // Set an attribute with the height that we can use for the placeholder
+      filterBarRef.current.setAttribute('data-height', `${filterBarRef.current.offsetHeight}px`);
+    }
+  }, [activeFilters]);
 
-        <div className="flex items-center space-x-4">
-          <img
-            src="./icons/grid4.svg"
-            alt="Two column grid"
-            className={`cursor-pointer h-5 w-5 ${
-              gridType === 2 ? "opacity-100" : "opacity-50"
-            }`}
-            onClick={() => handleGridChange(2)}
-          />
-          <img
-            src="./icons/grid8.svg"
-            alt="Four column grid"
-            className={`cursor-pointer h-5 w-5 ${
-              gridType === 4 ? "opacity-100" : "opacity-50"
-            }`}
-            onClick={() => handleGridChange(4)}
-          />
-          <span className="text-gray-400">|</span>
-          <div className="relative">
+  return (
+    <div ref={stickyWrapperRef} className="mb-6">
+      {/* This div will take up space when the filter bar becomes fixed */}
+      {isSticky && (
+        <div style={{ height: filterBarRef.current ? filterBarRef.current.getAttribute('data-height') : '0px' }}></div>
+      )}
+      
+      <div 
+        ref={filterBarRef}
+        className={`${isSticky ? 'fixed top-0 left-0 right-0 z-30 bg-white shadow-md' : ''}`}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-gray-300">
+          <div className="flex items-center">
             <button
-              className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-thin tracking-wider focus:outline-none"
-              onClick={toggleDropdown}
+              className="flex items-center text-gray-800 focus:outline-none cursor-pointer"
+              onClick={toggleFilter}
             >
-              Sort <IoMdArrowDropdown className="ml-1" />
+              <span className="tracking-wider text-sm uppercase font-thin">
+                Filter
+              </span>
+              <span className="ml-2 text-sm leading-none">+</span>
             </button>
-            <AnimatePresence>
-              {isDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute top-full right-0 bg-white shadow-lg border mt-1 w-48 z-50"
-                >
-                  <ul className="text-gray-700 text-xs py-1">
-                    <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                      Most Popular
-                    </li>
-                    <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                      Price: Low to High
-                    </li>
-                    <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                      Price: High to Low
-                    </li>
-                    <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                      Newest
-                    </li>
-                  </ul>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <img
+              src="./icons/grid4.svg"
+              alt="Two column grid"
+              className={`cursor-pointer h-5 w-5 ${
+                gridType === 2 ? "opacity-100" : "opacity-50"
+              }`}
+              onClick={() => handleGridChange(2)}
+            />
+            <img
+              src="./icons/grid8.svg"
+              alt="Four column grid"
+              className={`cursor-pointer h-5 w-5 ${
+                gridType === 4 ? "opacity-100" : "opacity-50"
+              }`}
+              onClick={() => handleGridChange(4)}
+            />
+            <span className="text-gray-400">|</span>
+            <div className="relative">
+              <button
+                className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-thin tracking-wider focus:outline-none"
+                onClick={toggleDropdown}
+              >
+                Sort <IoMdArrowDropdown className="ml-1" />
+              </button>
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full right-0 bg-white shadow-lg border mt-1 w-48 z-50"
+                  >
+                    <ul className="text-gray-700 text-xs py-1">
+                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
+                        Most Popular
+                      </li>
+                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
+                        Price: Low to High
+                      </li>
+                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
+                        Price: High to Low
+                      </li>
+                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
+                        Newest
+                      </li>
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-      </div>
 
-      {renderActiveFilters()}
+        {renderActiveFilters()}
+      </div>
 
       <AnimatePresence>
         {isFilterOpen && (
