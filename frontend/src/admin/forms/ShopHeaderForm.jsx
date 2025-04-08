@@ -17,8 +17,6 @@ const ShopHeaderForm = () => {
     content: {
       title: 'Shop the Latest Trends',
       description: 'Find your perfect style today.',
-      buttonText: 'EXPLORE',
-      buttonLink: '/collections',
       alignment: 'center'
     },
     media: {
@@ -53,8 +51,6 @@ const ShopHeaderForm = () => {
               content: {
                 title: section.content?.title || 'Shop the Latest Trends',
                 description: section.content?.description || 'Find your perfect style today.',
-                buttonText: section.content?.buttonText || 'EXPLORE',
-                buttonLink: section.content?.buttonLink || '/collections',
                 alignment: section.content?.alignment || 'center'
               },
               media: {
@@ -322,41 +318,6 @@ const ShopHeaderForm = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Text
-                </label>
-                <input
-                  type="text"
-                  name="content.buttonText"
-                  value={formData.content.buttonText}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Text for the button (leave empty for no button)
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Link
-                </label>
-                <input
-                  type="text"
-                  name="content.buttonLink"
-                  value={formData.content.buttonLink}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="e.g., /collections"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Where the button should direct users
-                </p>
-              </div>
-            </div>
-            
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Header Image
@@ -492,12 +453,7 @@ const ShopHeaderForm = () => {
                     <h2 className="text-white text-2xl font-bold mb-2">{formData.content.title}</h2>
                   )}
                   {formData.content.description && (
-                    <p className="text-white text-lg mb-4">{formData.content.description}</p>
-                  )}
-                  {formData.content.buttonText && (
-                    <button className="px-6 py-2 bg-white text-black hover:bg-gray-100">
-                      {formData.content.buttonText}
-                    </button>
+                    <p className="text-white text-lg">{formData.content.description}</p>
                   )}
                 </div>
               </div>

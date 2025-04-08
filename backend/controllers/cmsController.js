@@ -668,3 +668,79 @@ exports.deleteMedia = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getShopHeaders = async (req, res, next) => {
+  try {
+    const shopHeaders = await ContentSection.find({ type: 'shop-header' })
+      .sort({ order: 1, createdAt: -1 });
+    
+    res.status(200).json({ 
+      success: true, 
+      count: shopHeaders.length,
+      data: shopHeaders 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all promo sections
+exports.getPromoSections = async (req, res, next) => {
+  try {
+    const promoSections = await ContentSection.find({ type: 'promo-section' })
+      .sort({ order: 1, createdAt: -1 });
+    
+    res.status(200).json({ 
+      success: true, 
+      count: promoSections.length,
+      data: promoSections 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all collection heroes
+exports.getCollectionHeroes = async (req, res, next) => {
+  try {
+    const collectionHeroes = await ContentSection.find({ type: 'collection-hero' })
+      .sort({ order: 1, createdAt: -1 });
+    
+    res.status(200).json({ 
+      success: true, 
+      count: collectionHeroes.length,
+      data: collectionHeroes 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all services sections
+exports.getServices = async (req, res, next) => {
+  try {
+    const services = await ContentSection.find({ type: 'services' })
+      .sort({ order: 1, createdAt: -1 });
+    
+    res.status(200).json({ 
+      success: true, 
+      count: services.length,
+      data: services 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+exports.getSection = async (req, res, next) => {
+  try {
+    const section = await ContentSection.findById(req.params.id);
+    
+    if (!section) {
+      return res.status(404).json({ success: false, message: 'Section not found' });
+    }
+    
+    res.status(200).json({ success: true, data: section });
+  } catch (error) {
+    next(error);
+  }
+};

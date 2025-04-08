@@ -9,8 +9,6 @@ const ShopHeader = () => {
     imageUrl: "/images/banner.webp",
     title: "Shop the Latest Trends",
     description: "Find your perfect style today.",
-    buttonText: "EXPLORE",
-    buttonLink: "/collections",
     overlayOpacity: 0.5
   });
   const [loading, setLoading] = useState(true);
@@ -31,8 +29,6 @@ const ShopHeader = () => {
               imageUrl: activeHeader.media?.imageUrl || headerData.imageUrl,
               title: activeHeader.content?.title || headerData.title,
               description: activeHeader.content?.description || headerData.description,
-              buttonText: activeHeader.content?.buttonText || headerData.buttonText,
-              buttonLink: activeHeader.content?.buttonLink || headerData.buttonLink,
               overlayOpacity: activeHeader.media?.overlayOpacity !== undefined ? 
                           activeHeader.media.overlayOpacity : 0.5
             });
@@ -60,7 +56,7 @@ const ShopHeader = () => {
   }
 
   return (
-    <div className="relative w-full h-70">
+    <div className="relative w-full h-70 mt-[70px]">
       {/* Background image */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
@@ -74,7 +70,7 @@ const ShopHeader = () => {
       ></div>
       
       {/* Content */}
-      <div className="relative h-full z-10 flex flex-col justify-center items-center text-center p-4">
+      <div className="relative h-full z-10 flex flex-col justify-center items-center text-center">
         {headerData.title && (
           <motion.h1 
             initial={{ y: 20, opacity: 0 }}
@@ -94,17 +90,6 @@ const ShopHeader = () => {
           >
             {headerData.description}
           </motion.p>
-        )}
-        {headerData.buttonText && (
-          <motion.a 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            href={headerData.buttonLink}
-            className="mt-4 inline-block px-6 py-2 bg-white text-black hover:bg-gray-100 transition-colors"
-          >
-            {headerData.buttonText}
-          </motion.a>
         )}
       </div>
     </div>
