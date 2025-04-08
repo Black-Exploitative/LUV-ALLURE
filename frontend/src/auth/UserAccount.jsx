@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 // Import the separated components
 import Orders from "./Orders";
@@ -10,12 +11,15 @@ import ProfileManagement from "./ProfileManagement";
 import StyleAdvisor from "./StyleAdvisor";
 
 export default function UserAccount() {
-  // Mock user data -
+  const { currentUser, logout, loading } = useAuth();
+  const navigate = useNavigate();
+  
+  // Set local user state from auth context
   const [user, setUser] = useState({
-    firstName: "Emma",
-    lastName: "Thompson",
-    email: "emma.thompson@example.com",
-    phoneNumber: "+1 212 555 0123",
+    firstName: currentUser?.firstName || "",
+    lastName: currentUser?.lastName || "",
+    email: currentUser?.email || "",
+    phoneNumber: currentUser?.phoneNumber || "",
   });
 
   // Mock order history
@@ -52,6 +56,20 @@ export default function UserAccount() {
     { id: "payments", label: "PAYMENT METHODS" },
     { id: "profile", label: "PERSONAL DETAILS" },
   ];
+
+  const handleSignOut = () => {
+    logout();
+    navigate('/');
+  };
+
+  // Show loading state while fetching user data
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -90,6 +108,7 @@ export default function UserAccount() {
                   ))}
 
                   <motion.button
+                    onClick={handleSignOut}
                     className="block w-full text-left py-3 px-4 cursor-pointer transition duration-150 text-gray-800 hover:bg-gray-100"
                     whileHover={{ x: 5 }}
                     whileTap={{ scale: 0.98 }}
@@ -285,7 +304,7 @@ export default function UserAccount() {
                         </span>
                       </div>
 
-                      <p className="text-sm font-normal  font-[Raleway]">Emma Thompson</p>
+                      <p className="text-sm font-normal  font-[Raleway]">{user.firstName} {user.lastName}</p>
                       <p className="text-sm font-normal  font-[Raleway]">135 W 50th Street</p>
                       <p className="text-sm font-normal  font-[Raleway]">New York, NY 10020</p>
                       <p className="text-sm font-normal  font-[Raleway]">United States</p>
@@ -299,7 +318,7 @@ export default function UserAccount() {
                       </div>
 
                       <h3 className="font-medium mb-2">OFFICE</h3>
-                      <p className="text-sm font-normal  font-[Raleway]">Emma Thompson</p>
+                      <p className="text-sm font-normal  font-[Raleway]">{user.firstName} {user.lastName}</p>
                       <p className="text-sm font-normal  font-[Raleway]">350 Fifth Avenue</p>
                       <p className="text-sm font-normal  font-[Raleway]">New York, NY 10118</p>
                       <p className="text-sm font-normal  font-[Raleway]">United States</p>
@@ -336,7 +355,7 @@ export default function UserAccount() {
                         </span>
                       </div>
 
-                      <p className="text-sm font-normal  font-[Raleway]">Emma Thompson</p>
+                      <p className="text-sm font-normal  font-[Raleway]">{user.firstName} {user.lastName}</p>
                       <p className="text-sm font-normal  font-[Raleway]">Expiry: 05/27</p>
                       <p className="text-sm font-normal  font-[Raleway]">
                         Billing Address: 135 W 50th Street, New York

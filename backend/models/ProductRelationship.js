@@ -39,4 +39,10 @@ ProductRelationshipSchema.index(
   { unique: true }
 );
 
+// Update timestamp when document is modified
+ProductRelationshipSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
 module.exports = mongoose.model('ProductRelationship', ProductRelationshipSchema);

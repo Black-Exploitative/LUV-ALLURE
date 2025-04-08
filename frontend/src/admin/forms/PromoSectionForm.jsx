@@ -1,4 +1,4 @@
-// frontend/src/admin/forms/BannerForm.jsx
+// frontend/src/admin/forms/PromoSectionForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
@@ -6,23 +6,27 @@ import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
 
-const BannerForm = () => {
+const PromoSectionForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
   
   const [formData, setFormData] = useState({
-    name: '',
-    page: 'home',
-    title: '',
-    description: '',
-    imageUrl: '',
-    altText: '',
-    buttonText: '',
-    buttonLink: '',
+    name: 'Promo Section',
+    type: 'promo-section',
+    content: {
+      title: 'We Share the Love of Valentine',
+      description: 'As the lofty and flory presence of valentine ensumes the air and fills our heart. We bring you a subtlyty of blah blah blah this that that.',
+      linkText: 'Explore Collection',
+      linkUrl: '#',
+      alignment: 'center'
+    },
+    media: {
+      imageUrl: '/images/grid1.avif',
+      altText: 'Promo Image',
+    },
     isActive: true,
-    startDate: '',
-    endDate: ''
+    order: 0
   });
   
   const [mediaLibrary, setMediaLibrary] = useState([]);
@@ -31,36 +35,37 @@ const BannerForm = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // Available pages for banners
-  const availablePages = [
-    { value: 'home', label: 'Home Page' },
-    { value: 'shop', label: 'Shop Page' },
-    { value: 'product', label: 'Product Details' },
-    { value: 'checkout', label: 'Checkout Page' },
-    { value: 'contact', label: 'Contact Page' }
-  ];
-  
-  // Load banner data if editing
+  // Load section data if editing
   useEffect(() => {
     const loadData = async () => {
       if (isEditing) {
         try {
           setLoading(true);
-          const response = await api.get(`/cms/banners/${id}`);
+          const response = await api.get(`/cms/sections/${id}`);
           
-          // Format dates for input fields if they exist
-          const banner = response.data.data;
-          if (banner.startDate) {
-            banner.startDate = new Date(banner.startDate).toISOString().split('T')[0];
+          if (response.data.success) {
+            // Initialize form fields that might be missing
+            const section = response.data.data;
+            setFormData({
+              ...section,
+              content: {
+                title: section.content?.title || 'We Share the Love of Valentine',
+                description: section.content?.description || 'As the lofty and flory presence of valentine ensumes the air and fills our heart. We bring you a subtlyty of blah blah blah this that that.',
+                linkText: section.content?.linkText || 'Explore Collection',
+                linkUrl: section.content?.linkUrl || '#',
+                alignment: section.content?.alignment || 'center'
+              },
+              media: {
+                imageUrl: section.media?.imageUrl || '',
+                altText: section.media?.altText || 'Promo Image'
+              }
+            });
+          } else {
+            setError('Failed to load section data');
           }
-          if (banner.endDate) {
-            banner.endDate = new Date(banner.endDate).toISOString().split('T')[0];
-          }
-          
-          setFormData(banner);
         } catch (err) {
-          setError('Failed to load banner data');
-          console.error(err);
+          console.error('Error loading section:', err);
+          setError('Failed to load section data');
         } finally {
           setLoading(false);
         }
@@ -74,8 +79,10 @@ const BannerForm = () => {
   useEffect(() => {
     const loadMedia = async () => {
       try {
-        const response = await api.get('/cms/media?type=image');
-        setMediaLibrary(response.data.data || []);
+        const response = await api.get('/cms/media');
+        if (response.data.success) {
+          setMediaLibrary(response.data.data || []);
+        }
       } catch (err) {
         console.error('Failed to load media:', err);
       }
@@ -87,10 +94,24 @@ const BannerForm = () => {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    
+    if (name.includes('.')) {
+      // Handle nested fields (e.g., content.title)
+      const [parent, child] = name.split('.');
+      setFormData({
+        ...formData,
+        [parent]: {
+          ...formData[parent],
+          [child]: type === 'checkbox' ? checked : value
+        }
+      });
+    } else {
+      // Handle top-level fields
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value
+      });
+    }
     
     // Clear any previous error/success messages
     setError('');
@@ -101,9 +122,13 @@ const BannerForm = () => {
   const handleMediaSelect = (mediaItem) => {
     setFormData({
       ...formData,
-      imageUrl: mediaItem.url,
-      altText: formData.altText || mediaItem.altText || mediaItem.name
+      media: {
+        ...formData.media,
+        imageUrl: mediaItem.url,
+        altText: formData.media.altText || mediaItem.altText || mediaItem.name
+      }
     });
+    
     setShowMediaLibrary(false);
   };
   
@@ -113,12 +138,12 @@ const BannerForm = () => {
     
     // Validate form
     if (!formData.name.trim()) {
-      setError('Banner name is required');
+      setError('Section name is required');
       return;
     }
     
-    if (!formData.imageUrl.trim()) {
-      setError('Banner image is required');
+    if (!formData.media.imageUrl) {
+      setError('Image is required for the promo section');
       return;
     }
     
@@ -127,31 +152,38 @@ const BannerForm = () => {
       setError('');
       setSuccess('');
       
+      // Set the correct section type
+      const dataToSubmit = {
+        ...formData,
+        type: 'promo-section' // Ensure the type is correct
+      };
+      
       // API endpoint and method based on editing or creating
       const url = isEditing 
-        ? `/cms/banners/${id}` 
-        : '/cms/banners';
+        ? `/cms/sections/${id}` 
+        : '/cms/sections';
       
       const method = isEditing ? 'put' : 'post';
       
-      await api[method](url, formData);
+      const response = await api[method](url, dataToSubmit);
       
-      setSuccess(isEditing 
-        ? 'Banner updated successfully!' 
-        : 'Banner created successfully!');
-      
-      // Show toast notification
-      toast.success(isEditing ? 'Banner updated!' : 'Banner created!');
-      
-      // Redirect after short delay
-      setTimeout(() => {
-        navigate('/admin');
-      }, 1500);
-      
+      if (response.data.success) {
+        setSuccess(isEditing 
+          ? 'Promo Section updated successfully!' 
+          : 'Promo Section created successfully!');
+        
+        toast.success(isEditing ? 'Promo Section updated!' : 'Promo Section created!');
+        
+        // Redirect after short delay
+        setTimeout(() => {
+          navigate('/admin');
+        }, 1500);
+      } else {
+        setError(response.data.message || 'An error occurred');
+      }
     } catch (err) {
-      setError('Failed to save banner. Please try again.');
-      toast.error('Failed to save banner');
-      console.error(err);
+      console.error('Error saving section:', err);
+      setError('Failed to save. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -176,22 +208,24 @@ const BannerForm = () => {
           
           <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
             {mediaLibrary.length > 0 ? (
-              mediaLibrary.map(media => (
-                <div 
-                  key={media._id} 
-                  className="border border-gray-200 p-2 cursor-pointer hover:border-black"
-                  onClick={() => handleMediaSelect(media)}
-                >
-                  <div className="h-24 bg-gray-100 flex items-center justify-center mb-2">
-                    <img 
-                      src={media.url} 
-                      alt={media.name}
-                      className="max-h-full max-w-full object-contain"
-                    />
+              mediaLibrary
+                .filter(media => media.type === 'image')
+                .map(media => (
+                  <div 
+                    key={media._id} 
+                    className="border border-gray-200 p-2 cursor-pointer hover:border-black"
+                    onClick={() => handleMediaSelect(media)}
+                  >
+                    <div className="h-24 bg-gray-100 flex items-center justify-center mb-2">
+                      <img 
+                        src={media.url} 
+                        alt={media.name}
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </div>
+                    <p className="text-xs truncate">{media.name}</p>
                   </div>
-                  <p className="text-xs truncate">{media.name}</p>
-                </div>
-              ))
+                ))
             ) : (
               <p className="col-span-4 text-center text-gray-500 py-8">
                 No media found. Please upload some images first.
@@ -214,7 +248,7 @@ const BannerForm = () => {
           <FiArrowLeft size={20} />
         </button>
         <h1 className="text-xl font-medium">
-          {isEditing ? 'Edit Banner' : 'Create New Banner'}
+          {isEditing ? 'Edit Promo Section' : 'Create Promo Section'}
         </h1>
       </div>
       
@@ -233,57 +267,100 @@ const BannerForm = () => {
       <form onSubmit={handleSubmit}>
         <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
           <div className="p-6">
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Section Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Internal name for this section (not displayed on the website)
+              </p>
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Section Title
+              </label>
+              <input
+                type="text"
+                name="content.title"
+                value={formData.content.title}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Main heading for the promo section
+              </p>
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                name="content.description"
+                value={formData.content.description}
+                onChange={handleChange}
+                rows="4"
+                className="w-full p-2 border border-gray-300 rounded-md"
+              ></textarea>
+              <p className="mt-1 text-xs text-gray-500">
+                Descriptive text that appears below the title
+              </p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Banner Name
+                  Link Text
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="content.linkText"
+                  value={formData.content.linkText}
                   onChange={handleChange}
-                  required
                   className="w-full p-2 border border-gray-300 rounded-md"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Internal name for this banner
+                  Text for the clickable link (e.g., "Explore Collection")
                 </p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Page
+                  Link URL
                 </label>
-                <select
-                  name="page"
-                  value={formData.page}
+                <input
+                  type="text"
+                  name="content.linkUrl"
+                  value={formData.content.linkUrl}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                >
-                  {availablePages.map(page => (
-                    <option key={page.value} value={page.value}>
-                      {page.label}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="e.g., /collections"
+                />
                 <p className="mt-1 text-xs text-gray-500">
-                  Where this banner will be displayed
+                  Where the link should direct users
                 </p>
               </div>
             </div>
             
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Banner Image
+                Image
               </label>
               <div className="flex">
                 <input
                   type="text"
-                  name="imageUrl"
-                  value={formData.imageUrl}
+                  name="media.imageUrl"
+                  value={formData.media.imageUrl}
                   onChange={handleChange}
-                  required
                   className="w-full p-2 border border-gray-300 rounded-l-md"
                   placeholder="Image URL"
                 />
@@ -306,112 +383,53 @@ const BannerForm = () => {
               </label>
               <input
                 type="text"
-                name="altText"
-                value={formData.altText}
+                name="media.altText"
+                value={formData.media.altText}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-md"
                 placeholder="Descriptive text for the image"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Text description for screen readers and SEO
+                For accessibility and SEO
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Banner Title
+                  Text Alignment
                 </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
+                <select
+                  name="content.alignment"
+                  value={formData.content.alignment}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                />
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  Order
                 </label>
                 <input
-                  type="text"
-                  name="description"
-                  value={formData.description}
+                  type="number"
+                  name="order"
+                  value={formData.order}
                   onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Text
-                </label>
-                <input
-                  type="text"
-                  name="buttonText"
-                  value={formData.buttonText}
-                  onChange={handleChange}
+                  min="0"
                   className="w-full p-2 border border-gray-300 rounded-md"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Optional. Leave empty if no button is needed.
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Link
-                </label>
-                <input
-                  type="text"
-                  name="buttonLink"
-                  value={formData.buttonLink}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="e.g., /shop/dresses"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional. When this banner should start displaying.
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional. When this banner should stop displaying.
+                  Display order in the homepage layout
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center">
+            <div className="flex items-center mb-1">
               <input
                 type="checkbox"
                 id="isActive"
@@ -428,32 +446,31 @@ const BannerForm = () => {
         </div>
 
         {/* Preview */}
-        {formData.imageUrl && (
+        {formData.media.imageUrl && (
           <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
             <div className="p-6">
-              <h3 className="text-md font-medium mb-4">Banner Preview</h3>
-              <div className="relative overflow-hidden">
-                <img
-                  src={formData.imageUrl}
-                  alt={formData.altText || formData.name}
-                  className="w-full h-56 object-cover"
-                />
+              <h3 className="text-md font-medium mb-4">Preview</h3>
+              <div className="flex flex-col md:flex-row border border-gray-200 p-4 rounded">
+                <div className="md:w-1/2 mb-4 md:mb-0 md:mr-4">
+                  <img
+                    src={formData.media.imageUrl}
+                    alt={formData.media.altText}
+                    className="w-full max-w-md h-64 object-cover mx-auto"
+                  />
+                </div>
                 
-                {(formData.title || formData.description || formData.buttonText) && (
-                  <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-center p-4">
-                    {formData.title && (
-                      <h2 className="text-white text-xl font-bold mb-2">{formData.title}</h2>
-                    )}
-                    {formData.description && (
-                      <p className="text-white text-sm mb-4">{formData.description}</p>
-                    )}
-                    {formData.buttonText && (
-                      <button className="px-4 py-2 bg-white text-black text-sm">
-                        {formData.buttonText}
-                      </button>
-                    )}
+                <div className="md:w-1/2 flex flex-col justify-center">
+                  <div className={`text-${formData.content.alignment} max-w-lg mx-auto`}>
+                    <h2 className="text-2xl font-light mb-4">{formData.content.title}</h2>
+                    <p className="text-base mb-4">{formData.content.description}</p>
+                    
+                    <div className="inline-block relative">
+                      <span className="border-b-2 border-black pb-1 hover:border-b-0 transition-all">
+                        {formData.content.linkText}
+                      </span>
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -482,7 +499,7 @@ const BannerForm = () => {
             ) : (
               <>
                 <FiSave className="mr-2" />
-                <span>Save Banner</span>
+                <span>Save</span>
               </>
             )}
           </motion.button>
@@ -494,4 +511,4 @@ const BannerForm = () => {
   );
 };
 
-export default BannerForm;
+export default PromoSectionForm;

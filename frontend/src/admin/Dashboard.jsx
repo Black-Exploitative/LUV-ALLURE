@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 import { 
   FiHome, FiImage, FiGrid, FiLayers, FiLayout, 
   FiSettings, FiLogOut, FiEdit, FiTrash, FiPlus,
-  FiLink, FiShoppingBag, FiEye, FiStar
+  FiLink, FiShoppingBag, FiEye, FiStar, FiAward,
+  FiBookOpen, FiDatabase, FiTarget
 } from 'react-icons/fi';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import api from '../services/api';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('homepage');
@@ -18,6 +19,10 @@ const Dashboard = () => {
   const [navImages, setNavImages] = useState([]);
   const [media, setMedia] = useState([]);
   const [relationships, setRelationships] = useState([]);
+  const [collectionHeroes, setCollectionHeroes] = useState([]);
+  const [promoSections, setPromoSections] = useState([]);
+  const [shopHeaders, setShopHeaders] = useState([]);
+  const [featuredSections, setFeaturedSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [relationshipType, setRelationshipType] = useState('style-with');
@@ -25,16 +30,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication
-   /* const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/signin');
-      return;
-    } */
-
     // Load initial data based on active section
     loadData(activeSection);
-  }, [activeSection, navigate]);
+  }, [activeSection]);
 
   // Function to load data based on selected section
   const loadData = async (section) => {
@@ -45,36 +43,51 @@ const Dashboard = () => {
       let response;
       switch (section) {
         case 'homepage':
-          response = await axios.get('/api/cms/layouts');
-          setLayouts(response.data.data);
+          response = await api.get('/cms/layouts');
+          setLayouts(response.data.data || []);
           break;
         case 'sections':
-          response = await axios.get('/api/cms/sections');
-          setSections(response.data.data);
+          response = await api.get('/cms/sections');
+          setSections(response.data.data || []);
           break;
         case 'banners':
-          response = await axios.get('/api/cms/banners');
-          setBanners(response.data.data);
+          response = await api.get('/cms/banners');
+          setBanners(response.data.data || []);
           break;
         case 'navigation':
-          response = await axios.get('/api/cms/nav-images');
-          setNavImages(response.data.data);
+          response = await api.get('/cms/nav-images');
+          setNavImages(response.data.data || []);
           break;
         case 'media':
-          response = await axios.get('/api/cms/media');
-          setMedia(response.data.data);
+          response = await api.get('/cms/media');
+          setMedia(response.data.data || []);
           break;
         case 'relationships':
-          // Add query parameter for relationship type
-          response = await axios.get(`/api/cms/product-relationships?relationType=${relationshipType}`);
-          setRelationships(response.data.data);
+          response = await api.get(`/cms/product-relationships?relationType=${relationshipType}`);
+          setRelationships(response.data.data || []);
+          break;
+        case 'collection-hero':
+          response = await api.get('/cms/sections?type=collection-hero');
+          setCollectionHeroes(response.data.data || []);
+          break;
+        case 'promo-section':
+          response = await api.get('/cms/sections?type=promo-section');
+          setPromoSections(response.data.data || []);
+          break;
+        case 'shop-header':
+          response = await api.get('/cms/sections?type=shop-header');
+          setShopHeaders(response.data.data || []);
+          break;
+        case 'featured-products':
+          response = await api.get('/cms/featured-products/sections');
+          setFeaturedSections(response.data.sections || []);
           break;
         default:
           break;
       }
     } catch (err) {
-      setError('Failed to load data. Please try again.');
       console.error('Error loading data:', err);
+      setError('Failed to load data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -88,28 +101,36 @@ const Dashboard = () => {
       let endpoint;
       switch (section) {
         case 'homepage':
-          endpoint = `/api/cms/layouts/${id}`;
+          endpoint = `/cms/layouts/${id}`;
           break;
         case 'sections':
-          endpoint = `/api/cms/sections/${id}`;
+          endpoint = `/cms/sections/${id}`;
           break;
         case 'banners':
-          endpoint = `/api/cms/banners/${id}`;
+          endpoint = `/cms/banners/${id}`;
           break;
         case 'navigation':
-          endpoint = `/api/cms/nav-images/${id}`;
+          endpoint = `/cms/nav-images/${id}`;
           break;
         case 'media':
-          endpoint = `/api/cms/media/${id}`;
+          endpoint = `/cms/media/${id}`;
           break;
         case 'relationships':
-          endpoint = `/api/cms/product-relationships/${id}`;
+          endpoint = `/cms/product-relationships/${id}`;
+          break;
+        case 'collection-hero':
+        case 'promo-section':
+        case 'shop-header':
+          endpoint = `/cms/sections/${id}`;
+          break;
+        case 'featured-products':
+          endpoint = `/cms/featured-products/${id}`;
           break;
         default:
           throw new Error('Invalid section');
       }
 
-      await axios.delete(endpoint);
+      await api.delete(endpoint);
       toast.success('Item deleted successfully');
       loadData(section); // Reload data after deletion
     } catch (err) {
@@ -126,22 +147,28 @@ const Dashboard = () => {
       
       switch (section) {
         case 'banners':
-          endpoint = `/api/cms/banners/${id}`;
+          endpoint = `/cms/banners/${id}`;
           break;
         case 'sections':
-          endpoint = `/api/cms/sections/${id}`;
+        case 'collection-hero':
+        case 'promo-section':
+        case 'shop-header':
+          endpoint = `/cms/sections/${id}`;
           break;
         case 'navigation':
-          endpoint = `/api/cms/nav-images/${id}`;
+          endpoint = `/cms/nav-images/${id}`;
           break;
         case 'relationships':
-          endpoint = `/api/cms/product-relationships/${id}`;
+          endpoint = `/cms/product-relationships/${id}`;
+          break;
+        case 'featured-products':
+          endpoint = `/cms/featured-products/${id}`;
           break;
         default:
           throw new Error('Invalid section');
       }
 
-      await axios.put(endpoint, data);
+      await api.put(endpoint, data);
       toast.success(`Item ${!currentState ? 'activated' : 'deactivated'} successfully`);
       loadData(section); // Reload data
     } catch (err) {
@@ -153,7 +180,7 @@ const Dashboard = () => {
   // Set a layout as active
   const setLayoutActive = async (id) => {
     try {
-      await axios.put(`/api/cms/layouts/${id}`, { isActive: true });
+      await api.put(`/cms/layouts/${id}`, { isActive: true });
       toast.success('Layout set as active');
       loadData('homepage'); // Reload data
     } catch (err) {
@@ -165,7 +192,6 @@ const Dashboard = () => {
   // Handle relationship type change
   const handleRelationshipTypeChange = (type) => {
     setRelationshipType(type);
-    // Reload data with new relationship type
     loadData('relationships');
   };
 
@@ -173,14 +199,18 @@ const Dashboard = () => {
   const navItems = [
     { id: 'homepage', label: 'Homepage Layouts', icon: FiHome },
     { id: 'sections', label: 'Content Sections', icon: FiGrid },
-    { id: 'banners', label: 'Banners', icon: FiLayers },
-    { id: 'featured', label: 'Featured Products', icon: FiShoppingBag }, // New item
+    { id: 'featured-products', label: 'Featured Products', icon: FiStar },
+    { id: 'collection-hero', label: 'Collection Hero', icon: FiTarget },
+    { id: 'promo-section', label: 'Promo Section', icon: FiBookOpen },
+    { id: 'shop-header', label: 'Shop Header', icon: FiLayers },
+    { id: 'banners', label: 'Banners', icon: FiAward },
     { id: 'navigation', label: 'Navigation Images', icon: FiLayout },
     { id: 'relationships', label: 'Product Relationships', icon: FiLink },
     { id: 'media', label: 'Media Library', icon: FiImage },
     { id: 'settings', label: 'Settings', icon: FiSettings }
   ];
-  // Animation variants
+  
+  // Animation variants for sidebar
   const sidebarItemVariants = {
     hover: { x: 10, transition: { duration: 0.2 } }
   };
@@ -226,12 +256,18 @@ const Dashboard = () => {
         return renderBanners();
       case 'navigation':
         return renderNavImages();
-      case 'featured':
-        return renderFeaturedProducts();
       case 'media':
         return renderMedia();
       case 'relationships':
         return renderRelationships();
+      case 'collection-hero':
+        return renderCollectionHeroes();
+      case 'promo-section':
+        return renderPromoSections();
+      case 'shop-header':
+        return renderShopHeaders();
+      case 'featured-products':
+        return renderFeaturedProducts();
       case 'settings':
         return renderSettings();
       default:
@@ -252,11 +288,11 @@ const Dashboard = () => {
         </Link>
       </div>
   
-      {!layouts || layouts.length === 0 ? ( // Fixed with null check
+      {!layouts || layouts.length === 0 ? (
         <p>No layouts found. Create your first layout.</p>
       ) : (
         <div className="grid gap-4">
-          {layouts.map(layout => (
+          {layouts.map((layout, index) => (
             <div
               key={layout._id || index}
               className={`border p-4 ${layout.isActive ? 'border-black' : 'border-gray-200'}`}
@@ -314,7 +350,7 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {!sections || sections.length === 0 ?(
+      {!sections || sections.length === 0 ? (
         <p>No content sections found. Create your first section.</p>
       ) : (
         <div className="grid gap-4">
@@ -444,6 +480,282 @@ const Dashboard = () => {
                 </Link>
                 <button 
                   onClick={() => handleDelete('banners', banner._id)}
+                  className="p-2 text-gray-600 hover:text-red-600"
+                >
+                  <FiTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderFeaturedProducts = () => (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Featured Products Sections</h2>
+        <Link
+          to="/admin/featured-products/new"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiPlus className="mr-2" /> Create New Section
+        </Link>
+      </div>
+
+      {!featuredSections || featuredSections.length === 0 ? (
+        <p>No featured product sections found. Create your first section.</p>
+      ) : (
+        <div className="grid gap-4">
+          {featuredSections.map(section => (
+            <div
+              key={section.sectionId || section._id}
+              className={`border ${section.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-medium">{section.title || 'Unnamed Section'}</h3>
+                  <p className="text-sm text-gray-600">
+                    Section ID: {section.sectionId} • {section.productIds?.length || 0} products
+                  </p>
+                </div>
+                <div className="flex space-x-2">
+                  <Link 
+                    to={`/admin/featured-products/edit/${section.sectionId}`}
+                    className="px-3 py-1 text-xs bg-black text-white hover:bg-gray-800"
+                  >
+                    Edit Products
+                  </Link>
+                  <button 
+                    onClick={() => handleDelete('featured-products', section.sectionId)}
+                    className="p-2 text-gray-600 hover:text-red-600"
+                  >
+                    <FiTrash />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderCollectionHeroes = () => (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Collection Hero</h2>
+        <Link
+          to="/admin/collection-hero/new"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiPlus className="mr-2" /> Create New Collection Hero
+        </Link>
+      </div>
+
+      {!collectionHeroes || collectionHeroes.length === 0 ? (
+        <p>No collection heroes found. Create your first one.</p>
+      ) : (
+        <div className="grid gap-4">
+          {collectionHeroes.map(hero => (
+            <div
+              key={hero._id}
+              className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+            >
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <h3 className="font-medium">{hero.name}</h3>
+                  <div className="flex items-center mt-1">
+                    <span className={`inline-block w-2 h-2 rounded-full ${hero.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                    <p className="text-sm text-gray-600">
+                      {hero.isActive ? 'Active' : 'Inactive'}
+                    </p>
+                  </div>
+                </div>
+                <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
+                  {hero.media?.imageUrl && (
+                    <img 
+                      src={hero.media.imageUrl} 
+                      alt={hero.media.altText || hero.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-2">
+                <button
+                  onClick={() => toggleActive('collection-hero', hero._id, hero.isActive)}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    hero.isActive 
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  {hero.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <Link 
+                  to={`/admin/collection-hero/edit/${hero._id}`}
+                  className="p-2 text-gray-600 hover:text-black"
+                >
+                  <FiEdit />
+                </Link>
+                <button 
+                  onClick={() => handleDelete('collection-hero', hero._id)}
+                  className="p-2 text-gray-600 hover:text-red-600"
+                >
+                  <FiTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderPromoSections = () => (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Promo Sections</h2>
+        <Link
+          to="/admin/promo-section/new"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiPlus className="mr-2" /> Create New Promo Section
+        </Link>
+      </div>
+
+      {!promoSections || promoSections.length === 0 ? (
+        <p>No promo sections found. Create your first one.</p>
+      ) : (
+        <div className="grid gap-4">
+          {promoSections.map(promo => (
+            <div
+              key={promo._id}
+              className={`border ${promo.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+            >
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <h3 className="font-medium">{promo.name}</h3>
+                  <div className="flex items-center mt-1">
+                    <span className={`inline-block w-2 h-2 rounded-full ${promo.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                    <p className="text-sm text-gray-600">
+                      {promo.isActive ? 'Active' : 'Inactive'}
+                    </p>
+                  </div>
+                  {promo.content?.title && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Title: {promo.content.title}
+                    </p>
+                  )}
+                </div>
+                <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
+                  {promo.media?.imageUrl && (
+                    <img 
+                      src={promo.media.imageUrl} 
+                      alt={promo.media.altText || promo.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-2">
+                <button
+                  onClick={() => toggleActive('promo-section', promo._id, promo.isActive)}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    promo.isActive 
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  {promo.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <Link 
+                  to={`/admin/promo-section/edit/${promo._id}`}
+                  className="p-2 text-gray-600 hover:text-black"
+                >
+                  <FiEdit />
+                </Link>
+                <button 
+                  onClick={() => handleDelete('promo-section', promo._id)}
+                  className="p-2 text-gray-600 hover:text-red-600"
+                >
+                  <FiTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderShopHeaders = () => (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Shop Headers</h2>
+        <Link
+          to="/admin/shop-header/new"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiPlus className="mr-2" /> Create New Shop Header
+        </Link>
+      </div>
+
+      {!shopHeaders || shopHeaders.length === 0 ? (
+        <p>No shop headers found. Create your first one.</p>
+      ) : (
+        <div className="grid gap-4">
+          {shopHeaders.map(header => (
+            <div
+              key={header._id}
+              className={`border ${header.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+            >
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <h3 className="font-medium">{header.name}</h3>
+                  <div className="flex items-center mt-1">
+                    <span className={`inline-block w-2 h-2 rounded-full ${header.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                    <p className="text-sm text-gray-600">
+                      {header.isActive ? 'Active' : 'Inactive'}
+                    </p>
+                  </div>
+                  {header.content?.title && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Title: {header.content.title}
+                    </p>
+                  )}
+                </div>
+                <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
+                  {header.media?.imageUrl && (
+                    <img 
+                      src={header.media.imageUrl} 
+                      alt={header.media.altText || header.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-2">
+                <button
+                  onClick={() => toggleActive('shop-header', header._id, header.isActive)}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    header.isActive 
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  {header.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <Link 
+                  to={`/admin/shop-header/edit/${header._id}`}
+                  className="p-2 text-gray-600 hover:text-black"
+                >
+                  <FiEdit />
+                </Link>
+                <button 
+                  onClick={() => handleDelete('shop-header', header._id)}
                   className="p-2 text-gray-600 hover:text-red-600"
                 >
                   <FiTrash />
@@ -658,7 +970,7 @@ const Dashboard = () => {
       )}
 
       {/* Pagination */}
-      {!media || media.length > 0 && (
+      {media && media.length > 0 && (
         <div className="flex justify-center mt-8">
           <nav className="flex items-center space-x-2">
             <button className="px-3 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
@@ -672,60 +984,6 @@ const Dashboard = () => {
               Next
             </button>
           </nav>
-        </div>
-      )}
-    </div>
-  );
-
-  const renderFeaturedProducts = () => (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium">Featured Products Sections</h2>
-        <Link
-          to="/admin/featured-products/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
-        >
-          <FiPlus className="mr-2" /> Create New Section
-        </Link>
-      </div>
-  
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
-        </div>
-      ) : error ? (
-        <div className="bg-red-50 p-4 rounded-md">
-          <p className="text-red-700">{error}</p>
-          <button
-            onClick={() => loadData('featured')}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-          >
-            Retry
-          </button>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {/* Season Offers Section */}
-          <div className="border border-gray-200 p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-medium">Season Offers</h3>
-                <p className="text-sm text-gray-600">
-                  Featured products shown in the "Season Offers" section
-                </p>
-              </div>
-              <div className="flex space-x-2">
-                <Link 
-                  to="/admin/featured-products/edit/season-offers"
-                  className="px-3 py-1 text-xs bg-black text-white hover:bg-gray-800"
-                >
-                  Edit Products
-                </Link>
-              </div>
-            </div>
-          </div>
-          
-          {/* You can add more predefined sections here */}
         </div>
       )}
     </div>

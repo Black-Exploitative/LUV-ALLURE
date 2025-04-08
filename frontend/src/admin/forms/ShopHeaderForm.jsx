@@ -1,4 +1,4 @@
-// frontend/src/admin/forms/BannerForm.jsx
+// frontend/src/admin/forms/ShopHeaderForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
@@ -6,23 +6,27 @@ import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
 
-const BannerForm = () => {
+const ShopHeaderForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
   
   const [formData, setFormData] = useState({
-    name: '',
-    page: 'home',
-    title: '',
-    description: '',
-    imageUrl: '',
-    altText: '',
-    buttonText: '',
-    buttonLink: '',
+    name: 'Shop Header',
+    type: 'shop-header',
+    content: {
+      title: 'Shop the Latest Trends',
+      description: 'Find your perfect style today.',
+      buttonText: 'EXPLORE',
+      buttonLink: '/collections',
+      alignment: 'center'
+    },
+    media: {
+      imageUrl: '/images/banner.webp',
+      altText: 'Shop Header',
+    },
     isActive: true,
-    startDate: '',
-    endDate: ''
+    order: 0
   });
   
   const [mediaLibrary, setMediaLibrary] = useState([]);
@@ -31,36 +35,37 @@ const BannerForm = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // Available pages for banners
-  const availablePages = [
-    { value: 'home', label: 'Home Page' },
-    { value: 'shop', label: 'Shop Page' },
-    { value: 'product', label: 'Product Details' },
-    { value: 'checkout', label: 'Checkout Page' },
-    { value: 'contact', label: 'Contact Page' }
-  ];
-  
-  // Load banner data if editing
+  // Load section data if editing
   useEffect(() => {
     const loadData = async () => {
       if (isEditing) {
         try {
           setLoading(true);
-          const response = await api.get(`/cms/banners/${id}`);
+          const response = await api.get(`/cms/sections/${id}`);
           
-          // Format dates for input fields if they exist
-          const banner = response.data.data;
-          if (banner.startDate) {
-            banner.startDate = new Date(banner.startDate).toISOString().split('T')[0];
+          if (response.data.success) {
+            // Initialize form fields that might be missing
+            const section = response.data.data;
+            setFormData({
+              ...section,
+              content: {
+                title: section.content?.title || 'Shop the Latest Trends',
+                description: section.content?.description || 'Find your perfect style today.',
+                buttonText: section.content?.buttonText || 'EXPLORE',
+                buttonLink: section.content?.buttonLink || '/collections',
+                alignment: section.content?.alignment || 'center'
+              },
+              media: {
+                imageUrl: section.media?.imageUrl || '',
+                altText: section.media?.altText || 'Shop Header'
+              }
+            });
+          } else {
+            setError('Failed to load section data');
           }
-          if (banner.endDate) {
-            banner.endDate = new Date(banner.endDate).toISOString().split('T')[0];
-          }
-          
-          setFormData(banner);
         } catch (err) {
-          setError('Failed to load banner data');
-          console.error(err);
+          console.error('Error loading section:', err);
+          setError('Failed to load section data');
         } finally {
           setLoading(false);
         }
@@ -74,8 +79,10 @@ const BannerForm = () => {
   useEffect(() => {
     const loadMedia = async () => {
       try {
-        const response = await api.get('/cms/media?type=image');
-        setMediaLibrary(response.data.data || []);
+        const response = await api.get('/cms/media');
+        if (response.data.success) {
+          setMediaLibrary(response.data.data || []);
+        }
       } catch (err) {
         console.error('Failed to load media:', err);
       }
@@ -87,10 +94,24 @@ const BannerForm = () => {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    
+    if (name.includes('.')) {
+      // Handle nested fields (e.g., content.title)
+      const [parent, child] = name.split('.');
+      setFormData({
+        ...formData,
+        [parent]: {
+          ...formData[parent],
+          [child]: type === 'checkbox' ? checked : value
+        }
+      });
+    } else {
+      // Handle top-level fields
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value
+      });
+    }
     
     // Clear any previous error/success messages
     setError('');
@@ -101,9 +122,13 @@ const BannerForm = () => {
   const handleMediaSelect = (mediaItem) => {
     setFormData({
       ...formData,
-      imageUrl: mediaItem.url,
-      altText: formData.altText || mediaItem.altText || mediaItem.name
+      media: {
+        ...formData.media,
+        imageUrl: mediaItem.url,
+        altText: formData.media.altText || mediaItem.altText || mediaItem.name
+      }
     });
+    
     setShowMediaLibrary(false);
   };
   
@@ -113,12 +138,12 @@ const BannerForm = () => {
     
     // Validate form
     if (!formData.name.trim()) {
-      setError('Banner name is required');
+      setError('Section name is required');
       return;
     }
     
-    if (!formData.imageUrl.trim()) {
-      setError('Banner image is required');
+    if (!formData.media.imageUrl) {
+      setError('Image is required for the shop header');
       return;
     }
     
@@ -127,31 +152,38 @@ const BannerForm = () => {
       setError('');
       setSuccess('');
       
+      // Set the correct section type
+      const dataToSubmit = {
+        ...formData,
+        type: 'shop-header' // Ensure the type is correct
+      };
+      
       // API endpoint and method based on editing or creating
       const url = isEditing 
-        ? `/cms/banners/${id}` 
-        : '/cms/banners';
+        ? `/cms/sections/${id}` 
+        : '/cms/sections';
       
       const method = isEditing ? 'put' : 'post';
       
-      await api[method](url, formData);
+      const response = await api[method](url, dataToSubmit);
       
-      setSuccess(isEditing 
-        ? 'Banner updated successfully!' 
-        : 'Banner created successfully!');
-      
-      // Show toast notification
-      toast.success(isEditing ? 'Banner updated!' : 'Banner created!');
-      
-      // Redirect after short delay
-      setTimeout(() => {
-        navigate('/admin');
-      }, 1500);
-      
+      if (response.data.success) {
+        setSuccess(isEditing 
+          ? 'Shop Header updated successfully!' 
+          : 'Shop Header created successfully!');
+        
+        toast.success(isEditing ? 'Shop Header updated!' : 'Shop Header created!');
+        
+        // Redirect after short delay
+        setTimeout(() => {
+          navigate('/admin');
+        }, 1500);
+      } else {
+        setError(response.data.message || 'An error occurred');
+      }
     } catch (err) {
-      setError('Failed to save banner. Please try again.');
-      toast.error('Failed to save banner');
-      console.error(err);
+      console.error('Error saving section:', err);
+      setError('Failed to save. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -176,22 +208,24 @@ const BannerForm = () => {
           
           <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
             {mediaLibrary.length > 0 ? (
-              mediaLibrary.map(media => (
-                <div 
-                  key={media._id} 
-                  className="border border-gray-200 p-2 cursor-pointer hover:border-black"
-                  onClick={() => handleMediaSelect(media)}
-                >
-                  <div className="h-24 bg-gray-100 flex items-center justify-center mb-2">
-                    <img 
-                      src={media.url} 
-                      alt={media.name}
-                      className="max-h-full max-w-full object-contain"
-                    />
+              mediaLibrary
+                .filter(media => media.type === 'image')
+                .map(media => (
+                  <div 
+                    key={media._id} 
+                    className="border border-gray-200 p-2 cursor-pointer hover:border-black"
+                    onClick={() => handleMediaSelect(media)}
+                  >
+                    <div className="h-24 bg-gray-100 flex items-center justify-center mb-2">
+                      <img 
+                        src={media.url} 
+                        alt={media.name}
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </div>
+                    <p className="text-xs truncate">{media.name}</p>
                   </div>
-                  <p className="text-xs truncate">{media.name}</p>
-                </div>
-              ))
+                ))
             ) : (
               <p className="col-span-4 text-center text-gray-500 py-8">
                 No media found. Please upload some images first.
@@ -214,7 +248,7 @@ const BannerForm = () => {
           <FiArrowLeft size={20} />
         </button>
         <h1 className="text-xl font-medium">
-          {isEditing ? 'Edit Banner' : 'Create New Banner'}
+          {isEditing ? 'Edit Shop Header' : 'Create Shop Header'}
         </h1>
       </div>
       
@@ -233,57 +267,100 @@ const BannerForm = () => {
       <form onSubmit={handleSubmit}>
         <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
           <div className="p-6">
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Section Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Internal name for this section (not displayed on the website)
+              </p>
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Header Title
+              </label>
+              <input
+                type="text"
+                name="content.title"
+                value={formData.content.title}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Main heading for the shop header
+              </p>
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                name="content.description"
+                value={formData.content.description}
+                onChange={handleChange}
+                rows="2"
+                className="w-full p-2 border border-gray-300 rounded-md"
+              ></textarea>
+              <p className="mt-1 text-xs text-gray-500">
+                Short descriptive text that appears below the title
+              </p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Banner Name
+                  Button Text
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="content.buttonText"
+                  value={formData.content.buttonText}
                   onChange={handleChange}
-                  required
                   className="w-full p-2 border border-gray-300 rounded-md"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Internal name for this banner
+                  Text for the button (leave empty for no button)
                 </p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Page
+                  Button Link
                 </label>
-                <select
-                  name="page"
-                  value={formData.page}
+                <input
+                  type="text"
+                  name="content.buttonLink"
+                  value={formData.content.buttonLink}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                >
-                  {availablePages.map(page => (
-                    <option key={page.value} value={page.value}>
-                      {page.label}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="e.g., /collections"
+                />
                 <p className="mt-1 text-xs text-gray-500">
-                  Where this banner will be displayed
+                  Where the button should direct users
                 </p>
               </div>
             </div>
             
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Banner Image
+                Header Image
               </label>
               <div className="flex">
                 <input
                   type="text"
-                  name="imageUrl"
-                  value={formData.imageUrl}
+                  name="media.imageUrl"
+                  value={formData.media.imageUrl}
                   onChange={handleChange}
-                  required
                   className="w-full p-2 border border-gray-300 rounded-l-md"
                   placeholder="Image URL"
                 />
@@ -306,112 +383,53 @@ const BannerForm = () => {
               </label>
               <input
                 type="text"
-                name="altText"
-                value={formData.altText}
+                name="media.altText"
+                value={formData.media.altText}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-md"
                 placeholder="Descriptive text for the image"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Text description for screen readers and SEO
+                For accessibility and SEO
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Banner Title
+                  Text Alignment
                 </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
+                <select
+                  name="content.alignment"
+                  value={formData.content.alignment}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                />
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  Order
                 </label>
                 <input
-                  type="text"
-                  name="description"
-                  value={formData.description}
+                  type="number"
+                  name="order"
+                  value={formData.order}
                   onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Text
-                </label>
-                <input
-                  type="text"
-                  name="buttonText"
-                  value={formData.buttonText}
-                  onChange={handleChange}
+                  min="0"
                   className="w-full p-2 border border-gray-300 rounded-md"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Optional. Leave empty if no button is needed.
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Link
-                </label>
-                <input
-                  type="text"
-                  name="buttonLink"
-                  value={formData.buttonLink}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="e.g., /shop/dresses"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional. When this banner should start displaying.
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional. When this banner should stop displaying.
+                  Display order if multiple shop headers exist
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center">
+            <div className="flex items-center mb-1">
               <input
                 type="checkbox"
                 id="isActive"
@@ -428,32 +446,30 @@ const BannerForm = () => {
         </div>
 
         {/* Preview */}
-        {formData.imageUrl && (
+        {formData.media.imageUrl && (
           <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
             <div className="p-6">
-              <h3 className="text-md font-medium mb-4">Banner Preview</h3>
-              <div className="relative overflow-hidden">
+              <h3 className="text-md font-medium mb-4">Preview</h3>
+              <div className="relative w-full h-60 overflow-hidden rounded-md">
                 <img
-                  src={formData.imageUrl}
-                  alt={formData.altText || formData.name}
-                  className="w-full h-56 object-cover"
+                  src={formData.media.imageUrl}
+                  alt={formData.media.altText}
+                  className="w-full h-full object-cover"
                 />
                 
-                {(formData.title || formData.description || formData.buttonText) && (
-                  <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-center p-4">
-                    {formData.title && (
-                      <h2 className="text-white text-xl font-bold mb-2">{formData.title}</h2>
-                    )}
-                    {formData.description && (
-                      <p className="text-white text-sm mb-4">{formData.description}</p>
-                    )}
-                    {formData.buttonText && (
-                      <button className="px-4 py-2 bg-white text-black text-sm">
-                        {formData.buttonText}
-                      </button>
-                    )}
-                  </div>
-                )}
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center p-4">
+                  {formData.content.title && (
+                    <h2 className="text-white text-2xl font-bold mb-2">{formData.content.title}</h2>
+                  )}
+                  {formData.content.description && (
+                    <p className="text-white text-lg mb-4">{formData.content.description}</p>
+                  )}
+                  {formData.content.buttonText && (
+                    <button className="px-6 py-2 bg-white text-black hover:bg-gray-100">
+                      {formData.content.buttonText}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -482,7 +498,7 @@ const BannerForm = () => {
             ) : (
               <>
                 <FiSave className="mr-2" />
-                <span>Save Banner</span>
+                <span>Save</span>
               </>
             )}
           </motion.button>
@@ -494,4 +510,4 @@ const BannerForm = () => {
   );
 };
 
-export default BannerForm;
+export default ShopHeaderForm;

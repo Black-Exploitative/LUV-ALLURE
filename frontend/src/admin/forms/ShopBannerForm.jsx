@@ -1,4 +1,4 @@
-// frontend/src/admin/forms/BannerForm.jsx
+// frontend/src/admin/forms/ShopBannerForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
@@ -6,23 +6,25 @@ import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
 
-const BannerForm = () => {
+const ShopBannerForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
   
   const [formData, setFormData] = useState({
-    name: '',
-    page: 'home',
-    title: '',
-    description: '',
-    imageUrl: '',
-    altText: '',
-    buttonText: '',
-    buttonLink: '',
-    isActive: true,
-    startDate: '',
-    endDate: ''
+    name: 'Shop Now Banner',
+    type: 'shop-banner',
+    content: {
+      buttonText: 'SHOP NOW',
+      buttonLink: '/collections',
+      alignment: 'center'
+    },
+    media: {
+      imageUrl: '/images/photo3.jpg',
+      altText: 'Fashion Model',
+      overlayOpacity: 0.4
+    },
+    isActive: true
   });
   
   const [mediaLibrary, setMediaLibrary] = useState([]);
@@ -31,35 +33,16 @@ const BannerForm = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // Available pages for banners
-  const availablePages = [
-    { value: 'home', label: 'Home Page' },
-    { value: 'shop', label: 'Shop Page' },
-    { value: 'product', label: 'Product Details' },
-    { value: 'checkout', label: 'Checkout Page' },
-    { value: 'contact', label: 'Contact Page' }
-  ];
-  
-  // Load banner data if editing
+  // Load section data if editing
   useEffect(() => {
     const loadData = async () => {
       if (isEditing) {
         try {
           setLoading(true);
-          const response = await api.get(`/cms/banners/${id}`);
-          
-          // Format dates for input fields if they exist
-          const banner = response.data.data;
-          if (banner.startDate) {
-            banner.startDate = new Date(banner.startDate).toISOString().split('T')[0];
-          }
-          if (banner.endDate) {
-            banner.endDate = new Date(banner.endDate).toISOString().split('T')[0];
-          }
-          
-          setFormData(banner);
+          const response = await api.get(`/cms/sections/${id}`);
+          setFormData(response.data.data);
         } catch (err) {
-          setError('Failed to load banner data');
+          setError('Failed to load section data');
           console.error(err);
         } finally {
           setLoading(false);
@@ -87,10 +70,24 @@ const BannerForm = () => {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    
+    if (name.includes('.')) {
+      // Handle nested properties
+      const [parent, child] = name.split('.');
+      setFormData({
+        ...formData,
+        [parent]: {
+          ...formData[parent],
+          [child]: type === 'checkbox' ? checked : value
+        }
+      });
+    } else {
+      // Handle top-level properties
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value
+      });
+    }
     
     // Clear any previous error/success messages
     setError('');
@@ -101,8 +98,11 @@ const BannerForm = () => {
   const handleMediaSelect = (mediaItem) => {
     setFormData({
       ...formData,
-      imageUrl: mediaItem.url,
-      altText: formData.altText || mediaItem.altText || mediaItem.name
+      media: {
+        ...formData.media,
+        imageUrl: mediaItem.url,
+        altText: formData.media.altText || mediaItem.altText || mediaItem.name
+      }
     });
     setShowMediaLibrary(false);
   };
@@ -113,11 +113,11 @@ const BannerForm = () => {
     
     // Validate form
     if (!formData.name.trim()) {
-      setError('Banner name is required');
+      setError('Section name is required');
       return;
     }
     
-    if (!formData.imageUrl.trim()) {
+    if (!formData.media.imageUrl) {
       setError('Banner image is required');
       return;
     }
@@ -129,19 +129,53 @@ const BannerForm = () => {
       
       // API endpoint and method based on editing or creating
       const url = isEditing 
-        ? `/cms/banners/${id}` 
-        : '/cms/banners';
+        ? `/cms/sections/${id}` 
+        : '/cms/sections';
       
       const method = isEditing ? 'put' : 'post';
       
-      await api[method](url, formData);
+      const response = await api[method](url, formData);
+      
+      // If creating a new section (not editing), add it to the active homepage layout
+      if (!isEditing && response.data && response.data.data && response.data.data._id) {
+        try {
+          // Get the active layout
+          const layoutResponse = await api.get('/cms/homepage');
+          const layout = layoutResponse.data.data;
+          
+          // Check if this section already exists in the layout
+          const sectionExists = layout.sections.some(section => 
+            section.sectionId && section.sectionId._id === response.data.data._id);
+          
+          // If it doesn't exist, add it to the layout
+          if (!sectionExists && layout._id) {
+            const updatedSections = [...layout.sections, {
+              sectionId: response.data.data._id,
+              order: layout.sections.length,
+              column: 0,
+              width: 12
+            }];
+            
+            // Update the layout
+            await api.put(`/cms/layouts/${layout._id}`, {
+              ...layout,
+              sections: updatedSections
+            });
+            
+            console.log("Added shop banner to homepage layout");
+          }
+        } catch (layoutErr) {
+          console.error("Failed to update homepage layout:", layoutErr);
+          // Still consider the operation successful even if layout update fails
+        }
+      }
       
       setSuccess(isEditing 
-        ? 'Banner updated successfully!' 
-        : 'Banner created successfully!');
+        ? 'Shop banner updated successfully!' 
+        : 'Shop banner created successfully!');
       
       // Show toast notification
-      toast.success(isEditing ? 'Banner updated!' : 'Banner created!');
+      toast.success(isEditing ? 'Shop banner updated!' : 'Shop banner created!');
       
       // Redirect after short delay
       setTimeout(() => {
@@ -149,8 +183,8 @@ const BannerForm = () => {
       }, 1500);
       
     } catch (err) {
-      setError('Failed to save banner. Please try again.');
-      toast.error('Failed to save banner');
+      setError('Failed to save shop banner section. Please try again.');
+      toast.error('Failed to save shop banner');
       console.error(err);
     } finally {
       setLoading(false);
@@ -174,7 +208,7 @@ const BannerForm = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {mediaLibrary.length > 0 ? (
               mediaLibrary.map(media => (
                 <div 
@@ -182,7 +216,7 @@ const BannerForm = () => {
                   className="border border-gray-200 p-2 cursor-pointer hover:border-black"
                   onClick={() => handleMediaSelect(media)}
                 >
-                  <div className="h-24 bg-gray-100 flex items-center justify-center mb-2">
+                  <div className="h-40 bg-gray-100 flex items-center justify-center mb-2">
                     <img 
                       src={media.url} 
                       alt={media.name}
@@ -214,7 +248,7 @@ const BannerForm = () => {
           <FiArrowLeft size={20} />
         </button>
         <h1 className="text-xl font-medium">
-          {isEditing ? 'Edit Banner' : 'Create New Banner'}
+          {isEditing ? 'Edit Shop Banner' : 'Create Shop Banner'}
         </h1>
       </div>
       
@@ -233,44 +267,21 @@ const BannerForm = () => {
       <form onSubmit={handleSubmit}>
         <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Banner Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Internal name for this banner
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Page
-                </label>
-                <select
-                  name="page"
-                  value={formData.page}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                >
-                  {availablePages.map(page => (
-                    <option key={page.value} value={page.value}>
-                      {page.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-xs text-gray-500">
-                  Where this banner will be displayed
-                </p>
-              </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Section Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Internal name for this section
+              </p>
             </div>
             
             <div className="mb-6">
@@ -280,8 +291,8 @@ const BannerForm = () => {
               <div className="flex">
                 <input
                   type="text"
-                  name="imageUrl"
-                  value={formData.imageUrl}
+                  name="media.imageUrl"
+                  value={formData.media.imageUrl}
                   onChange={handleChange}
                   required
                   className="w-full p-2 border border-gray-300 rounded-l-md"
@@ -306,8 +317,8 @@ const BannerForm = () => {
               </label>
               <input
                 type="text"
-                name="altText"
-                value={formData.altText}
+                name="media.altText"
+                value={formData.media.altText}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-md"
                 placeholder="Descriptive text for the image"
@@ -317,98 +328,53 @@ const BannerForm = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Banner Title
-                </label>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Overlay Opacity
+              </label>
+              <div className="flex items-center">
                 <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
+                  type="range"
+                  name="media.overlayOpacity"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={formData.media.overlayOpacity}
                   onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className="w-full mr-3"
                 />
+                <span>{formData.media.overlayOpacity}</span>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Opacity of the dark overlay on the image (0 = transparent, 1 = opaque)
+              </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Text
-                </label>
-                <input
-                  type="text"
-                  name="buttonText"
-                  value={formData.buttonText}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional. Leave empty if no button is needed.
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Button Link
-                </label>
-                <input
-                  type="text"
-                  name="buttonLink"
-                  value={formData.buttonLink}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="e.g., /shop/dresses"
-                />
-              </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Button Text
+              </label>
+              <input
+                type="text"
+                name="content.buttonText"
+                value={formData.content.buttonText}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional. When this banner should start displaying.
-                </p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional. When this banner should stop displaying.
-                </p>
-              </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Button Link
+              </label>
+              <input
+                type="text"
+                name="content.buttonLink"
+                value={formData.content.buttonLink}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="e.g., /collections"
+              />
             </div>
             
             <div className="flex items-center">
@@ -428,32 +394,29 @@ const BannerForm = () => {
         </div>
 
         {/* Preview */}
-        {formData.imageUrl && (
+        {formData.media.imageUrl && (
           <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
             <div className="p-6">
               <h3 className="text-md font-medium mb-4">Banner Preview</h3>
-              <div className="relative overflow-hidden">
+              <div className="relative h-96 overflow-hidden">
                 <img
-                  src={formData.imageUrl}
-                  alt={formData.altText || formData.name}
-                  className="w-full h-56 object-cover"
+                  src={formData.media.imageUrl}
+                  alt={formData.media.altText || 'Shop Now Banner'}
+                  className="w-full h-full object-cover"
                 />
                 
-                {(formData.title || formData.description || formData.buttonText) && (
-                  <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-center p-4">
-                    {formData.title && (
-                      <h2 className="text-white text-xl font-bold mb-2">{formData.title}</h2>
-                    )}
-                    {formData.description && (
-                      <p className="text-white text-sm mb-4">{formData.description}</p>
-                    )}
-                    {formData.buttonText && (
-                      <button className="px-4 py-2 bg-white text-black text-sm">
-                        {formData.buttonText}
-                      </button>
-                    )}
+                <div 
+                  className="absolute inset-0 bg-black" 
+                  style={{ opacity: formData.media.overlayOpacity }}
+                ></div>
+                
+                <div className="absolute inset-0 flex items-end justify-center pb-8">
+                  <div className="relative inline-block px-8 py-3 border-2 border-white text-white text-lg overflow-hidden cursor-pointer">
+                    <span className="relative z-10">
+                      {formData.content.buttonText}
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -494,4 +457,4 @@ const BannerForm = () => {
   );
 };
 
-export default BannerForm;
+export default ShopBannerForm;

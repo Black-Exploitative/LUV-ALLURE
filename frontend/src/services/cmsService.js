@@ -1,5 +1,6 @@
 // frontend/src/services/cmsService.js
 import axios from 'axios';
+import api from './api';
 
 // Create cache for CMS content
 let contentCache = {
@@ -178,5 +179,20 @@ const cmsService = {
     }
   }
 };
-
+// Add this function to your cmsService.js
+export const getShopBanner = async () => {
+  try {
+    // Make a direct call to get all sections of type shop-banner
+    const response = await api.get('/cms/sections?type=shop-banner');
+    const banners = response.data.data || [];
+    
+    // Get the first active banner
+    const activeBanner = banners.find(banner => banner.isActive);
+    
+    return activeBanner;
+  } catch (error) {
+    console.error('Error fetching shop banner:', error);
+    return null;
+  }
+};
 export default cmsService;

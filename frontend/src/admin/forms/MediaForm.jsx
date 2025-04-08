@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiUpload } from 'react-icons/fi';
-import axios from 'axios';
+import api from '../../services/api';
 
 const MediaForm = () => {
   const { id } = useParams();
@@ -95,7 +95,7 @@ const MediaForm = () => {
       
       if (isEditing) {
         // Update existing media
-        await axios.put(`/api/cms/media/${id}`, formData);
+        await api.put(`/cms/media/${id}`, formData);
         
         setSuccess('Media updated successfully!');
       } else {
@@ -106,7 +106,7 @@ const MediaForm = () => {
         formDataToSend.append('altText', formData.altText);
         formDataToSend.append('tags', formData.tags);
         
-        await axios.post('/api/cms/media', formDataToSend, {
+        await api.post('/cms/media', formDataToSend, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

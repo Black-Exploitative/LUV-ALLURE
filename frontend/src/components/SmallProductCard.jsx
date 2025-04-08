@@ -27,12 +27,16 @@ const SmallProductCard = ({ image, name, color, price, onViewProduct }) => {
         {/* View Product Button */}
         
  
-      <button
-          onClick={onViewProduct}
+        <button
+          onClick={() => {
+            const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            onViewProduct(id, slug);
+          }}
           className="uppercase border border-gray-500 text-gray-500 text-[12px] w-[154px] h-[50px] cursor-pointer"
         >
           VIEW PRODUCT
         </button>
+
     </div>
   );
 };
@@ -41,8 +45,8 @@ SmallProductCard.propTypes = {
   image: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
-  onViewProduct: PropTypes.func.isRequired,
   price: PropTypes.string.isRequired,
+  onViewProduct: PropTypes.func.isRequired,
 };
 
 export default SmallProductCard;

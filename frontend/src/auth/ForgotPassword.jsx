@@ -3,15 +3,57 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { authService } from "../services/api";
+import { toast } from "react-hot-toast";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const validateEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Password reset requested for:", email);
-    setSubmitted(true);
+    
+    // Reset error
+    setError("");
+    
+    // Validate email
+    if (!email || !validateEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Call the API to request password reset
+      await authService.requestPasswordReset(email);
+      
+      // Show success message
+      toast.success("Password reset instructions sent to your email");
+      
+      // Update UI state to show success message
+      setSubmitted(true);
+    } catch (error) {
+      // For security reasons, we don't want to reveal if an email exists or not
+      // So we show a generic success message even if there's an error
+      console.error("Error requesting password reset:", error);
+      
+      // Still update UI to show the success message
+      setSubmitted(true);
+      
+      // Optionally show a toast for internal errors (e.g. server down)
+      if (error.message && error.message.includes("server")) {
+        toast.error("Server error. Please try again later.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -44,7 +86,10 @@ export default function ForgotPassword() {
                 </svg>
               </div>
               <p className="text-sm text-gray-700">
-                If an account exists for {email}, you will receive an email with instructions on how to reset your password.
+                If an account exists for <span className="font-medium">{email}</span>, you will receive an email with instructions on how to reset your password.
+              </p>
+              <p className="text-sm text-gray-600">
+                Please check your inbox and spam folders.
               </p>
               <div className="pt-4">
                 <Link
@@ -69,18 +114,24 @@ export default function ForgotPassword() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm"
+                  className={`appearance-none block w-full px-3 py-3 border ${
+                    error ? 'border-red-500' : 'border-gray-300'
+                  } focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm`}
                 />
+                {error && (
+                  <p className="mt-1 text-xs text-red-500">{error}</p>
+                )}
               </div>
 
               <div>
                 <motion.button
                   type="submit"
+                  disabled={isSubmitting}
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent cursor-pointer text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent cursor-pointer text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  RESET PASSWORD
+                  {isSubmitting ? "SENDING..." : "RESET PASSWORD"}
                 </motion.button>
               </div>
             </form>

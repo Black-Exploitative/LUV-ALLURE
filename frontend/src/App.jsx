@@ -1,9 +1,10 @@
-// frontend/src/App.jsx (updated with CMS routes)
+// In your App.jsx, add the ResetPassword route
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import { CartProvider } from "./context/CartContext";
+import { AuthProvider } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import CheckoutNavbar from "./components/CheckOutNavbar";
@@ -15,7 +16,9 @@ import CartDrawer from "./components/CartDrawer";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
 import ForgotPassword from "./auth/ForgotPassword";
+import ResetPassword from "./auth/ResetPassword"; // Import the new component
 import UserAccount from "./auth/UserAccount";
+import ProtectedRoute from "./auth/ProtectedRoute";
 import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 import SearchResults from "./pages/SearchResults";
@@ -29,8 +32,10 @@ import LayoutForm from "./admin/forms/LayoutForm";
 import MediaForm from "./admin/forms/MediaForm";
 import ProductRelationshipForm from "./admin/forms/ProductRelationshipForm";
 import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
-
-// Add these routes in the admin routes section
+import ShopBannerForm from "./admin/forms/ShopBannerForm";
+import PromoSectionForm from "./admin/forms/PromoSectionForm";
+import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
+import ServicesForm from "./admin/forms/ServicesForm";
 
 const AppContent = () => {
   const location = useLocation();
@@ -65,6 +70,14 @@ const AppContent = () => {
           <Route path="/admin/media/edit/:id" element={<MediaForm />} />
           <Route path="/admin/product-relationships/new" element={<ProductRelationshipForm />} />
           <Route path="/admin/product-relationships/edit/:id" element={<ProductRelationshipForm />} />
+          <Route path="/admin/shop-banner/new" element={<ShopBannerForm />} />
+          <Route path="/admin/shop-banner/edit/:id" element={<ShopBannerForm />} />
+          <Route path="/admin/promo-section/new" element={<PromoSectionForm />} />
+          <Route path="/admin/promo-section/edit/:id" element={<PromoSectionForm />} />
+          <Route path="/admin/shop-header/new" element={<ShopHeaderForm />} />
+          <Route path="/admin/shop-header/edit/:id" element={<ShopHeaderForm />} />
+          <Route path="/admin/services/new" element={<ServicesForm />} />
+          <Route path="/admin/services/edit/:id" element={<ServicesForm />} />
         </Routes>
       </>
     );
@@ -80,14 +93,30 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
-        <Route path="/product/:productId" element={<ProductDetailsPage />} />
-        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/product/:slug" element={<ProductDetailsPage />} />
         <Route path="/contact-us" element={<ContactUs />} />
-        <Route path="/payment" element={<Payment />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/user-account" element={<UserAccount />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
+        
+        {/* Protected routes that require authentication */}
+        <Route path="/checkout" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
+        <Route path="/payment" element={
+          <ProtectedRoute>
+            <Payment />
+          </ProtectedRoute>
+        } />
+        <Route path="/user-account" element={
+          <ProtectedRoute>
+            <UserAccount />
+          </ProtectedRoute>
+        } />
+        
         <Route path="/search" element={<SearchResults />} />
       </Routes>
     </>
@@ -96,12 +125,14 @@ const AppContent = () => {
 
 export default function App() {
   return (
-    <CartProvider>
-      <RecentlyViewedProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </RecentlyViewedProvider>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <RecentlyViewedProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </RecentlyViewedProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }

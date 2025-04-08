@@ -4,7 +4,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
 
-const   ProductCard = ({ product, gridType, onProductClick }) => {
+const ProductCard = ({ product, gridType, onProductClick }) => {
   // Add safe defaults and error handling
   const { 
     id,
@@ -98,6 +98,14 @@ const   ProductCard = ({ product, gridType, onProductClick }) => {
     setSelectedSize("");
   };
 
+  // Simplified Product Click - just pass the ID
+  const handleProductClick = () => {
+    if (onProductClick) {
+      // Pass both id and name for the URL slug
+      onProductClick(id, name.toLowerCase().replace(/\s+/g, '-'));
+    }
+  };
+
   // Animation variants
   const slideVariants = {
     enter: (direction) => ({
@@ -125,7 +133,7 @@ const   ProductCard = ({ product, gridType, onProductClick }) => {
       transition={{ duration: 0.5 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      onClick={() => onProductClick?.(product)}
+      onClick={handleProductClick}
     >
       {/* Image Carousel Section */}
       <div 
@@ -264,7 +272,7 @@ const   ProductCard = ({ product, gridType, onProductClick }) => {
 
 ProductCard.propTypes = {
   product: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     name: PropTypes.string,
     price: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.object]),
     sizes: PropTypes.arrayOf(PropTypes.string),

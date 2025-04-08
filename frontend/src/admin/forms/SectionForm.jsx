@@ -4,7 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
 import SectionPreview from '../components/SectionPreview';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import api from '../../services/api';
+
 
 const SectionForm = () => {
   const { id } = useParams();
@@ -63,7 +64,7 @@ const SectionForm = () => {
       if (isEditing) {
         try {
           setLoading(true);
-          const response = await axios.get(`/api/cms/sections/${id}`);
+          const response = await api.get(`/cms/sections/${id}`);
           setFormData(response.data.data);
         } catch (err) {
           setError('Failed to load section data');
@@ -81,7 +82,7 @@ const SectionForm = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await axios.get('/api/products');
+        const response = await api.get('/products');
         setAvailableProducts(response.data.products || []);
       } catch (err) {
         console.error('Failed to load products:', err);
@@ -90,7 +91,7 @@ const SectionForm = () => {
     
     const loadMedia = async () => {
       try {
-        const response = await axios.get('/api/cms/media?type=image');
+        const response = await api.get('/cms/media?type=image');
         setMediaLibrary(response.data.data || []);
       } catch (err) {
         console.error('Failed to load media:', err);
@@ -232,12 +233,12 @@ const SectionForm = () => {
       
       // API endpoint and method based on editing or creating
       const url = isEditing 
-        ? `/api/cms/sections/${id}` 
-        : '/api/cms/sections';
+        ? `/cms/sections/${id}` 
+        : '/cms/sections';
       
       const method = isEditing ? 'put' : 'post';
       
-      const response = await axios[method](url, formData);
+      const response = await api[method](url, formData);
       
       if (response.data.success) {
         setSuccess(isEditing 

@@ -12,10 +12,15 @@ const ProductCarousel = ({ images }) => {
   const dragX = useMotionValue(0);
   const opacity = useTransform(dragX, [-100, 0, 100], [0.5, 1, 0.5]);
   
+  // Safely handle the images array
+  const safeImages = Array.isArray(images) && images.length > 0 
+    ? images.filter(img => img) // Filter out null/undefined images
+    : ["/images/placeholder.jpg"];
+  
   // Extend images array if it's too short
-  const extendedImages = images.length < 6 
-    ? [...images, ...images, ...images].slice(0, Math.max(6, images.length))
-    : images;
+  const extendedImages = safeImages.length < 6 
+    ? [...safeImages, ...safeImages, ...safeImages].slice(0, Math.max(6, safeImages.length))
+    : safeImages;
 
   // Max number of thumbnails visible at once
   const maxVisibleThumbnails = 7;
@@ -23,14 +28,15 @@ const ProductCarousel = ({ images }) => {
   // Number of thumbnails
   const thumbnailCount = extendedImages.length;
 
-  // Ensure we always have a valid pair of images
+  // Reset current pair when images change to ensure we start with the first image
   useEffect(() => {
     if (extendedImages.length === 1) {
       setCurrentPair([0, 0]);
-    } else if (currentPair[1] >= extendedImages.length) {
-      setCurrentPair([currentPair[0], (currentPair[0] + 1) % extendedImages.length]);
+    } else {
+      // Always start with the first two images when the images array changes
+      setCurrentPair([0, 1]);
     }
-  }, [extendedImages.length, currentPair]);
+  }, [images, extendedImages.length]);
 
   const handleThumbnailClick = (index) => {
     // Only update if clicking a different image than the current primary
@@ -112,7 +118,7 @@ const ProductCarousel = ({ images }) => {
             initial={{ x: slideDirection * 1040 }}
             animate={{ x: 0 }}
             exit={{ x: -slideDirection * 1040 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
+            transition={{ duration: 2, ease: [0.25, 0.8, 0.25, 1] }}
             style={{ width: "1040px" }}
           >
             {/* Primary Image */}
@@ -180,8 +186,8 @@ const ProductCarousel = ({ images }) => {
                     ? "border-[0.3px] border-black h-[202px]" 
                     : "border-transparent h-[200px]"}`}
                 onClick={() => handleThumbnailClick(item.index)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02, transition: { duration: 0.5 } }}
+                whileTap={{ scale: 0.98, transition: { duration: 0.3 } }}
               >
                 <img
                   src={item.image}
@@ -215,6 +221,10 @@ const ProductCarousel = ({ images }) => {
 
 ProductCarousel.propTypes = {
   images: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
+ProductCarousel.defaultProps = {
+  images: ['/images/placeholder.jpg'],
 };
 
 export default ProductCarousel;
