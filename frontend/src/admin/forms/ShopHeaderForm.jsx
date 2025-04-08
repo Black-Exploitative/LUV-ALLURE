@@ -24,6 +24,7 @@ const ShopHeaderForm = () => {
     media: {
       imageUrl: '/images/banner.webp',
       altText: 'Shop Header',
+      overlayOpacity: 0.5
     },
     isActive: true,
     order: 0
@@ -48,6 +49,7 @@ const ShopHeaderForm = () => {
             const section = response.data.data;
             setFormData({
               ...section,
+              type: 'shop-header', // Ensure correct type
               content: {
                 title: section.content?.title || 'Shop the Latest Trends',
                 description: section.content?.description || 'Find your perfect style today.',
@@ -56,8 +58,9 @@ const ShopHeaderForm = () => {
                 alignment: section.content?.alignment || 'center'
               },
               media: {
-                imageUrl: section.media?.imageUrl || '',
-                altText: section.media?.altText || 'Shop Header'
+                imageUrl: section.media?.imageUrl || '/images/banner.webp',
+                altText: section.media?.altText || 'Shop Header',
+                overlayOpacity: section.media?.overlayOpacity !== undefined ? section.media.overlayOpacity : 0.5
               }
             });
           } else {
@@ -102,7 +105,8 @@ const ShopHeaderForm = () => {
         ...formData,
         [parent]: {
           ...formData[parent],
-          [child]: type === 'checkbox' ? checked : value
+          [child]: type === 'checkbox' ? checked : 
+                  (child === 'overlayOpacity' ? parseFloat(value) : value)
         }
       });
     } else {
@@ -152,7 +156,7 @@ const ShopHeaderForm = () => {
       setError('');
       setSuccess('');
       
-      // Set the correct section type
+      // Make sure the type is explicitly set to 'shop-header'
       const dataToSubmit = {
         ...formData,
         type: 'shop-header' // Ensure the type is correct
@@ -164,6 +168,8 @@ const ShopHeaderForm = () => {
         : '/cms/sections';
       
       const method = isEditing ? 'put' : 'post';
+      
+      console.log('Submitting data:', JSON.stringify(dataToSubmit, null, 2));
       
       const response = await api[method](url, dataToSubmit);
       
@@ -183,7 +189,7 @@ const ShopHeaderForm = () => {
       }
     } catch (err) {
       console.error('Error saving section:', err);
-      setError('Failed to save. Please try again.');
+      setError('Failed to save. Please try again. ' + (err.response?.data?.message || ''));
     } finally {
       setLoading(false);
     }
@@ -394,6 +400,25 @@ const ShopHeaderForm = () => {
               </p>
             </div>
             
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Overlay Opacity: {formData.media.overlayOpacity}
+              </label>
+              <input
+                type="range"
+                name="media.overlayOpacity"
+                min="0"
+                max="1"
+                step="0.1"
+                value={formData.media.overlayOpacity}
+                onChange={handleChange}
+                className="w-full"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Controls the darkness of the overlay on the background image
+              </p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -457,7 +482,12 @@ const ShopHeaderForm = () => {
                   className="w-full h-full object-cover"
                 />
                 
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center p-4">
+                <div 
+                  className="absolute inset-0 bg-black"
+                  style={{ opacity: formData.media.overlayOpacity }}
+                ></div>
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
                   {formData.content.title && (
                     <h2 className="text-white text-2xl font-bold mb-2">{formData.content.title}</h2>
                   )}

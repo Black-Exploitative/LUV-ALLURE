@@ -40,7 +40,6 @@ const upload = multer({
   }
 });
 
-// Content Sections Controller
 exports.getAllSections = async (req, res, next) => {
   try {
     // Create query object based on request params
@@ -69,20 +68,7 @@ exports.getAllSections = async (req, res, next) => {
   }
 };
 
-exports.getSection = async (req, res, next) => {
-  try {
-    const section = await ContentSection.findById(req.params.id);
-    
-    if (!section) {
-      return res.status(404).json({ success: false, message: 'Section not found' });
-    }
-    
-    res.status(200).json({ success: true, data: section });
-  } catch (error) {
-    next(error);
-  }
-};
-
+// Update the createSection method to validate section types
 exports.createSection = async (req, res, next) => {
   try {
     // Validate section type
@@ -99,6 +85,11 @@ exports.createSection = async (req, res, next) => {
       });
     }
     
+    // Ensure services array is properly structured if this is a services section
+    if (req.body.type === 'services' && (!req.body.services || !Array.isArray(req.body.services))) {
+      req.body.services = [];
+    }
+    
     // Create section with sanitized data
     const section = await ContentSection.create({
       ...req.body,
@@ -112,6 +103,7 @@ exports.createSection = async (req, res, next) => {
   }
 };
 
+// Update the updateSection method to validate section types
 exports.updateSection = async (req, res, next) => {
   try {
     // Validate section type if updating
