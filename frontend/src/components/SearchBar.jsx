@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -13,6 +14,8 @@ const SearchBar = ({ darkNavbar }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const navigate = useNavigate();
@@ -25,6 +28,18 @@ const SearchBar = ({ darkNavbar }) => {
     { id: "bottoms", name: "Bottoms" },
     { id: "accessories", name: "Accessories" },
   ];
+
+  // Color options
+  const colorOptions = [
+    { id: "white", color: "#FFFFFF", border: true },
+    { id: "black", color: "#000000" },
+    { id: "beige", color: "#F5F5DC", border: true },
+    { id: "pink", color: "#FFC0CB" },
+    { id: "purple", color: "#800080" },
+  ];
+
+  // Size options
+  const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"];
 
   // Close search when clicking outside
   useEffect(() => {
@@ -93,7 +108,7 @@ const SearchBar = ({ darkNavbar }) => {
     }, 500);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery]);
+  }, [searchQuery, selectedColor, selectedSize, selectedCategory]);
 
   // Fetch search suggestions
   const fetchSuggestions = async () => {
@@ -113,9 +128,12 @@ const SearchBar = ({ darkNavbar }) => {
 
     setLoading(true);
     try {
-      // Call the search service
+      // Call the search service with filters
       const { products } = await searchService.searchProducts(searchQuery, {
         limit: 8,
+        color: selectedColor,
+        size: selectedSize,
+        category: selectedCategory !== "all" ? selectedCategory : undefined
       });
 
       setSearchResults(products);
@@ -158,6 +176,9 @@ const SearchBar = ({ darkNavbar }) => {
 
   const handleCloseSearch = () => {
     setIsOpen(false);
+    setSelectedColor(null);
+    setSelectedSize(null);
+    setSelectedCategory("all");
   };
 
   const handleResultClick = (productId) => {
@@ -195,37 +216,21 @@ const SearchBar = ({ darkNavbar }) => {
     }
   };
 
-  // Animation variants for the search panel
-  const searchPanelVariants = {
-    hidden: {
-      opacity: 0,
-      height: 0,
-      transition: {
-        duration: 0.3,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    },
-    visible: {
-      opacity: 1,
-      height: "auto",
-      transition: {
-        duration: 0.4,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    },
+  const handleColorSelect = (colorId) => {
+    setSelectedColor(colorId === selectedColor ? null : colorId);
   };
 
-  // Backdrop blur animation
-  const backdropVariants = {
-    hidden: {
-      opacity: 0.5,
-    },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-      },
-    },
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size === selectedSize ? null : size);
+  };
+
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
+
+  const goToSearchResults = () => {
+    navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${selectedCategory}`);
+    handleCloseSearch();
   };
 
   return (
@@ -254,171 +259,191 @@ const SearchBar = ({ darkNavbar }) => {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              variants={backdropVariants}
-              className="fixed inset-0 bg-black/70 z-40 mt-[70px]"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1 }
+              }}
+              className="fixed inset-0 bg-white/95 z-40"
               onClick={handleCloseSearch}
             />
 
-            {/* Search panel - Fixed position below navbar */}
+            {/* Search panel - Full screen */}
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 left-0 right-0 bg-white z-50 shadow-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="container mx-auto px-4 py-4">
+              <div className="max-w-screen-xl mx-auto">
                 {/* Search input and close button */}
-                <div className="flex items-center border-b border-gray-300 pb-4">
+                <div className="flex items-center border-b border-gray-200 py-6 px-4">
                   <FaSearch className="text-gray-400 mr-3" />
                   <input
                     ref={inputRef}
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search for products..."
-                    className="flex-grow text-base font-light focus:outline-none"
+                    placeholder="SEARCH..."
+                    className="flex-grow text-base uppercase font-light focus:outline-none"
                     autoComplete="off"
                   />
-                  {searchQuery && (
-                    <button 
-                      onClick={handleClearSearch}
-                      className="mr-3 text-gray-400 hover:text-gray-600"
-                      aria-label="Clear search"
-                    >
-                      <FaTimes />
-                    </button>
-                  )}
                   <button 
                     onClick={handleCloseSearch}
-                    className="ml-4 text-gray-500 hover:text-black transition-colors duration-300"
+                    className="text-gray-500 hover:text-black transition-colors duration-300"
                     aria-label="Close search"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <FaTimes className="w-5 h-5" />
                   </button>
                 </div>
 
-                {/* Search suggestions */}
-                {showSuggestions && suggestions.length > 0 && !loading && (
-                  <div className="mt-2">
-                    <h3 className="text-xs font-medium text-gray-500 mb-2">SUGGESTIONS</h3>
-                    <div className="space-y-1">
-                      {suggestions.map((suggestion, index) => (
-                        <div 
-                          key={index}
-                          className="px-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
-                          onClick={() => handleSuggestionClick(suggestion)}
-                        >
-                          <FaSearch className="text-gray-400 mr-3 text-xs" />
-                          <span className="text-sm">{suggestion}</span>
-                        </div>
-                      ))}
+                <div className="flex flex-col md:flex-row">
+                  {/* Filters column */}
+                  <div className="w-full md:w-1/4 p-4 border-r border-gray-200">
+                    {/* Color filter */}
+                    <div className="mb-8">
+                      <h3 className="text-uppercase mb-4 font-medium text-sm border-b border-gray-100 pb-2">COLOUR</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {colorOptions.map((color) => (
+                          <button
+                            key={color.id}
+                            onClick={() => handleColorSelect(color.id)}
+                            className={`w-10 h-10 rounded-full ${
+                              color.border ? 'border border-gray-300' : ''
+                            } ${
+                              selectedColor === color.id ? 'ring-1 ring-black' : ''
+                            }`}
+                            style={{ backgroundColor: color.color }}
+                            aria-label={`Select ${color.id} color`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Size filter */}
+                    <div className="mb-8">
+                      <h3 className="text-uppercase mb-4 font-medium text-sm border-b border-gray-100 pb-2">SIZE</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {sizeOptions.map((size) => (
+                          <button
+                            key={size}
+                            onClick={() => handleSizeSelect(size)}
+                            className={`w-12 h-12 flex items-center justify-center border ${
+                              selectedSize === size 
+                                ? 'border-black bg-black text-white' 
+                                : 'border-gray-300 hover:border-gray-500'
+                            }`}
+                          >
+                            {size}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Category filter */}
+                    <div className="mb-8">
+                      <h3 className="text-uppercase mb-4 font-medium text-sm border-b border-gray-100 pb-2">CATEGORY</h3>
+                      <div className="space-y-2">
+                        {categories.map((category) => (
+                          <div key={category.id} className="flex items-center">
+                            <input
+                              type="radio"
+                              id={category.id}
+                              name="category"
+                              checked={selectedCategory === category.id}
+                              onChange={() => handleCategorySelect(category.id)}
+                              className="mr-2"
+                            />
+                            <label htmlFor={category.id}>{category.name}</label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                )}
-                
-                {/* Recent searches */}
-                {searchQuery.length < 2 && recentSearches.length > 0 && (
-                  <div className="mt-4 mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xs font-medium text-gray-500">RECENT SEARCHES</h3>
-                      <button 
-                        className="text-xs text-gray-500 hover:text-black"
-                        onClick={clearRecentSearches}
-                      >
-                        Clear
-                      </button>
-                    </div>
-                    <div className="space-y-1">
-                      {recentSearches.map((search, index) => (
-                        <div 
-                          key={index}
-                          className="px-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
-                          onClick={() => handleRecentSearchClick(search)}
+
+                  {/* Results column */}
+                  <div className="w-full md:w-3/4 p-4">
+                    <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-4">
+                      <h3 className="text-uppercase font-medium text-sm">PRODUCT RESULTS</h3>
+                      {searchResults.length > 0 && (
+                        <button 
+                          onClick={goToSearchResults}
+                          className="text-sm text-gray-700 hover:text-black underline"
                         >
-                          <FaHistory className="text-gray-400 mr-3 text-xs" />
-                          <span className="text-sm">{search}</span>
+                          See all results
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Search suggestions */}
+                    {showSuggestions && suggestions.length > 0 && !loading && (
+                      <div className="mb-6">
+                        <h4 className="text-xs text-gray-500 mb-2">SUGGESTIONS</h4>
+                        <div className="space-y-1">
+                          {suggestions.map((suggestion, index) => (
+                            <div 
+                              key={index}
+                              className="px-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                              onClick={() => handleSuggestionClick(suggestion)}
+                            >
+                              <FaSearch className="text-gray-400 mr-3 text-xs" />
+                              <span className="text-sm">{suggestion}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      </div>
+                    )}
 
-                {/* Search results */}
-                <div className="mb-6">
-                  {loading && (
-                    <div className="text-center py-10">
-                      <div className="inline-block h-6 w-6 border-2 border-t-black border-gray-200 rounded-full animate-spin"></div>
-                      <p className="mt-3 text-gray-500 text-sm">
-                        Searching...
-                      </p>
-                    </div>
-                  )}
-
-                  {!loading &&
-                    searchQuery.length >= 2 &&
-                    searchResults.length === 0 &&
-                    !showSuggestions && (
+                    {loading && (
                       <div className="text-center py-10">
-                        <p className="text-gray-700">
-                          No results found for `{searchQuery}`
-                        </p>
-                        <p className="text-sm text-gray-500 mt-2">
-                          Try a different search term or browse our
-                          collections
+                        <div className="inline-block h-6 w-6 border-2 border-t-black border-gray-200 rounded-full animate-spin"></div>
+                        <p className="mt-3 text-gray-500 text-sm">
+                          Searching...
                         </p>
                       </div>
                     )}
 
-                  {!loading && searchResults.length > 0 && (
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium text-gray-500">SEARCH RESULTS</h3>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {!loading && searchResults.length === 0 && searchQuery && (
+                      <div className="text-center py-10">
+                        <p className="text-gray-700">
+                          No results found for "{searchQuery}"
+                        </p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Try a different search term or browse our collections
+                        </p>
+                      </div>
+                    )}
+
+                    {!loading && searchResults.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {searchResults.map(product => (
                           <div 
                             key={product.id}
-                            className="flex items-center border border-gray-200 p-3 cursor-pointer hover:border-gray-400 transition-colors"
+                            className="cursor-pointer group"
                             onClick={() => handleResultClick(product.id)}
                           >
                             {/* Product Image */}
-                            <div className="w-16 h-20 bg-gray-100 mr-3 flex-shrink-0">
+                            <div className="aspect-[3/4] overflow-hidden bg-gray-100 mb-3">
                               <img
                                 src={product.image || product.images?.[0] || "/images/placeholder.jpg"}
                                 alt={product.title}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             </div>
                             
                             {/* Product Info */}
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-medium truncate">{product.title}</h4>
-                              <p className="text-xs text-gray-500 mt-1 line-clamp-1">{product.productType}</p>
+                            <div>
+                              <h4 className="text-sm uppercase truncate">{product.title}</h4>
                               <p className="text-sm text-gray-800 mt-1 font-medium">₦{parseFloat(product.price).toLocaleString()}</p>
                             </div>
                           </div>
                         ))}
                       </div>
-                      
-                      {searchResults.length > 0 && (
-                        <div className="text-center mt-6">
-                          <button 
-                            className="text-black underline hover:text-gray-600 text-sm"
-                            onClick={() => {
-                              navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${selectedCategory}`);
-                              handleCloseSearch();
-                            }}
-                          >
-                            See all results
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-            </div>
+              </div>
             </motion.div>
           </>
         )}
