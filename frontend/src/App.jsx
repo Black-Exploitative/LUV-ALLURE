@@ -97,7 +97,8 @@ const AppContent = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/payment" element={<ForgotPassword />} />
+        <Route path="/payment" element={<Payment />} />
+        {/* <Route path="/payment" element={<ForgotPassword />} /> */}
         <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
         
         {/* Protected routes that require authentication */}
@@ -106,11 +107,11 @@ const AppContent = () => {
             <Checkout />
           </ProtectedRoute>
         } />
-        <Route path="/payment" element={
+        {/* <Route path="/payment" element={
           <ProtectedRoute>
             <Payment />
           </ProtectedRoute>
-        } />
+        } /> */}
         <Route path="/user-account" element={
           <ProtectedRoute>
             <UserAccount />
