@@ -1,4 +1,3 @@
-// In your App.jsx, add the ResetPassword route
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -35,7 +34,7 @@ import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
 import ShopBannerForm from "./admin/forms/ShopBannerForm";
 import PromoSectionForm from "./admin/forms/PromoSectionForm";
 import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
-
+// import ServicesForm from "./admin/forms/ServicesForm";
 
 const AppContent = () => {
   const location = useLocation();
@@ -76,7 +75,9 @@ const AppContent = () => {
           <Route path="/admin/promo-section/edit/:id" element={<PromoSectionForm />} />
           <Route path="/admin/shop-header/new" element={<ShopHeaderForm />} />
           <Route path="/admin/shop-header/edit/:id" element={<ShopHeaderForm />} />
-        
+          {/* <Route path="/admin/services/new" element={<ServicesForm />} />
+          <Route path="/admin/services/edit/:id" element={<ServicesForm />} /> */}
+
         </Routes>
       </>
     );
@@ -97,6 +98,8 @@ const AppContent = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/payment" element={<Payment />} />
+        {/* <Route path="/payment" element={<ForgotPassword />} /> */}
         <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
         
         {/* Protected routes that require authentication */}
@@ -105,11 +108,11 @@ const AppContent = () => {
             <Checkout />
           </ProtectedRoute>
         } />
-        <Route path="/payment" element={
+        {/* <Route path="/payment" element={
           <ProtectedRoute>
             <Payment />
           </ProtectedRoute>
-        } />
+        } /> */}
         <Route path="/user-account" element={
           <ProtectedRoute>
             <UserAccount />

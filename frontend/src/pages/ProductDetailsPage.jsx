@@ -12,13 +12,26 @@ import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import StarRating from "../components/StarRating";
 import cmsService from "../services/cmsService";
+import CustomersReviews from "../components/CustomersReviews";
+import { useRef } from "react";
 import api from "../services/api";
 
 const ProductDetailsPage = () => {
+  const reviewsRef = useRef(null);
   // URL and navigation
   const { slug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
+  const rawProduct = location.state?.product;
+
+  const scrollToReviews = () => {
+    reviewsRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   
   // Product state
   const [product, setProduct] = useState(null);
@@ -267,21 +280,30 @@ const ProductDetailsPage = () => {
         setLoadingRelated(true);
         
         // Fetch each type of related product
-        const styleWith = await cmsService.getProductRelationships(productId, 'style-with');
-        const alsoPurchased = await cmsService.getProductRelationships(productId, 'also-purchased');
-        const alsoViewed = await cmsService.getProductRelationships(productId, 'also-viewed');
-        
+        const styleWith = await cmsService.getProductRelationships(
+          productId,
+          "style-with"
+        );
+        const alsoPurchased = await cmsService.getProductRelationships(
+          productId,
+          "also-purchased"
+        );
+        const alsoViewed = await cmsService.getProductRelationships(
+          productId,
+          "also-viewed"
+        );
+
         // Update state with fetched products
         setStyleWithProducts(styleWith || []);
         setAlsoPurchasedProducts(alsoPurchased || []);
         setAlsoViewedProducts(alsoViewed || []);
       } catch (error) {
-        console.error('Error fetching related products:', error);
+        console.error("Error fetching related products:", error);
       } finally {
         setLoadingRelated(false);
       }
     };
-    
+
     fetchRelatedProducts();
   }, [productId]);
 
@@ -873,9 +895,12 @@ const ProductDetailsPage = () => {
           <div className="w-[400px] flex flex-col justify-start">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
-            
-            {/* Star Rating */}
-            <StarRating onChange={(value) => console.log(`Rated: ${value} stars`)} />
+            {/*  Star Rating */}
+            <StarRating
+              rating={4.9}
+              reviewCount={90}
+              scrollToReviews={scrollToReviews}
+            />
 
             {/* Product Price */}
             <p className="text-lg font-semibold text-gray-700">
@@ -1043,7 +1068,10 @@ const ProductDetailsPage = () => {
                       name: product.title || product.name,
                       price: parseFloat(product.price),
                       color: product.color || "DEFAULT",
-                      images: product.images?.[0] || product.image || "/images/placeholder.jpg"
+                      images:
+                        product.images?.[0] ||
+                        product.image ||
+                        "/images/placeholder.jpg",
                     }}
                   />
                 ))}
@@ -1078,7 +1106,10 @@ const ProductDetailsPage = () => {
                       name: product.title || product.name,
                       price: parseFloat(product.price),
                       color: product.color || "DEFAULT",
-                      images: product.images?.[0] || product.image || "/images/placeholder.jpg"
+                      images:
+                        product.images?.[0] ||
+                        product.image ||
+                        "/images/placeholder.jpg",
                     }}
                   />
                 ))}
@@ -1093,6 +1124,11 @@ const ProductDetailsPage = () => {
           </>
         )}
       </div>
+
+      <div ref={reviewsRef}>
+        <CustomersReviews productName={product.name}/>
+      </div>
+
       <Footer />
     </>
   );
