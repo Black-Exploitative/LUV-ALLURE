@@ -1,4 +1,4 @@
-// controllers/authController.js - Enhanced Authentication controller
+// controllers/authController.js - Fixed JWT Secret issue
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
@@ -45,10 +45,13 @@ exports.register = async (req, res, next) => {
     // Store the Shopify password securely
     await shopifyPasswordProxy.storeShopifyPassword(user._id, password);
     
+    // Make sure JWT_SECRET is defined before using it
+    const jwtSecret = process.env.JWT_SECRET || "";
+    
     // Generate JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
+      jwtSecret,
       { expiresIn: '1d' }
     );
     
@@ -96,6 +99,9 @@ exports.login = async (req, res, next) => {
       });
     }
     
+    // Make sure JWT_SECRET is defined before using it
+    const jwtSecret = process.env.JWT_SECRET || "";
+    
     // Generate JWT token
     const token = jwt.sign(
       { 
@@ -103,7 +109,7 @@ exports.login = async (req, res, next) => {
         email: user.email,
         shopifyAccessToken: shopifyResponse.customerAccessTokenCreate.customerAccessToken.accessToken
       },
-      process.env.JWT_SECRET,
+      jwtSecret,
       { expiresIn: '1d' }
     );
     
@@ -121,7 +127,6 @@ exports.login = async (req, res, next) => {
     next(error);
   }
 };
-
 // Get user profile
 exports.getProfile = async (req, res, next) => {
   try {

@@ -217,7 +217,7 @@ export default function Navbar() {
             { name: "Knitwear", href: "#" },
             { name: "Coats + Jackets", href: "#" },
             { name: "Loungewear", href: "#" },
-            { name: "All Clothing", href: "shop" }
+            { name: "All Clothing", href: "/shop" }
           ]
         },
         {

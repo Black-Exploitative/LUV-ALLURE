@@ -34,6 +34,7 @@ import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
 import ShopBannerForm from "./admin/forms/ShopBannerForm";
 import PromoSectionForm from "./admin/forms/PromoSectionForm";
 import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
+import CollectionHeroForm from "./admin/forms/CollectionHeroForm";
 // import ServicesForm from "./admin/forms/ServicesForm";
 
 const AppContent = () => {
@@ -75,8 +76,8 @@ const AppContent = () => {
           <Route path="/admin/promo-section/edit/:id" element={<PromoSectionForm />} />
           <Route path="/admin/shop-header/new" element={<ShopHeaderForm />} />
           <Route path="/admin/shop-header/edit/:id" element={<ShopHeaderForm />} />
-          {/* <Route path="/admin/services/new" element={<ServicesForm />} />
-          <Route path="/admin/services/edit/:id" element={<ServicesForm />} /> */}
+          <Route path="/admin/collection-hero/new" element={<CollectionHeroForm />} />
+          <Route path="/admin/collection-hero/edit/:id" element={<CollectionHeroForm />} />
 
         </Routes>
       </>
