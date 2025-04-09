@@ -1,4 +1,3 @@
-// In your App.jsx, add the ResetPassword route
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -98,6 +97,7 @@ const AppContent = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/payment" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
         
         {/* Protected routes that require authentication */}

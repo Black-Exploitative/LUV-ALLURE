@@ -5,7 +5,7 @@ import { FiX } from 'react-icons/fi';
 import PropTypes from 'prop-types';
 
 // eslint-disable-next-line no-unused-vars
-const ReviewModal = ({ isOpen, onClose, productName = "SWIVEL ALLURE MAXI DRESS" }) => {
+const ReviewModal = ({ isOpen, onClose, productName = "SWIVEL ALLURE MAXI DRESS", onSubmit}) => {
   const [formData, setFormData] = useState({
     rating: 0,
     review: '',
@@ -48,6 +48,14 @@ const ReviewModal = ({ isOpen, onClose, productName = "SWIVEL ALLURE MAXI DRESS"
     e.preventDefault();
     // Submit logic here
     console.log('Submitting review:', formData);
+
+    if (onSubmit) {
+      onSubmit({
+        ...formData,
+        date: new Date().toISOString(),
+      });
+    }
+
     onClose();
     // Reset form
     setFormData({
@@ -453,7 +461,8 @@ const ReviewModal = ({ isOpen, onClose, productName = "SWIVEL ALLURE MAXI DRESS"
 ReviewModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  productName: PropTypes.string
+  productName: PropTypes.string,
+  onSubmit: PropTypes.func
 };
 
 export default ReviewModal;

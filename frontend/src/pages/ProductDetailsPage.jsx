@@ -1118,7 +1118,7 @@ const ProductDetailsPage = () => {
       </div>
 
       <div ref={reviewsRef}>
-        <CustomersReviews />
+        <CustomersReviews productName={product.name}/>
       </div>
 
       <Footer />
