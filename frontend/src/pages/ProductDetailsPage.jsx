@@ -22,6 +22,7 @@ const ProductDetailsPage = () => {
   const { slug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
   const rawProduct = location.state?.product;
 
   const scrollToReviews = () => {
