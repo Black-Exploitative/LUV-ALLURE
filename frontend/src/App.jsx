@@ -77,6 +77,7 @@ const AppContent = () => {
           <Route path="/admin/shop-header/edit/:id" element={<ShopHeaderForm />} />
           {/* <Route path="/admin/services/new" element={<ServicesForm />} />
           <Route path="/admin/services/edit/:id" element={<ServicesForm />} /> */}
+
         </Routes>
       </>
     );

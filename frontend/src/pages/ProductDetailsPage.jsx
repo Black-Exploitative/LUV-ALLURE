@@ -96,6 +96,45 @@ const ProductDetailsPage = () => {
     };
   }, [product, productName]);
 
+  const renderStyleItWith = () => {
+    if (loadingRelated) {
+      return (
+        <div className="mt-[50px]">
+          <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
+          <div className="flex justify-center items-center py-8">
+            <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Only render if we have style-with products
+    if (styleWithProducts && styleWithProducts.length > 0) {
+      return (
+        <div className="mt-[50px]">
+          <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
+          <div className="grid gap-4 md:gap-6">
+            {styleWithProducts.map((product, index) => (
+              <SmallProductCard
+                key={product.id || index}
+                image={product.images?.[0] || product.image || "/images/placeholder.jpg"}
+                name={product.title || product.name}
+                color={product.color || "Default"}
+                price={`₦${parseFloat(product.price).toLocaleString()}`}
+                onViewProduct={() => navigate(`/product/${product.id}`)}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    
+   
+    
+    // Don't render anything if no products
+    return null;
+  };
+
   // Initialize display images when product loads
   const processAndValidateImages = (imageArray) => {
     if (!Array.isArray(imageArray) || imageArray.length === 0) {
@@ -838,6 +877,8 @@ const ProductDetailsPage = () => {
     );
   }
 
+  
+
   return (
     <>
       <div className="mx-[80px]">
@@ -847,40 +888,7 @@ const ProductDetailsPage = () => {
             <ProductCarousel images={displayImages} />
 
             {/* Related Products - Also inside the max-w-screen-xl container */}
-            <div className="mt-[50px]">
-              <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
-              {loadingRelated ? (
-                <div className="flex justify-center items-center py-8">
-                  <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-                </div>
-              ) : styleWithProducts.length > 0 ? (
-                <div className="grid gap-4 md:gap-6">
-                  {styleWithProducts.map((product, index) => (
-                    <SmallProductCard
-                      key={product.id || index}
-                      image={product.images?.[0] || product.image || "/images/placeholder.jpg"}
-                      name={product.title || product.name}
-                      color={product.color || "Default"}
-                      price={`₦${parseFloat(product.price).toLocaleString()}`}
-                      onViewProduct={() => navigate(`/product/${product.id}`)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid gap-4 md:gap-6">
-                  {relatedProducts.map((product, index) => (
-                    <SmallProductCard
-                      key={index}
-                      image={product.image}
-                      name={product.name}
-                      color={product.color}
-                      price={product.price}
-                      onViewProduct={() => console.log(`Viewing ${product.name}`)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+            {renderStyleItWith()}
           </div>
 
           {/* Right Side: Product Details */}
@@ -918,9 +926,9 @@ const ProductDetailsPage = () => {
                     return (
                       <button
                         key={index}
-                        className={`w-[50px] h-[50px] flex transition-all cursor-pointer duration-300 items-center justify-center overflow-hidden ${
+                        className={`w-[40px] h-[40px] flex transition-all cursor-pointer duration-300 items-center justify-center overflow-hidden ${
                           selectedColor === color.name
-                            ? "ring-2 ring-black"
+                            ? "ring-1 ring-black"
                             : "ring-1 ring-gray-300"
                         } ${
                           color.inStock ? "" : "opacity-40 cursor-not-allowed"
@@ -929,7 +937,7 @@ const ProductDetailsPage = () => {
                         disabled={!color.inStock}
                       >
                         {/* Use product image instead of color swatch */}
-                        <div className="w-full h-full">
+                        <div className="w-[34px] h-[34px]">
                           <img 
                             src={thumbnailImage} 
                             alt={`${color.name} color`}
