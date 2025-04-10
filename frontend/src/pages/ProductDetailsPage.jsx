@@ -1047,6 +1047,10 @@ const ProductDetailsPage = () => {
         </div>
       </div>
       
+      <div ref={reviewsRef}>
+        <CustomersReviews productName={product.name}/>
+      </div>
+      
       <div className="mx-[20px] mt-[50px] mb-[100px]">
         {/* Customers Also Purchased Section */}
         {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
@@ -1123,10 +1127,6 @@ const ProductDetailsPage = () => {
             )}
           </>
         )}
-      </div>
-
-      <div ref={reviewsRef}>
-        <CustomersReviews productName={product.name}/>
       </div>
 
       <Footer />

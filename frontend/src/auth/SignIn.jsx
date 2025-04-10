@@ -85,15 +85,11 @@ export default function SignIn() {
         <div className="h-16 bg-black w-full"></div>
         
         <div className="flex-grow flex flex-col items-center justify-center px-6 py-12">
-          {/* Logo */}
-          <div className="mb-12">
-            <img src="/images/logo-black.svg" alt="Logo" className="h-10" />
-          </div>
-
+          
           <div className="w-full max-w-md space-y-10">
             {/* Title */}
             <div className="text-center">
-              <h1 className="text-3xl font-light tracking-wide text-gray-900">SIGN IN</h1>
+              <h1 className="text-3xl font-thin tracking-wide text-gray-900">SIGN IN</h1>
               <p className="mt-6 text-sm text-gray-600">
                 Sign in to access your account and manage your preferences.
               </p>
