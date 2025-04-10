@@ -386,7 +386,7 @@ export default function Navbar() {
     <nav
       ref={navRef}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled || location.pathname !== "/" ? "bg-white" : "bg-transparent"
+        isScrolled ? "bg-white shadow-md" : (location.pathname !== "/" ? "bg-white" : "bg-transparent")
       }`}
     >                                      
       <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
