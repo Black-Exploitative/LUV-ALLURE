@@ -7,9 +7,9 @@ import { AuthProvider } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import CheckoutNavbar from "./components/CheckOutNavbar";
-import Checkout from "./components/Checkout";
+import Checkout from "./pages/Checkout";
+import ShoppingBag from "./components/ShoppingBag";
 import ContactUs from "./pages/ContactUs";
-import Payment from "./pages/Payment";
 import AlreadyInCartModal from "./components/AlreadyInCartModal";
 import CartDrawer from "./components/CartDrawer";
 import SignIn from "./auth/SignIn";
@@ -99,21 +99,17 @@ const AppContent = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/payment" element={<Payment />} />
-        {/* <Route path="/payment" element={<ForgotPassword />} /> */}
         <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
         
         {/* Protected routes that require authentication */}
-        <Route path="/checkout" element={
+        <Route path="/shopping-bag" element={
+            <ShoppingBag />
+        } />
+         <Route path="/checkout" element={
           <ProtectedRoute>
             <Checkout />
           </ProtectedRoute>
         } />
-        {/* <Route path="/payment" element={
-          <ProtectedRoute>
-            <Payment />
-          </ProtectedRoute>
-        } /> */}
         <Route path="/user-account" element={
           <ProtectedRoute>
             <UserAccount />
