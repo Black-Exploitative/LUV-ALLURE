@@ -14,6 +14,7 @@ import StarRating from "../components/StarRating";
 import cmsService from "../services/cmsService";
 import CustomersReviews from "../components/CustomersReviews";
 import api from "../services/api";
+import ColorVariants from "../components/ColorVaraint";
 
 const ProductDetailsPage = () => {
   const reviewsRef = useRef(null);
@@ -30,6 +31,38 @@ const ProductDetailsPage = () => {
       block: "start",
     });
   };
+  const parseProductSlug = (slug) => {
+    if (!slug) return { productId: null, productName: null, colorName: null };
+    
+    // Check if the slug follows the pattern product-name---color_productId
+    if (slug.includes('---') && slug.includes('_')) {
+      const [namePart, idPart] = slug.split('_');
+      const [productName, colorName] = namePart.split('---');
+      return {
+        productId: idPart,
+        productName: productName,
+        colorName: colorName
+      };
+    }
+    
+    // Handle the case where it's just product-name_productId
+    const parts = slug.split('_');
+    if (parts.length > 1) {
+      return {
+        productId: parts[parts.length - 1],
+        productName: parts.slice(0, -1).join('_'),
+        colorName: null
+      };
+    }
+    
+    // Fallback for simple slugs (just the ID)
+    return {
+      productId: slug,
+      productName: null,
+      colorName: null
+    };
+  };
+  
 
   
   // Product state
@@ -181,16 +214,19 @@ const ProductDetailsPage = () => {
       try {
         setLoading(true);
         
-        if (!productId) {
+        // Parse the slug to get productId and colorName
+        const { productId: parsedProductId, colorName } = parseProductSlug(slug);
+        
+        if (!parsedProductId) {
           setError("Product ID is missing");
           return;
         }
         
-        console.log("Attempting to fetch product with ID:", productId);
+        console.log("Attempting to fetch product with ID:", parsedProductId);
         
         try {
           // Log the URL being called
-          const apiUrl = `/products/id/${productId}`;
+          const apiUrl = `/products/id/${parsedProductId}`;
           console.log("Calling API endpoint:", apiUrl);
           
           const response = await api.get(apiUrl, { 
@@ -224,6 +260,12 @@ const ProductDetailsPage = () => {
             if (productData) {
               console.log("Found product data:", productData);
               const processedProduct = processApiProduct(productData);
+              
+              // If we have a color from the URL, select it
+              if (colorName) {
+                setSelectedColor(colorName.charAt(0).toUpperCase() + colorName.slice(1));
+              }
+              
               setProduct(processedProduct);
               addToRecentlyViewed(processedProduct);
             } else {
@@ -269,8 +311,8 @@ const ProductDetailsPage = () => {
       isMounted = false;
       controller.abort();
     };
-  }, [productId]); 
-
+  }, [slug]);
+  
   // Fetch all color variants when the product loads
   useEffect(() => {
     if (!product || !productId) return;
@@ -1065,50 +1107,13 @@ const ProductDetailsPage = () => {
             <hr className="border-t border-gray-300 my-4" />
            
             {/* Color Selection - Only show if there are colors */}
-            {product.colors && product.colors.length > 0 && (
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-xs font-medium">COLOR:</p>
-                  {selectedColor && <p className="text-xs">{selectedColor}</p>}
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {product.colors.map((color, index) => {
-                    // Use the color's variant image if available, otherwise use product image
-                    const thumbnailImage = color.variantImage || 
-                      (product.images.length > 0 ? product.images[0] : "/images/placeholder.jpg");
-                    
-                    const isCurrentProductColor = !color.variantId || color.variantId === productId;
-                    
-                    return (
-                      <button
-                        key={index}
-                        className={`w-[40px] h-[40px] flex transition-all cursor-pointer duration-300 items-center justify-center overflow-hidden ${
-                          selectedColor === color.name
-                            ? "ring-1 ring-black"
-                            : "ring-1 ring-gray-300"
-                        } ${
-                          color.inStock ? "" : "opacity-40 cursor-not-allowed"
-                        }`}
-                        onClick={() => color.inStock && 
-                          handleColorSelect(color.name, color.variantId, color.variantHandle)
-                        }
-                        disabled={!color.inStock}
-                        title={`${color.name}${!isCurrentProductColor ? ' (Will navigate to variant)' : ''}`}
-                      >
-                        {/* Use product/variant image instead of color swatch */}
-                        <div className="w-[34px] h-[34px]">
-                          <img 
-                            src={thumbnailImage} 
-                            alt={`${color.name} color`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            <ColorVariants 
+              product={product}
+              productId={productId}
+              selectedColor={selectedColor}
+              setSelectedColor={setSelectedColor}
+              setDisplayImages={setDisplayImages}
+            />
 
             {/* Size Selection */}
             <div className="mb-6">
