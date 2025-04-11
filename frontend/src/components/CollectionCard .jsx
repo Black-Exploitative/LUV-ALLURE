@@ -36,7 +36,7 @@ const CollectionCard = ({ imageUrl, title, onClick, onShopNowClick }) => {
               transition={{ duration: 0.5, ease: "easeInOut" }}
             />
 
-            <span className="relative z-10 block px-8 py-3 border border-white text-white group-hover:text-white text-lg uppercase tracking-wider">
+            <span className="relative z-10 block px-8 py-3 border border-white text-black lg uppercase tracking-wider">
               Shop Now
             </span>
           </button>
