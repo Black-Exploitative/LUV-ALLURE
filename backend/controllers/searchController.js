@@ -245,3 +245,78 @@ exports.getTrendingSearches = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.searchProductsByTag = async (req, res, next) => {
+  try {
+    const { tag } = req.query;
+    
+    if (!tag) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Tag parameter is required' 
+      });
+    }
+    
+    // Create GraphQL query
+    const query = `
+      {
+        products(first: 10, query: "tag:${tag}") {
+          edges {
+            node {
+              id
+              title
+              handle
+              description
+              images(first: 1) {
+                edges {
+                  node {
+                    url
+                  }
+                }
+              }
+              variants(first: 1) {
+                edges {
+                  node {
+                    price {
+                      amount
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+    
+    // Execute the query
+    const result = await shopifyClient.query(query);
+    
+    // Transform products for the frontend
+    const products = result.products.edges.map(({ node }) => {
+      const imageUrl = node.images.edges.length > 0 
+        ? node.images.edges[0].node.url 
+        : null;
+      
+      const price = node.variants.edges.length > 0 
+        ? node.variants.edges[0].node.price.amount
+        : "0.00";
+      
+      return {
+        id: node.id.split('/').pop(),
+        title: node.title,
+        handle: node.handle,
+        description: node.description,
+        image: imageUrl,
+        price: price
+      };
+    });
+    
+    res.status(200).json({
+      success: true,
+      products
+    });
+  } catch (error) {
+    next(error);
+  }
+};
