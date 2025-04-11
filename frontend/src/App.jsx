@@ -15,12 +15,13 @@ import CartDrawer from "./components/CartDrawer";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
 import ForgotPassword from "./auth/ForgotPassword";
-import ResetPassword from "./auth/ResetPassword"; // Import the new component
+import ResetPassword from "./auth/ResetPassword"; 
 import UserAccount from "./auth/UserAccount";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 import SearchResults from "./pages/SearchResults";
+import Services from "./pages/Services";
 
 // Admin CMS imports
 import Dashboard from "./admin/Dashboard";
@@ -98,6 +99,7 @@ const AppContent = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/services" element={<Services />} />
         {/* <Route path="/payment" element={<ForgotPassword />} /> */}
         <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
         
