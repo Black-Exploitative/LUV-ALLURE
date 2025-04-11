@@ -22,6 +22,7 @@ import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 import SearchResults from "./pages/SearchResults";
 import Services from "./pages/Services";
+import CollectionsPage from "./pages/CollectionsPage";
 
 // Admin CMS imports
 import Dashboard from "./admin/Dashboard";
@@ -101,7 +102,8 @@ const AppContent = () => {
         <Route path="/payment" element={<Payment />} />
         <Route path="/services" element={<Services />} />
         {/* <Route path="/payment" element={<ForgotPassword />} /> */}
-        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
+        <Route path="/collections" element={<CollectionsPage />} /> 
         
         {/* Protected routes that require authentication */}
         <Route path="/checkout" element={
