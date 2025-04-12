@@ -19,7 +19,7 @@ export default function Hero() {
         // Get the active homepage layout
         const homepageLayout = await cmsService.getHomepageContent();
         
-        // Find the hero section in the layout
+       
         if (homepageLayout && homepageLayout.sections) {
           const heroSection = homepageLayout.sections.find(
             section => section.sectionId?.type === 'hero'
@@ -33,7 +33,7 @@ export default function Hero() {
               mediaUrl: sectionData.media?.videoUrl || sectionData.media?.imageUrl || heroData.mediaUrl,
               title: sectionData.content?.title || heroData.title,
               buttonLink: sectionData.content?.buttonLink || heroData.buttonLink,
-              backgroundColor: "rgba(0, 0, 0, 0.3)" // Keep the same overlay for consistency
+              backgroundColor: "rgba(0, 0, 0, 0.3)" 
             });
           }
         }

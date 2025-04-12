@@ -41,7 +41,7 @@ const CollectionCard = ({ imageUrl, title, onClick, onShopNowClick }) => {
             </span>
           </button>
         </div>
-      </div>
+      </div> 
     </motion.div>
   );
 };
