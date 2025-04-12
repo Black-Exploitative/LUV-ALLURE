@@ -21,7 +21,6 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 import SearchResults from "./pages/SearchResults";
-import Services from "./pages/Services";
 import CollectionsPage from "./pages/CollectionsPage";
 
 // Admin CMS imports
@@ -36,6 +35,7 @@ import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
 import ShopBannerForm from "./admin/forms/ShopBannerForm";
 import PromoSectionForm from "./admin/forms/PromoSectionForm";
 import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
+import ServicesPage from "./pages/ServicesPage";
 // import ServicesForm from "./admin/forms/ServicesForm";
 
 const AppContent = () => {
@@ -100,10 +100,10 @@ const AppContent = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/payment" element={<Payment />} />
-        <Route path="/services" element={<Services />} />
         {/* <Route path="/payment" element={<ForgotPassword />} /> */}
         <Route path="/reset-password/:token" element={<ResetPassword />} /> 
         <Route path="/collections" element={<CollectionsPage />} /> 
+        <Route path="/services" element={<ServicesPage />} /> 
         
         {/* Protected routes that require authentication */}
         <Route path="/checkout" element={
