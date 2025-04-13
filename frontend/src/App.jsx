@@ -104,6 +104,7 @@ const AppContent = () => {
         <Route path="/reset-password/:token" element={<ResetPassword />} /> 
         <Route path="/collections" element={<CollectionsPage />} /> 
         <Route path="/services" element={<ServicesPage />} /> 
+        <Route path="/user-account" element={<UserAccount />} /> 
         
         {/* Protected routes that require authentication */}
         <Route path="/checkout" element={
@@ -116,11 +117,11 @@ const AppContent = () => {
             <Payment />
           </ProtectedRoute>
         } /> */}
-        <Route path="/user-account" element={
+        {/* <Route path="/user-account" element={
           <ProtectedRoute>
             <UserAccount />
           </ProtectedRoute>
-        } />
+        } /> */}
         
         <Route path="/search" element={<SearchResults />} />
       </Routes>
