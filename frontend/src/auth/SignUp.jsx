@@ -229,7 +229,7 @@ export default function SignUp() {
                 <label htmlFor="dateOfBirth" className="block text-xs font-medium text-gray-700 mb-1">
                   DATE OF BIRTH
                 </label>
-                <ElegantDatePicker
+                <DatePicker
                   value={formData.dateOfBirth}
                   onChange={handleChange}
                   error={errors.dateOfBirth}

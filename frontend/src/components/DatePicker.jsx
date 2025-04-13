@@ -1,4 +1,4 @@
-import  { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PropTypes from 'prop-types';
 
@@ -6,7 +6,8 @@ const DatePicker = ({ value, onChange, error }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [displayValue, setDisplayValue] = useState("");
   const dropdownRef = useRef(null);
-  
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [internalValue, setInternalValue] = useState(value);
 
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -34,33 +35,42 @@ const DatePicker = ({ value, onChange, error }) => {
     Array.from({ length: getDaysInMonth(selectedMonth, selectedYear) }, (_, i) => i + 1) : 
     days;
 
-  // Format the date for display
+  // Format the date for display - only runs when value prop changes from outside
   useEffect(() => {
-    if (value) {
+    if (value && value !== internalValue) {
+      setInternalValue(value);
       const date = new Date(value);
       setSelectedYear(date.getFullYear().toString());
       setSelectedMonth(months[date.getMonth()]);
       setSelectedDay(date.getDate().toString());
       
-      
       setDisplayValue(`${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`);
     }
-  }, [value]);
+  }, [value, months, internalValue]);
   
-  // Update the date when selections change
+  // Update the date when selections change - but only if all are selected and not on initial load
   useEffect(() => {
-    if (selectedMonth && selectedDay && selectedYear) {
+    if (selectedMonth && selectedDay && selectedYear && !isInitialLoad) {
       const monthIndex = months.indexOf(selectedMonth);
       const newDate = new Date(parseInt(selectedYear), monthIndex, parseInt(selectedDay));
       
       // Format as "YYYY-MM-DD" for the input value
       const formattedDate = newDate.toISOString().split('T')[0];
-      onChange({ target: { name: 'dateOfBirth', value: formattedDate } });
       
-      // Format for display
-      setDisplayValue(`${selectedMonth} ${selectedDay}, ${selectedYear}`);
+      // Only update if the date actually changed to prevent loops
+      if (formattedDate !== internalValue) {
+        setInternalValue(formattedDate);
+        onChange({ target: { name: 'dateOfBirth', value: formattedDate } });
+        
+        // Format for display
+        setDisplayValue(`${selectedMonth} ${selectedDay}, ${selectedYear}`);
+      }
     }
-  }, [selectedMonth, selectedDay, selectedYear, onChange]);
+    
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [selectedMonth, selectedDay, selectedYear, onChange, isInitialLoad, months, internalValue]);
   
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -251,7 +261,7 @@ const DatePicker = ({ value, onChange, error }) => {
       <input
         type="date"
         name="dateOfBirth"
-        value={value || ''}
+        value={internalValue || ''}
         onChange={() => {}}
         className="hidden"
       />
@@ -260,9 +270,9 @@ const DatePicker = ({ value, onChange, error }) => {
 };
 
 DatePicker.propTypes = {
-    value: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    error: PropTypes.string,
-  };
+  value: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  error: PropTypes.string,
+};
 
 export default DatePicker;
