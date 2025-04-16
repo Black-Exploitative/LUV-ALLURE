@@ -1,9 +1,8 @@
-// frontend/src/auth/ProfileManagement.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { useAuth } from "../context/AuthContext";
-import { authService } from "../services/api"; // Assuming you have an authService for API calls
+import { authService } from "../services/api";
 
 const ProfileManagement = ({ user, setUser }) => {
   const { updateProfile, currentUser } = useAuth();

@@ -13,11 +13,15 @@ import { FaHeart } from "react-icons/fa";
 import StarRating from "../components/StarRating";
 import cmsService from "../services/cmsService";
 import CustomersReviews from "../components/CustomersReviews";
+import { useRef } from "react";
+import SizeGuideModal from "../components/SizeGuideModal";
 import api from "../services/api";
 import ColorVariants from "../components/ColorVaraint";
 import { useWishlist } from "../context/WishlistContext";
 
 const ProductDetailsPage = () => {
+  const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
+
   const reviewsRef = useRef(null);
   // URL and navigation
   const { slug } = useParams();
@@ -72,7 +76,7 @@ const ProductDetailsPage = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // User selection state
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -92,13 +96,13 @@ const ProductDetailsPage = () => {
     
   // Display images (changes based on color selection)
   const [displayImages, setDisplayImages] = useState([]);
-  
+
   // Related products state
   const [styleWithProducts, setStyleWithProducts] = useState([]);
   const [alsoPurchasedProducts, setAlsoPurchasedProducts] = useState([]);
   const [alsoViewedProducts, setAlsoViewedProducts] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(true);
-  
+
   // Hooks
   const { addToCart } = useCart();
   const { addToRecentlyViewed } = useRecentlyViewed();
@@ -107,19 +111,22 @@ const ProductDetailsPage = () => {
   const productId = useMemo(() => {
     if (!slug) return null;
     // Extract ID from the format "product-name_123456"
-    const parts = slug.split('_');
+    const parts = slug.split("_");
     return parts.length > 1 ? parts[parts.length - 1] : slug;
   }, [slug]);
-  
+
   // Extract product name from the slug for the page title
   const productName = useMemo(() => {
     if (!slug) return "";
-    const parts = slug.split('_');
+    const parts = slug.split("_");
     if (parts.length > 1) {
       // Remove the last part (the ID) and join the rest
-      return parts.slice(0, -1).join(' ')
-        .split('-').join(' ') // Replace hyphens with spaces
-        .replace(/\b\w/g, l => l.toUpperCase()); // Capitalize first letter of each word
+      return parts
+        .slice(0, -1)
+        .join(" ")
+        .split("-")
+        .join(" ") // Replace hyphens with spaces
+        .replace(/\b\w/g, (l) => l.toUpperCase()); // Capitalize first letter of each word
     }
     return "";
   }, [slug]);
@@ -128,14 +135,14 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     // Set default title
     document.title = "Luv's Allure";
-    
+
     // Update title when product loads
     if (product?.name) {
       document.title = `${product.name} | Luv's Allure`;
     } else if (productName) {
       document.title = `${productName} | Luv's Allure`;
     }
-    
+
     // Cleanup when component unmounts
     return () => {
       document.title = "Luv's Allure"; // Reset to default
@@ -186,26 +193,29 @@ const ProductDetailsPage = () => {
     if (!Array.isArray(imageArray) || imageArray.length === 0) {
       return ["/images/placeholder.jpg"];
     }
-    
+
     // Ensure all images are valid strings
-    return imageArray.map(img => {
-      if (typeof img === 'string') return img;
-      if (img && typeof img === 'object') {
+    return imageArray.map((img) => {
+      if (typeof img === "string") return img;
+      if (img && typeof img === "object") {
         return img.src || img.url || "/images/placeholder.jpg";
       }
       return "/images/placeholder.jpg";
     });
   };
-  
+
   // Replace your current useEffect for initializing displayImages with this:
   useEffect(() => {
     if (product) {
-      console.log("Setting initial display images from product:", product.images);
+      console.log(
+        "Setting initial display images from product:",
+        product.images
+      );
       if (product.images && product.images.length > 0) {
         // Process images to ensure they're valid
         const validatedImages = processAndValidateImages(product.images);
         setDisplayImages(validatedImages);
-        
+
         // Force render by using a timeout
         setTimeout(() => {
           console.log("Re-validating images after delay");
@@ -222,7 +232,7 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     let isMounted = true;
     let controller = new AbortController();
-    
+
     const fetchProductData = async () => {
       try {
         setLoading(true);
@@ -241,35 +251,38 @@ const ProductDetailsPage = () => {
           // Log the URL being called
           const apiUrl = `/products/id/${parsedProductId}`;
           console.log("Calling API endpoint:", apiUrl);
-          
-          const response = await api.get(apiUrl, { 
-            signal: controller.signal 
+
+          const response = await api.get(apiUrl, {
+            signal: controller.signal,
           });
-          
+
           if (!isMounted) return;
-          
+
           // Debug the API response
           console.log("API Response:", response);
-          
+
           if (response.data) {
             console.log("API Response Data:", response.data);
-            
+
             // Handle different response structures
             let productData = null;
-            
+
             if (response.data.product) {
               productData = response.data.product;
             } else if (response.data.data && response.data.data.product) {
               // GraphQL style response
               productData = response.data.data.product;
-            } else if (Array.isArray(response.data) && response.data.length > 0) {
+            } else if (
+              Array.isArray(response.data) &&
+              response.data.length > 0
+            ) {
               // Array response, take first item
               productData = response.data[0];
-            } else if (typeof response.data === 'object' && response.data.id) {
+            } else if (typeof response.data === "object" && response.data.id) {
               // Direct product object
               productData = response.data;
             }
-            
+
             if (productData) {
               console.log("Found product data:", productData);
               const processedProduct = processApiProduct(productData);
@@ -291,19 +304,23 @@ const ProductDetailsPage = () => {
           }
         } catch (err) {
           if (!isMounted) return;
-          
-          if (err.name === 'AbortError') {
-            console.log('Fetch aborted');
+
+          if (err.name === "AbortError") {
+            console.log("Fetch aborted");
             return;
           }
-          
+
           console.error("Error fetching product:", err);
-          
+
           // Try fallback to location state if available
           if (location.state?.product) {
-            console.log("API error, using product data from navigation state as fallback");
+            console.log(
+              "API error, using product data from navigation state as fallback"
+            );
             console.log("State product data:", location.state.product);
-            const processedProduct = processShopifyProduct(location.state.product);
+            const processedProduct = processShopifyProduct(
+              location.state.product
+            );
             setProduct(processedProduct);
             addToRecentlyViewed(processedProduct);
           } else {
@@ -316,9 +333,9 @@ const ProductDetailsPage = () => {
         }
       }
     };
-  
+
     fetchProductData();
-    
+
     // Cleanup function to abort fetch and prevent state updates after unmount
     return () => {
       isMounted = false;
@@ -440,10 +457,10 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!productId) return;
-      
+
       try {
         setLoadingRelated(true);
-        
+
         // Fetch each type of related product
         const styleWith = await cmsService.getProductRelationships(
           productId,
@@ -475,80 +492,94 @@ const ProductDetailsPage = () => {
   // Function to get images for a specific color
   const getImagesForColor = (colorName) => {
     if (!product || !colorName) return product?.images || [];
-    
+
     console.log(`Getting images for color: ${colorName}`);
-    
+
     // Check if the product has variants with images by color
     if (product.variants && Array.isArray(product.variants)) {
       console.log("Checking variants for color-specific images");
-      
+
       // Find variant(s) matching this color
-      const colorVariants = product.variants.filter(variant => {
+      const colorVariants = product.variants.filter((variant) => {
         // Check direct color property
         if (variant.color === colorName) {
           return true;
         }
-        
+
         // Check selectedOptions array
         if (variant.selectedOptions && Array.isArray(variant.selectedOptions)) {
-          return variant.selectedOptions.some(opt => 
-            opt.name && opt.name.toLowerCase() === 'color' && opt.value === colorName
+          return variant.selectedOptions.some(
+            (opt) =>
+              opt.name &&
+              opt.name.toLowerCase() === "color" &&
+              opt.value === colorName
           );
         }
-        
+
         // Check options property
         if (variant.options && Array.isArray(variant.options)) {
-          return variant.options.some(opt => 
-            opt.name && opt.name.toLowerCase() === 'color' && opt.value === colorName
+          return variant.options.some(
+            (opt) =>
+              opt.name &&
+              opt.name.toLowerCase() === "color" &&
+              opt.value === colorName
           );
         }
-        
+
         return false;
       });
-      
-      console.log(`Found ${colorVariants.length} variants matching color: ${colorName}`);
-      
+
+      console.log(
+        `Found ${colorVariants.length} variants matching color: ${colorName}`
+      );
+
       // If we found variants with this color and they have images, use those
       if (colorVariants.length > 0) {
         // First check for direct images on the variant
         const variantImagesArrays = colorVariants
-          .map(variant => variant.images)
+          .map((variant) => variant.images)
           .filter(Array.isArray);
-        
+
         if (variantImagesArrays.length > 0) {
           const flattenedImages = variantImagesArrays.flat();
-          console.log(`Found ${flattenedImages.length} images from variant.images arrays`);
-          
+          console.log(
+            `Found ${flattenedImages.length} images from variant.images arrays`
+          );
+
           if (flattenedImages.length > 0) {
             return flattenedImages;
           }
         }
-        
+
         // Then check for single image property
         const variantSingleImages = colorVariants
-          .map(variant => variant.image)
+          .map((variant) => variant.image)
           .filter(Boolean);
-        
+
         if (variantSingleImages.length > 0) {
-          console.log(`Found ${variantSingleImages.length} images from variant.image properties`);
-          
-          const processedImages = variantSingleImages.map(image => 
-            typeof image === 'string' ? image : image.src || image.url || image
+          console.log(
+            `Found ${variantSingleImages.length} images from variant.image properties`
           );
-          
+
+          const processedImages = variantSingleImages.map((image) =>
+            typeof image === "string" ? image : image.src || image.url || image
+          );
+
           if (processedImages.length > 0) {
             return processedImages;
           }
         }
       }
     }
-    
+
     // Check if there are color-specific images in the product object
     if (product.colorImages && product.colorImages[colorName]) {
-      console.log(`Found direct color images for ${colorName} in product.colorImages`);
+      console.log(
+        `Found direct color images for ${colorName} in product.colorImages`
+      );
       return product.colorImages[colorName];
     }
-    
+
     // Fallback to the main product images if no color-specific images found
     console.log("No color-specific images found, using main product images");
     return product.images || [];
@@ -559,7 +590,7 @@ const ProductDetailsPage = () => {
     if (selectedColor && product) {
       // Get images for the selected color
       const colorImages = getImagesForColor(selectedColor);
-      
+
       // Update display images to show the selected color
       setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
     }
@@ -568,214 +599,266 @@ const ProductDetailsPage = () => {
   // Process API product data to match component needs
   const processApiProduct = (apiProduct) => {
     if (!apiProduct) return null;
-    
+
     // Debug the incoming data structure to understand what we're working with
     console.log("API Product Raw Data:", JSON.stringify(apiProduct, null, 2));
-    
+
     // Extract product details from API response
     let productImages = [];
     let productSizes = [];
     let productColors = [];
     let productVariants = [];
-  
+
     // ENHANCED: More flexible image processing
     if (apiProduct.images) {
       // Direct array format
       if (Array.isArray(apiProduct.images)) {
-        productImages = apiProduct.images.map(img => 
-          typeof img === 'string' ? img : img.src || img.url || img
+        productImages = apiProduct.images.map((img) =>
+          typeof img === "string" ? img : img.src || img.url || img
         );
-      } 
+      }
       // Edges format from GraphQL APIs
       else if (apiProduct.images.edges) {
-        productImages = apiProduct.images.edges.map(edge => 
-          edge.node.url || edge.node.src || edge.node.originalSrc || edge.node
+        productImages = apiProduct.images.edges.map(
+          (edge) =>
+            edge.node.url || edge.node.src || edge.node.originalSrc || edge.node
         );
-      } 
+      }
       // Object with array property
       else if (apiProduct.images.items || apiProduct.images.data) {
         const imagesArray = apiProduct.images.items || apiProduct.images.data;
-        productImages = imagesArray.map(img => 
-          typeof img === 'string' ? img : img.src || img.url || img
+        productImages = imagesArray.map((img) =>
+          typeof img === "string" ? img : img.src || img.url || img
         );
       }
       // Single image object
-      else if (typeof apiProduct.images === 'object') {
+      else if (typeof apiProduct.images === "object") {
         const img = apiProduct.images;
-        productImages = [img.src || img.url || img.originalSrc || ''];
+        productImages = [img.src || img.url || img.originalSrc || ""];
       }
     }
-    
+
     // Check for image in other common locations
     if (productImages.length === 0 && apiProduct.image) {
-      if (typeof apiProduct.image === 'string') {
+      if (typeof apiProduct.image === "string") {
         productImages = [apiProduct.image];
       } else if (apiProduct.image.src || apiProduct.image.url) {
         productImages = [apiProduct.image.src || apiProduct.image.url];
       }
     }
-    
+
     console.log("Extracted Images:", productImages);
-  
+
     // ENHANCED: More flexible variant processing
     if (apiProduct.variants) {
       // Process variants array
       if (Array.isArray(apiProduct.variants)) {
         productVariants = apiProduct.variants;
-        
+
         // Extract sizes from variants
         const sizeValues = apiProduct.variants
-          .map(v => v.size || (v.options && v.options.find(o => o.name === 'Size')?.value))
+          .map(
+            (v) =>
+              v.size ||
+              (v.options && v.options.find((o) => o.name === "Size")?.value)
+          )
           .filter(Boolean);
         productSizes = [...new Set(sizeValues)];
-        
+
         // Extract colors from variants
         const colorValues = apiProduct.variants
-          .map(v => v.color || (v.options && v.options.find(o => o.name === 'Color')?.value))
+          .map(
+            (v) =>
+              v.color ||
+              (v.options && v.options.find((o) => o.name === "Color")?.value)
+          )
           .filter(Boolean);
-        productColors = [...new Set(colorValues)]
-          .map(colorName => ({
-            name: colorName,
-            code: getColorCode(colorName),
-            inStock: true
-          }));
-      } 
+        productColors = [...new Set(colorValues)].map((colorName) => ({
+          name: colorName,
+          code: getColorCode(colorName),
+          inStock: true,
+        }));
+      }
       // Handle GraphQL edges format
       else if (apiProduct.variants.edges) {
-        productVariants = apiProduct.variants.edges.map(edge => edge.node);
-        
+        productVariants = apiProduct.variants.edges.map((edge) => edge.node);
+
         // Extract sizes and colors from edge nodes
         const sizeValues = productVariants
-          .map(v => v.size || (v.options && v.options.find(o => o.name === 'Size')?.value))
+          .map(
+            (v) =>
+              v.size ||
+              (v.options && v.options.find((o) => o.name === "Size")?.value)
+          )
           .filter(Boolean);
         productSizes = [...new Set(sizeValues)];
-        
+
         const colorValues = productVariants
-          .map(v => v.color || (v.options && v.options.find(o => o.name === 'Color')?.value))
+          .map(
+            (v) =>
+              v.color ||
+              (v.options && v.options.find((o) => o.name === "Color")?.value)
+          )
           .filter(Boolean);
-        productColors = [...new Set(colorValues)]
-          .map(colorName => ({
-            name: colorName,
-            code: getColorCode(colorName),
-            inStock: true
-          }));
+        productColors = [...new Set(colorValues)].map((colorName) => ({
+          name: colorName,
+          code: getColorCode(colorName),
+          inStock: true,
+        }));
       }
     }
-  
+
     // ENHANCED: Check for options as an alternative to variants
-    if ((productSizes.length === 0 || productColors.length === 0) && apiProduct.options) {
-      const options = Array.isArray(apiProduct.options) ? apiProduct.options : [apiProduct.options];
-      
-      options.forEach(option => {
-        const optionName = option.name ? option.name.toLowerCase() : '';
+    if (
+      (productSizes.length === 0 || productColors.length === 0) &&
+      apiProduct.options
+    ) {
+      const options = Array.isArray(apiProduct.options)
+        ? apiProduct.options
+        : [apiProduct.options];
+
+      options.forEach((option) => {
+        const optionName = option.name ? option.name.toLowerCase() : "";
         const optionValues = option.values || [];
-        
-        if (optionName.includes('size') && productSizes.length === 0) {
-          productSizes = Array.isArray(optionValues) ? optionValues : [optionValues];
+
+        if (optionName.includes("size") && productSizes.length === 0) {
+          productSizes = Array.isArray(optionValues)
+            ? optionValues
+            : [optionValues];
         }
-        
-        if (optionName.includes('color') && productColors.length === 0) {
-          productColors = Array.isArray(optionValues) ? optionValues : [optionValues];
-          
+
+        if (optionName.includes("color") && productColors.length === 0) {
+          productColors = Array.isArray(optionValues)
+            ? optionValues
+            : [optionValues];
+
           // Convert color strings to objects
-          productColors = productColors.map(color => 
-            typeof color === 'string' ? {
-              name: color,
-              code: getColorCode(color),
-              inStock: true
-            } : color
+          productColors = productColors.map((color) =>
+            typeof color === "string"
+              ? {
+                  name: color,
+                  code: getColorCode(color),
+                  inStock: true,
+                }
+              : color
           );
         }
       });
     }
-    
+
     // ENHANCED: Check for sizes and colors in direct properties
     if (productSizes.length === 0 && apiProduct.sizes) {
-      productSizes = Array.isArray(apiProduct.sizes) ? apiProduct.sizes : [apiProduct.sizes];
+      productSizes = Array.isArray(apiProduct.sizes)
+        ? apiProduct.sizes
+        : [apiProduct.sizes];
     }
-    
+
     if (productColors.length === 0 && apiProduct.colors) {
       if (Array.isArray(apiProduct.colors)) {
-        productColors = apiProduct.colors.map(color => 
-          typeof color === 'string' ? {
-            name: color,
-            code: getColorCode(color),
-            inStock: true
-          } : color
+        productColors = apiProduct.colors.map((color) =>
+          typeof color === "string"
+            ? {
+                name: color,
+                code: getColorCode(color),
+                inStock: true,
+              }
+            : color
         );
-      } else if (typeof apiProduct.colors === 'string') {
-        productColors = [{
-          name: apiProduct.colors,
-          code: getColorCode(apiProduct.colors),
-          inStock: true
-        }];
+      } else if (typeof apiProduct.colors === "string") {
+        productColors = [
+          {
+            name: apiProduct.colors,
+            code: getColorCode(apiProduct.colors),
+            inStock: true,
+          },
+        ];
       }
     }
-  
+
     // Default sizes and colors if none found
     if (productSizes.length === 0) {
       productSizes = ["S", "M", "L"];
-      console.warn("No sizes found in product data, using defaults:", productSizes);
+      console.warn(
+        "No sizes found in product data, using defaults:",
+        productSizes
+      );
     } else {
       console.log("Extracted Sizes:", productSizes);
     }
-    
+
     if (productColors.length === 0) {
       productColors = [{ name: "Black", code: "#000000", inStock: true }];
-      console.warn("No colors found in product data, using defaults:", productColors);
+      console.warn(
+        "No colors found in product data, using defaults:",
+        productColors
+      );
     } else {
       console.log("Extracted Colors:", productColors);
     }
-  
+
     // ENHANCED: More flexible price extraction
     let priceValue = null;
-    
-    if (typeof apiProduct.price === 'number') {
+
+    if (typeof apiProduct.price === "number") {
       priceValue = apiProduct.price;
-    } else if (typeof apiProduct.price === 'string' && !isNaN(parseFloat(apiProduct.price))) {
+    } else if (
+      typeof apiProduct.price === "string" &&
+      !isNaN(parseFloat(apiProduct.price))
+    ) {
       priceValue = parseFloat(apiProduct.price);
     } else if (apiProduct.priceValue) {
-      priceValue = typeof apiProduct.priceValue === 'number' ? 
-        apiProduct.priceValue : 
-        parseFloat(apiProduct.priceValue);
+      priceValue =
+        typeof apiProduct.priceValue === "number"
+          ? apiProduct.priceValue
+          : parseFloat(apiProduct.priceValue);
     } else if (apiProduct.variants && apiProduct.variants.length > 0) {
       // Try to get price from first variant
       const firstVariant = apiProduct.variants[0];
       if (firstVariant.price) {
-        priceValue = typeof firstVariant.price === 'number' ? 
-          firstVariant.price : 
-          parseFloat(firstVariant.price);
+        priceValue =
+          typeof firstVariant.price === "number"
+            ? firstVariant.price
+            : parseFloat(firstVariant.price);
       } else if (firstVariant.price?.amount) {
         priceValue = parseFloat(firstVariant.price.amount);
       }
-    } else if (apiProduct.variants && apiProduct.variants.edges && apiProduct.variants.edges.length > 0) {
+    } else if (
+      apiProduct.variants &&
+      apiProduct.variants.edges &&
+      apiProduct.variants.edges.length > 0
+    ) {
       // Try to get price from first edge variant (GraphQL)
       const firstVariant = apiProduct.variants.edges[0].node;
       if (firstVariant.price) {
-        priceValue = typeof firstVariant.price === 'number' ? 
-          firstVariant.price : 
-          parseFloat(firstVariant.price);
+        priceValue =
+          typeof firstVariant.price === "number"
+            ? firstVariant.price
+            : parseFloat(firstVariant.price);
       } else if (firstVariant.price?.amount) {
         priceValue = parseFloat(firstVariant.price.amount);
       }
     }
-    
+
     if (priceValue === null || isNaN(priceValue)) {
       priceValue = 0;
-      console.warn("Could not extract valid price from product data, using default:", priceValue);
+      console.warn(
+        "Could not extract valid price from product data, using default:",
+        priceValue
+      );
     }
-  
+
     const processedProduct = {
       id: apiProduct.id,
       name: apiProduct.title || apiProduct.name || "Unnamed Product",
       price: formatPrice(priceValue),
-      images: productImages.length > 0 ? productImages : ["/images/placeholder.jpg"],
+      images:
+        productImages.length > 0 ? productImages : ["/images/placeholder.jpg"],
       description: apiProduct.description || "No description available",
       sizes: productSizes,
       colors: productColors,
-      variants: productVariants
+      variants: productVariants,
     };
-    
+
     console.log("Processed Product:", processedProduct);
     return processedProduct;
   };
@@ -805,10 +888,10 @@ const ProductDetailsPage = () => {
 
   // Format price helper
   const formatPrice = (price) => {
-    if (typeof price === 'number') {
+    if (typeof price === "number") {
       return price.toLocaleString();
     }
-    if (typeof price === 'string' && !isNaN(parseFloat(price))) {
+    if (typeof price === "string" && !isNaN(parseFloat(price))) {
       return parseFloat(price).toLocaleString();
     }
     return price || "0.00";
@@ -902,14 +985,15 @@ const ProductDetailsPage = () => {
       id: rawProduct.id,
       name: rawProduct.title || rawProduct.name,
       price: formattedPrice,
-      images: productImages.length > 0 ? productImages : ["/images/placeholder.jpg"],
+      images:
+        productImages.length > 0 ? productImages : ["/images/placeholder.jpg"],
       description: rawProduct.description || "No description available",
       sizes: productSizes.length > 0 ? productSizes : ["S", "M", "L"],
       colors:
         productColors.length > 0
           ? productColors
           : [{ name: "Blue", code: "#0000FF", inStock: true }],
-      variants: rawProduct.variants || []
+      variants: rawProduct.variants || [],
     };
   };
 
@@ -1044,8 +1128,8 @@ const ProductDetailsPage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h2 className="text-xl mb-4">{error}</h2>
-        <button 
-          onClick={() => navigate('/shop')} 
+        <button
+          onClick={() => navigate("/shop")}
           className="bg-black text-white px-4 py-2"
         >
           Return to Shop
@@ -1059,8 +1143,8 @@ const ProductDetailsPage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h2 className="text-xl mb-4">Product not found</h2>
-        <button 
-          onClick={() => navigate('/shop')} 
+        <button
+          onClick={() => navigate("/shop")}
           className="bg-black text-white px-4 py-2"
         >
           Return to Shop
@@ -1109,6 +1193,46 @@ const ProductDetailsPage = () => {
             <ProductCarousel images={displayImages} />
 
             {/* Related Products - Also inside the max-w-screen-xl container */}
+            <div className="mt-[50px]">
+              <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
+              {loadingRelated ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+                </div>
+              ) : styleWithProducts.length > 0 ? (
+                <div className="grid gap-4 md:gap-6">
+                  {styleWithProducts.map((product, index) => (
+                    <SmallProductCard
+                      key={product.id || index}
+                      image={
+                        product.images?.[0] ||
+                        product.image ||
+                        "/images/placeholder.jpg"
+                      }
+                      name={product.title || product.name}
+                      color={product.color || "Default"}
+                      price={`₦${parseFloat(product.price).toLocaleString()}`}
+                      onViewProduct={() => navigate(`/product/${product.id}`)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid gap-4 md:gap-6">
+                  {relatedProducts.map((product, index) => (
+                    <SmallProductCard
+                      key={index}
+                      image={product.image}
+                      name={product.name}
+                      color={product.color}
+                      price={product.price}
+                      onViewProduct={() =>
+                        console.log(`Viewing ${product.name}`)
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
             {renderStyleItWith()}
           </div>
 
@@ -1145,11 +1269,17 @@ const ProductDetailsPage = () => {
                 <p className="text-xs font-medium">SIZE:</p>
                 <button
                   className="text-[12px] underline cursor-pointer"
-                  onClick={() => console.log("Size guide clicked")}
+                  onClick={() => setSizeGuideOpen(true)}
                 >
                   Size Guide
                 </button>
               </div>
+
+              {/* Size Guide Modal */}
+              <SizeGuideModal
+                isOpen={isSizeGuideOpen}
+                onClose={() => setSizeGuideOpen(false)}
+              />
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size, index) => (
                   <button
@@ -1315,6 +1445,10 @@ const ProductDetailsPage = () => {
             )}
           </>
         )}
+      </div>
+
+      <div ref={reviewsRef}>
+        <CustomersReviews productName={product.name} />
       </div>
 
       <Footer />

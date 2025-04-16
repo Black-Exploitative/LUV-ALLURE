@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -62,12 +64,6 @@ const SearchBar = ({ darkNavbar }) => {
         inputRef.current.focus();
       }, 300); // Small delay to ensure animation has started
 
-      // Lock body scroll
-      document.body.style.overflow = "hidden";
-
-      // Add blur class to the main content
-      document.body.classList.add("search-open");
-
       // Load recent searches from localStorage
       const savedSearches = localStorage.getItem("recentSearches");
       if (savedSearches) {
@@ -78,19 +74,10 @@ const SearchBar = ({ darkNavbar }) => {
           setRecentSearches([]);
         }
       }
-    } else {
-      // Restore body scroll
-      document.body.style.overflow = "";
-
-      // Remove blur class
-      document.body.classList.remove("search-open");
     }
 
     // Cleanup function
-    return () => {
-      document.body.style.overflow = "";
-      document.body.classList.remove("search-open");
-    };
+    return () => {};
   }, [isOpen]);
 
   // Search functionality with debouncing
@@ -226,6 +213,10 @@ const SearchBar = ({ darkNavbar }) => {
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
+    
+    // Navigate to category page
+    navigate(`/category/${categoryId}`);
+    handleCloseSearch();
   };
 
   const goToSearchResults = () => {
@@ -250,202 +241,230 @@ const SearchBar = ({ darkNavbar }) => {
         />
       </button>
 
-      {/* Search overlay and panel */}
+      {/* Search dropdown */}
       <AnimatePresence>
         {isOpen && (
-          <>
-            {/* Backdrop with blur */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1 }
-              }}
-              className="fixed inset-0 bg-white/95 z-40"
-              onClick={handleCloseSearch}
-            />
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed left-0 top-[60px] w-full bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200 z-50 overflow-hidden"
+            style={{ maxHeight: '80vh', overflowY: 'auto' }}
+          >
+            <div className="max-w-screen-xl mx-auto">
+              {/* Search input */}
+              <div className="flex items-center border-b border-gray-200 py-4 px-4">
+                <FaSearch className="text-gray-400 mr-3" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="SEARCH..."
+                  className="flex-grow text-base uppercase font-light focus:outline-none text-gray-700"
+                  autoComplete="off"
+                />
+                <button 
+                  onClick={searchQuery ? handleClearSearch : handleCloseSearch}
+                  className="text-gray-500 hover:text-black transition-colors duration-300"
+                  aria-label={searchQuery ? "Clear search" : "Close search"}
+                >
+                  <FaTimes className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
 
-            {/* Search panel - Full screen */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="max-w-screen-xl mx-auto">
-                {/* Search input and close button */}
-                <div className="flex items-center border-b border-gray-200 py-6 px-4">
-                  <FaSearch className="text-gray-400 mr-3" />
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="SEARCH..."
-                    className="flex-grow text-base uppercase font-light focus:outline-none"
-                    autoComplete="off"
-                  />
+            {/* Recent searches - shown when no query */}
+            {!searchQuery && recentSearches.length > 0 && (
+              <div className="max-w-screen-xl mx-auto p-4 mb-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-xs text-gray-500">RECENT SEARCHES</h4>
                   <button 
-                    onClick={handleCloseSearch}
-                    className="text-gray-500 hover:text-black transition-colors duration-300"
-                    aria-label="Close search"
+                    onClick={clearRecentSearches}
+                    className="text-xs text-gray-500 hover:text-black"
                   >
-                    <FaTimes className="w-5 h-5" />
+                    Clear all
                   </button>
                 </div>
-
-                <div className="flex flex-col md:flex-row">
-                  {/* Filters column */}
-                  <div className="w-full md:w-1/4 p-4 border-r border-gray-200">
-                    {/* Color filter */}
-                    <div className="mb-8">
-                      <h3 className="text-uppercase mb-4 font-medium text-sm border-b border-gray-100 pb-2">COLOUR</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {colorOptions.map((color) => (
-                          <button
-                            key={color.id}
-                            onClick={() => handleColorSelect(color.id)}
-                            className={`w-10 h-10 rounded-full ${
-                              color.border ? 'border border-gray-300' : ''
-                            } ${
-                              selectedColor === color.id ? 'ring-1 ring-black' : ''
-                            }`}
-                            style={{ backgroundColor: color.color }}
-                            aria-label={`Select ${color.id} color`}
-                          />
-                        ))}
-                      </div>
+                <div className="flex flex-wrap gap-3 pb-3 border-b border-gray-200">
+                  {recentSearches.map((search, index) => (
+                    <div 
+                      key={index}
+                      className="px-3 py-1 bg-gray-50 hover:bg-gray-100 cursor-pointer flex items-center rounded-full"
+                      onClick={() => handleRecentSearchClick(search)}
+                    >
+                      <FaHistory className="text-gray-400 mr-2 text-xs" />
+                      <span className="text-sm text-gray-600">{search}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                    {/* Size filter */}
-                    <div className="mb-8">
-                      <h3 className="text-uppercase mb-4 font-medium text-sm border-b border-gray-100 pb-2">SIZE</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {sizeOptions.map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => handleSizeSelect(size)}
-                            className={`w-12 h-12 flex items-center justify-center border ${
-                              selectedSize === size 
-                                ? 'border-black bg-black text-white' 
-                                : 'border-gray-300 hover:border-gray-500'
-                            }`}
-                          >
-                            {size}
-                          </button>
-                        ))}
-                      </div>
+            {/* Search suggestions */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="max-w-screen-xl mx-auto p-4">
+                <h4 className="text-xs text-gray-500 mb-2">SUGGESTIONS</h4>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.map((suggestion, index) => (
+                    <div 
+                      key={index}
+                      className="px-3 py-1 bg-gray-50 hover:bg-gray-100 cursor-pointer flex items-center rounded-full"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      <FaSearch className="text-gray-400 mr-2 text-xs" />
+                      <span className="text-sm text-gray-600">{suggestion}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                    {/* Category filter */}
-                    <div className="mb-8">
-                      <h3 className="text-uppercase mb-4 font-medium text-sm border-b border-gray-100 pb-2">CATEGORY</h3>
-                      <div className="space-y-2">
-                        {categories.map((category) => (
-                          <div key={category.id} className="flex items-center">
-                            <input
-                              type="radio"
-                              id={category.id}
-                              name="category"
-                              checked={selectedCategory === category.id}
-                              onChange={() => handleCategorySelect(category.id)}
-                              className="mr-2"
-                            />
-                            <label htmlFor={category.id}>{category.name}</label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Results column */}
-                  <div className="w-full md:w-3/4 p-4">
-                    <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-4">
-                      <h3 className="text-uppercase font-medium text-sm">PRODUCT RESULTS</h3>
-                      {searchResults.length > 0 && (
-                        <button 
-                          onClick={goToSearchResults}
-                          className="text-sm text-gray-700 hover:text-black underline"
-                        >
-                          See all results
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Search suggestions */}
-                    {showSuggestions && suggestions.length > 0 && !loading && (
+            {/* Only show filters and results if there's a search query */}
+            {searchQuery && (
+              <>
+                {/* Empty spacer div for separation */}
+                <div className="h-16 bg-gray-50"></div>
+                
+                <div className="max-w-screen-xl mx-auto">
+                  <div className="flex flex-col md:flex-row">
+                    {/* Filters column */}
+                    <div className="w-full md:w-64 p-4">
+                      {/* Color filter */}
                       <div className="mb-6">
-                        <h4 className="text-xs text-gray-500 mb-2">SUGGESTIONS</h4>
-                        <div className="space-y-1">
-                          {suggestions.map((suggestion, index) => (
-                            <div 
-                              key={index}
-                              className="px-2 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
-                              onClick={() => handleSuggestionClick(suggestion)}
+                        <h3 className="text-uppercase mb-2 font-medium text-sm text-gray-700">COLOUR</h3>
+                        <div className="w-full h-px bg-gray-200 mb-3"></div>
+                        <div className="grid grid-cols-3 gap-x-1 gap-y-2">
+                          {colorOptions.map((color) => (
+                            <button
+                              key={color.id}
+                              onClick={() => handleColorSelect(color.id)}
+                              className={`w-8 h-8 rounded-full mx-auto ${
+                                color.border ? 'border border-gray-300' : ''
+                              } ${
+                                selectedColor === color.id ? 'ring-1 ring-black' : ''
+                              }`}
+                              style={{ backgroundColor: color.color }}
+                              aria-label={`Select ${color.id} color`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Size filter */}
+                      <div className="mb-6">
+                        <h3 className="text-uppercase mb-2 font-medium text-sm text-gray-700">SIZE</h3>
+                        <div className="w-full h-px bg-gray-200 mb-3"></div>
+                        <div className="grid grid-cols-3 gap-y-2">
+                          {sizeOptions.map((size) => (
+                            <button
+                              key={size}
+                              onClick={() => handleSizeSelect(size)}
+                              className={`w-10 h-10 flex items-center justify-center border ${
+                                selectedSize === size 
+                                  ? 'border-black bg-black text-gray-200' 
+                                  : 'border-gray-300 hover:border-gray-500 text-gray-700'
+                              }`}
                             >
-                              <FaSearch className="text-gray-400 mr-3 text-xs" />
-                              <span className="text-sm">{suggestion}</span>
+                              {size}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Category filter */}
+                      <div className="mb-6">
+                        <h3 className="text-uppercase mb-2 font-medium text-sm text-gray-700">CATEGORY</h3>
+                        <div className="w-full h-px bg-gray-200 mb-3"></div>
+                        <div className="space-y-2">
+                          {categories.map((category) => (
+                            <div key={category.id} className="flex items-center">
+                              <button
+                                onClick={() => handleCategorySelect(category.id)}
+                                className={`text-gray-700 hover:text-black ${
+                                  selectedCategory === category.id 
+                                  ? 'font-medium underline' 
+                                  : 'hover:underline'
+                                }`}
+                              >
+                                {category.name}
+                              </button>
                             </div>
                           ))}
                         </div>
                       </div>
-                    )}
+                    </div>
 
-                    {loading && (
-                      <div className="text-center py-10">
-                        <div className="inline-block h-6 w-6 border-2 border-t-black border-gray-200 rounded-full animate-spin"></div>
-                        <p className="mt-3 text-gray-500 text-sm">
-                          Searching...
-                        </p>
-                      </div>
-                    )}
+                    {/* Empty spacer div for separation between filters and results */}
+                    <div className="hidden md:block w-6 bg-gray-50"></div>
 
-                    {!loading && searchResults.length === 0 && searchQuery && (
-                      <div className="text-center py-10">
-                        <p className="text-gray-700">
-                          No results found for "{searchQuery}"
-                        </p>
-                        <p className="text-sm text-gray-500 mt-2">
-                          Try a different search term or browse our collections
-                        </p>
-                      </div>
-                    )}
-
-                    {!loading && searchResults.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {searchResults.map(product => (
-                          <div 
-                            key={product.id}
-                            className="cursor-pointer group"
-                            onClick={() => handleResultClick(product.id)}
+                    {/* Results column */}
+                    <div className="w-full md:flex-1 p-4">
+                      <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-4">
+                        <h3 className="text-uppercase font-medium text-sm text-gray-700">PRODUCT RESULTS</h3>
+                        {searchResults.length > 0 && (
+                          <button 
+                            onClick={goToSearchResults}
+                            className="text-sm text-gray-600 hover:text-black underline"
                           >
-                            {/* Product Image */}
-                            <div className="aspect-[3/4] overflow-hidden bg-gray-100 mb-3">
-                              <img
-                                src={product.image || product.images?.[0] || "/images/placeholder.jpg"}
-                                alt={product.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            </div>
-                            
-                            {/* Product Info */}
-                            <div>
-                              <h4 className="text-sm uppercase truncate">{product.title}</h4>
-                              <p className="text-sm text-gray-800 mt-1 font-medium">₦{parseFloat(product.price).toLocaleString()}</p>
-                            </div>
-                          </div>
-                        ))}
+                            See all results
+                          </button>
+                        )}
                       </div>
-                    )}
+
+                      {loading && (
+                        <div className="text-center py-6">
+                          <div className="inline-block h-6 w-6 border-2 border-t-black border-gray-200 rounded-full animate-spin"></div>
+                          <p className="mt-3 text-gray-600">
+                            Searching...
+                          </p>
+                        </div>
+                      )}
+
+                      {!loading && searchResults.length === 0 && searchQuery && (
+                        <div className="text-center py-6">
+                          <p className="text-gray-600">
+                            No results found for "{searchQuery}"
+                          </p>
+                          <p className="text-sm text-gray-500 mt-2">
+                            Try a different search term or browse our collections
+                          </p>
+                        </div>
+                      )}
+
+                      {!loading && searchResults.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {searchResults.map(product => (
+                            <div 
+                              key={product.id}
+                              className="cursor-pointer group"
+                              onClick={() => handleResultClick(product.id)}
+                            >
+                              {/* Product Image */}
+                              <div className="aspect-[3/4] overflow-hidden bg-gray-100 mb-2">
+                                <img
+                                  src={product.image || product.images?.[0] || "/images/placeholder.jpg"}
+                                  alt={product.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                              
+                              {/* Product Info */}
+                              <div>
+                                <h4 className="text-xs uppercase truncate text-gray-700">{product.title}</h4>
+                                <p className="text-xs text-gray-600 mt-1 font-medium">₦{parseFloat(product.price).toLocaleString()}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          </>
+              </>
+            )}
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

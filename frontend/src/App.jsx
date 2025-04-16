@@ -16,12 +16,13 @@ import CartDrawer from "./components/CartDrawer";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
 import ForgotPassword from "./auth/ForgotPassword";
-import ResetPassword from "./auth/ResetPassword"; // Import the new component
+import ResetPassword from "./auth/ResetPassword"; 
 import UserAccount from "./auth/UserAccount";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 import SearchResults from "./pages/SearchResults";
+import CollectionsPage from "./pages/CollectionsPage";
 
 // Admin CMS imports
 import Dashboard from "./admin/Dashboard";
@@ -35,6 +36,7 @@ import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
 import ShopBannerForm from "./admin/forms/ShopBannerForm";
 import PromoSectionForm from "./admin/forms/PromoSectionForm";
 import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
+import ServicesPage from "./pages/ServicesPage";
 import CollectionHeroForm from "./admin/forms/CollectionHeroForm";
 // import ServicesForm from "./admin/forms/ServicesForm";
 
@@ -101,6 +103,12 @@ const AppContent = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
+        <Route path="/payment" element={<Payment />} />
+        {/* <Route path="/payment" element={<ForgotPassword />} /> */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
+        <Route path="/collections" element={<CollectionsPage />} /> 
+        <Route path="/services" element={<ServicesPage />} /> 
+        <Route path="/user-account" element={<UserAccount />} /> 
         
         {/* Protected routes that require authentication */}
         <Route path="/shopping-bag" element={
@@ -111,11 +119,11 @@ const AppContent = () => {
             <Checkout />
           </ProtectedRoute>
         } />
-        <Route path="/user-account" element={
+        {/* <Route path="/user-account" element={
           <ProtectedRoute>
             <UserAccount />
           </ProtectedRoute>
-        } />
+        } /> */}
         
         <Route path="/search" element={<SearchResults />} />
       </Routes>
