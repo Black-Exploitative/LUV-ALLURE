@@ -15,6 +15,7 @@ import cmsService from "../services/cmsService";
 import CustomersReviews from "../components/CustomersReviews";
 import api from "../services/api";
 import ColorVariants from "../components/ColorVaraint";
+import { useWishlist } from "../context/WishlistContext";
 
 const ProductDetailsPage = () => {
   const reviewsRef = useRef(null);
@@ -64,6 +65,8 @@ const ProductDetailsPage = () => {
   };
   
 
+
+
   
   // Product state
   const [product, setProduct] = useState(null);
@@ -74,9 +77,19 @@ const ProductDetailsPage = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [isInWishlist, setIsInWishlist] = useState(false)
   const [colorVariants, setColorVariants] = useState([]);
-  
+  const { isInWishlist, toggleWishlist } = useWishlist();
+
+  // Replace the existing state
+  const [isInWishlistState, setIsInWishlistState] = useState(false);
+
+  // Add this useEffect to initialize wishlist state when product loads
+  useEffect(() => {
+    if (product && product.id) {
+      setIsInWishlistState(isInWishlist(product.id));
+    }
+  }, [product, isInWishlist]);
+    
   // Display images (changes based on color selection)
   const [displayImages, setDisplayImages] = useState([]);
   
@@ -977,8 +990,19 @@ const ProductDetailsPage = () => {
   };
 
   // Toggle wishlist state
-  const toggleWishlist = () => {
-    setIsInWishlist(!isInWishlist);
+  const handleToggleWishlist = () => {
+    if (!product) return;
+    
+    const productForWishlist = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      color: selectedColor || (product.colors && product.colors.length > 0 ? product.colors[0].name : null)
+    };
+    
+    const isNowInWishlist = toggleWishlist(productForWishlist);
+    setIsInWishlistState(isNowInWishlist);
   };
 
   // Color selection handler
@@ -1167,14 +1191,14 @@ const ProductDetailsPage = () => {
             {/* Wishlist Button */}
             <div
               className="flex items-center justify-start gap-2 text-[13px] mt-4 mb-2 cursor-pointer"
-              onClick={toggleWishlist}
+              onClick={handleToggleWishlist}
             >
               {isInWishlist ? (
                 <FaHeart className="h-[15px] w-[15px] text-black" />
               ) : (
                 <FiHeart className="h-[15px] w-[15px]" />
               )}
-              <span>Add to Wishlist</span>
+              <span>{isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}</span>
             </div>
 
             <hr className="border-t border-gray-300 my-4" />

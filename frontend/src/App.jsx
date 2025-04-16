@@ -4,6 +4,7 @@ import Shop from "./pages/Shop";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
+import { WishlistProvider } from "./context/WishlistContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import CheckoutNavbar from "./components/CheckOutNavbar";
@@ -126,11 +127,13 @@ export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
+      <WishlistProvider> 
         <RecentlyViewedProvider>
           <Router>
             <AppContent />
           </Router>
         </RecentlyViewedProvider>
+      </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );

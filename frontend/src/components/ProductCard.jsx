@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa";
+import { FiHeart } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 const ProductCard = ({ product, gridType, onProductClick }) => {
   // Add safe defaults and error handling
@@ -12,13 +14,16 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     price = 0, 
     sizes = [], 
     images = ["/images/placeholder.jpg"],
-    color
+    color,
+    inventory = {}
   } = product || {};
 
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [currentImage, setCurrentImage] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
+  const [isInWishlistState, setIsInWishlistState] = useState(false);
   const cardRef = useRef(null);
   const autoPlayRef = useRef(null);
 
@@ -32,6 +37,11 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
 
   // Tracking manual navigation to pause auto-play
   const [manuallyNavigated, setManuallyNavigated] = useState(false);
+  
+  // Initialize wishlist state
+  useEffect(() => {
+    setIsInWishlistState(isInWishlist(id));
+  }, [id, isInWishlist]);
   
   // Auto play carousel on hover
   useEffect(() => {
@@ -85,17 +95,36 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     
     if (!selectedSize) return;
     
+    // Check inventory for the selected size
+    const availableQuantity = inventory[selectedSize] || 999; // Default to 999 if not specified
+    
     const productToAdd = {
       id,
       name,
       price,
       color,
       selectedSize,
+      availableQuantity,
       images: validImages
     };
     
     addToCart(productToAdd);
     setSelectedSize("");
+  };
+  
+  const handleWishlistToggle = (e) => {
+    e.stopPropagation(); // Prevent card click
+    
+    const productForWishlist = {
+      id,
+      name,
+      price,
+      color,
+      images: validImages
+    };
+    
+    const isNowInWishlist = toggleWishlist(productForWishlist);
+    setIsInWishlistState(isNowInWishlist);
   };
 
   // Simplified Product Click - just pass the ID
@@ -122,6 +151,11 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
       x: direction < 0 ? 300 : -300,
       opacity: 0
     })
+  };
+
+  // Check if item is out of stock
+  const isSizeAvailable = (size) => {
+    return !inventory[size] || inventory[size] > 0;
   };
 
   return (
@@ -156,6 +190,23 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
             }}
           />
         </AnimatePresence>
+
+        {/* Wishlist Heart Icon */}
+        <motion.button
+          onClick={handleWishlistToggle}
+          className="absolute top-4 right-4 z-20 bg-white/70 hover:bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isHovered || isInWishlistState ? 1 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {isInWishlistState ? (
+            <FaHeart className="text-red-500" size={16} />
+          ) : (
+            <FiHeart className="text-gray-700" size={16} />
+          )}
+        </motion.button>
 
         {/* Image Indicator */}
         {hasMultipleImages && (
@@ -256,12 +307,17 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
               className={`px-2 py-1 border mr-2 mb-2 cursor-pointer text-xs md:text-sm
                 ${selectedSize === size 
                   ? "border-black bg-black text-white" 
-                  : "border-gray-300 hover:border-gray-400"}`}
-              whileHover={{ backgroundColor: selectedSize === size ? "#000" : "#f7f7f7", scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => handleSizeClick(size, e)}
+                  : "border-gray-300 hover:border-gray-400"}
+                ${!isSizeAvailable(size) ? "opacity-50 cursor-not-allowed line-through" : ""}`}
+              whileHover={{ 
+                backgroundColor: isSizeAvailable(size) ? (selectedSize === size ? "#000" : "#f7f7f7") : "", 
+                scale: isSizeAvailable(size) ? 1.05 : 1 
+              }}
+              whileTap={{ scale: isSizeAvailable(size) ? 0.95 : 1 }}
+              onClick={(e) => isSizeAvailable(size) && handleSizeClick(size, e)}
             >
               {size}
+              {!isSizeAvailable(size) && <span className="ml-1 text-xs">(Out of stock)</span>}
             </motion.div>
           ))}
         </motion.div>
@@ -284,6 +340,7 @@ ProductCard.propTypes = {
         alt: PropTypes.string
       }))
     ]),
+    inventory: PropTypes.object
   }),
   gridType: PropTypes.oneOf([2, 4]),
   onProductClick: PropTypes.func,
@@ -294,7 +351,8 @@ ProductCard.defaultProps = {
     name: "Product Name",
     price: 0,
     sizes: [],
-    images: ["/images/placeholder.jpg"]
+    images: ["/images/placeholder.jpg"],
+    inventory: {}
   },
   gridType: 4
 };

@@ -3,8 +3,11 @@ import { useState, useEffect, useRef } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { IoCloseOutline } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const FilterSortBar = ({ onGridChange }) => {
+const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [gridType, setGridType] = useState(4);
@@ -12,22 +15,122 @@ const FilterSortBar = ({ onGridChange }) => {
   const [isSticky, setIsSticky] = useState(false);
   const filterBarRef = useRef(null);
   const stickyWrapperRef = useRef(null);
+  const [currentSort, setCurrentSort] = useState("Most Popular"); // Track current sort
 
   // Filter state management
   const [expandedFilter, setExpandedFilter] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({
-    colour: [],
-    size: [],
-    length: [],
-    style: [],
-    occasion: [],
-    category: [],
-    features: [],
-    collection: [],
-    fabric: [],
-    price: [0, 5000],
+    colour: initialFilters.colour || [],
+    size: initialFilters.size || [],
+    length: initialFilters.length || [],
+    style: initialFilters.style || [],
+    occasion: initialFilters.occasion || [],
+    category: initialFilters.category || [],
+    features: initialFilters.features || [],
+    collection: initialFilters.collection || [],
+    fabric: initialFilters.fabric || [],
+    price: initialFilters.price || [0, 5000],
   });
 
+  // Filter options mock data
+  const filterOptions = {
+    colour: [
+      "Black",
+      "White",
+      "Red",
+      "Blue",
+      "Green",
+      "Beige",
+      "Pink",
+      "Yellow",
+    ],
+    size: ["XS", "S", "M", "L", "XL"],
+    length: ["Mini", "Midi", "Maxi", "Knee-Length", "Ankle-Length"],
+    style: ["Casual", "Formal", "Bohemian", "Street", "Minimalist"],
+    occasion: ["Everyday", "Party", "Wedding", "Business", "Vacation"],
+    category: ["Tops", "Dresses", "Bottoms", "Outerwear", "Accessories"],
+    features: ["Sequined", "Embroidered", "Pockets", "Cut-outs", "Open back"],
+    collection: ["Spring/Summer", "Fall/Winter", "Resort", "Limited Edition"],
+    fabric: ["Cotton", "Silk", "Satin", "Linen", "Wool", "Polyester", "Velvet"],
+  };
+
+  // Sort options data
+  const sortOptions = [
+    "Most Popular",
+    "Price: Low to High",
+    "Price: High to Low",
+    "Newest",
+    "Alphabetical: A-Z"
+  ];
+
+  // Parse query parameters on mount and when location changes
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    
+    // Parse query parameters for filters
+    let updatedFilters = { ...selectedFilters };
+    let hasUpdates = false;
+    
+    // Parse each filter type from URL
+    for (const filterType of Object.keys(selectedFilters)) {
+      if (filterType === 'price') {
+        const priceRange = searchParams.get('price');
+        if (priceRange) {
+          const [min, max] = priceRange.split('-').map(Number);
+          updatedFilters.price = [min || 0, max || 5000];
+          hasUpdates = true;
+        }
+      } else {
+        const filterParams = searchParams.getAll(filterType);
+        if (filterParams.length > 0) {
+          updatedFilters[filterType] = filterParams;
+          hasUpdates = true;
+        }
+      }
+    }
+    
+    // Get sort parameter
+    const sortParam = searchParams.get('sort');
+    if (sortParam) {
+      setCurrentSort(sortParam);
+    }
+    
+    // Get grid type
+    const gridParam = parseInt(searchParams.get('grid') || '0');
+    if (gridParam === 2 || gridParam === 4) {
+      setGridType(gridParam);
+      if (onGridChange) {
+        onGridChange(gridParam);
+      }
+    }
+    
+    // Update states if we found any filters in URL
+    if (hasUpdates) {
+      setSelectedFilters(updatedFilters);
+      
+      // Generate active filters from the URL parameters
+      const newActiveFilters = [];
+      
+      for (const [type, values] of Object.entries(updatedFilters)) {
+        if (type === 'price') {
+          if (values[0] > 0 || values[1] < 5000) {
+            newActiveFilters.push({
+              type,
+              values: [...values],
+            });
+          }
+        } else if (values.length > 0) {
+          newActiveFilters.push({
+            type,
+            values: [...values],
+          });
+        }
+      }
+      
+      setActiveFilters(newActiveFilters);
+    }
+  }, [location.search]);
+  
   // Setup scroll event listener to detect when to make the filter bar sticky
   useEffect(() => {
     const handleScroll = () => {
@@ -48,13 +151,64 @@ const FilterSortBar = ({ onGridChange }) => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  
+  // Update URL when filters or sort change
+  useEffect(() => {
+    if (activeFilters.length === 0 && currentSort === "Most Popular" && gridType === 4) {
+      return; // Don't update URL if using default values
+    }
+    
+    // Build new search params
+    const searchParams = new URLSearchParams();
+    
+    // Add active filters to URL
+    activeFilters.forEach(filter => {
+      if (filter.type === 'price') {
+        searchParams.set('price', `${filter.values[0]}-${filter.values[1]}`);
+      } else {
+        filter.values.forEach(value => {
+          searchParams.append(filter.type, value);
+        });
+      }
+    });
+    
+    // Add sort parameter
+    if (currentSort !== "Most Popular") {
+      searchParams.set('sort', currentSort);
+    }
+    
+    // Add grid type
+    if (gridType !== 4) {
+      searchParams.set('grid', gridType.toString());
+    }
+    
+    // Update URL without reload
+    const queryString = searchParams.toString();
+    const newUrl = queryString 
+      ? `${location.pathname}?${queryString}` 
+      : location.pathname;
+    
+    navigate(newUrl, { replace: true });
+    
+    // Call the filter change callback if provided
+    if (onFiltersChange) {
+      onFiltersChange({
+        filters: selectedFilters,
+        activeFilters,
+        sort: currentSort,
+        gridType
+      });
+    }
+  }, [activeFilters, currentSort, gridType, location.pathname, navigate, onFiltersChange]);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
 
   const handleGridChange = (type) => {
     setGridType(type);
-    onGridChange(type);
+    if (onGridChange) {
+      onGridChange(type);
+    }
   };
 
   const toggleAccordion = (filter) => {
@@ -154,11 +308,17 @@ const FilterSortBar = ({ onGridChange }) => {
       [filterType]: newValues,
     });
   };
+  
+  const handleSortChange = (sortOption) => {
+    setCurrentSort(sortOption);
+    setIsDropdownOpen(false);
+  };
 
   const formatPrice = (price) => {
     return `$${price}`;
   };
 
+  // Display active filters as tags
   const renderActiveFilters = () => {
     if (activeFilters.length === 0) return null;
 
@@ -209,28 +369,6 @@ const FilterSortBar = ({ onGridChange }) => {
         )}
       </div>
     );
-  };
-
-  // Filter options mock data
-  const filterOptions = {
-    colour: [
-      "Black",
-      "White",
-      "Red",
-      "Blue",
-      "Green",
-      "Beige",
-      "Pink",
-      "Yellow",
-    ],
-    size: ["XS", "S", "M", "L", "XL"],
-    length: ["Mini", "Midi", "Maxi", "Knee-Length", "Ankle-Length"],
-    style: ["Casual", "Formal", "Bohemian", "Street", "Minimalist"],
-    occasion: ["Everyday", "Party", "Wedding", "Business", "Vacation"],
-    category: ["Tops", "Dresses", "Bottoms", "Outerwear", "Accessories"],
-    features: ["Sequined", "Embroidered", "Pockets", "Cut-outs", "Open back"],
-    collection: ["Spring/Summer", "Fall/Winter", "Resort", "Limited Edition"],
-    fabric: ["Cotton", "Silk", "Satin", "Linen", "Wool", "Polyester", "Velvet"],
   };
 
   // Render color swatches
@@ -417,18 +555,17 @@ const FilterSortBar = ({ onGridChange }) => {
                     className="absolute top-full right-0 bg-white shadow-lg border mt-1 w-48 z-50"
                   >
                     <ul className="text-gray-700 text-xs py-1">
-                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                        Most Popular
-                      </li>
-                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                        Price: Low to High
-                      </li>
-                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                        Price: High to Low
-                      </li>
-                      <li className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide">
-                        Newest
-                      </li>
+                      {sortOptions.map((option) => (
+                        <li 
+                          key={option}
+                          className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide ${
+                            currentSort === option ? "bg-gray-100" : ""
+                          }`}
+                          onClick={() => handleSortChange(option)}
+                        >
+                          {option}
+                        </li>
+                      ))}
                     </ul>
                   </motion.div>
                 )}
@@ -611,7 +748,9 @@ const FilterSortBar = ({ onGridChange }) => {
 };
 
 FilterSortBar.propTypes = {
-  onGridChange: PropTypes.func.isRequired,
+  onGridChange: PropTypes.func,
+  onFiltersChange: PropTypes.func,
+  initialFilters: PropTypes.object
 };
 
 export default FilterSortBar;
