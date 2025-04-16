@@ -367,9 +367,9 @@ const FilterSortBar = ({ onGridChange }) => {
       
       <div 
         ref={filterBarRef}
-        className={`${isSticky ? 'fixed top-0 left-0 right-0 z-30 bg-white shadow-md' : ''}`}
+        className={`${isSticky ? 'fixed top-[70px] left-0 right-0 z-30 bg-white shadow-md' : ''}`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-300">
+        <div className="flex items-center justify-between p-4 border-y-[0.5px] border-gray-300">
           <div className="flex items-center">
             <button
               className="flex items-center text-gray-800 focus:outline-none cursor-pointer"

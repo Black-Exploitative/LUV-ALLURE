@@ -215,7 +215,7 @@ export default function UserAccount() {
             {/* Side navigation */}
             <div className="md:w-1/4">
               <div className="sticky top-24">
-                <nav className="space-y-1">
+                <nav className="space-y-1 font-normal">
                   {sections.map((section) => (
                     <motion.button
                       key={section.id}
@@ -249,24 +249,24 @@ export default function UserAccount() {
               {activeSection === "dashboard" && (
                 <div className="space-y-8">
                   <div className="p-2">
-                    <h2 className="text-xl font-medium mb-4">
+                    <h2 className="text-[20px] font-medium mb-4">
                       WELCOME BACK, {user.firstName.toUpperCase()}
                     </h2>
-                    <p className="text-xs text-gray-800 font-base font-[Raleway] mb-6">
+                    <p className="text-[12px] text-gray-600 font-normal tracking-wide mb-6">
                       From your account dashboard you can view your recent
                       orders, manage your shipping and billing addresses, and
                       edit your password and account details.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 m-2">
                       <div className="p-4 border border-gray-200 bg-white">
-                        <h3 className="font-medium mb-2">
+                        <h3 className="font-medium mb-[10px]">
                           PERSONAL INFORMATION
                         </h3>
-                        <p className="text-sm font-normal  font-[Raleway]">
+                        <p className="text-[14px] font-normal ">
                           {user.firstName} {user.lastName}
                         </p>
-                        <p className="text-sm font-normal  font-[Raleway]">{user.email}</p>
-                        <p className="text-sm font-normal  font-[Raleway]">{user.phoneNumber}</p>
+                        <p className="text-[13px] font-[100] tracking-wide">{user.email}</p>
+                        <p className="text-[13px]  tracking-wide">{user.phoneNumber}</p>
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}

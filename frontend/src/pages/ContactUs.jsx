@@ -3,7 +3,7 @@ import { FaPhoneAlt, FaEnvelope, FaWhatsapp, FaMapMarkerAlt } from 'react-icons/
 
 const ContactUs = () => {
   return (
-    <div className="min-h-screen bg-white text-black px-6 md:px-12 py-16">
+    <div className="min-h-screen bg-white text-black px-6 md:px-12 py-16 mt-[100px]">
       {/* Hero Section */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}

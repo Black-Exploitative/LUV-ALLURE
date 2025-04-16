@@ -1,3 +1,4 @@
+// frontend/src/components/MiniCartPreview.jsx
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -6,13 +7,13 @@ import { useCart } from '../context/CartContext';
 const MiniCartPreview = () => {
   const [isHovering, setIsHovering] = useState(false);
   const navigate = useNavigate();
-  const { cartItems, getCartTotals, removeFromCart } = useCart();
+  const { cartItems, getCartTotals, removeFromCart, setIsCartDrawerOpen } = useCart();
   const previewRef = useRef(null);
   const timeoutRef = useRef(null);
   
   // Show only the most recent 3 items
   const displayItems = cartItems.slice(0, 3);
-  const { subtotal } = getCartTotals();
+  const { subtotal, itemCount } = getCartTotals();
   const hasMoreItems = cartItems.length > 3;
 
   // Handle mouse enter with delay to prevent flickering
@@ -26,6 +27,13 @@ const MiniCartPreview = () => {
     timeoutRef.current = setTimeout(() => {
       setIsHovering(false);
     }, 300);
+  };
+
+  // Handle click to open full cart drawer
+  const handleCartIconClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCartDrawerOpen(true);
   };
 
   // Close preview when clicking outside
@@ -44,13 +52,24 @@ const MiniCartPreview = () => {
 
   // Format currency
   const formatCurrency = (amount) => {
-    return `₦${parseFloat(amount).toLocaleString()}`;
+    // Make sure amount is a number and properly formatted
+    const numericAmount = typeof amount === 'string' 
+      ? parseFloat(amount.replace(/,/g, '')) 
+      : parseFloat(amount);
+    
+    if (isNaN(numericAmount)) return '₦0.00';
+    
+    // Format with commas for thousands
+    return `₦${numericAmount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
   };
 
   // Don't show preview if cart is empty
   if (cartItems.length === 0) {
     return (
-      <div className="relative cursor-pointer">
+      <div className="relative cursor-pointer" onClick={handleCartIconClick}>
         <div className="cart-icon-container">
           {/* We're not using the cart badge here as it's handled by the parent component */}
         </div>
@@ -63,6 +82,7 @@ const MiniCartPreview = () => {
       className="relative z-30"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={handleCartIconClick}
       ref={previewRef}
     >
       {/* Mini Cart Preview Popup */}
@@ -74,10 +94,11 @@ const MiniCartPreview = () => {
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
             className="absolute right-0 mt-2 w-72 bg-white shadow-lg border border-gray-200"
+            onClick={(e) => e.stopPropagation()} // Prevent clicks from bubbling up
           >
             <div className="p-4">
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
-                My Shopping Bag ({cartItems.length})
+                My Shopping Bag ({itemCount} item{itemCount !== 1 ? 's' : ''})
               </h3>
 
               {/* Cart Items */}
@@ -129,7 +150,8 @@ const MiniCartPreview = () => {
               {/* Buttons */}
               <div className="mt-4 space-y-2">
                 <button 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsHovering(false);
                     navigate('/checkout');
                   }}
@@ -138,7 +160,8 @@ const MiniCartPreview = () => {
                   Checkout
                 </button>
                 <button 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsHovering(false);
                     navigate('/shopping-bag');
                   }}
