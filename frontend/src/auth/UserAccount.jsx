@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -5,7 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 
-// Import the separated components
+
 import Orders from "./Orders";
 import ProfileManagement from "./ProfileManagement";
 import StyleAdvisor from "./StyleAdvisor";
@@ -45,6 +46,53 @@ export default function UserAccount() {
 
   // Active section tracker
   const [activeSection, setActiveSection] = useState("dashboard");
+  
+  // Address management states
+  const [addresses, setAddresses] = useState([
+    {
+      id: 1,
+      label: "HOME",
+      firstName: user.firstName,
+      lastName: user.lastName,
+      street: "135 W 50th Street",
+      city: "New York",
+      state: "NY",
+      zip: "10020",
+      country: "United States",
+      phone: "+1 212 555 0123",
+      isDefault: true
+    },
+    {
+      id: 2,
+      label: "OFFICE",
+      firstName: user.firstName,
+      lastName: user.lastName,
+      street: "350 Fifth Avenue",
+      city: "New York",
+      state: "NY",
+      zip: "10118",
+      country: "United States",
+      phone: "+1 212 555 4567",
+      isDefault: false
+    }
+  ]);
+  
+  // Edit and add address states
+  const [isEditing, setIsEditing] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState(null);
+  const [addressForm, setAddressForm] = useState({
+    label: "",
+    firstName: user.firstName,
+    lastName: user.lastName,
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "United States",
+    phone: "",
+    isDefault: false
+  });
 
   // Navigation sections
   const sections = [
@@ -60,6 +108,83 @@ export default function UserAccount() {
   const handleSignOut = () => {
     logout();
     navigate('/');
+  };
+  
+  // Address form handlers
+  const handleAddressChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAddressForm({
+      ...addressForm,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+  
+  const startEditingAddress = (address) => {
+    setCurrentAddress(address);
+    setAddressForm({
+      ...address
+    });
+    setIsEditing(true);
+    setIsAdding(false);
+  };
+  
+  const startAddingAddress = () => {
+    setAddressForm({
+      label: "",
+      firstName: user.firstName,
+      lastName: user.lastName,
+      street: "",
+      city: "",
+      state: "",
+      zip: "",
+      country: "United States",
+      phone: "",
+      isDefault: false
+    });
+    setIsAdding(true);
+    setIsEditing(false);
+  };
+  
+  const cancelAddressEdit = () => {
+    setIsEditing(false);
+    setIsAdding(false);
+    setCurrentAddress(null);
+  };
+  
+  const saveAddress = () => {
+    if (isEditing && currentAddress) {
+      setAddresses(addresses.map(addr => {
+        if (addr.id === currentAddress.id) {
+          return { ...addressForm, id: addr.id };
+        }
+        // If this address is set as default, set other addresses to non-default
+        if (addressForm.isDefault && addr.id !== currentAddress.id) {
+          return { ...addr, isDefault: false };
+        }
+        return addr;
+      }));
+    } else if (isAdding) {
+      const newId = Math.max(...addresses.map(a => a.id), 0) + 1;
+      const newAddress = { ...addressForm, id: newId };
+      
+      // If the new address is set as default, update other addresses
+      if (newAddress.isDefault) {
+        setAddresses([
+          ...addresses.map(a => ({ ...a, isDefault: false })),
+          newAddress
+        ]);
+      } else {
+        setAddresses([...addresses, newAddress]);
+      }
+    }
+    
+    setIsEditing(false);
+    setIsAdding(false);
+    setCurrentAddress(null);
+  };
+  
+  const deleteAddress = (id) => {
+    setAddresses(addresses.filter(addr => addr.id !== id));
   };
 
   // Show loading state while fetching user data
@@ -281,50 +406,220 @@ export default function UserAccount() {
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
                     <h2 className="text-xl font-medium mb-4">MY ADDRESSES</h2>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="px-4 py-2 border cursor-pointer border-black text-sm font-medium text-black hover:bg-black hover:text-white focus:outline-none transition duration-150"
-                    >
-                      ADD NEW ADDRESS
-                    </motion.button>
+                    {!isAdding && !isEditing && (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-4 py-2 border cursor-pointer border-black text-sm font-medium text-black hover:bg-black hover:text-white focus:outline-none transition duration-150"
+                        onClick={startAddingAddress}
+                      >
+                        ADD NEW ADDRESS
+                      </motion.button>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-6 border border-gray-200 relative">
-                      <div className="absolute top-4 right-4 flex space-x-2">
-                        <button className="text-xs underline cursor-pointer">EDIT</button>
-                        <button className="text-xs underline cursor-pointer">DELETE</button>
+                  {/* Form for adding or editing an address */}
+                  {(isAdding || isEditing) && (
+                    <div className="mb-6 p-6 border border-gray-200">
+                      <h3 className="font-medium mb-4">
+                        {isAdding ? "ADD NEW ADDRESS" : "EDIT ADDRESS"}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="label">
+                            ADDRESS LABEL
+                          </label>
+                          <input
+                            type="text"
+                            id="label"
+                            name="label"
+                            value={addressForm.label}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                            placeholder="e.g., HOME, OFFICE"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="firstName">
+                            FIRST NAME
+                          </label>
+                          <input
+                            type="text"
+                            id="firstName"
+                            name="firstName"
+                            value={addressForm.firstName}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="lastName">
+                            LAST NAME
+                          </label>
+                          <input
+                            type="text"
+                            id="lastName"
+                            name="lastName"
+                            value={addressForm.lastName}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="street">
+                            STREET ADDRESS
+                          </label>
+                          <input
+                            type="text"
+                            id="street"
+                            name="street"
+                            value={addressForm.street}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="city">
+                            CITY
+                          </label>
+                          <input
+                            type="text"
+                            id="city"
+                            name="city"
+                            value={addressForm.city}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="state">
+                            STATE/PROVINCE
+                          </label>
+                          <input
+                            type="text"
+                            id="state"
+                            name="state"
+                            value={addressForm.state}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="zip">
+                            ZIP/POSTAL CODE
+                          </label>
+                          <input
+                            type="text"
+                            id="zip"
+                            name="zip"
+                            value={addressForm.zip}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="country">
+                            COUNTRY
+                          </label>
+                          <input
+                            type="text"
+                            id="country"
+                            name="country"
+                            value={addressForm.country}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs mb-1" htmlFor="phone">
+                            PHONE NUMBER
+                          </label>
+                          <input
+                            type="text"
+                            id="phone"
+                            name="phone"
+                            value={addressForm.phone}
+                            onChange={handleAddressChange}
+                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                          />
+                        </div>
+                        <div className="md:col-span-2 flex items-center">
+                          <input
+                            type="checkbox"
+                            id="isDefault"
+                            name="isDefault"
+                            checked={addressForm.isDefault}
+                            onChange={handleAddressChange}
+                            className="mr-2"
+                          />
+                          <label htmlFor="isDefault" className="text-sm">
+                            SET AS DEFAULT ADDRESS
+                          </label>
+                        </div>
                       </div>
-
-                      <div className="mb-2 flex items-center">
-                        <h3 className="font-medium">HOME</h3>
-                        <span className="ml-2 px-2 py-0.5 bg-black text-white text-xs">
-                          DEFAULT
-                        </span>
+                      <div className="mt-6 flex space-x-4">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={saveAddress}
+                          className="px-6 py-2 bg-black text-white text-sm cursor-pointer"
+                        >
+                          {isAdding ? "ADD ADDRESS" : "SAVE CHANGES"}
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={cancelAddressEdit}
+                          className="px-6 py-2 border border-black text-sm cursor-pointer"
+                        >
+                          CANCEL
+                        </motion.button>
                       </div>
-
-                      <p className="text-sm font-normal  font-[Raleway]">{user.firstName} {user.lastName}</p>
-                      <p className="text-sm font-normal  font-[Raleway]">135 W 50th Street</p>
-                      <p className="text-sm font-normal  font-[Raleway]">New York, NY 10020</p>
-                      <p className="text-sm font-normal  font-[Raleway]">United States</p>
-                      <p className="text-sm font-normal  font-[Raleway]">Phone: +1 212 555 0123</p>
                     </div>
+                  )}
 
-                    <div className="p-6 border border-gray-200 relative">
-                      <div className="absolute top-4 right-4 flex space-x-2">
-                        <button className="text-xs underline cursor-pointer">EDIT</button>
-                        <button className="text-xs underline cursor-pointer">DELETE</button>
-                      </div>
+                  {/* List of addresses */}
+                  {!isAdding && !isEditing && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {addresses.map((address) => (
+                        <div key={address.id} className="p-6 border border-gray-200 relative">
+                          <div className="absolute top-4 right-4 flex space-x-2">
+                            <button 
+                              className="text-xs underline cursor-pointer"
+                              onClick={() => startEditingAddress(address)}
+                            >
+                              EDIT
+                            </button>
+                            <button 
+                              className="text-xs underline cursor-pointer"
+                              onClick={() => deleteAddress(address.id)}
+                            >
+                              DELETE
+                            </button>
+                          </div>
 
-                      <h3 className="font-medium mb-2">OFFICE</h3>
-                      <p className="text-sm font-normal  font-[Raleway]">{user.firstName} {user.lastName}</p>
-                      <p className="text-sm font-normal  font-[Raleway]">350 Fifth Avenue</p>
-                      <p className="text-sm font-normal  font-[Raleway]">New York, NY 10118</p>
-                      <p className="text-sm font-normal  font-[Raleway]">United States</p>
-                      <p className="text-sm font-normal  font-[Raleway]">Phone: +1 212 555 4567</p>
+                          <div className="mb-2 flex items-center">
+                            <h3 className="font-medium">{address.label}</h3>
+                            {address.isDefault && (
+                              <span className="ml-2 px-2 py-0.5 bg-black text-white text-xs">
+                                DEFAULT
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-sm font-normal font-[Raleway]">
+                            {address.firstName} {address.lastName}
+                          </p>
+                          <p className="text-sm font-normal font-[Raleway]">{address.street}</p>
+                          <p className="text-sm font-normal font-[Raleway]">
+                            {address.city}, {address.state} {address.zip}
+                          </p>
+                          <p className="text-sm font-normal font-[Raleway]">{address.country}</p>
+                          <p className="text-sm font-normal font-[Raleway]">Phone: {address.phone}</p>
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
 

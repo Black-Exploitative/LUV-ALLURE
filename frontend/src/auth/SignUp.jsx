@@ -1,10 +1,10 @@
-// SignUp.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
+import DatePicker from "../components/DatePicker"; 
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -226,16 +226,10 @@ export default function SignUp() {
                 <label htmlFor="dateOfBirth" className="block text-xs font-medium text-gray-700 mb-1">
                   DATE OF BIRTH
                 </label>
-                <input
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  type="date"
-                  required
+                <DatePicker
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  className={`appearance-none block w-full px-3 py-3 border ${
-                    errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'
-                  } focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm`}
+                  error={errors.dateOfBirth}
                 />
                 {errors.dateOfBirth && (
                   <p className="mt-1 text-xs text-red-500">{errors.dateOfBirth}</p>
