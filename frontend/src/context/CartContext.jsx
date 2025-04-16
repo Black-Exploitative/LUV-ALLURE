@@ -19,21 +19,38 @@ export const CartProvider = ({ children }) => {
   const [isAlreadyInCartModalOpen, setIsAlreadyInCartModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   
-  // Load cart from localStorage on initial render
+  // Load cart from localStorage on initial render with 1-week expiration check
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Error parsing cart from localStorage:', error);
+    const cartTimestamp = localStorage.getItem('cartTimestamp');
+    const currentTime = new Date().getTime();
+    const oneWeek = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+    
+    if (savedCart && cartTimestamp) {
+      // Check if cart is still valid (within 1 week)
+      if (currentTime - parseInt(cartTimestamp) < oneWeek) {
+        try {
+          setCartItems(JSON.parse(savedCart));
+        } catch (error) {
+          console.error('Error parsing cart from localStorage:', error);
+        }
+      } else {
+        // Clear expired cart
+        localStorage.removeItem('cart');
+        localStorage.removeItem('cartTimestamp');
       }
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes, with timestamp
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    if (cartItems.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+      // Set or update the timestamp when cart is modified
+      if (!localStorage.getItem('cartTimestamp')) {
+        localStorage.setItem('cartTimestamp', new Date().getTime().toString());
+      }
+    }
   }, [cartItems]);
 
   const cartItemCount = cartItems.length;
@@ -77,7 +94,8 @@ export const CartProvider = ({ children }) => {
     const itemWithId = {
       ...item,
       id: generateProductId(item),
-      dateAdded: new Date().toISOString()
+      dateAdded: new Date().toISOString(),
+      quantity: item.quantity || 1 // Ensure quantity is set
     };
     
     setCartItems((prevItems) => [...prevItems, itemWithId]);
@@ -99,9 +117,11 @@ export const CartProvider = ({ children }) => {
           ? parseFloat(item.price.replace(/,/g, '')) 
           : (parseFloat(item.price) || 0);
         
+        const quantity = item.quantity || 1;
+        
         return {
-          itemCount: totals.itemCount + 1,
-          subtotal: totals.subtotal + itemPrice
+          itemCount: totals.itemCount + quantity,
+          subtotal: totals.subtotal + (itemPrice * quantity)
         };
       },
       { itemCount: 0, subtotal: 0 }

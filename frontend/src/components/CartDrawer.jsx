@@ -1,7 +1,8 @@
+// frontend/src/components/CartDrawer.jsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const CartDrawer = () => {
   const navigate = useNavigate();
@@ -11,7 +12,8 @@ const CartDrawer = () => {
     cartItems,
     selectedProduct, 
     getCartTotals,
-    removeFromCart
+    removeFromCart,
+    updateCartItemQuantity
   } = useCart();
   
   // Local state for item quantities
@@ -20,31 +22,48 @@ const CartDrawer = () => {
   // If drawer is closed, don't render anything
   if (!isCartDrawerOpen) return null;
 
-  const { subtotal } = getCartTotals();
-  const formattedSubtotal = subtotal.toLocaleString();
+  const { subtotal, itemCount } = getCartTotals();
+  const formattedSubtotal = formatCurrency(subtotal);
   
   // Show all cart items or just the selected product
   const displayItems = selectedProduct ? [selectedProduct] : cartItems;
 
   // Update quantity for a specific item
   const updateQuantity = (itemId, newQuantity) => {
+    if (newQuantity < 1) return; // Prevent negative quantities
+    
     // Update local state first (for UI responsiveness)
     setQuantities(prev => ({
       ...prev,
       [itemId]: newQuantity
     }));
-
+    
+    // Update the cart context
+    updateCartItemQuantity(itemId, newQuantity);
   };
 
   // Format currency
-  const formatCurrency = (amount) => {
-    return `₦${parseFloat(amount).toLocaleString()}`;
-  };
+  function formatCurrency(amount) {
+    // Make sure amount is a number and properly formatted
+    const numericAmount = typeof amount === 'string' 
+      ? parseFloat(amount.replace(/,/g, '')) 
+      : parseFloat(amount);
+    
+    if (isNaN(numericAmount)) return '₦0.00';
+    
+    // Format with commas for thousands
+    return `₦${numericAmount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+  }
 
   // Calculate item total
   const calculateItemTotal = (item) => {
     const quantity = quantities[item.id] || item.quantity || 1;
-    const price = parseFloat(item.price);
+    const price = typeof item.price === 'string' 
+      ? parseFloat(item.price.replace(/,/g, '')) 
+      : parseFloat(item.price) || 0;
     return price * quantity;
   };
 
@@ -58,7 +77,7 @@ const CartDrawer = () => {
             animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-black z-50"
             onClick={() => setIsCartDrawerOpen(false)}
           />
 
@@ -96,12 +115,13 @@ const CartDrawer = () => {
                     {/* Products */}
                     <div className="space-y-6">
                       {displayItems.map((item) => {
-                        const itemQuantity = quantities[item.id] || item.quantity || 1;
+                        const itemId = item.id;
+                        const currentQuantity = quantities[itemId] || item.quantity || 1;
                         const itemTotal = calculateItemTotal(item);
                         
                         return (
                           <motion.div 
-                            key={item.id} 
+                            key={itemId} 
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
@@ -125,7 +145,7 @@ const CartDrawer = () => {
                                   <p className="text-sm text-gray-500 mb-1">{formatCurrency(item.price)}</p>
                                 </div>
                                 <button 
-                                  onClick={() => removeFromCart(item.id)}
+                                  onClick={() => removeFromCart(itemId)}
                                   className="text-gray-400 hover:text-gray-700 h-6 w-6 flex items-center justify-center cursor-pointer"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -154,22 +174,22 @@ const CartDrawer = () => {
                                 <div className="flex items-center border border-gray-300">
                                   <button 
                                     onClick={() => {
-                                      if (itemQuantity > 1) {
-                                        updateQuantity(item.id, itemQuantity - 1);
+                                      if (currentQuantity > 1) {
+                                        updateQuantity(itemId, currentQuantity - 1);
                                       }
                                     }}
                                     className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
-                                    disabled={itemQuantity <= 1}
+                                    disabled={currentQuantity <= 1}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                                     </svg>
                                   </button>
                                   <span className="px-3 py-1 text-sm min-w-[2rem] text-center">
-                                    {itemQuantity}
+                                    {currentQuantity}
                                   </span>
                                   <button 
-                                    onClick={() => updateQuantity(item.id, itemQuantity + 1)}
+                                    onClick={() => updateQuantity(itemId, currentQuantity + 1)}
                                     className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,7 +220,7 @@ const CartDrawer = () => {
                 {/* Summary */}
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600">Subtotal</span>
+                    <span className="text-gray-600">Subtotal ({itemCount} item{itemCount !== 1 ? 's' : ''})</span>
                     <span>{formattedSubtotal}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">

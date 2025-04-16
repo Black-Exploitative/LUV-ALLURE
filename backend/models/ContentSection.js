@@ -1,4 +1,4 @@
-// backend/models/ContentSection.js
+// backend/models/ContentSection.js - Update to ensure overlay opacity support
 const mongoose = require('mongoose');
 
 const ContentSectionSchema = new mongoose.Schema({
@@ -17,9 +17,9 @@ const ContentSectionSchema = new mongoose.Schema({
       'collection',
       'testimonial', 
       'shop-banner',
-      'collection-hero',  // New type for the collection hero (renamed from shop-banner)
-      'promo-section',    // New type for the promo section
-      'shop-header',      // New type for the shop page header
+      'collection-hero',  // Type for the collection hero (renamed from shop-banner)
+      'promo-section',    // Type for the promo section
+      'shop-header',      // Type for the shop page header
       'services',         // Type for services section
       'custom'            // For any custom section type
     ],
@@ -47,7 +47,7 @@ const ContentSectionSchema = new mongoose.Schema({
       type: Number,
       min: 0,
       max: 1,
-      default: 0.4
+      default: 0.5
     },
     mediaType: {
       type: String,

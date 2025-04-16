@@ -12,4 +12,6 @@ router.get('/suggestions', searchController.getSearchSuggestions);
 // Get trending searches
 router.get('/trending', searchController.getTrendingSearches);
 
+router.get('/tag', searchController.searchProductsByTag);
+
 module.exports = router;

@@ -32,9 +32,9 @@ const AnimatedCartBadge = ({ theme = "dark" }) => {
 
   return (
     <>
-      {/* Main Badge - Shows only the count, not duplicated */}
+      {/* Main Badge */}
       <span
-        className={`absolute -top-2 -right-2 ${bgColor} ${textColor} ${borderStyle} text-xs w-[10px] h-[10px] flex items-center justify-center rounded-full`}
+        className={`absolute -top-[18px] -right-[10px] ${bgColor} ${textColor} ${borderStyle} text-xs w-[15px] h-[15px] flex items-center justify-center rounded-full`}
       >
         {cartItemCount}
       </span>

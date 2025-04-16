@@ -7,9 +7,9 @@ import { AuthProvider } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import CheckoutNavbar from "./components/CheckOutNavbar";
-import Checkout from "./components/Checkout";
+import Checkout from "./pages/Checkout";
+import ShoppingBag from "./components/ShoppingBag";
 import ContactUs from "./pages/ContactUs";
-import Payment from "./pages/Payment";
 import AlreadyInCartModal from "./components/AlreadyInCartModal";
 import CartDrawer from "./components/CartDrawer";
 import SignIn from "./auth/SignIn";
@@ -36,6 +36,7 @@ import FeaturedProductsForm from "./admin/forms/FeaturedProductsForm";
 import ShopBannerForm from "./admin/forms/ShopBannerForm";
 import PromoSectionForm from "./admin/forms/PromoSectionForm";
 import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
+import CollectionHeroForm from "./admin/forms/CollectionHeroForm";
 // import ServicesForm from "./admin/forms/ServicesForm";
 
 const AppContent = () => {
@@ -77,8 +78,9 @@ const AppContent = () => {
           <Route path="/admin/promo-section/edit/:id" element={<PromoSectionForm />} />
           <Route path="/admin/shop-header/new" element={<ShopHeaderForm />} />
           <Route path="/admin/shop-header/edit/:id" element={<ShopHeaderForm />} />
-          {/* <Route path="/admin/services/new" element={<ServicesForm />} />
-          <Route path="/admin/services/edit/:id" element={<ServicesForm />} /> */}
+          <Route path="/admin/collection-hero/new" element={<CollectionHeroForm />} />
+          <Route path="/admin/collection-hero/edit/:id" element={<CollectionHeroForm />} />
+
         </Routes>
       </>
     );
@@ -99,23 +101,17 @@ const AppContent = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/services" element={<Services />} />
-        {/* <Route path="/payment" element={<ForgotPassword />} /> */}
-        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
-        <Route path="/collections" element={<CollectionsPage />} /> 
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
         
         {/* Protected routes that require authentication */}
-        <Route path="/checkout" element={
+        <Route path="/shopping-bag" element={
+            <ShoppingBag />
+        } />
+         <Route path="/checkout" element={
           <ProtectedRoute>
             <Checkout />
           </ProtectedRoute>
         } />
-        {/* <Route path="/payment" element={
-          <ProtectedRoute>
-            <Payment />
-          </ProtectedRoute>
-        } /> */}
         <Route path="/user-account" element={
           <ProtectedRoute>
             <UserAccount />

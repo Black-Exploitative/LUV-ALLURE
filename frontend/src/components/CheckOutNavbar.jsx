@@ -3,7 +3,7 @@ import { FiArrowLeft } from 'react-icons/fi';
 
 const CheckoutNavbar = () => {
   return (
-    <nav className="bg-black w-full py-14 px-4 md:px-10">
+    <nav className="bg-black w-full mt-[70px] py-14 px-4 md:px-10">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
           {/* Left: Back to shopping bag */}

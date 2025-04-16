@@ -103,7 +103,7 @@ const SectionForm = () => {
   }, []);
 
   // Enhanced form validation with detailed error messages
-    const validateForm = () => {
+  const validateForm = () => {
         const newErrors = {};
         
         // Basic validations
