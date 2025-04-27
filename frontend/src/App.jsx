@@ -105,7 +105,12 @@ const AppContent = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
+
         <Route path="/collections" element={<CollectionsPage />} /> 
         <Route path="/collections/:handle" element={<DynamicCollectionPage />} /> 
         <Route path="/services" element={<ServicesPage />} /> 
