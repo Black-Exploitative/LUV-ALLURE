@@ -32,29 +32,29 @@ const SearchFiltersAndResults = ({
     { id: "shoes", name: "Shoes" }
   ];
 
-  // Enhanced color options with more luxurious colors
+  
   const colorOptions = [
-    { id: "white", color: "#FFFFFF", border: true, name: "White" },
-    { id: "black", color: "#000000", name: "Black" },
-    { id: "beige", color: "#F5F5DC", border: true, name: "Beige" },
-    { id: "ivory", color: "#FFFFF0", border: true, name: "Ivory" },
-    { id: "cream", color: "#FFFDD0", border: true, name: "Cream" },
-    { id: "navy", color: "#000080", name: "Navy" },
-    { id: "burgundy", color: "#800020", name: "Burgundy" },
-    { id: "emerald", color: "#50C878", name: "Emerald" },
-    { id: "gold", color: "#FFD700", name: "Gold" },
-    { id: "silver", color: "#C0C0C0", border: true, name: "Silver" },
-    { id: "charcoal", color: "#36454F", name: "Charcoal" },
-    { id: "red", color: "#FF0000", name: "Red" },
-    { id: "blue", color: "#0000FF", name: "Blue" },
-    { id: "green", color: "#008000", name: "Green" },
-    { id: "yellow", color: "#FFFF00", name: "Yellow" },
-    { id: "pink", color: "#FFC0CB", name: "Pink" },
-    { id: "purple", color: "#800080", name: "Purple" },
-    { id: "camel", color: "#C19A6B", name: "Camel" }
+    { id: "white", color: "#FFFFFF", border: true,  },
+    { id: "black", color: "#000000",  },
+    { id: "beige", color: "#F5F5DC", border: true, },
+    { id: "ivory", color: "#FFFFF0", border: true, },
+    { id: "cream", color: "#FFFDD0", border: true, },
+    { id: "navy", color: "#000080",  },
+    { id: "burgundy", color: "#800020", },
+    { id: "emerald", color: "#50C878",  },
+    { id: "gold", color: "#FFD700",  },
+    { id: "silver", color: "#C0C0C0", border: true, },
+    { id: "charcoal", color: "#36454F", },
+    { id: "red", color: "#FF0000",  },
+    { id: "blue", color: "#0000FF",  },
+    { id: "green", color: "#008000",  },
+    { id: "yellow", color: "#FFFF00",  },
+    { id: "pink", color: "#FFC0CB",  },
+    { id: "purple", color: "#800080",  },
+    { id: "camel", color: "#C19A6B", }
   ];
 
-  // Size options
+ 
   const sizeOptions = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"];
 
   // Animation variants for collapsible sections
@@ -97,7 +97,7 @@ const SearchFiltersAndResults = ({
         <div className="mx-auto px-6 md:px-16 lg:px-24 max-w-screen-2xl py-6">
           <div className="flex flex-col md:flex-row gap-8">
             {/* Filters column */}
-            <div className="w-full md:w-64 p-6 bg-white border border-gray-200">
+            <div className="w-full md:w-64 p-6 bg-white">
           {/* Color filter */}
           <div className="mb-6">
             <div 
@@ -234,7 +234,7 @@ const SearchFiltersAndResults = ({
         </div>
 
         {/* Results column with elegant fade-in animation */}
-        <div className="w-full md:flex-1 p-6 bg-white border border-gray-200">
+        <div className="w-full md:flex-1 p-6 bg-white">
           <div className="flex justify-between items-center border-b border-gray-200 pb-3 mb-6">
             <h3 className="font-medium text-sm text-gray-800 tracking-wider">PRODUCT RESULTS</h3>
           </div>

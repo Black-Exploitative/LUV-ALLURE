@@ -196,7 +196,7 @@ const SearchBar = ({ darkNavbar }) => {
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
     
-    // Navigate to category page
+   
     navigate(`/category/${categoryId}`);
     handleCloseSearch();
   };
