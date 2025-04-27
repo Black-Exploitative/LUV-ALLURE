@@ -6,7 +6,7 @@ import {
   FiHome, FiImage, FiGrid, FiLayers, FiLayout, 
   FiSettings, FiLogOut, FiEdit, FiTrash, FiPlus,
   FiLink, FiShoppingBag, FiEye, FiStar, FiAward,
-  FiBookOpen, FiDatabase, FiTarget
+  FiBookOpen, FiDatabase, FiTarget, FiFolder
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [promoSections, setPromoSections] = useState([]);
   const [shopHeaders, setShopHeaders] = useState([]);
   const [featuredSections, setFeaturedSections] = useState([]);
+  const [collections, setCollections] = useState([]); // New state for collections
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [relationshipType, setRelationshipType] = useState('style-with');
@@ -82,6 +83,10 @@ const Dashboard = () => {
           response = await api.get('/cms/featured-products/sections');
           setFeaturedSections(response.data.sections || []);
           break;
+        case 'collections': // New case for collections
+          response = await api.get('/collections');
+          setCollections(response.data.data || []);
+          break;
         default:
           break;
       }
@@ -126,6 +131,9 @@ const Dashboard = () => {
         case 'featured-products':
           endpoint = `/cms/featured-products/${id}`;
           break;
+        case 'collections': // New case for collections
+          endpoint = `/collections/${id}`;
+          break;
         default:
           throw new Error('Invalid section');
       }
@@ -164,6 +172,9 @@ const Dashboard = () => {
         case 'featured-products':
           endpoint = `/cms/featured-products/${id}`;
           break;
+        case 'collections': // New case for collections
+          endpoint = `/collections/${id}`;
+          break;
         default:
           throw new Error('Invalid section');
       }
@@ -199,6 +210,7 @@ const Dashboard = () => {
   const navItems = [
     { id: 'homepage', label: 'Homepage Layouts', icon: FiHome },
     { id: 'sections', label: 'Content Sections', icon: FiGrid },
+    { id: 'collections', label: 'Collections', icon: FiFolder }, // New Collections item
     { id: 'featured-products', label: 'Featured Products', icon: FiStar },
     { id: 'collection-hero', label: 'Collection Hero', icon: FiTarget },
     { id: 'promo-section', label: 'Promo Section', icon: FiBookOpen },
@@ -268,6 +280,8 @@ const Dashboard = () => {
         return renderShopHeaders();
       case 'featured-products':
         return renderFeaturedProducts();
+      case 'collections': // Add new collections case
+        return renderCollections();
       case 'settings':
         return renderSettings();
       default:
@@ -1190,6 +1204,90 @@ const Dashboard = () => {
     </div>
   );
 
+  const renderCollections = () => (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Collections</h2>
+        <Link
+          to="/admin/collections/new"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiPlus className="mr-2" /> Create New Collection
+        </Link>
+      </div>
+
+      {!collections || collections.length === 0 ? (
+        <p>No collections found. Create your first collection.</p>
+      ) : (
+        <div className="grid gap-4">
+          {collections.map(collection => (
+            <div
+              key={collection._id}
+              className={`border ${collection.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+            >
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <h3 className="font-medium">{collection.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Handle: {collection.handle} • 
+                    Products: {collection.productIds?.length || 0} • 
+                    Tags: {collection.filters?.tags?.length || 0}
+                  </p>
+                  {collection.description && (
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      {collection.description}
+                    </p>
+                  )}
+                </div>
+                {collection.headerImage && (
+                  <div className="w-24 h-24 bg-gray-100 flex-shrink-0 ml-4">
+                    <img 
+                      src={collection.headerImage} 
+                      alt={collection.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end space-x-2 mt-2">
+                <a
+                  href={`/collections/${collection.handle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
+                >
+                  <FiEye className="inline mr-1" /> View
+                </a>
+                <button
+                  onClick={() => toggleActive('collections', collection._id, collection.isActive)}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    collection.isActive 
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  {collection.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <Link 
+                  to={`/admin/collections/edit/${collection._id}`}
+                  className="p-2 text-gray-600 hover:text-black"
+                >
+                  <FiEdit />
+                </Link>
+                <button 
+                  onClick={() => handleDelete('collections', collection._id)}
+                  className="p-2 text-gray-600 hover:text-red-600"
+                >
+                  <FiTrash />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
@@ -1247,5 +1345,6 @@ const Dashboard = () => {
     </div>
   );
 };
+
 
 export default Dashboard;

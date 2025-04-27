@@ -1,4 +1,4 @@
-// server.js - Entry point with Featured Products routes added
+// backend/server.js - Updated with collection routes
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -14,6 +14,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const cmsRoutes = require('./routes/cmsRoutes');
 const featuredProductsRoutes = require('./routes/featuredProductsRoutes');
+const collectionRoutes = require('./routes/collectionRoutes'); // New collection routes
 
 dotenv.config();
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/cms/featured-products', featuredProductsRoutes);
+app.use('/api/collections', collectionRoutes); // Add collection routes
 
 // Error handling middleware
 app.use(errorHandler);

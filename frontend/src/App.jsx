@@ -1,3 +1,4 @@
+// frontend/src/App.jsx - Updated with dynamic collection routes
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
@@ -23,6 +24,7 @@ import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 import SearchResults from "./pages/SearchResults";
 import CollectionsPage from "./pages/CollectionsPage";
+import DynamicCollectionPage from "./pages/DynamicCollectionPage"; // New dynamic collection page
 
 // Admin CMS imports
 import Dashboard from "./admin/Dashboard";
@@ -38,7 +40,7 @@ import PromoSectionForm from "./admin/forms/PromoSectionForm";
 import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
 import ServicesPage from "./pages/ServicesPage";
 import CollectionHeroForm from "./admin/forms/CollectionHeroForm";
-// import ServicesForm from "./admin/forms/ServicesForm";
+import CollectionForm from "./admin/forms/CollectionForm"; // New collection form
 
 const AppContent = () => {
   const location = useLocation();
@@ -48,7 +50,7 @@ const AppContent = () => {
   const isAdminRoute = path.startsWith('/admin');
   
   // Check if current route is a checkout route
-  const checkoutPaths = ['/payment'];
+  const checkoutPaths = ['/Checkout'];
   const isCheckoutRoute = checkoutPaths.includes(path);
   
   // Don't show any navigation for admin routes
@@ -81,7 +83,8 @@ const AppContent = () => {
           <Route path="/admin/shop-header/edit/:id" element={<ShopHeaderForm />} />
           <Route path="/admin/collection-hero/new" element={<CollectionHeroForm />} />
           <Route path="/admin/collection-hero/edit/:id" element={<CollectionHeroForm />} />
-
+          <Route path="/admin/collections/new" element={<CollectionForm />} />
+          <Route path="/admin/collections/edit/:id" element={<CollectionForm />} />
         </Routes>
       </>
     );
@@ -102,11 +105,9 @@ const AppContent = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
-        <Route path="/payment" element={<Payment />} />
-        {/* <Route path="/payment" element={<ForgotPassword />} /> */}
-        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/collections" element={<CollectionsPage />} /> 
+        <Route path="/collections/:handle" element={<DynamicCollectionPage />} /> 
         <Route path="/services" element={<ServicesPage />} /> 
         <Route path="/user-account" element={<UserAccount />} /> 
         
@@ -119,11 +120,6 @@ const AppContent = () => {
             <Checkout />
           </ProtectedRoute>
         } />
-        {/* <Route path="/user-account" element={
-          <ProtectedRoute>
-            <UserAccount />
-          </ProtectedRoute>
-        } /> */}
         
         <Route path="/search" element={<SearchResults />} />
       </Routes>
