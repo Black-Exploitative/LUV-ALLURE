@@ -16,6 +16,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
   const filterBarRef = useRef(null);
   const stickyWrapperRef = useRef(null);
   const [currentSort, setCurrentSort] = useState("Most Popular"); // Track current sort
+  const sortOptionsRef = useRef(null);
 
   // Filter state management
   const [expandedFilter, setExpandedFilter] = useState(null);
@@ -43,8 +44,18 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       "Beige",
       "Pink",
       "Yellow",
+      "Navy",
+      "Burgundy",
+      "Grey",
+      "Silver",
+      "Gold",
+      "Purple",
+      "Orange",
+      "Brown",
+      "Cream",
+      "Ivory"
     ],
-    size: ["XS", "S", "M", "L", "XL"],
+    size: ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"],
     length: ["Mini", "Midi", "Maxi", "Knee-Length", "Ankle-Length"],
     style: ["Casual", "Formal", "Bohemian", "Street", "Minimalist"],
     occasion: ["Everyday", "Party", "Wedding", "Business", "Vacation"],
@@ -62,6 +73,18 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
     "Newest",
     "Alphabetical: A-Z"
   ];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sortOptionsRef.current && !sortOptionsRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Parse query parameters on mount and when location changes
   useEffect(() => {
@@ -89,10 +112,46 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       }
     }
     
+    // Special handling for query parameter
+    const query = searchParams.get('q');
+    if (query) {
+      // If there's a search query, add it as a special filter
+      updatedFilters.query = query;
+      hasUpdates = true;
+    }
+    
+    // Special handling for color parameter (which might be spelled differently than 'colour')
+    const colorParam = searchParams.get('color');
+    if (colorParam && !updatedFilters.colour.includes(colorParam)) {
+      updatedFilters.colour = [...updatedFilters.colour, colorParam];
+      hasUpdates = true;
+    }
+    
     // Get sort parameter
     const sortParam = searchParams.get('sort');
     if (sortParam) {
-      setCurrentSort(sortParam);
+      // Map API sort parameter to display sort option
+      let displaySort = "Most Popular";
+      switch(sortParam.toLowerCase()) {
+        case 'price-low-high':
+          displaySort = "Price: Low to High";
+          break;
+        case 'price-high-low':
+          displaySort = "Price: High to Low";
+          break;
+        case 'newest':
+          displaySort = "Newest";
+          break;
+        case 'alphabetical':
+        case 'alphabetical: a-z':
+          displaySort = "Alphabetical: A-Z";
+          break;
+        case 'best-selling':
+        case 'most popular':
+          displaySort = "Most Popular";
+          break;
+      }
+      setCurrentSort(displaySort);
     }
     
     // Get grid type
@@ -119,7 +178,12 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
               values: [...values],
             });
           }
-        } else if (values.length > 0) {
+        } else if (type === 'query' && values) {
+          newActiveFilters.push({
+            type,
+            values: [values],
+          });
+        } else if (Array.isArray(values) && values.length > 0) {
           newActiveFilters.push({
             type,
             values: [...values],
@@ -158,23 +222,55 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       return; // Don't update URL if using default values
     }
     
+    // Get current search parameters to preserve search query
+    const currentParams = new URLSearchParams(location.search);
+    const searchQuery = currentParams.get('q');
+    
     // Build new search params
     const searchParams = new URLSearchParams();
+    
+    // Keep original search query if it exists
+    if (searchQuery) {
+      searchParams.set('q', searchQuery);
+    }
     
     // Add active filters to URL
     activeFilters.forEach(filter => {
       if (filter.type === 'price') {
         searchParams.set('price', `${filter.values[0]}-${filter.values[1]}`);
-      } else {
+      } else if (filter.type !== 'query') { // Don't duplicate the query parameter
         filter.values.forEach(value => {
-          searchParams.append(filter.type, value);
+          // Special handling for colour/color
+          if (filter.type === 'colour') {
+            searchParams.append('color', value);
+          } else {
+            searchParams.append(filter.type, value);
+          }
         });
       }
     });
     
     // Add sort parameter
     if (currentSort !== "Most Popular") {
-      searchParams.set('sort', currentSort);
+      // Convert display sort option to API sort parameter
+      let sortParam = "";
+      switch(currentSort) {
+        case "Price: Low to High":
+          sortParam = "price-low-high";
+          break;
+        case "Price: High to Low":
+          sortParam = "price-high-low";
+          break;
+        case "Newest":
+          sortParam = "newest";
+          break;
+        case "Alphabetical: A-Z":
+          sortParam = "alphabetical";
+          break;
+        default:
+          sortParam = "most-popular";
+      }
+      searchParams.set('sort', sortParam);
     }
     
     // Add grid type
@@ -192,14 +288,34 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
     
     // Call the filter change callback if provided
     if (onFiltersChange) {
-      onFiltersChange({
+      // Convert the filter data to the format expected by the API
+      const filterData = {
         filters: selectedFilters,
         activeFilters,
-        sort: currentSort,
+        sort: mapSortToApiParameter(currentSort),
         gridType
-      });
+      };
+      
+      onFiltersChange(filterData);
     }
   }, [activeFilters, currentSort, gridType, location.pathname, navigate, onFiltersChange]);
+
+  // Convert UI sort option to API parameter
+  const mapSortToApiParameter = (sortOption) => {
+    switch(sortOption) {
+      case "Price: Low to High":
+        return "price-low-high";
+      case "Price: High to Low":
+        return "price-high-low";
+      case "Newest":
+        return "newest";
+      case "Alphabetical: A-Z":
+        return "alphabetical";
+      case "Most Popular":
+      default:
+        return "relevance";
+    }
+  };
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
@@ -227,6 +343,8 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
             values: [...values],
           });
         }
+      } else if (type === "query") {
+        // Skip query; it's managed separately
       } else if (values.length > 0) {
         newFilters.push({
           type,
@@ -240,7 +358,11 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
   };
 
   const handleClearFilters = () => {
+    // Preserve the search query if it exists
+    const query = selectedFilters.query;
+    
     setSelectedFilters({
+      query, // Keep the search query
       colour: [],
       size: [],
       length: [],
@@ -252,7 +374,17 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       fabric: [],
       price: [0, 5000],
     });
-    setActiveFilters([]);
+    
+    // Keep only the query in active filters if it exists
+    const newActiveFilters = [];
+    if (query) {
+      newActiveFilters.push({
+        type: 'query',
+        values: [query]
+      });
+    }
+    
+    setActiveFilters(newActiveFilters);
   };
 
   const handleRemoveFilter = (filterType, value) => {
@@ -341,6 +473,9 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
                 />
               </div>
             );
+          } else if (filter.type === "query") {
+            // Don't display the query as a removable filter
+            return null;
           } else {
             return filter.values.map((value) => (
               <div
@@ -359,7 +494,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
             ));
           }
         })}
-        {activeFilters.length > 0 && (
+        {activeFilters.some(filter => filter.type !== 'query') && (
           <button
             className="text-xs underline ml-2 mb-2 cursor-pointer"
             onClick={handleClearFilters}
@@ -382,6 +517,16 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       Beige: "#F5F5DC",
       Pink: "#FFC0CB",
       Yellow: "#FFFF00",
+      Navy: "#000080",
+      Burgundy: "#800020",
+      Grey: "#808080",
+      Silver: "#C0C0C0",
+      Gold: "#FFD700",
+      Purple: "#800080",
+      Orange: "#FFA500",
+      Brown: "#A52A2A",
+      Cream: "#FFFDD0",
+      Ivory: "#FFFFF0"
     };
 
     return (
@@ -404,7 +549,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
               }`}
               style={{
                 backgroundColor: colorMap[color] || color,
-                border: color === "White" ? "1px solid #e5e5e5" : "none",
+                border: color === "White" || color === "Ivory" || color === "Cream" ? "1px solid #e5e5e5" : "none",
               }}
             />
             <span className="text-xs text-center">{color}</span>
@@ -520,7 +665,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
             </button>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4" ref={sortOptionsRef}>
             <img
               src="./icons/grid4.svg"
               alt="Two column grid"

@@ -1,4 +1,4 @@
-// backend/server.js - Updated with collection routes
+// backend/server.js - Updated with payment routes
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -14,7 +14,8 @@ const orderRoutes = require('./routes/orderRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const cmsRoutes = require('./routes/cmsRoutes');
 const featuredProductsRoutes = require('./routes/featuredProductsRoutes');
-const collectionRoutes = require('./routes/collectionRoutes'); // New collection routes
+const collectionRoutes = require('./routes/collectionRoutes');
+const paymentRoutes = require('./routes/paymentRoutes'); // New payment routes
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,9 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Special middleware for Paystack webhook (raw body)
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -39,7 +43,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/cms/featured-products', featuredProductsRoutes);
-app.use('/api/collections', collectionRoutes); // Add collection routes
+app.use('/api/collections', collectionRoutes);
+app.use('/api/payment', paymentRoutes); // Add payment routes
 
 // Error handling middleware
 app.use(errorHandler);

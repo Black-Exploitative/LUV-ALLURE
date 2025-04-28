@@ -1,74 +1,87 @@
-// controllers/searchController.js
+// controllers/searchController.js - Enhanced to search all fields
 const shopifyClient = require('../utils/shopifyClient');
 
 // Search products based on query
 exports.searchProducts = async (req, res, next) => {
   try {
-    const { q, category, limit = 20, page = 1, sort = 'relevance' } = req.query;
+    const { q, category, limit = 20, page = 1, sort = 'relevance', color, size } = req.query;
     
     if (!q || q.trim().length < 2) {
-      return res.status(400).json({ 
-        message: 'Search query must be at least 2 characters long'
+      return res.status(200).json({ 
+        products: [],
+        totalCount: 0,
+        query: q
       });
     }
     
     // Map sort parameter to Shopify sort key
     let sortKey = 'RELEVANCE';
-    let sortDirection = 'DESC';
+    let sortDirection = false; // false = DESC, true = ASC in Shopify API
     
     switch (sort.toLowerCase()) {
       case 'price-low-high':
         sortKey = 'PRICE';
-        sortDirection = 'ASC';
+        sortDirection = true; // ASC
         break;
       case 'price-high-low':
         sortKey = 'PRICE';
-        sortDirection = 'DESC';
+        sortDirection = false; // DESC
         break;
       case 'newest':
         sortKey = 'CREATED_AT';
-        sortDirection = 'DESC';
+        sortDirection = false; // DESC
         break;
       case 'alphabetical':
+      case 'alphabetical: a-z':
         sortKey = 'TITLE';
-        sortDirection = 'ASC';
+        sortDirection = true; // ASC
         break;
       case 'best-selling':
+      case 'most popular':
         sortKey = 'BEST_SELLING';
-        sortDirection = 'DESC';
+        sortDirection = false; // DESC
         break;
       default:
         sortKey = 'RELEVANCE';
-        sortDirection = 'DESC';
+        sortDirection = false; // DESC
     }
     
-    // Create GraphQL query
-    let filters = [];
+    // Build search query with multiple fields
+    let searchQuery = q;
     
-    // Add search term
-    if (q) {
-      filters.push(`query: "${q}"`);
-    }
+    // Create advanced GraphQL query to search across all fields
+    // This builds a more comprehensive search that includes:
+    // - title
+    // - description (partial matches)
+    // - tags
+    // - handle (product URL/slug)
+    // - product type (category)
+    // - variant titles (options)
     
     // Add category filter if specified
     if (category && category !== 'all') {
-      filters.push(`productType: "${category}"`);
+      searchQuery += ` AND product_type:${category}`;
     }
     
-    // Calculate pagination for cursor-based pagination
-    const first = parseInt(limit);
-    const after = page > 1 ? req.query.cursor : null;
+    // Add color filter if specified
+    if (color) {
+      // Search for color in tags, variant titles, and option values
+      searchQuery += ` AND (tag:${color} OR variant:${color} OR option:${color})`;
+    }
     
-    // Build the GraphQL query
-    const query = `
-      {
-        products(
-          first: $first,
-          after: $after,
-          query: $query,
-          sortKey: $sortKey,
-          reverse: $reverse
-        ) {
+    // Add size filter if specified
+    if (size) {
+      // Search for size in variant titles and option values
+      searchQuery += ` AND (variant:${size} OR option:${size})`;
+    }
+    
+    // Calculate pagination
+    const first = parseInt(limit);
+    
+    // Execute the query
+    const gqlQuery = `
+      query SearchProducts($query: String!, $first: Int!, $sortKey: ProductSortKeys!, $reverse: Boolean!) {
+        products(query: $query, first: $first, sortKey: $sortKey, reverse: $reverse) {
           edges {
             node {
               id
@@ -83,7 +96,7 @@ exports.searchProducts = async (req, res, next) => {
                   currencyCode
                 }
               }
-              images(first: 1) {
+              images(first: 3) {
                 edges {
                   node {
                     url
@@ -91,7 +104,7 @@ exports.searchProducts = async (req, res, next) => {
                   }
                 }
               }
-              variants(first: 5) {
+              variants(first: 10) {
                 edges {
                   node {
                     id
@@ -108,6 +121,10 @@ exports.searchProducts = async (req, res, next) => {
                   }
                 }
               }
+              options {
+                name
+                values
+              }
             }
           }
           pageInfo {
@@ -118,31 +135,68 @@ exports.searchProducts = async (req, res, next) => {
       }
     `;
     
-    // Execute the query
-    const result = await shopifyClient.query(query);
+    const variables = {
+      query: searchQuery,
+      first: first,
+      sortKey: sortKey,
+      reverse: sortDirection
+    };
+    
+    const result = await shopifyClient.query(gqlQuery, variables);
+    
+    // If no results found, try a more lenient search (partial word matching)
+    if (!result.products || result.products.edges.length === 0) {
+      // Try breaking the search term into individual words for better matching
+      const words = q.split(/\s+/).filter(word => word.length > 2);
+      
+      if (words.length > 1) {
+        // Create a new query using OR to match any of the words
+        const wordsQuery = words.join(' OR ');
+        variables.query = wordsQuery;
+        
+        const secondResult = await shopifyClient.query(gqlQuery, variables);
+        if (secondResult.products) {
+          result.products = secondResult.products;
+        }
+      }
+    }
     
     // Transform products for the frontend
-    const products = result.products.edges.map(({ node }) => {
+    const products = result.products?.edges?.map(({ node }) => {
       // Extract first image URL or use placeholder
       const imageUrl = node.images.edges.length > 0 
         ? node.images.edges[0].node.url 
         : null;
+      
+      // Get additional images
+      const images = node.images.edges.map(edge => edge.node.url);
       
       // Get price from price range
       const price = node.priceRange?.minVariantPrice?.amount || '0.00';
       
       // Get variants
       const variants = node.variants?.edges.map(({ node: variant }) => ({
-        id: variant.id,
+        id: variant.id.split('/').pop(),
         title: variant.title,
         price: variant.price.amount,
         options: variant.selectedOptions,
         available: variant.availableForSale
       })) || [];
       
+      // Extract color and size options
+      const options = {};
+      node.options.forEach(option => {
+        const name = option.name.toLowerCase();
+        if (name === 'color' || name === 'colour') {
+          options.colors = option.values;
+        } else if (name === 'size') {
+          options.sizes = option.values;
+        }
+      });
+      
       // Transform to simplified structure
       return {
-        id: node.id,
+        id: node.id.split('/').pop(),
         handle: node.handle,
         title: node.title,
         description: node.description,
@@ -150,17 +204,20 @@ exports.searchProducts = async (req, res, next) => {
         tags: node.tags || [],
         price: price,
         image: imageUrl,
-        variants: variants
+        images: images,
+        variants: variants,
+        options: options
       };
-    });
+    }) || [];
     
     res.status(200).json({
       products,
-      pageInfo: result.products.pageInfo,
+      pageInfo: result.products?.pageInfo || { hasNextPage: false },
       query: q,
       totalCount: products.length
     });
   } catch (error) {
+    console.error('Search error:', error);
     next(error);
   }
 };
@@ -186,6 +243,10 @@ exports.getSearchSuggestions = async (req, res, next) => {
               title
               productType
               tags
+              options {
+                name
+                values
+              }
             }
           }
         }
@@ -194,10 +255,10 @@ exports.getSearchSuggestions = async (req, res, next) => {
     
     const result = await shopifyClient.query(query);
     
-    // Extract suggestions from product titles, types, and tags
+    // Extract suggestions from product titles, types, tags, and options
     const suggestionsSet = new Set();
     
-    result.products.edges.forEach(({ node }) => {
+    result.products?.edges?.forEach(({ node }) => {
       // Add product title if it contains the query
       if (node.title.toLowerCase().includes(q.toLowerCase())) {
         suggestionsSet.add(node.title);
@@ -216,28 +277,40 @@ exports.getSearchSuggestions = async (req, res, next) => {
           }
         });
       }
+      
+      // Add option values that contain the query
+      if (node.options) {
+        node.options.forEach(option => {
+          option.values.forEach(value => {
+            if (value.toLowerCase().includes(q.toLowerCase())) {
+              suggestionsSet.add(`${option.name}: ${value}`);
+            }
+          });
+        });
+      }
     });
     
-    // Convert Set to Array and limit to 5 suggestions
-    const suggestions = [...suggestionsSet].slice(0, 5);
+    // Convert Set to Array and limit to 6 suggestions
+    const suggestions = [...suggestionsSet].slice(0, 6);
     
     res.status(200).json({ suggestions });
   } catch (error) {
-    next(error);
+    console.error('Error getting search suggestions:', error);
+    res.status(200).json({ suggestions: [] });
   }
 };
 
-// Get popular searches/trending terms
+// Get trending searches
 exports.getTrendingSearches = async (req, res, next) => {
   try {
-    // This would typically come from analytics data
-    // For this example, we'll return static trending terms
+    // This would typically come from analytics data or a database
+    // For now, return common fashion search terms
     const trendingSearches = [
-      "Summer Collection",
-      "Evening Dress",
-      "Wedding Guest",
-      "Party Wear",
-      "New Arrivals"
+      "Dress",
+      "Black",
+      "Summer",
+      "New",
+      "Sale"
     ];
     
     res.status(200).json({ trendingSearches });
@@ -246,6 +319,7 @@ exports.getTrendingSearches = async (req, res, next) => {
   }
 };
 
+// Search products by tag
 exports.searchProductsByTag = async (req, res, next) => {
   try {
     const { tag } = req.query;
@@ -260,7 +334,7 @@ exports.searchProductsByTag = async (req, res, next) => {
     // Create GraphQL query
     const query = `
       {
-        products(first: 10, query: "tag:${tag}") {
+        products(first: 20, query: "tag:${tag}") {
           edges {
             node {
               id
@@ -293,7 +367,7 @@ exports.searchProductsByTag = async (req, res, next) => {
     const result = await shopifyClient.query(query);
     
     // Transform products for the frontend
-    const products = result.products.edges.map(({ node }) => {
+    const products = result.products?.edges?.map(({ node }) => {
       const imageUrl = node.images.edges.length > 0 
         ? node.images.edges[0].node.url 
         : null;
@@ -310,7 +384,7 @@ exports.searchProductsByTag = async (req, res, next) => {
         image: imageUrl,
         price: price
       };
-    });
+    }) || [];
     
     res.status(200).json({
       success: true,

@@ -1,9 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaSearch, FaTimes, FaHistory } from "react-icons/fa";
 import searchService from "../services/searchApi";
 import SearchFiltersAndResults from "./SearchFiltersAndResults";
@@ -23,6 +22,7 @@ const SearchBar = ({ darkNavbar }) => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const navigate = useNavigate();
+  const searchTimeoutRef = useRef(null);
 
   // Close search when clicking outside
   useEffect(() => {
@@ -60,21 +60,35 @@ const SearchBar = ({ darkNavbar }) => {
 
   // Search functionality with debouncing
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (searchQuery.trim().length >= 2) {
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.trim().length >= 2) {
+      setLoading(true);
+      
+      // Set new timeout for debouncing
+      searchTimeoutRef.current = setTimeout(() => {
         performSearch();
         fetchSuggestions();
         setShowSuggestions(true);
         setShowFilters(true); // Show filters when search is performed
-      } else {
-        setSearchResults([]);
-        setSuggestions([]);
-        setShowSuggestions(false);
-        setShowFilters(false); // Hide filters when search is cleared
-      }
-    }, 500);
+      }, 500);
+    } else {
+      setSearchResults([]);
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setShowFilters(false); // Hide filters when search is cleared
+      setLoading(false);
+    }
 
-    return () => clearTimeout(debounceTimer);
+    // Cleanup timeout on unmount
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, [searchQuery, selectedColor, selectedSize, selectedCategory]);
 
   // Fetch search suggestions
@@ -96,16 +110,16 @@ const SearchBar = ({ darkNavbar }) => {
     setLoading(true);
     try {
       // Call the search service with filters
-      const { products } = await searchService.searchProducts(searchQuery, {
+      const response = await searchService.searchProducts(searchQuery, {
         limit: 8,
         color: selectedColor,
         size: selectedSize,
         category: selectedCategory !== "all" ? selectedCategory : undefined
       });
 
-      setSearchResults(products);
+      setSearchResults(response.products || []);
 
-      // Save search query to recent searches
+      // Save search query to recent searches if it's meaningful
       if (searchQuery.trim().length >= 3) {
         saveRecentSearch(searchQuery);
       }
@@ -143,6 +157,7 @@ const SearchBar = ({ darkNavbar }) => {
 
   const handleCloseSearch = () => {
     setIsOpen(false);
+    setSearchQuery("");
     setSelectedColor(null);
     setSelectedSize(null);
     setSelectedCategory("all");
@@ -161,7 +176,21 @@ const SearchBar = ({ darkNavbar }) => {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion);
+    // If suggestion includes a category like "Color: Black", extract just the value
+    if (suggestion.includes(": ")) {
+      const parts = suggestion.split(": ");
+      if (parts[0].toLowerCase() === "color" || parts[0].toLowerCase() === "colour") {
+        setSelectedColor(parts[1]);
+      } else if (parts[0].toLowerCase() === "size") {
+        setSelectedSize(parts[1]);
+      } else if (parts[0].toLowerCase() === "category" || parts[0].toLowerCase() === "type") {
+        setSelectedCategory(parts[1].toLowerCase());
+      }
+      setSearchQuery(parts[1]);
+    } else {
+      setSearchQuery(suggestion);
+    }
+    
     setShowSuggestions(false);
     performSearch();
   };
@@ -195,14 +224,31 @@ const SearchBar = ({ darkNavbar }) => {
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
-    
-   
-    navigate(`/category/${categoryId}`);
-    handleCloseSearch();
   };
 
   const goToSearchResults = () => {
-    navigate(`/search?q=${encodeURIComponent(searchQuery)}&category=${selectedCategory}`);
+    // Build URL with all selected filters
+    const params = new URLSearchParams();
+    params.append("q", searchQuery);
+    
+    if (selectedCategory !== "all") {
+      params.append("category", selectedCategory);
+    }
+    
+    if (selectedColor) {
+      params.append("color", selectedColor);
+    }
+    
+    if (selectedSize) {
+      params.append("size", selectedSize);
+    }
+    
+    // Save search before navigating
+    if (searchQuery.trim()) {
+      saveRecentSearch(searchQuery);
+    }
+    
+    navigate(`/search?${params.toString()}`);
     handleCloseSearch();
   };
 
