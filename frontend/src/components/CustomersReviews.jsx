@@ -141,20 +141,23 @@ const CustomersReviews = ({
   };
 
   return (
-    <div id="customer-reviews" className="py-12 border-t border-gray-200">
-      <h2 className="text-2xl text-center font-normal mb-10">
+    <div
+      id="customer-reviews"
+      className="py-8 sm:py-10 md:py-12 border-t border-gray-200"
+    >
+      <h2 className="text-xl sm:text-2xl text-center font-normal mb-6 sm:mb-8 md:mb-10">
         Customer Reviews
       </h2>
 
-      <div className="flex flex-col md:flex-row justify-between max-w-4xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between max-w-4xl mx-auto px-4 sm:px-6 md:px-0 gap-8 md:gap-4">
         {/* Left side: Overall Rating */}
-        <div className="flex flex-col items-center mb-8 md:mb-0">
-          <div className="text-6xl font-light">{averageRating}</div>
+        <div className="flex flex-col items-center mb-6 md:mb-0">
+          <div className="text-5xl sm:text-6xl font-light">{averageRating}</div>
           <div className="flex my-2">
             {[...Array(5)].map((_, i) => (
               <svg
                 key={i}
-                className="w-5 h-5 text-black"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-black"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -162,13 +165,13 @@ const CustomersReviews = ({
               </svg>
             ))}
           </div>
-          <div className="text-sm text-gray-700">
+          <div className="text-xs sm:text-sm text-gray-700">
             Based on {totalReviews} reviews
           </div>
         </div>
 
         {/* Middle: Rating breakdown */}
-        <div className="mb-8 md:mb-0">
+        <div className="mb-6 md:mb-0 max-w-xs sm:max-w-none mx-auto md:mx-0">
           {[5, 4, 3, 2, 1].map((rating) => (
             <div key={rating} className="flex items-center mb-2">
               <div className="w-3">{rating}</div>
@@ -179,7 +182,7 @@ const CustomersReviews = ({
               >
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.799-2.034c-.784-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <div className="mx-2 w-48 bg-gray-200 rounded-sm h-2">
+              <div className="mx-2 w-32 sm:w-40 md:w-48 bg-gray-200 rounded-sm h-2">
                 <div
                   className="h-2 bg-black rounded-sm"
                   style={{
@@ -195,10 +198,10 @@ const CustomersReviews = ({
         </div>
 
         {/* Right: Quality and Fit */}
-        <div>
+        <div className="max-w-xs sm:max-w-none mx-auto md:mx-0">
           <div className="mb-6">
             <div className="text-sm font-medium mb-2">Quality</div>
-            <div className="w-48 bg-gray-200 rounded-sm h-2 mb-1">
+            <div className="w-full sm:w-40 md:w-48 bg-gray-200 rounded-sm h-2 mb-1">
               <div
                 className="h-2 bg-black rounded-sm"
                 style={{ width: "90%" }}
@@ -209,7 +212,7 @@ const CustomersReviews = ({
 
           <div>
             <div className="text-sm font-medium mb-2">Fit</div>
-            <div className="w-48 bg-gray-200 rounded-sm h-2 mb-1">
+            <div className="w-full sm:w-40 md:w-48 bg-gray-200 rounded-sm h-2 mb-1">
               <div
                 className="h-2 bg-black rounded-sm"
                 style={{ width: "50%" }}
@@ -221,7 +224,7 @@ const CustomersReviews = ({
       </div>
 
       {/* Write a Review Button */}
-      <div className="flex justify-center mt-10">
+      <div className="flex justify-center mt-8 md:mt-10">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -233,14 +236,14 @@ const CustomersReviews = ({
       </div>
 
       {/* Display Reviews Section */}
-      <div className="mt-12 max-w-4xl mx-auto">
+      <div className="mt-10 md:mt-12 max-w-4xl mx-auto px-4 sm:px-6 md:px-0">
         {reviews.length > 0 ? (
           <div className="space-y-8">
             {reviews.map((review, index) => (
               <div key={index} className="border-b border-gray-200 pb-6">
                 <div className="flex flex-col md:flex-row">
                   {/* Left column - Reviewer info */}
-                  <div className="w-full md:w-1/4 pr-6">
+                  <div className="w-full md:w-1/4 pr-0 md:pr-6 mb-4 md:mb-0">
                     <div className="mb-4">
                       <div className="font-medium">{review.name}</div>
                       {review.verifiedBuyer && (
@@ -290,7 +293,7 @@ const CustomersReviews = ({
                   </div>
 
                   {/* Right column - Review content */}
-                  <div className="w-full md:w-3/4 mt-4 md:mt-0">
+                  <div className="w-full md:w-3/4">
                     {/* Rating and date */}
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex">
@@ -313,7 +316,7 @@ const CustomersReviews = ({
                     </div>
 
                     {/* Review title */}
-                    <h3 className="font-medium text-lg mb-2">
+                    <h3 className="font-medium text-base sm:text-lg mb-2">
                       {review.headline}
                     </h3>
 
@@ -326,7 +329,7 @@ const CustomersReviews = ({
                     </div>
 
                     {/* Quality and Fit indicators */}
-                    <div className="grid grid-cols-2 gap-6 mt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4">
                       {review.quality && (
                         <div>
                           <div className="text-sm font-medium mb-1">
