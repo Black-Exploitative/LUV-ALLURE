@@ -226,7 +226,7 @@ const CollectionsPage = () => {
             ease: [0.22, 1, 0.36, 1],
             staggerChildren: 0.1,
           }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-16 md:py-24 place-items-center"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-16 md:py-24 place-items-center"
         >
           {collections.map((collection, index) => (
             <motion.div
