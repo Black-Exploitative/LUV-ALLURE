@@ -1,10 +1,10 @@
-// backend/routes/orderRoutes.js - Fixed Order routes
+// backend/routes/orderRoutes.js - Updated with Shopify integration routes
 const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 const auth = require('../middleware/authMiddleware');
 
-// All order routes are protected
+// Protected routes (require authentication)
 router.use(auth);
 
 // Create order and initialize payment
@@ -19,7 +19,17 @@ router.get('/', orderController.getOrders);
 // Get order by ID
 router.get('/:orderId', orderController.getOrderById);
 
+// Verify if Shopify order was created
+router.get('/:id/verify-shopify', orderController.verifyShopifyOrder);
+
+// Create Shopify order (used for retrying if initial creation failed)
+router.post('/:id/create-shopify', orderController.createShopifyOrder);
+
 // Update order status (admin only)
 router.put('/:orderId/status', orderController.updateOrderStatus);
 
+// Export the router
 module.exports = router;
+
+// Note: The Paystack webhook endpoint should be registered separately 
+// in server.js as it doesn't require authentication and needs raw body parsing

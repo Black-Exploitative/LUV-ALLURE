@@ -202,3 +202,85 @@ exports.getBanks = async (req, res, next) => {
     });
   }
 };
+
+// backend/controllers/paymentController.js
+// Add this function to your existing controller
+
+// Handle Paystack callback
+exports.handlePaymentCallback = async (req, res) => {
+    try {
+      const { reference, trxref } = req.query;
+      
+      if (!reference) {
+        // Redirect to a failure page if no reference is provided
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
+      }
+      
+      // Look up the order by reference
+      const order = await Order.findOne({ reference });
+      
+      if (!order) {
+        console.error('Order not found for reference:', reference);
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
+      }
+      
+      // If the order is already paid, just redirect to success page
+      if (order.paymentStatus === 'paid') {
+        return res.redirect(`${process.env.FRONTEND_URL}/order-confirmation/${order._id}`);
+      }
+      
+      // Verify the payment with Paystack
+      try {
+        const verifyResponse = await paystackClient.verifyTransaction(reference);
+        
+        if (verifyResponse.data.status === 'success') {
+          // Update the order
+          order.paymentStatus = 'paid';
+          order.status = 'processing';
+          const data = verifyResponse.data;
+          
+          order.paymentDetails = {
+            reference: data.reference,
+            amount: data.amount / 100, // Convert from kobo to naira
+            currency: data.currency,
+            channel: data.channel,
+            paymentDate: new Date(),
+            transactionId: data.id,
+            authCode: data.authorization?.authorization_code || null,
+            cardLast4: data.authorization?.last4 || null,
+            cardBrand: data.authorization?.card_type || null
+          };
+          
+          await order.save();
+          
+          // Create Shopify order
+          try {
+            await createShopifyOrder(order);
+          } catch (shopifyError) {
+            console.error('Error creating Shopify order from callback:', shopifyError);
+            // Continue processing even if Shopify sync fails
+          }
+          
+          // Clear the user's cart
+          if (order.userId) {
+            await Cart.findOneAndUpdate(
+              { userId: order.userId },
+              { items: [] }
+            );
+          }
+          
+          // Redirect to success page
+          return res.redirect(`${process.env.FRONTEND_URL}/order-confirmation/${order._id}`);
+        } else {
+          // Payment wasn't successful
+          return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?reference=${reference}`);
+        }
+      } catch (verifyError) {
+        console.error('Error verifying payment:', verifyError);
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?reference=${reference}`);
+      }
+    } catch (error) {
+      console.error('Payment callback error:', error);
+      return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
+    }
+  };

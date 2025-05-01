@@ -1,5 +1,10 @@
 // frontend/src/services/paymentService.js
 import api from './api';
+import { 
+  initializeInlinePayment, 
+  verifyPayment as verifyPaymentConfig, 
+  createPaymentUrl 
+} from '../config/paystackConfig';
 
 const paymentService = {
   // Initialize payment with Paystack
@@ -16,8 +21,7 @@ const paymentService = {
   // Verify payment status
   verifyPayment: async (reference) => {
     try {
-      const response = await api.get(`/payment/verify/${reference}`);
-      return response.data;
+      return await verifyPaymentConfig(reference);
     } catch (error) {
       console.error('Error verifying payment:', error);
       throw error.response?.data || { message: 'Payment verification failed' };
@@ -38,32 +42,24 @@ const paymentService = {
   // Process payment using Paystack Popup
   processPaymentWithPopup: async (orderData) => {
     try {
-      // First, initialize payment to get authorization URL
-      const paymentInitData = {
+      // Create the payment URL for redirect
+      const paymentUrl = await createPaymentUrl({
         email: orderData.email,
         amount: orderData.amount,
         reference: orderData.reference,
         orderId: orderData.orderId,
-        metadata: {
-          customer_name: `${orderData.firstName} ${orderData.lastName}`,
-          products: orderData.items.map(item => item.name || item.title).join(', ')
-        }
+        customerName: `${orderData.firstName} ${orderData.lastName}`,
+        items: orderData.items
+      });
+      
+      // Open Paystack checkout in new window
+      window.open(paymentUrl, '_blank');
+      
+      return {
+        success: true,
+        message: 'Payment initialized',
+        reference: orderData.reference
       };
-
-      const initResponse = await paymentService.initializePayment(paymentInitData);
-
-      if (initResponse.success) {
-        // Open Paystack checkout in new window
-        window.open(initResponse.data.authorizationUrl, '_blank');
-        
-        return {
-          success: true,
-          message: 'Payment initialized',
-          reference: initResponse.data.reference
-        };
-      } else {
-        throw new Error(initResponse.message || 'Payment initialization failed');
-      }
     } catch (error) {
       console.error('Error processing payment with popup:', error);
       throw error;
@@ -72,38 +68,24 @@ const paymentService = {
 
   // Inline implementation of Paystack checkout
   initializeInlinePayment: (paymentData, onSuccess, onClose) => {
-    // Check if PaystackPop is available
-    if (window.PaystackPop) {
-      const handler = window.PaystackPop.setup({
-        key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
-        email: paymentData.email,
-        amount: Math.round(paymentData.amount * 100), // Convert to kobo
-        ref: paymentData.reference,
-        metadata: {
-          order_id: paymentData.orderId,
-          custom_fields: [
-            {
-              display_name: "Order ID",
-              variable_name: "order_id",
-              value: paymentData.orderId
-            },
-            {
-              display_name: "Customer Name",
-              variable_name: "customer_name",
-              value: paymentData.customerName
-            }
-          ]
-        },
-        onSuccess,
-        onClose
-      });
-      
-      handler.openIframe();
-      return true;
-    } else {
-      console.error('Paystack script not loaded');
-      return false;
+    return initializeInlinePayment(paymentData, onSuccess, onClose);
+  },
+
+  // Generate unique transaction reference
+  generateTransactionReference: () => {
+    const timestamp = Date.now();
+    const randomNum = Math.floor(Math.random() * 1000000);
+    return `LA-${timestamp}-${randomNum}`;
+  },
+
+  // Calculate payment fee (if any)
+  calculatePaymentFee: (amount, paymentMethod = 'card') => {
+    // Paystack charges 1.5% + ₦100 for transactions above ₦2500
+    if (paymentMethod === 'card' && amount > 2500) {
+      const fee = amount * 0.015 + 100;
+      return Math.min(fee, 2000); // Cap at ₦2000
     }
+    return 0;
   }
 };
 

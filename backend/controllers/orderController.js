@@ -1,4 +1,4 @@
-// controllers/orderController.js - Complete controller with packaging options
+// backend/controllers/orderController.js - Enhanced to handle Shopify integration
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const User = require('../models/User');
@@ -14,23 +14,21 @@ exports.createOrder = async (req, res, next) => {
       subtotal, 
       tax, 
       shipping, 
-      packagingOption, // New packaging option field
-      giftMessage, // New gift message field
+      packagingOption, // Packaging option object
+      giftMessage, // Gift message for gift packaging
       total, 
       transactionId, 
+      reference, 
       shippingProvider,
       estimatedDeliveryDays,
       shippingAddress 
     } = req.body;
     
-    // Generate a unique reference for Paystack
-    const reference = `LA-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-    
     // Create order in our database
     const order = new Order({
       userId: req.user ? req.user.id : null,
       items: items.map(item => ({
-        variantId: item.id || item.variantId,
+        variantId: item.variantId || item.id,
         quantity: item.quantity || 1,
         title: item.name || item.title,
         price: item.price,
@@ -72,7 +70,7 @@ exports.createOrder = async (req, res, next) => {
 // Verify Paystack payment and update order
 exports.verifyPayment = async (req, res, next) => {
   try {
-    const { orderId, reference, transactionId } = req.body;
+    const { orderId, reference } = req.body;
     
     // Find the order
     const order = await Order.findById(orderId);
@@ -102,6 +100,7 @@ exports.verifyPayment = async (req, res, next) => {
         channel: data.channel,
         paymentDate: new Date(),
         transactionId: data.id,
+        authCode: data.authorization?.authorization_code || null,
         cardLast4: data.authorization?.last4 || null,
         cardBrand: data.authorization?.card_type || null
       };
@@ -109,7 +108,13 @@ exports.verifyPayment = async (req, res, next) => {
       await order.save();
       
       // Create order in Shopify
-      await createShopifyOrder(order);
+      try {
+        await createShopifyOrder(order);
+      } catch (shopifyError) {
+        console.error('Error creating Shopify order:', shopifyError);
+        // Continue with success response even if Shopify sync fails
+        // We'll retry Shopify sync later
+      }
       
       // Clear user's cart if they are logged in
       if (order.userId) {
@@ -147,9 +152,64 @@ exports.verifyPayment = async (req, res, next) => {
   }
 };
 
+// Verify that an order was created in Shopify
+exports.verifyShopifyOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    
+    return res.status(200).json({
+      success: true,
+      shopifyOrderId: order.shopifyOrderId || null
+    });
+  } catch (error) {
+    console.error('Error verifying Shopify order:', error);
+    next(error);
+  }
+};
+
+// Create a Shopify order for an existing order
+exports.createShopifyOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    
+    // Don't create Shopify order if payment isn't complete
+    if (order.paymentStatus !== 'paid') {
+      return res.status(400).json({ success: false, message: 'Cannot create Shopify order for unpaid order' });
+    }
+    
+    // Create the Shopify order
+    const shopifyOrder = await createShopifyOrder(order);
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Shopify order created successfully',
+      shopifyOrderId: order.shopifyOrderId
+    });
+  } catch (error) {
+    console.error('Error creating Shopify order:', error);
+    next(error);
+  }
+};
+
 // Helper function to create order in Shopify
 async function createShopifyOrder(order) {
   try {
+    // Only create a Shopify order if it doesn't already exist
+    if (order.shopifyOrderId) {
+      console.log(`Shopify order already exists for order ${order._id}: ${order.shopifyOrderId}`);
+      return { id: order.shopifyOrderId };
+    }
+    
     // Format line items for Shopify
     const lineItems = order.items.map(item => ({
       variantId: item.variantId.includes('gid://') 
@@ -224,13 +284,15 @@ async function createShopifyOrder(order) {
     if (shopifyOrder && shopifyOrder.id) {
       order.shopifyOrderId = shopifyOrder.id;
       await order.save();
+      
+      console.log(`Created Shopify order ${shopifyOrder.id} for order ${order._id}`);
+      return shopifyOrder;
+    } else {
+      throw new Error('Failed to create Shopify order: No ID returned');
     }
-    
-    return shopifyOrder;
   } catch (error) {
-    console.error('Error creating Shopify order:', error);
-    // Still return successfully even if Shopify order creation fails
-    // The order exists in our system, and we can retry Shopify sync later
+    console.error(`Error creating Shopify order for order ${order._id}:`, error);
+    throw error;
   }
 }
 
@@ -300,11 +362,12 @@ exports.paystackWebhook = async (req, res) => {
         order.status = 'processing';
         order.paymentDetails = {
           reference: data.reference,
-          amount: data.amount / 100,
+          amount: data.amount / 100, // Convert from kobo to naira
           currency: data.currency,
           channel: data.channel,
           paymentDate: new Date(),
           transactionId: data.id,
+          authCode: data.authorization?.authorization_code || null,
           cardLast4: data.authorization?.last4 || null,
           cardBrand: data.authorization?.card_type || null
         };
@@ -312,8 +375,21 @@ exports.paystackWebhook = async (req, res) => {
         await order.save();
         
         // Create Shopify order if it wasn't created earlier
-        if (!order.shopifyOrderId) {
-          await createShopifyOrder(order);
+        try {
+          if (!order.shopifyOrderId) {
+            await createShopifyOrder(order);
+          }
+        } catch (shopifyError) {
+          console.error('Error creating Shopify order from webhook:', shopifyError);
+          // Continue processing even if Shopify sync fails
+        }
+        
+        // Clear the user's cart
+        if (order.userId) {
+          await Cart.findOneAndUpdate(
+            { userId: order.userId },
+            { items: [] }
+          );
         }
       }
     }

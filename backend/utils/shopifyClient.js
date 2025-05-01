@@ -497,6 +497,168 @@ class ShopifyClient {
 
     return this.query(query, { collectionId: formattedId, first });
   }
+
+  /**
+   * Create an order in Shopify
+   * @param {Object} orderData Order data including lineItems, shipping, etc.
+   * @returns {Promise<Object>} Created order
+   */
+  async createOrder(orderData) {
+    try {
+      // First create a draft order
+      const draftOrderQuery = `
+        mutation draftOrderCreate($input: DraftOrderInput!) {
+          draftOrderCreate(input: $input) {
+            draftOrder {
+              id
+              name
+              totalPrice
+              subtotalPrice
+              customer {
+                id
+                email
+              }
+              note
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+      
+      // Format line items for GraphQL
+      const lineItems = orderData.lineItems.map(item => {
+        // Check if this is a variant ID or custom item
+        if (item.variantId) {
+          return {
+            variantId: item.variantId,
+            quantity: item.quantity
+          };
+        } else {
+          // Custom item (like packaging)
+          return {
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity
+          };
+        }
+      });
+      
+      // Format shipping line
+      const shippingLine = {
+        title: orderData.shippingLine.title,
+        price: orderData.shippingLine.price
+      };
+      
+      // Format shipping address
+      const shippingAddress = {
+        address1: orderData.shippingAddress.address1,
+        address2: orderData.shippingAddress.address2 || "",
+        city: orderData.shippingAddress.city,
+        province: orderData.shippingAddress.province,
+        country: orderData.shippingAddress.country,
+        firstName: orderData.shippingAddress.firstName,
+        lastName: orderData.shippingAddress.lastName,
+        phone: orderData.shippingAddress.phone,
+        zip: orderData.shippingAddress.zip || ""
+      };
+      
+      // Prepare custom note attributes
+      const customAttributes = orderData.customAttributes || [];
+      
+      // Create draft order
+      const draftOrderVars = {
+        input: {
+          lineItems,
+          shippingLine,
+          shippingAddress,
+          note: orderData.note,
+          customAttributes,
+          email: orderData.customer.email,
+          tags: ["website-order"]
+        }
+      };
+      
+      // Execute the draft order creation
+      const draftOrderResult = await this.query(draftOrderQuery, { input: draftOrderVars.input });
+      
+      if (draftOrderResult.draftOrderCreate.userErrors.length > 0) {
+        throw new Error(`Draft order creation errors: ${JSON.stringify(draftOrderResult.draftOrderCreate.userErrors)}`);
+      }
+      
+      const draftOrderId = draftOrderResult.draftOrderCreate.draftOrder.id;
+      
+      // Complete the draft order to create an actual order
+      const completeDraftOrderQuery = `
+        mutation draftOrderComplete($id: ID!) {
+          draftOrderComplete(id: $id) {
+            draftOrder {
+              id
+              order {
+                id
+                name
+                processedAt
+                totalPrice
+              }
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+      
+      const completeResult = await this.query(completeDraftOrderQuery, { id: draftOrderId });
+      
+      if (completeResult.draftOrderComplete.userErrors.length > 0) {
+        throw new Error(`Draft order completion errors: ${JSON.stringify(completeResult.draftOrderComplete.userErrors)}`);
+      }
+      
+      const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
+      
+      // Mark the order as paid
+      const fulfillmentOrderQuery = `
+        mutation orderMarkAsPaid($id: ID!, $input: OrderMarkAsPaidInput!) {
+          orderMarkAsPaid(id: $id, input: $input) {
+            order {
+              id
+              name
+              displayFinancialStatus
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+      
+      const markAsPaidResult = await this.query(fulfillmentOrderQuery, { 
+        id: orderId,
+        input: { 
+          notifyCustomer: false 
+        }
+      });
+      
+      if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
+        throw new Error(`Mark as paid errors: ${JSON.stringify(markAsPaidResult.orderMarkAsPaid.userErrors)}`);
+      }
+      
+      // Return the order data
+      return {
+        id: orderId,
+        name: completeResult.draftOrderComplete.draftOrder.order.name,
+        processedAt: completeResult.draftOrderComplete.draftOrder.order.processedAt,
+        totalPrice: completeResult.draftOrderComplete.draftOrder.order.totalPrice
+      };
+    } catch (error) {
+      console.error('Error creating Shopify order:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new ShopifyClient();
