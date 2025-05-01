@@ -263,7 +263,7 @@ const SearchBar = ({ darkNavbar }) => {
         <motion.img 
           src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
           alt="Search" 
-          className="w-5 h-5 cursor-pointer" 
+          className="w-[15px] h-[15px] cursor-pointer" 
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         />

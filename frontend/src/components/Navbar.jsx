@@ -518,7 +518,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-6">
             
             <motion.div className="flex items-center h-full"> 
-              <SearchBar />
+              <SearchBar darkNavbar={darkNavbar} />
             </motion.div>
             
             <a href="/user-account">
@@ -547,20 +547,14 @@ export default function Navbar() {
         {/* Mobile Right Icons */}
         <div className={`md:hidden flex space-x-4 items-center ${darkNavbar ? "text-white" : "text-black"}`}>
           <motion.div className="flex items-center">
-            <motion.img 
-              src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
-              alt="Search" 
-              className="w-5 h-5 cursor-pointer" 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            />
+            <SearchBar darkNavbar={darkNavbar} />
           </motion.div>
           
           <motion.div className="flex items-center">
             <motion.img 
               src={darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"} 
               alt="Phone" 
-              className="w-5 h-5 cursor-pointer"
+              className="w-[12.6px] h-[15px] cursor-pointer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             />
