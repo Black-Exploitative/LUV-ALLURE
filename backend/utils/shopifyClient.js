@@ -551,6 +551,50 @@ class ShopifyClient {
     return this.query(query, { collectionId: formattedId, first });
   }
 
+  // Add this helper function to shopifyClient.js
+  async getProductVariantById(variantId) {
+    // Clean up the variant ID
+    let cleanId = variantId;
+    if (typeof cleanId === 'string') {
+      if (cleanId.includes('/')) {
+        cleanId = cleanId.split('/').pop();
+      }
+      if (cleanId.includes('-')) {
+        cleanId = cleanId.split('-')[0];
+      }
+    }
+    
+    // Format as a Shopify GraphQL ID
+    const formattedId = `gid://shopify/ProductVariant/${cleanId}`;
+    
+    const query = `
+      query GetProductVariant($id: ID!) {
+        productVariant(id: $id) {
+          id
+          title
+          product {
+            id
+            title
+            availableForSale
+          }
+          price {
+            amount
+          }
+          availableForSale
+          inventoryQuantity
+        }
+      }
+    `;
+    
+    try {
+      const result = await this.query(query, { id: formattedId });
+      return result.productVariant;
+    } catch (error) {
+      console.error(`Error fetching variant ${variantId}:`, error);
+      return null;
+    }
+  }
+
   /**
    * Create an order in Shopify
    * @param {Object} orderData Order data including lineItems, shipping, etc.
@@ -558,7 +602,7 @@ class ShopifyClient {
    */
   async createOrder(orderData) {
     try {
-      // First create a draft order
+      // First create a draft order with proper line item handling
       const draftOrderQuery = `
         mutation draftOrderCreate($input: DraftOrderInput!) {
           draftOrderCreate(input: $input) {
@@ -571,7 +615,6 @@ class ShopifyClient {
                 id
                 email
               }
-              note
             }
             userErrors {
               field
@@ -581,61 +624,35 @@ class ShopifyClient {
         }
       `;
       
-      // Format line items for GraphQL
-      const lineItems = orderData.lineItems.map(item => {
-        // Check if this is a variant ID or custom item
-        if (item.variantId) {
-          return {
-            variantId: item.variantId,
-            quantity: item.quantity
-          };
-        } else {
-          // Custom item (like packaging)
-          return {
+      // Format custom line items using the correct Shopify format
+      const formattedLineItems = [...orderData.lineItems];
+      
+      // If custom line items exist, add them to the formatted line items with correct structure
+      if (orderData.customLineItems && orderData.customLineItems.length > 0) {
+        orderData.customLineItems.forEach(item => {
+          formattedLineItems.push({
             title: item.title,
-            price: item.price,
-            quantity: item.quantity
-          };
-        }
-      });
+            quantity: item.quantity,
+            originalUnitPrice: item.originalUnitPrice,
+            taxable: item.taxable,
+            requiresShipping: item.requiresShipping
+          });
+        });
+      }
       
-      // Format shipping line
-      const shippingLine = {
-        title: orderData.shippingLine.title,
-        price: orderData.shippingLine.price
+      // Create draft order input with properly formatted line items
+      const draftOrderInput = {
+        lineItems: formattedLineItems,
+        shippingLine: orderData.shippingLine,
+        shippingAddress: orderData.shippingAddress,
+        note: orderData.note,
+        customAttributes: orderData.customAttributes,
+        email: orderData.email,
+        tags: orderData.tags || ["website-order"]
       };
       
-      // Format shipping address
-      const shippingAddress = {
-        address1: orderData.shippingAddress.address1,
-        address2: orderData.shippingAddress.address2 || "",
-        city: orderData.shippingAddress.city,
-        province: orderData.shippingAddress.province,
-        country: orderData.shippingAddress.country,
-        firstName: orderData.shippingAddress.firstName,
-        lastName: orderData.shippingAddress.lastName,
-        phone: orderData.shippingAddress.phone,
-        zip: orderData.shippingAddress.zip || ""
-      };
-      
-      // Prepare custom note attributes
-      const customAttributes = orderData.customAttributes || [];
-      
-      // Create draft order
-      const draftOrderVars = {
-        input: {
-          lineItems,
-          shippingLine,
-          shippingAddress,
-          note: orderData.note,
-          customAttributes,
-          email: orderData.customer.email,
-          tags: ["website-order"]
-        }
-      };
-      
-      // Execute the draft order creation - USE ADMIN QUERY HERE
-      const draftOrderResult = await this.adminQuery(draftOrderQuery, { input: draftOrderVars.input });
+      // Execute the draft order creation
+      const draftOrderResult = await this.adminQuery(draftOrderQuery, { input: draftOrderInput });
       
       if (draftOrderResult.draftOrderCreate.userErrors.length > 0) {
         throw new Error(`Draft order creation errors: ${JSON.stringify(draftOrderResult.draftOrderCreate.userErrors)}`);
@@ -664,7 +681,6 @@ class ShopifyClient {
         }
       `;
       
-      // USE ADMIN QUERY HERE TOO
       const completeResult = await this.adminQuery(completeDraftOrderQuery, { id: draftOrderId });
       
       if (completeResult.draftOrderComplete.userErrors.length > 0) {
@@ -690,7 +706,6 @@ class ShopifyClient {
         }
       `;
       
-      // USE ADMIN QUERY HERE TOO
       const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
         id: orderId,
         input: { 
@@ -713,8 +728,7 @@ class ShopifyClient {
       console.error('Error creating Shopify order:', error);
       throw error;
     }
-  }
-}
+  } }
 
 
 module.exports = new ShopifyClient();
