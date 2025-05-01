@@ -5,8 +5,61 @@ const shopifyConfig = require('../config/shopify');
 class ShopifyClient {
   constructor() {
     this.shopifyDomain = `https://${shopifyConfig.shopName}.myshopify.com`;
+    this.adminAccessToken = shopifyConfig.adminAccessToken;
     this.storefrontAccessToken = shopifyConfig.storefrontAccessToken;
     this.apiVersion = shopifyConfig.apiVersion;
+    this.adminApiVersion = shopifyConfig.adminApiVersion; // Added for admin API
+  }
+
+  async adminQuery(query, variables = {}) {
+    try {
+      // Debug output
+      console.log("Admin API URL:", `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/graphql.json`);
+      console.log("Using Admin Token:", this.adminAccessToken ? "Token exists" : "No token found");
+      
+      if (!this.adminAccessToken) {
+        throw new Error("No admin access token provided. Check your .env file.");
+      }
+  
+      // Using node-fetch for compatibility
+      // const fetch = require('node-fetch'); // Uncomment if using node-fetch directly
+      
+      const response = await fetch(
+        `${this.shopifyDomain}/admin/api/${this.apiVersion}/graphql.json`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': this.adminAccessToken
+          },
+          body: JSON.stringify({ query, variables })
+        }
+      );
+  
+      // Log HTTP status
+      console.log(`Admin API response status: ${response.status} ${response.statusText}`);
+      
+      // Handle non-200 responses
+      if (!response.ok) {
+        // Get the text response for better error information
+        const errorText = await response.text();
+        throw new Error(`Shopify API returned ${response.status}: ${errorText}`);
+      }
+  
+      const jsonResponse = await response.json();
+      
+      // Check for GraphQL errors
+      if (jsonResponse.errors) {
+        const errorMsg = JSON.stringify(jsonResponse.errors);
+        console.error("GraphQL errors:", errorMsg);
+        throw new Error(`GraphQL errors: ${errorMsg}`);
+      }
+  
+      return jsonResponse.data;
+    } catch (error) {
+      console.error('Shopify Admin API detailed error:', error);
+      throw error;
+    }
   }
 
   async query(query, variables = {}) {
@@ -581,8 +634,8 @@ class ShopifyClient {
         }
       };
       
-      // Execute the draft order creation
-      const draftOrderResult = await this.query(draftOrderQuery, { input: draftOrderVars.input });
+      // Execute the draft order creation - USE ADMIN QUERY HERE
+      const draftOrderResult = await this.adminQuery(draftOrderQuery, { input: draftOrderVars.input });
       
       if (draftOrderResult.draftOrderCreate.userErrors.length > 0) {
         throw new Error(`Draft order creation errors: ${JSON.stringify(draftOrderResult.draftOrderCreate.userErrors)}`);
@@ -611,7 +664,8 @@ class ShopifyClient {
         }
       `;
       
-      const completeResult = await this.query(completeDraftOrderQuery, { id: draftOrderId });
+      // USE ADMIN QUERY HERE TOO
+      const completeResult = await this.adminQuery(completeDraftOrderQuery, { id: draftOrderId });
       
       if (completeResult.draftOrderComplete.userErrors.length > 0) {
         throw new Error(`Draft order completion errors: ${JSON.stringify(completeResult.draftOrderComplete.userErrors)}`);
@@ -620,7 +674,7 @@ class ShopifyClient {
       const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
       
       // Mark the order as paid
-      const fulfillmentOrderQuery = `
+      const markAsPaidQuery = `
         mutation orderMarkAsPaid($id: ID!, $input: OrderMarkAsPaidInput!) {
           orderMarkAsPaid(id: $id, input: $input) {
             order {
@@ -636,7 +690,8 @@ class ShopifyClient {
         }
       `;
       
-      const markAsPaidResult = await this.query(fulfillmentOrderQuery, { 
+      // USE ADMIN QUERY HERE TOO
+      const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
         id: orderId,
         input: { 
           notifyCustomer: false 
@@ -660,5 +715,6 @@ class ShopifyClient {
     }
   }
 }
+
 
 module.exports = new ShopifyClient();

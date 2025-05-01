@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const paystackClient = require('../utils/paystackClient');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
+const { createShopifyOrder } = require('../utils/orderUtils');
 
 // Initialize a payment transaction
 exports.initializePayment = async (req, res, next) => {
@@ -26,7 +27,7 @@ exports.initializePayment = async (req, res, next) => {
     // Initialize transaction with Paystack
     const paymentData = {
       email,
-      amount: Math.round(amount * 100), // Convert to kobo (Paystack uses smallest currency unit)
+      amount, // Convert to kobo (Paystack uses smallest currency unit)
       reference,
       metadata: {
         order_id: orderId,
@@ -226,7 +227,7 @@ exports.handlePaymentCallback = async (req, res) => {
       
       // If the order is already paid, just redirect to success page
       if (order.paymentStatus === 'paid') {
-        return res.redirect(`${process.env.FRONTEND_URL}/order-confirmation/${order._id}`);
+        return res.redirect(`${process.env.FRONTEND_URL}/order-confirmation/${order.reference}`);
       }
       
       // Verify the payment with Paystack
