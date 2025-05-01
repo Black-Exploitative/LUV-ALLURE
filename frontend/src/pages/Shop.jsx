@@ -19,7 +19,6 @@ const ShopPage = () => {
       <Navbar />
       <ShopHeader /> 
       <FilterSortBar onGridChange={handleGridChange} />
-
       <ProductGrid gridType={gridType} />
       <Footer />
     </div>
