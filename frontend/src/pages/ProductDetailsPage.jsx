@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo , useRef} from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import ProductCarousel from "../components/ProductCarousel";
 import ExpandableSection from "../components/ExpandableSection";
 import SmallProductCard from "../components/SmallProductCard";
@@ -37,40 +38,36 @@ const ProductDetailsPage = () => {
   };
   const parseProductSlug = (slug) => {
     if (!slug) return { productId: null, productName: null, colorName: null };
-    
+
     // Check if the slug follows the pattern product-name---color_productId
-    if (slug.includes('---') && slug.includes('_')) {
-      const [namePart, idPart] = slug.split('_');
-      const [productName, colorName] = namePart.split('---');
+    if (slug.includes("---") && slug.includes("_")) {
+      const [namePart, idPart] = slug.split("_");
+      const [productName, colorName] = namePart.split("---");
       return {
         productId: idPart,
         productName: productName,
-        colorName: colorName
+        colorName: colorName,
       };
     }
-    
+
     // Handle the case where it's just product-name_productId
-    const parts = slug.split('_');
+    const parts = slug.split("_");
     if (parts.length > 1) {
       return {
         productId: parts[parts.length - 1],
-        productName: parts.slice(0, -1).join('_'),
-        colorName: null
+        productName: parts.slice(0, -1).join("_"),
+        colorName: null,
       };
     }
-    
+
     // Fallback for simple slugs (just the ID)
     return {
       productId: slug,
       productName: null,
-      colorName: null
+      colorName: null,
     };
   };
-  
 
-
-
-  
   // Product state
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -92,7 +89,7 @@ const ProductDetailsPage = () => {
       setIsInWishlistState(isInWishlist(product.id));
     }
   }, [product, isInWishlist]);
-    
+
   // Display images (changes based on color selection)
   const [displayImages, setDisplayImages] = useState([]);
 
@@ -159,7 +156,7 @@ const ProductDetailsPage = () => {
         </div>
       );
     }
-    
+
     // Only render if we have style-with products
     if (styleWithProducts && styleWithProducts.length > 0) {
       return (
@@ -169,7 +166,11 @@ const ProductDetailsPage = () => {
             {styleWithProducts.map((product, index) => (
               <SmallProductCard
                 key={product.id || index}
-                image={product.images?.[0] || product.image || "/images/placeholder.jpg"}
+                image={
+                  product.images?.[0] ||
+                  product.image ||
+                  "/images/placeholder.jpg"
+                }
                 name={product.title || product.name}
                 color={product.color || "Default"}
                 price={`₦${parseFloat(product.price).toLocaleString()}`}
@@ -180,9 +181,7 @@ const ProductDetailsPage = () => {
         </div>
       );
     }
-    
-   
-    
+
     // Don't render anything if no products
     return null;
   };
@@ -235,17 +234,18 @@ const ProductDetailsPage = () => {
     const fetchProductData = async () => {
       try {
         setLoading(true);
-        
+
         // Parse the slug to get productId and colorName
-        const { productId: parsedProductId, colorName } = parseProductSlug(slug);
-        
+        const { productId: parsedProductId, colorName } =
+          parseProductSlug(slug);
+
         if (!parsedProductId) {
           setError("Product ID is missing");
           return;
         }
-        
+
         console.log("Attempting to fetch product with ID:", parsedProductId);
-        
+
         try {
           // Log the URL being called
           const apiUrl = `/products/id/${parsedProductId}`;
@@ -285,12 +285,14 @@ const ProductDetailsPage = () => {
             if (productData) {
               console.log("Found product data:", productData);
               const processedProduct = processApiProduct(productData);
-              
+
               // If we have a color from the URL, select it
               if (colorName) {
-                setSelectedColor(colorName.charAt(0).toUpperCase() + colorName.slice(1));
+                setSelectedColor(
+                  colorName.charAt(0).toUpperCase() + colorName.slice(1)
+                );
               }
-              
+
               setProduct(processedProduct);
               addToRecentlyViewed(processedProduct);
             } else {
@@ -341,83 +343,99 @@ const ProductDetailsPage = () => {
       controller.abort();
     };
   }, [slug]);
-  
+
   // Fetch all color variants when the product loads
   useEffect(() => {
     if (!product || !productId) return;
-    
+
     // Function to fetch products with the same model tag
     const fetchColorVariants = async () => {
       try {
         // Extract base model name from product name (simplified approach)
         // If product name doesn't contain a dash, use the whole name
         let baseModelName;
-        if (product.name.includes(' - ')) {
-          baseModelName = product.name.split(' - ')[0].trim().toLowerCase().replace(/\s+/g, '-');
+        if (product.name.includes(" - ")) {
+          baseModelName = product.name
+            .split(" - ")[0]
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "-");
         } else {
-          baseModelName = product.name.trim().toLowerCase().replace(/\s+/g, '-');
+          baseModelName = product.name
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "-");
         }
-        
+
         // Create tag for model search
         const modelTag = `model-${baseModelName}`;
         console.log(`Searching for color variants with tag: ${modelTag}`);
-        
+
         // Use the correct endpoint for tag-based search
         const response = await api.get(`/search/tag?tag=${modelTag}`);
-        
+
         if (response.data && response.data.products) {
-          console.log(`Found ${response.data.products.length} potential color variants`);
-          
+          console.log(
+            `Found ${response.data.products.length} potential color variants`
+          );
+
           // Include the current product in the color variants
           const currentProductIncluded = response.data.products.some(
-            variant => variant.id === productId
+            (variant) => variant.id === productId
           );
-          
+
           // If current product is not included in the search results, add it
           let variants = [...response.data.products];
           if (!currentProductIncluded) {
-            console.log(`Current product not found in results, adding it manually`);
+            console.log(
+              `Current product not found in results, adding it manually`
+            );
             variants = [
               {
                 id: productId,
                 title: product.name,
-                handle: '', // We don't need the handle for current product
+                handle: "", // We don't need the handle for current product
                 image: product.images[0],
-                price: product.price
+                price: product.price,
               },
-              ...variants
+              ...variants,
             ];
           }
-          
+
           // Process variants to extract color information
-          const processedVariants = variants.map(variant => {
+          const processedVariants = variants.map((variant) => {
             // Extract color from name or title (assuming format: "Product Name - Color")
-            let variantColor = '';
-            if (variant.name && variant.name.includes(' - ')) {
-              variantColor = variant.name.split(' - ')[1].trim();
-            } else if (variant.title && variant.title.includes(' - ')) {
-              variantColor = variant.title.split(' - ')[1].trim();
+            let variantColor = "";
+            if (variant.name && variant.name.includes(" - ")) {
+              variantColor = variant.name.split(" - ")[1].trim();
+            } else if (variant.title && variant.title.includes(" - ")) {
+              variantColor = variant.title.split(" - ")[1].trim();
             } else {
               // Default color if not specified
               variantColor = variant.id === productId ? "Default" : "Variant";
-              console.log(`No color found in name/title for variant ${variant.id}, using ${variantColor}`);
+              console.log(
+                `No color found in name/title for variant ${variant.id}, using ${variantColor}`
+              );
             }
-            
+
             return {
               id: variant.id,
               name: variant.name || variant.title,
               color: variantColor,
               handle: variant.handle,
-              image: variant.images?.[0] || variant.image || "/images/placeholder.jpg",
-              price: variant.price
+              image:
+                variant.images?.[0] ||
+                variant.image ||
+                "/images/placeholder.jpg",
+              price: variant.price,
             };
           });
-          
+
           // Update the product's colors with all color variants
           const uniqueColors = [];
           const colorNames = new Set();
-          
-          processedVariants.forEach(variant => {
+
+          processedVariants.forEach((variant) => {
             if (!colorNames.has(variant.color)) {
               colorNames.add(variant.color);
               uniqueColors.push({
@@ -426,31 +444,32 @@ const ProductDetailsPage = () => {
                 inStock: true,
                 variantId: variant.id,
                 variantHandle: variant.handle,
-                variantImage: variant.image
+                variantImage: variant.image,
               });
             }
           });
-          
-          console.log(`Found ${uniqueColors.length} unique color variants:`, 
-            uniqueColors.map(c => c.name).join(', '));
-          
+
+          console.log(
+            `Found ${uniqueColors.length} unique color variants:`,
+            uniqueColors.map((c) => c.name).join(", ")
+          );
+
           // Replace product's colors with all available colors if we found variants
           if (uniqueColors.length > 0) {
-            setProduct(prevProduct => ({
+            setProduct((prevProduct) => ({
               ...prevProduct,
-              colors: uniqueColors
+              colors: uniqueColors,
             }));
           }
         }
       } catch (error) {
-        console.error('Error fetching color variants:', error);
+        console.error("Error fetching color variants:", error);
       }
     };
-    
+
     fetchColorVariants();
   }, [product?.name, productId]);
   // When a color is selected, either update the display images or navigate to the variant
- 
 
   // Fetch related products
   useEffect(() => {
@@ -1075,15 +1094,19 @@ const ProductDetailsPage = () => {
   // Toggle wishlist state
   const handleToggleWishlist = () => {
     if (!product) return;
-    
+
     const productForWishlist = {
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.images[0],
-      color: selectedColor || (product.colors && product.colors.length > 0 ? product.colors[0].name : null)
+      color:
+        selectedColor ||
+        (product.colors && product.colors.length > 0
+          ? product.colors[0].name
+          : null),
     };
-    
+
     const isNowInWishlist = toggleWishlist(productForWishlist);
     setIsInWishlistState(isNowInWishlist);
   };
@@ -1091,24 +1114,26 @@ const ProductDetailsPage = () => {
   // Color selection handler
   // When a color is selected, either update the display images or navigate to the variant
   const handleColorSelect = (colorName, variantId, variantHandle) => {
-    console.log(`Color selected: ${colorName}, variant ID: ${variantId}, handle: ${variantHandle}`);
-    
+    console.log(
+      `Color selected: ${colorName}, variant ID: ${variantId}, handle: ${variantHandle}`
+    );
+
     // If selected color is for the current product, just update the selected color
     if (variantId === productId || !variantHandle) {
       console.log(`Selecting color ${colorName} on current product`);
       setSelectedColor(colorName);
-      
+
       // Find images for this color
       const colorImages = getImagesForColor(colorName);
       setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
     } else {
       // If it's another variant, navigate to that product
       console.log(`Navigating to variant with color ${colorName}`);
-      
+
       // Determine what to use for navigation: handle or id
       const navTarget = variantHandle || variantId;
       console.log(`Navigation target: ${navTarget}`);
-      
+
       navigate(`/product/${navTarget}`);
     }
   };
@@ -1154,7 +1179,7 @@ const ProductDetailsPage = () => {
 
   const renderColorVariantsUI = () => {
     if (!colorVariants || colorVariants.length === 0) return null;
-    
+
     return (
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
@@ -1165,11 +1190,13 @@ const ProductDetailsPage = () => {
             <div key={index} className="flex flex-col items-center">
               <button
                 className="w-[40px] h-[40px] overflow-hidden border border-gray-300 rounded-full"
-                onClick={() => navigate(`/product/${variant.handle || variant.id}`)}
+                onClick={() =>
+                  navigate(`/product/${variant.handle || variant.id}`)
+                }
               >
-                <img 
-                  src={variant.image} 
-                  alt={variant.color} 
+                <img
+                  src={variant.image}
+                  alt={variant.color}
                   className="w-full h-full object-cover"
                 />
               </button>
@@ -1181,14 +1208,12 @@ const ProductDetailsPage = () => {
     );
   };
 
-  
-
   return (
     <>
-      <div className="mx-[80px]">
-        <div className="mt-[100px] md:mt-[100px] flex flex-col md:flex-row">
+      <div className="mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]">
+        <div className="mt-[60px] sm:mt-[80px] md:mt-[100px] flex flex-col md:flex-row">
           {/* Left Side: Product Carousel */}
-          <div className="mb-8 md:mb-0 mr-[50px]">
+          <div className="mb-8 md:mb-0 md:mr-[50px] w-full md:w-auto md:flex-1">
             <ProductCarousel images={displayImages} />
 
             {/* Related Products - Also inside the max-w-screen-xl container */}
@@ -1236,7 +1261,7 @@ const ProductDetailsPage = () => {
           </div>
 
           {/* Right Side: Product Details */}
-          <div className="w-[400px] flex flex-col justify-start">
+          <div className="w-full md:w-[400px] flex flex-col justify-start">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
             {/*  Star Rating */}
@@ -1252,9 +1277,9 @@ const ProductDetailsPage = () => {
             </p>
 
             <hr className="border-t border-gray-300 my-4" />
-           
+
             {/* Color Selection - Only show if there are colors */}
-            <ColorVariants 
+            <ColorVariants
               product={product}
               productId={productId}
               selectedColor={selectedColor}
@@ -1327,7 +1352,9 @@ const ProductDetailsPage = () => {
               ) : (
                 <FiHeart className="h-[15px] w-[15px]" />
               )}
-              <span>{isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}</span>
+              <span>
+                {isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}
+              </span>
             </div>
 
             <hr className="border-t border-gray-300 my-4" />
@@ -1363,11 +1390,11 @@ const ProductDetailsPage = () => {
           </div>
         </div>
       </div>
-      
+
       <div ref={reviewsRef}>
-        <CustomersReviews productName={product.name}/>
+        <CustomersReviews productName={product.name} />
       </div>
-      
+
       <div className="mx-[20px] mt-[50px] mb-[100px]">
         {/* Customers Also Purchased Section */}
         {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (

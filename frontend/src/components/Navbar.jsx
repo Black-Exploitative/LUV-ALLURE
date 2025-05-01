@@ -532,7 +532,7 @@ export default function Navbar() {
         <div className={`hidden md:flex items-center space-x-6 text-xs lg:text-[12px] ${darkNavbar ? "text-white" : "text-black"}`}>
           {/* Show these links only on larger screens */}
           <a href="/contact-us" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">CONTACT US</a>
-          <a href="#" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">SERVICES</a>
+          <a href="/services" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">SERVICES</a>
           
           {/* Icons - wrapped in a flex container with consistent alignment */}
           <div className="flex items-center space-x-6">
