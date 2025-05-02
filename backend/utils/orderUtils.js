@@ -13,12 +13,11 @@ async function createShopifyOrder(order) {
         return { id: order.shopifyOrderId };
       }
       
-      // First try to get product variants properly formatted
-      const lineItems = order.items.map(item => {
-        // Strip any format that may have been added to the variant ID 
-        // and get just the numeric part
+      const lineItems = [];
+    
+        for (const item of order.items) {
         let variantId = item.variantId;
-        
+
         // If it has a format like "gid://shopify/ProductVariant/123456", extract just the ID
         if (typeof variantId === 'string' && variantId.includes('/')) {
           variantId = variantId.split('/').pop();
@@ -32,25 +31,52 @@ async function createShopifyOrder(order) {
         // Now format it properly for the Shopify Admin API
         const formattedVariantId = `gid://shopify/ProductVariant/${variantId}`;
         
-        console.log(`Original variantId: ${item.variantId}, Formatted: ${formattedVariantId}`);
+        try {
+        // Verify that this variant exists and is available
+        const variant = await shopifyClient.getProductVariantById(variantId);
         
-        return {
-          variantId: formattedVariantId,
-          quantity: item.quantity || 1
-        };
-      });
-      
-      // Add packaging as a custom line item if premium packaging is selected
-      const customLineItems = [];
-      if (order.packagingDetails?.packagingType !== 'normal' && order.packagingDetails?.packagingPrice > 0) {
-        customLineItems.push({
-          title: order.packagingDetails.packagingName || "Premium Packaging",
-          quantity: 1,
-          originalUnitPrice: (order.packagingDetails.packagingPrice || 0).toString(),
-          requiresShipping: false,
-          taxable: false
-        });
+        if (!variant || !variant.availableForSale) {
+          console.log(`Variant ${variantId} is not available, will use custom line item instead`);
+          // Don't add to lineItems - it will be added as custom line item instead
+        } else {
+          // Add as a real product line item
+          lineItems.push({
+            variantId: formattedVariantId,
+            quantity: item.quantity || 1
+          });
+        }
+      } catch (error) {
+        console.log(`Error verifying variant ${variantId}, will use custom line item instead:`, error);
+        // Don't add to lineItems - it will be added as custom line item instead
       }
+     }
+
+        const customLineItems = order.items
+        .filter(item => {
+        const normalizedId = (typeof item.variantId === 'string' && item.variantId.includes('/'))
+            ? item.variantId.split('/').pop()
+            : item.variantId;
+        
+        return !lineItems.some(li => li.variantId.includes(normalizedId));
+        })
+        .map(item => ({
+        title: item.title || 'Product',
+        quantity: item.quantity || 1,
+        originalUnitPrice: (parseFloat(item.price) || 0).toString(),
+        requiresShipping: true,
+        taxable: true
+        }));
+      
+      
+        if (order.packagingDetails?.packagingType !== 'normal' && order.packagingDetails?.packagingPrice > 0) {
+            customLineItems.push({
+              title: order.packagingDetails.packagingName || "Premium Packaging",
+              quantity: 1,
+              originalUnitPrice: (order.packagingDetails.packagingPrice || 0).toString(),
+              requiresShipping: false,
+              taxable: false
+            });
+          }
       
       // Prepare shipping address
       const shippingAddress = {
@@ -74,9 +100,10 @@ async function createShopifyOrder(order) {
           price: (order.shipping || 0).toString()
         },
         customer: {
-          firstName: order.shippingAddress.firstName || "Customer",
+            id: order.customerId || null,
+          /*firstName: order.shippingAddress.firstName || "Customer",
           lastName: order.shippingAddress.lastName || "",
-          email: order.shippingAddress.email || "customer@example.com"
+          email: order.shippingAddress.email || "customer@example.com"*/
         },
         customAttributes: [
           { key: "Source", value: "Luv's Allure Website" },

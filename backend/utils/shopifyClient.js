@@ -25,7 +25,7 @@ class ShopifyClient {
       // const fetch = require('node-fetch'); // Uncomment if using node-fetch directly
       
       const response = await fetch(
-        `${this.shopifyDomain}/admin/api/${this.apiVersion}/graphql.json`,
+        `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/graphql.json`,
         {
           method: 'POST',
           headers: {
@@ -613,7 +613,6 @@ class ShopifyClient {
               subtotalPrice
               customer {
                 id
-                email
               }
             }
             userErrors {
@@ -691,27 +690,27 @@ class ShopifyClient {
       
       // Mark the order as paid
       const markAsPaidQuery = `
-        mutation orderMarkAsPaid($id: ID!, $input: OrderMarkAsPaidInput!) {
-          orderMarkAsPaid(id: $id, input: $input) {
-            order {
-              id
-              name
-              displayFinancialStatus
-            }
-            userErrors {
-              field
-              message
-            }
+      mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
+        orderMarkAsPaid(input: $input) {
+          order {
+            id
+            name
+            displayFinancialStatus
+          }
+          userErrors {
+            field
+            message
           }
         }
-      `;
-      
-      const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
+      }
+    `;
+
+    // And replace the current adminQuery call with:
+    const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
+      input: { 
         id: orderId,
-        input: { 
-          notifyCustomer: false 
-        }
-      });
+      }
+    });
       
       if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
         throw new Error(`Mark as paid errors: ${JSON.stringify(markAsPaidResult.orderMarkAsPaid.userErrors)}`);
