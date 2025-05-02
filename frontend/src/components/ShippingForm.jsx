@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import shippingService from '../services/shippingService';
 
 const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
   const { currentUser } = useAuth();
+  const { cartItems, getCartTotals } = useCart();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -17,11 +19,14 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
     zipCode: '',
     country: 'Nigeria',
     phone: '',
+    email: '',
     saveInfo: true
   });
   
   const [errors, setErrors] = useState({});
   const [nigerianStates, setNigerianStates] = useState([]);
+  const [estimatedShipping, setEstimatedShipping] = useState(null);
+  const [isEstimating, setIsEstimating] = useState(false);
   
   // Initialize form with user data or initial data
   useEffect(() => {
@@ -44,6 +49,48 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
     setNigerianStates(shippingService.getNigerianStates());
   }, [currentUser, initialData]);
   
+  // Function to get shipping estimate when state changes
+  useEffect(() => {
+    const getShippingEstimate = async () => {
+      // Only estimate if we have enough information
+      if (formData.state && formData.city) {
+        setIsEstimating(true);
+        try {
+          const { subtotal } = getCartTotals();
+          
+          // Prepare minimal address for shipping estimate
+          const shippingAddress = {
+            state: formData.state,
+            city: formData.city,
+            address: formData.address || "Unknown",
+            country: "Nigeria"
+          };
+          
+          // Get shipping estimate
+          const estimate = await shippingService.getShippingEstimate(
+            { items: cartItems, subtotal }, 
+            shippingAddress
+          );
+          
+          if (estimate.success) {
+            setEstimatedShipping(estimate);
+          } else {
+            setEstimatedShipping(null);
+          }
+        } catch (error) {
+          console.error('Error estimating shipping:', error);
+          setEstimatedShipping(null);
+        } finally {
+          setIsEstimating(false);
+        }
+      } else {
+        setEstimatedShipping(null);
+      }
+    };
+    
+    getShippingEstimate();
+  }, [formData.state, formData.city, cartItems, getCartTotals]);
+  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prevData => ({
@@ -64,16 +111,27 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
     const newErrors = {};
     
     // Required fields
-    const requiredFields = ['firstName', 'lastName', 'address', 'city', 'state', 'phone'];
+    const requiredFields = ['firstName', 'lastName', 'address', 'city', 'state', 'phone', 'email'];
     requiredFields.forEach(field => {
       if (!formData[field] || formData[field].trim() === '') {
         newErrors[field] = 'This field is required';
       }
     });
     
-    // Phone validation
-    if (formData.phone && !/^\d{10,15}$/.test(formData.phone.replace(/\D/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number';
+    // Email validation
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    // Phone validation (Nigerian format)
+    if (formData.phone) {
+      // Remove any non-digit characters for validation
+      const digitsOnly = formData.phone.replace(/\D/g, '');
+      
+      // Check for Nigerian number formats (should be 10-11 digits)
+      if (!(digitsOnly.length >= 10 && digitsOnly.length <= 15)) {
+        newErrors.phone = 'Please enter a valid phone number (10-15 digits)';
+      }
     }
     
     // Nigerian state validation
@@ -92,6 +150,20 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
     
     if (validateForm()) {
       onSubmit(formData);
+    }
+  };
+  
+  // Calculate shipping provider display name
+  const getProviderDisplayName = (provider) => {
+    if (!provider) return '';
+    
+    switch (provider.toUpperCase()) {
+      case 'GIGL':
+        return 'GIGL Express';
+      case 'BOLT':
+        return 'Bolt Delivery';
+      default:
+        return provider;
     }
   };
   
@@ -136,6 +208,24 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
               <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
             )}
           </div>
+        </div>
+        
+        {/* Email Address */}
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            Email Address *
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded focus:outline-none focus:ring-1 focus:ring-black`}
+          />
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+          )}
         </div>
         
         {/* Address */}
@@ -266,6 +356,35 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
             <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
           )}
         </div>
+        
+        {/* Shipping estimate display */}
+        {formData.state && formData.city && (
+          <div className="mb-6 p-4 border border-gray-200 rounded-md bg-gray-50">
+            <h4 className="font-medium mb-2">Estimated Shipping</h4>
+            
+            {isEstimating ? (
+              <div className="flex items-center">
+                <span className="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></span>
+                <p className="text-sm text-gray-600">Calculating shipping...</p>
+              </div>
+            ) : estimatedShipping ? (
+              <div>
+                <div className="flex justify-between mb-1">
+                  <p className="text-sm">{getProviderDisplayName(estimatedShipping.provider)}</p>
+                  <p className="text-sm font-medium">₦{estimatedShipping.cost.toLocaleString()}</p>
+                </div>
+                <p className="text-xs text-gray-600">
+                  Estimated delivery: {estimatedShipping.estimatedDeliveryDays} business days
+                  {estimatedShipping.isEstimate && ' (estimate)'}
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600">
+                Unable to estimate shipping at this time. Final cost will be calculated at checkout.
+              </p>
+            )}
+          </div>
+        )}
         
         {/* Save info checkbox */}
         <div className="mb-8">

@@ -568,8 +568,9 @@ class ShopifyClient {
     const formattedId = `gid://shopify/ProductVariant/${cleanId}`;
     
     const query = `
-      query GetProductVariant($id: ID!) {
-        productVariant(id: $id) {
+    query GetNodeById($id: ID!) {
+      node(id: $id) {
+        ... on ProductVariant {
           id
           title
           product {
@@ -581,19 +582,20 @@ class ShopifyClient {
             amount
           }
           availableForSale
-          inventoryQuantity
+          quantityAvailable
         }
       }
-    `;
-    
-    try {
-      const result = await this.query(query, { id: formattedId });
-      return result.productVariant;
-    } catch (error) {
-      console.error(`Error fetching variant ${variantId}:`, error);
-      return null;
     }
+  `;
+  
+  try {
+    const result = await this.query(query, { id: formattedId });
+    return result.node;
+  } catch (error) {
+    console.error(`Error fetching variant ${variantId}:`, error);
+    return null;
   }
+}
 
   /**
    * Create an order in Shopify
@@ -647,7 +649,10 @@ class ShopifyClient {
         note: orderData.note,
         customAttributes: orderData.customAttributes,
         email: orderData.email,
-        tags: orderData.tags || ["website-order"]
+        tags: orderData.tags || ["website-order"],
+        // Add payment info
+        appliedDiscount: null,
+        paymentTerms: null
       };
       
       // Execute the draft order creation
@@ -688,29 +693,28 @@ class ShopifyClient {
       
       const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
       
-      // Mark the order as paid
+      // Now mark the order as paid AFTER we have the orderId
       const markAsPaidQuery = `
-      mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
-        orderMarkAsPaid(input: $input) {
-          order {
-            id
-            name
-            displayFinancialStatus
-          }
-          userErrors {
-            field
-            message
+        mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
+          orderMarkAsPaid(input: $input) {
+            order {
+              id
+              name
+              displayFinancialStatus
+            }
+            userErrors {
+              field
+              message
+            }
           }
         }
-      }
-    `;
-
-    // And replace the current adminQuery call with:
-    const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
-      input: { 
-        id: orderId,
-      }
-    });
+      `;
+  
+      const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
+        input: { 
+          id: orderId,
+        }
+      });
       
       if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
         throw new Error(`Mark as paid errors: ${JSON.stringify(markAsPaidResult.orderMarkAsPaid.userErrors)}`);
@@ -727,7 +731,6 @@ class ShopifyClient {
       console.error('Error creating Shopify order:', error);
       throw error;
     }
-  } }
-
+  }}
 
 module.exports = new ShopifyClient();

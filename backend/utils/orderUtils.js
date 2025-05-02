@@ -3,8 +3,6 @@ const shopifyClient = require('./shopifyClient');
 const Order = require('../models/Order');
 
 // Shared function for creating Shopify orders
-// In utils/orderUtils.js
-// In utils/orderUtils.js - Revised approach for handling real products
 async function createShopifyOrder(order) {
     try {
       // Only create a Shopify order if it doesn't already exist
@@ -62,7 +60,7 @@ async function createShopifyOrder(order) {
         .map(item => ({
         title: item.title || 'Product',
         quantity: item.quantity || 1,
-        originalUnitPrice: (parseFloat(item.price) || 0).toString(),
+        originalUnitPrice : ((parseFloat(item.price) || 0) * 100).toString(),
         requiresShipping: true,
         taxable: true
         }));
@@ -155,7 +153,7 @@ async function createShopifyOrder(order) {
           const customLineItems = order.items.map(item => ({
             title: item.title || 'Product',
             quantity: item.quantity || 1,
-            originalUnitPrice: (parseFloat(item.price) || 0).toString(),
+            originalUnitPrice : ((parseFloat(item.price) || 0) * 100).toString(),
             requiresShipping: true,
             taxable: true
           }));

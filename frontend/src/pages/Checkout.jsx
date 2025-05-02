@@ -30,6 +30,7 @@ const Checkout = () => {
   const [selectedPackaging, setSelectedPackaging] = useState(packagingOptions[0]); // Default to standard
   const [giftMessage, setGiftMessage] = useState('');
   const [showGiftMessage, setShowGiftMessage] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   // Redirect to cart if empty
   useEffect(() => {
@@ -180,6 +181,7 @@ const Checkout = () => {
   
   // Handle successful payment
   const handlePaymentSuccess = async (paymentResult) => {
+    setIsRedirecting(true);
     try {
       // Verify that the order was created in Shopify (additional server call)
       const orderResponse = await fetch(`/api/orders/${paymentResult.order.id}/verify-shopify`, {
@@ -212,6 +214,7 @@ const Checkout = () => {
     } catch (error) {
       console.error('Error finalizing order:', error);
       // Even if Shopify sync fails, the order was still placed in our system
+      setIsRedirecting(false);
       clearCart();
       toast.success('Your order has been placed successfully!');
       navigate(`/order-confirmation/${paymentResult.order.id}`);
@@ -460,7 +463,7 @@ const Checkout = () => {
                           </div>
                           <div className="ml-4">
                             <p className="font-medium">
-                              ₦{((typeof item.price === 'string' ? parseFloat(item.price) : item.price) * (item.quantity || 1)).toLocaleString()}
+                              ₦{((typeof item.price === 'string' ? parseFloat(item.price) * 1000 : item.price) * (item.quantity || 1)).toLocaleString()}
                             </p>
                           </div>
                         </div>
@@ -549,6 +552,15 @@ const Checkout = () => {
           {renderStepContent()}
         </div>
       </div>
+      {isRedirecting && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg text-center">
+          <div className="animate-spin w-16 h-16 border-4 border-black border-t-transparent rounded-full mx-auto mb-4"></div>
+          <h2 className="text-xl font-medium mb-2">Processing Your Order</h2>
+          <p>Please wait while we complete your purchase...</p>
+        </div>
+      </div>
+        )}
     </div>
   );
 };
