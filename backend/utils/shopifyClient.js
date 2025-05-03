@@ -5,8 +5,61 @@ const shopifyConfig = require('../config/shopify');
 class ShopifyClient {
   constructor() {
     this.shopifyDomain = `https://${shopifyConfig.shopName}.myshopify.com`;
+    this.adminAccessToken = shopifyConfig.adminAccessToken;
     this.storefrontAccessToken = shopifyConfig.storefrontAccessToken;
     this.apiVersion = shopifyConfig.apiVersion;
+    this.adminApiVersion = shopifyConfig.adminApiVersion; // Added for admin API
+  }
+
+  async adminQuery(query, variables = {}) {
+    try {
+      // Debug output
+      console.log("Admin API URL:", `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/graphql.json`);
+      console.log("Using Admin Token:", this.adminAccessToken ? "Token exists" : "No token found");
+      
+      if (!this.adminAccessToken) {
+        throw new Error("No admin access token provided. Check your .env file.");
+      }
+  
+      // Using node-fetch for compatibility
+      // const fetch = require('node-fetch'); // Uncomment if using node-fetch directly
+      
+      const response = await fetch(
+        `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/graphql.json`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': this.adminAccessToken
+          },
+          body: JSON.stringify({ query, variables })
+        }
+      );
+  
+      // Log HTTP status
+      console.log(`Admin API response status: ${response.status} ${response.statusText}`);
+      
+      // Handle non-200 responses
+      if (!response.ok) {
+        // Get the text response for better error information
+        const errorText = await response.text();
+        throw new Error(`Shopify API returned ${response.status}: ${errorText}`);
+      }
+  
+      const jsonResponse = await response.json();
+      
+      // Check for GraphQL errors
+      if (jsonResponse.errors) {
+        const errorMsg = JSON.stringify(jsonResponse.errors);
+        console.error("GraphQL errors:", errorMsg);
+        throw new Error(`GraphQL errors: ${errorMsg}`);
+      }
+  
+      return jsonResponse.data;
+    } catch (error) {
+      console.error('Shopify Admin API detailed error:', error);
+      throw error;
+    }
   }
 
   async query(query, variables = {}) {
@@ -497,6 +550,192 @@ class ShopifyClient {
 
     return this.query(query, { collectionId: formattedId, first });
   }
+
+  // Add this helper function to shopifyClient.js
+  async getProductVariantById(variantId) {
+    // Clean up the variant ID
+    let cleanId = variantId;
+    if (typeof cleanId === 'string') {
+      if (cleanId.includes('/')) {
+        cleanId = cleanId.split('/').pop();
+      }
+      if (cleanId.includes('-')) {
+        cleanId = cleanId.split('-')[0];
+      }
+    }
+    
+    // Format as a Shopify GraphQL ID
+    const formattedId = `gid://shopify/ProductVariant/${cleanId}`;
+    
+    const query = `
+    query GetNodeById($id: ID!) {
+      node(id: $id) {
+        ... on ProductVariant {
+          id
+          title
+          product {
+            id
+            title
+            availableForSale
+          }
+          price {
+            amount
+          }
+          availableForSale
+          quantityAvailable
+        }
+      }
+    }
+  `;
+  
+  try {
+    const result = await this.query(query, { id: formattedId });
+    return result.node;
+  } catch (error) {
+    console.error(`Error fetching variant ${variantId}:`, error);
+    return null;
+  }
 }
 
+  /**
+   * Create an order in Shopify
+   * @param {Object} orderData Order data including lineItems, shipping, etc.
+   * @returns {Promise<Object>} Created order
+   */
+  async createOrder(orderData) {
+    try {
+      // First create a draft order with proper line item handling
+      const draftOrderQuery = `
+        mutation draftOrderCreate($input: DraftOrderInput!) {
+          draftOrderCreate(input: $input) {
+            draftOrder {
+              id
+              name
+              totalPrice
+              subtotalPrice
+              customer {
+                id
+              }
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+      
+      // Format custom line items using the correct Shopify format
+      const formattedLineItems = [...orderData.lineItems];
+      
+      // If custom line items exist, add them
+      if (orderData.customLineItems && orderData.customLineItems.length > 0) {
+        orderData.customLineItems.forEach(item => {
+          formattedLineItems.push({
+            title: item.title,
+            quantity: item.quantity,
+            originalUnitPrice: item.originalUnitPrice,
+            taxable: item.taxable,
+            requiresShipping: item.requiresShipping
+          });
+        });
+      }
+      
+      // Create draft order input with properly formatted line items
+      const draftOrderInput = {
+        lineItems: formattedLineItems,
+        shippingLine: orderData.shippingLine,
+        shippingAddress: orderData.shippingAddress,
+        note: orderData.note,
+        customAttributes: orderData.customAttributes,
+        email: orderData.email,
+        tags: orderData.tags || ["website-order"],
+        // Add payment info
+        appliedDiscount: null,
+        paymentTerms: null
+      };
+      
+      // Execute the draft order creation
+      const draftOrderResult = await this.adminQuery(draftOrderQuery, { input: draftOrderInput });
+      
+      if (draftOrderResult.draftOrderCreate.userErrors.length > 0) {
+        throw new Error(`Draft order creation errors: ${JSON.stringify(draftOrderResult.draftOrderCreate.userErrors)}`);
+      }
+      
+      const draftOrderId = draftOrderResult.draftOrderCreate.draftOrder.id;
+      
+      // Complete the draft order to create an actual order
+      const completeDraftOrderQuery = `
+        mutation draftOrderComplete($id: ID!) {
+          draftOrderComplete(id: $id) {
+            draftOrder {
+              id
+              order {
+                id
+                name
+                processedAt
+                totalPrice
+              }
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+      
+      const completeResult = await this.adminQuery(completeDraftOrderQuery, { id: draftOrderId });
+      
+      if (completeResult.draftOrderComplete.userErrors.length > 0) {
+        throw new Error(`Draft order completion errors: ${JSON.stringify(completeResult.draftOrderComplete.userErrors)}`);
+      }
+      
+      const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
+      
+      // TRY to mark the order as paid, but don't fail if it doesn't work
+      try {
+        const markAsPaidQuery = `
+          mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
+            orderMarkAsPaid(input: $input) {
+              order {
+                id
+                name
+                displayFinancialStatus
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `;
+  
+        const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
+          input: { 
+            id: orderId
+          }
+        });
+        
+        if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
+          console.warn(`Warning: Could not mark order as paid: ${JSON.stringify(markAsPaidResult.orderMarkAsPaid.userErrors)}`);
+        }
+      } catch (paymentError) {
+        // Log the error but don't fail the order creation
+        console.warn('Warning: Could not mark order as paid:', paymentError.message);
+      }
+      
+      // Return the order data regardless of payment marking status
+      return {
+        id: orderId,
+        name: completeResult.draftOrderComplete.draftOrder.order.name,
+        processedAt: completeResult.draftOrderComplete.draftOrder.order.processedAt,
+        totalPrice: completeResult.draftOrderComplete.draftOrder.order.totalPrice
+      };
+    } catch (error) {
+      console.error('Error creating Shopify order:', error);
+      throw error;
+    }
+  }
+}
 module.exports = new ShopifyClient();

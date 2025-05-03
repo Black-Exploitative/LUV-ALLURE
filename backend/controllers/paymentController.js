@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const paystackClient = require('../utils/paystackClient');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
+const { createShopifyOrder } = require('../utils/orderUtils');
 
 // Initialize a payment transaction
 exports.initializePayment = async (req, res, next) => {
@@ -26,7 +27,7 @@ exports.initializePayment = async (req, res, next) => {
     // Initialize transaction with Paystack
     const paymentData = {
       email,
-      amount: Math.round(amount * 100), // Convert to kobo (Paystack uses smallest currency unit)
+      amount, // Convert to kobo (Paystack uses smallest currency unit)
       reference,
       metadata: {
         order_id: orderId,
@@ -202,3 +203,151 @@ exports.getBanks = async (req, res, next) => {
     });
   }
 };
+
+// backend/controllers/paymentController.js
+// Add this function to your existing controller
+
+// Handle Paystack callback
+exports.handlePaymentCallback = async (req, res) => {
+    try {
+      const { reference, trxref } = req.query;
+      
+      if (!reference) {
+        // Redirect to a failure page if no reference is provided
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
+      }
+      
+      // Look up the order by reference
+      const order = await Order.findOne({ reference });
+      
+      if (!order) {
+        console.error('Order not found for reference:', reference);
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
+      }
+      
+      // If the order is already paid, just redirect to success page
+      if (order.paymentStatus === 'paid') {
+        return res.redirect(`${process.env.FRONTEND_URL}/order-confirmation/${order.reference}`);
+      }
+      
+      // Verify the payment with Paystack
+      try {
+        const verifyResponse = await paystackClient.verifyTransaction(reference);
+        
+        if (verifyResponse.data.status === 'success') {
+          // Update the order
+          order.paymentStatus = 'paid';
+          order.status = 'processing';
+          const data = verifyResponse.data;
+          
+          order.paymentDetails = {
+            reference: data.reference,
+            amount: data.amount / 100, // Convert from kobo to naira
+            currency: data.currency,
+            channel: data.channel,
+            paymentDate: new Date(),
+            transactionId: data.id,
+            authCode: data.authorization?.authorization_code || null,
+            cardLast4: data.authorization?.last4 || null,
+            cardBrand: data.authorization?.card_type || null
+          };
+          
+          await order.save();
+          
+          // Create Shopify order
+          try {
+            await createShopifyOrder(order);
+          } catch (shopifyError) {
+            console.error('Error creating Shopify order from callback:', shopifyError);
+            // Continue processing even if Shopify sync fails
+          }
+          
+          // Clear the user's cart
+          try {
+            if (order.userId) {
+              await Cart.findOneAndUpdate(
+                { userId: order.userId },
+                { items: [] }
+              );
+            }
+            // Also clear local storage cart in frontend
+            // This can be done in the handlePaymentSuccess function in Checkout.jsx
+          } catch (cartError) {
+            console.error('Error clearing cart:', cartError);
+          }
+          
+          // Update inventory (if not already handled by Shopify)
+          // Loop through items and update inventory in your database if needed
+          for (const item of order.items) {
+            try {
+              // Get variant ID from the item
+              const variantId = item.variantId || item.id;
+              if (!variantId) continue;
+              
+              // Normalize variant ID if needed
+              let normalizedId = variantId;
+              if (typeof normalizedId === 'string') {
+                if (normalizedId.includes('/')) {
+                  normalizedId = normalizedId.split('/').pop();
+                }
+                if (normalizedId.includes('-')) {
+                  normalizedId = normalizedId.split('-')[0];
+                }
+              }
+              
+              // Get current inventory level
+              const Product = require('../models/Product'); // Adjust path as needed
+              
+              // Find the product in your local database
+              const product = await Product.findOne({ 
+                'variants.variantId': normalizedId 
+              });
+              
+              if (product) {
+                // Find the specific variant
+                const variantIndex = product.variants.findIndex(v => 
+                  v.variantId === normalizedId || v.variantId === String(normalizedId)
+                );
+                
+                if (variantIndex >= 0) {
+                  // Get current inventory and ordered quantity
+                  const currentInventory = product.variants[variantIndex].inventoryQuantity || 0;
+                  const orderedQuantity = item.quantity || 1;
+                  
+                  // Calculate new inventory level (prevent negative values)
+                  const newInventory = Math.max(0, currentInventory - orderedQuantity);
+                  
+                  // Update inventory in your database
+                  product.variants[variantIndex].inventoryQuantity = newInventory;
+                  
+                  // If inventory reaches zero, mark as not available
+                  if (newInventory === 0) {
+                    product.variants[variantIndex].availableForSale = false;
+                  }
+                  
+                  await product.save();
+                  
+                  console.log(`Updated inventory for ${product.title} - ${product.variants[variantIndex].title}: ${currentInventory} → ${newInventory}`);
+                }
+              }
+            } catch (error) {
+              console.error(`Error updating inventory for item ${item.title || item.name}:`, error);
+              // Continue processing other items even if this one fails
+            }
+          }
+          
+          // Redirect to success page
+          return res.redirect(`${process.env.FRONTEND_URL}/user-account?tab=orders&success=true&order=${order.reference}`);
+        } else {
+          // Payment wasn't successful
+          return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?reference=${reference}`);
+        }
+      } catch (verifyError) {
+        console.error('Error verifying payment:', verifyError);
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?reference=${reference}`);
+      }
+    } catch (error) {
+      console.error('Payment callback error:', error);
+      return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
+    }
+  };

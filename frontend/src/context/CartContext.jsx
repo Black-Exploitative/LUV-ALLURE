@@ -187,6 +187,7 @@ export const CartProvider = ({ children }) => {
       const itemWithId = {
         ...item,
         id: generateProductId(item),
+        variantId: variantId, // Ensure variantId is always set
         dateAdded: new Date().toISOString(),
         quantity: safeQuantity, // Use the safe quantity
         availableQuantity: inventory.quantity // Store the available quantity for future reference

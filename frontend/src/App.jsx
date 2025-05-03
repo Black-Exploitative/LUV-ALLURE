@@ -41,6 +41,7 @@ import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
 import ServicesPage from "./pages/ServicesPage";
 import CollectionHeroForm from "./admin/forms/CollectionHeroForm";
 import CollectionForm from "./admin/forms/CollectionForm"; // New collection form
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 const AppContent = () => {
   const location = useLocation();
@@ -108,8 +109,8 @@ const AppContent = () => {
 
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
-        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
+        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+        {/*<Route path="/payment-failed" element={<PaymentFailed />} />*/}
 
         <Route path="/collections" element={<CollectionsPage />} /> 
         <Route path="/collections/:handle" element={<DynamicCollectionPage />} /> 

@@ -16,4 +16,9 @@ router.post('/webhook', paymentController.paystackWebhook);
 // Get banks list
 router.get('/banks', paymentController.getBanks);
 
+// Callback route for Paystack redirects
+router.get('/callback', paymentController.handlePaymentCallback);
+
+
+
 module.exports = router;

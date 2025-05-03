@@ -135,6 +135,13 @@ const OrderSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+  shopifySyncAttempted: {
+    type: Boolean,
+    default: false
+  },
+  shopifySyncError: {
+    type: String
   }
 });
 

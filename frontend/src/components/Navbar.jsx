@@ -210,13 +210,10 @@ export default function Navbar() {
           links: [
             { name: "Dresses", href: "#" },
             { name: "Tops", href: "#" },
-            { name: "Skirts + Shorts", href: "#" },
+            { name: "Skirts & Skorts", href: "#" },
             { name: "Sets", href: "#" },
             { name: "Pants", href: "#" },
-            { name: "Playsuits + Jumpsuits", href: "#" },
-            { name: "Knitwear", href: "#" },
-            { name: "Coats + Jackets", href: "#" },
-            { name: "Loungewear", href: "#" },
+            { name: "Playsuits & Jumpsuits", href: "#" },
             { name: "All Clothing", href: "/shop" }
           ]
         },
@@ -262,7 +259,7 @@ export default function Navbar() {
             { name: "Party Dresses", href: "#" },
             { name: "Wedding Guest Dresses", href: "#" },
             { name: "Bridesmaid Dresses", href: "#" },
-            { name: "Bridal Dresses", href: "#" },
+//            { name: "Bridal Dresses", href: "#" },
             { name: "Corset Dresses", href: "#" },
             { name: "Bubblehem Dresses", href: "#" },
             { name: "Flowy Dresses", href: "#" }
@@ -276,7 +273,7 @@ export default function Navbar() {
             { name: "Pink Dresses", href: "#" },
             { name: "Yellow Dresses", href: "#" },
             { name: "Blue Dresses", href: "#" },
-            { name: "Sparkle Dresses", href: "#" }
+            { name: "Embelishment Dresses", href: "#" }
           ]
         }
       ],
@@ -293,21 +290,13 @@ export default function Navbar() {
         {
           title: "COLLECTIONS",
           links: [
-            { name: "Atelier", href: "#" },
-            { name: "La Muse", href: "#" },
-            { name: "Amore", href: "#" },
-            { name: "Starlet 2.0", href: "#" },
-            { name: "La Soir", href: "#" },
-            { name: "Novella", href: "#" },
-            { name: "Mon Chéri", href: "#" },
-            { name: "Noir", href: "#" },
             { name: "All Collections", href: "#s" }
           ]
         },
         {
           title: "OCCASION",
           links: [
-            { name: "Prom", href: "#" },
+            { name: "Birthdays", href: "#" },
             { name: "Formal", href: "#" },
             { name: "Party", href: "#" },
             { name: "Wedding Guest", href: "#" },
@@ -320,13 +309,6 @@ export default function Navbar() {
         {
           title: "TRENDING",
           links: [
-            { name: "Prom Season", href: "#" },
-            { name: "The Wedding Edit", href: "#" },
-            { name: "Red Edit", href: "#" },
-            { name: "Pretty in Pink", href: "#" },
-            { name: "White Edit", href: "#" },
-            { name: "Sparkle Edit", href: "#" },
-            { name: "Monochrome Edit", href: "#" }
           ]
         }
       ],
@@ -346,8 +328,6 @@ export default function Navbar() {
             { name: "New Arrivals", href: "#" },
             { name: "Back In Stock", href: "#" },
             { name: "Most Popular", href: "#" },
-            { name: "Prom Season", href: "#" },
-            { name: "Atelier", href: "#" }
           ]
         }
       ],
@@ -538,7 +518,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-6">
             
             <motion.div className="flex items-center h-full"> 
-              <SearchBar />
+              <SearchBar darkNavbar={darkNavbar} />
             </motion.div>
             
             <a href="/user-account">
@@ -567,20 +547,14 @@ export default function Navbar() {
         {/* Mobile Right Icons */}
         <div className={`md:hidden flex space-x-4 items-center ${darkNavbar ? "text-white" : "text-black"}`}>
           <motion.div className="flex items-center">
-            <motion.img 
-              src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
-              alt="Search" 
-              className="w-5 h-5 cursor-pointer" 
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            />
+            <SearchBar darkNavbar={darkNavbar} />
           </motion.div>
           
           <motion.div className="flex items-center">
             <motion.img 
               src={darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"} 
               alt="Phone" 
-              className="w-5 h-5 cursor-pointer"
+              className="w-[12.6px] h-[15px] cursor-pointer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             />

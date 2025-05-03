@@ -1,679 +1,566 @@
 // frontend/src/pages/Checkout.jsx
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { toast } from "react-hot-toast";
-import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
-import PaymentProcessor from "../components/PaymentProcessor";
-import shippingService from "../services/shippingService";
-import api from "../services/api";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import PaymentProcessor from '../components/PaymentProcessor';
+import ShippingForm from '../components/ShippingForm';
+import OrderSummary from '../components/OrderSummary';
+import PackagingSelection from '../components/PackagingSelection';
+import CheckoutNavbar from '../components/CheckOutNavbar';
+import packagingOptions from '../config/packagingOptions';
+import paymentService from '../services/paymentService';
+import shippingService from '../services/shippingService';
 
 const Checkout = () => {
-  const { cartItems, getCartTotals, checkStockAvailability, clearCart } = useCart();
-  const { currentUser } = useAuth();
+  // Navigation and hooks
   const navigate = useNavigate();
+  const { cartItems, getCartTotals, clearCart, checkStockAvailability } = useCart();
+  const { currentUser, isAuthenticated } = useAuth();
   
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [shippingMethods, setShippingMethods] = useState([]);
-  const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
-  const [packagingOptions, setPackagingOptions] = useState([
-    { id: 'normal', name: 'Normal Packaging', price: 0, description: 'Standard eco-friendly packaging' },
-    { id: 'luxe', name: 'Luxe Packaging', price: 2000, description: 'Premium gift box with satin ribbon' },
-    { id: 'gift', name: 'Gift Packaging', price: 3000, description: 'Luxury gift box with personalized note card' }
-  ]);
-  const [selectedPackaging, setSelectedPackaging] = useState(packagingOptions[0]);
+  // State management
+  const [currentStep, setCurrentStep] = useState('shipping');
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [orderData, setOrderData] = useState(null);
+  const [shippingAddress, setShippingAddress] = useState(null);
+  const [shippingMethod, setShippingMethod] = useState(null);
+  const [shippingCost, setShippingCost] = useState(0);
+  const [selectedPackaging, setSelectedPackaging] = useState(packagingOptions[0]); // Default to standard
   const [giftMessage, setGiftMessage] = useState('');
-  const [formData, setFormData] = useState({
-    firstName: currentUser?.firstName || '',
-    lastName: currentUser?.lastName || '',
-    email: currentUser?.email || '',
-    phone: currentUser?.phoneNumber || '',
-    address: '',
-    city: '',
-    state: 'Lagos',
-    country: 'Nigeria',
-    zipCode: '',
-  });
-  const [orderSummary, setOrderSummary] = useState({
-    subtotal: 0,
-    shipping: 0,
-    tax: 0,
-    packaging: 0,
-    total: 0
-  });
-  const [createdOrder, setCreatedOrder] = useState(null);
-  const [paymentComplete, setPaymentComplete] = useState(false);
-
-  // Calculate order summary when cart items, shipping method, or packaging change
+  const [showGiftMessage, setShowGiftMessage] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  
+  // Redirect to cart if empty
   useEffect(() => {
-    const { subtotal } = getCartTotals();
-    const shippingCost = selectedShippingMethod ? selectedShippingMethod.cost : 0;
-    const packagingCost = selectedPackaging ? selectedPackaging.price : 0;
-    const taxRate = 0.05; // 5% VAT for Nigeria
-    const taxAmount = subtotal * taxRate;
-    
-    setOrderSummary({
-      subtotal,
-      shipping: shippingCost,
-      packaging: packagingCost,
-      tax: taxAmount,
-      total: subtotal + shippingCost + packagingCost + taxAmount
-    });
-  }, [cartItems, selectedShippingMethod, selectedPackaging, getCartTotals]);
-
-  // Fetch shipping methods when address is updated
+    if (cartItems.length === 0) {
+      navigate('/shopping-bag');
+      toast.error('Your cart is empty. Please add items before checkout.');
+    }
+  }, [cartItems, navigate]);
+  
+  // Redirect to sign in if not authenticated
   useEffect(() => {
-    const fetchShippingEstimates = async () => {
-      // Only fetch if we have at least city and state
-      if (formData.city && formData.state) {
-        try {
-          setLoading(true);
-          
-          // Create simplified cart for shipping calculation
-          const cartSummary = {
-            items: cartItems.map(item => ({
-              id: item.id,
-              quantity: item.quantity || 1,
-              category: item.category || 'default'
-            }))
-          };
-          
-          // Get shipping estimates
-          const shippingAddress = {
-            city: formData.city,
-            state: formData.state,
-            country: formData.country
-          };
-          
-          const giglEstimate = await shippingService.calculateGIGLShipping(cartSummary, shippingAddress);
-          const boltEstimate = await shippingService.calculateBoltShipping(cartSummary, shippingAddress);
-          
-          // Format shipping methods
-          const methods = [];
-          
-          if (giglEstimate.success) {
-            methods.push({
-              id: 'gigl',
-              name: 'GIGL Delivery',
-              description: `Estimated delivery time: ${giglEstimate.estimatedDeliveryDays} days`,
-              cost: giglEstimate.cost,
-              provider: 'GIGL',
-              estimatedDays: giglEstimate.estimatedDeliveryDays
-            });
-          }
-          
-          if (boltEstimate.success) {
-            methods.push({
-              id: 'bolt',
-              name: 'Bolt Express',
-              description: `Estimated delivery time: ${boltEstimate.estimatedDeliveryDays} days`,
-              cost: boltEstimate.cost,
-              provider: 'Bolt',
-              estimatedDays: boltEstimate.estimatedDeliveryDays
-            });
-          }
-          
-          setShippingMethods(methods);
-          
-          // Auto-select the first method if none is selected
-          if (methods.length > 0 && !selectedShippingMethod) {
-            setSelectedShippingMethod(methods[0]);
-          }
-        } catch (error) {
-          console.error('Error fetching shipping estimates:', error);
-          toast.error('Failed to calculate shipping. Please try again.');
-        } finally {
-          setLoading(false);
-        }
+    if (!isAuthenticated) {
+      navigate('/signin?redirect=checkout');
+      toast.error('Please sign in to continue with checkout.');
+    }
+  }, [isAuthenticated, navigate]);
+  
+  // Handle shipping form submission
+  const handleShippingSubmit = async (formData) => {
+    try {
+      // Check stock availability before proceeding
+      const stockCheck = await checkStockAvailability();
+      if (!stockCheck) {
+        toast.error('Some items in your cart are out of stock or quantities have been adjusted');
+        navigate('/shopping-bag');
+        return;
       }
-    };
-    
-    fetchShippingEstimates();
-  }, [formData.city, formData.state, formData.country, cartItems]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  const handleSelectShippingMethod = (method) => {
-    setSelectedShippingMethod(method);
-  };
-
-  const handleSelectPackaging = (packaging) => {
-    setSelectedPackaging(packaging);
-  };
-
-  const handleGiftMessageChange = (e) => {
-    setGiftMessage(e.target.value);
-  };
-
-  const validateShippingForm = () => {
-    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state'];
-    for (const field of requiredFields) {
-      if (!formData[field]) {
-        toast.error(`Please fill in your ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
-        return false;
+      
+      // Save shipping address
+      setShippingAddress(formData);
+      
+      // Calculate shipping cost based on address
+      const { subtotal } = getCartTotals();
+      
+      const shippingEstimate = await shippingService.getShippingEstimate(
+        { items: cartItems, total: subtotal },
+        formData
+      );
+      
+      if (shippingEstimate.success) {
+        setShippingMethod(shippingEstimate.provider);
+        setShippingCost(shippingEstimate.cost);
+        
+        // Move to packaging selection
+        setCurrentStep('packaging');
+      } else {
+        toast.error(shippingEstimate.message || 'Failed to calculate shipping cost');
       }
+    } catch (error) {
+      console.error('Error processing shipping:', error);
+      toast.error('An error occurred. Please try again.');
     }
-    
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error('Please enter a valid email address');
-      return false;
-    }
-    
-    // Check if shipping method is selected
-    if (!selectedShippingMethod) {
-      toast.error('Please select a shipping method');
-      return false;
-    }
-    
-    return true;
   };
-
-  const handleProceedToPayment = async () => {
-    // Validate form
-    if (!validateShippingForm()) return;
-    
-    // Check stock availability
-    setLoading(true);
-    const stockAvailable = await checkStockAvailability();
-    if (!stockAvailable) {
-      setLoading(false);
-      return; // Error toast is shown by the checkStockAvailability function
+  
+  // Handle packaging selection
+  const handlePackagingSubmit = () => {
+    // If gift packaging is selected but no message is provided, show prompt
+    if (selectedPackaging.id === 'gift' && !giftMessage.trim() && !showGiftMessage) {
+      setShowGiftMessage(true);
+      toast('Would you like to add a gift message?', { icon: '🎁' });
+      return;
     }
+    
+    // Proceed to review
+    setCurrentStep('review');
+  };
+  
+  // Handle review submission and create order
+  const handleReviewSubmit = async () => {
+    setIsProcessingOrder(true);
     
     try {
-      // Create a unique order reference
-      const reference = `LA-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+      // Generate a unique reference for the transaction
+      const reference = paymentService.generateTransactionReference();
       
-      // Format order items
-      const orderItems = cartItems.map(item => ({
-        variantId: item.variantId || item.id,
-        quantity: item.quantity || 1,
-        title: item.name || item.title,
-        price: typeof item.price === 'string' ? parseFloat(item.price.replace(/,/g, '')) : item.price,
-        image: item.image || (item.images && item.images[0])
-      }));
+      // Get cart totals
+      const { subtotal } = getCartTotals();
+      const tax = Math.round(subtotal * 0.05); // 5% tax
       
-      // Create order in database
-      const orderData = {
-        items: orderItems,
-        subtotal: orderSummary.subtotal,
-        tax: orderSummary.tax,
-        shipping: orderSummary.shipping,
-        packagingOption: selectedPackaging,
-        giftMessage: giftMessage,
-        total: orderSummary.total,
-        transactionId: reference, // Use same reference as transaction ID for now
-        reference,
-        shippingProvider: selectedShippingMethod.provider,
-        estimatedDeliveryDays: selectedShippingMethod.estimatedDays,
-        shippingAddress: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          country: formData.country,
-          zipCode: formData.zipCode,
-          phone: formData.phone,
-          email: formData.email
-        }
-      };
+      // Add packaging cost
+      const packagingCost = selectedPackaging.price;
       
-      const response = await api.post('/orders/create', orderData);
+      // Calculate total
+      const total = subtotal + shippingCost + tax + packagingCost;
       
-      if (response.data.success) {
-        // Store created order for payment
-        setCreatedOrder({
-          ...response.data,
-          ...orderData,
-          id: response.data.orderId
+      // Create order on backend
+      const response = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          items: cartItems.map(item => ({
+            variantId: item.variantId || item.id,
+            quantity: item.quantity || 1,
+            title: item.name || item.title,
+            price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+            image: item.image || (item.images && item.images[0])
+          })),
+          subtotal,
+          tax,
+          shipping: shippingCost,
+          packagingOption: selectedPackaging,
+          giftMessage: giftMessage.trim() || null,
+          total,
+          transactionId: reference,
+          reference,
+          shippingProvider: shippingMethod,
+          estimatedDeliveryDays: '3-5', // Default estimate
+          shippingAddress: {
+            ...shippingAddress,
+            email: currentUser.email
+          }
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Prepare order data for payment processing
+        setOrderData({
+          id: data.orderId,
+          reference: reference,
+          email: currentUser.email,
+          firstName: shippingAddress.firstName,
+          lastName: shippingAddress.lastName,
+          subtotal,
+          shipping: shippingCost,
+          packaging: packagingCost,
+          tax,
+          total,
+          items: cartItems
         });
         
         // Move to payment step
-        setStep(2);
+        setCurrentStep('payment');
       } else {
-        toast.error('Error creating order. Please try again.');
+        toast.error(data.message || 'Failed to create order. Please try again.');
       }
     } catch (error) {
       console.error('Error creating order:', error);
-      toast.error('Error creating order. Please try again.');
+      toast.error('An error occurred while processing your order. Please try again.');
     } finally {
-      setLoading(false);
+      setIsProcessingOrder(false);
     }
   };
-
-  const handlePaymentSuccess = (paymentResult) => {
-    setPaymentComplete(true);
-    toast.success('Payment successful!');
-    clearCart(); // Clear the cart
-    setStep(3); // Move to confirmation step
+  
+  // Handle successful payment
+  const handlePaymentSuccess = async (paymentResult) => {
+    setIsRedirecting(true);
+    try {
+      // Verify that the order was created in Shopify (additional server call)
+      const orderResponse = await fetch(`/api/orders/${paymentResult.order.id}/verify-shopify`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      const orderData = await orderResponse.json();
+      
+      // If Shopify order wasn't created yet, trigger creation
+      if (!orderData.shopifyOrderId) {
+        await fetch(`/api/orders/${paymentResult.order.id}/create-shopify`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+      }
+      
+      // Clear the cart
+      clearCart();
+      
+      // Show success message
+      toast.success('Your order has been placed successfully!');
+      
+      // Navigate to order confirmation page
+      navigate(`/order-confirmation/${paymentResult.order.id}`);
+    } catch (error) {
+      console.error('Error finalizing order:', error);
+      // Even if Shopify sync fails, the order was still placed in our system
+      setIsRedirecting(false);
+      clearCart();
+      toast.success('Your order has been placed successfully!');
+      navigate(`/order-confirmation/${paymentResult.order.id}`);
+    }
   };
-
+  
+  // Handle payment cancellation
   const handlePaymentCancel = () => {
-    toast.error('Payment cancelled');
-    // Stay on payment step, user can try again
+    // Go back to review step
+    setCurrentStep('review');
+    toast.error('Payment cancelled. You can try again.');
   };
-
-  const handleGoToOrders = () => {
-    navigate('/user-account?tab=orders');
+  
+  // Handle back button navigation
+  const handleBackClick = () => {
+    switch (currentStep) {
+      case 'packaging':
+        setCurrentStep('shipping');
+        break;
+      case 'review':
+        setCurrentStep('packaging');
+        break;
+      case 'payment':
+        setCurrentStep('review');
+        break;
+      default:
+        navigate('/shopping-bag');
+        break;
+    }
   };
-
-  const handleGoToHome = () => {
-    navigate('/');
-  };
-
-  if (cartItems.length === 0 && !paymentComplete) {
+  
+  // Render progress steps indicator
+  const renderProgressSteps = () => {
+    const steps = [
+      { id: 'shipping', label: 'Shipping' },
+      { id: 'packaging', label: 'Packaging' },
+      { id: 'review', label: 'Review' },
+      { id: 'payment', label: 'Payment' }
+    ];
+    
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-medium mb-6">Your cart is empty</h1>
-        <p className="mb-8">You don't have any items in your cart to checkout.</p>
-        <button
-          onClick={() => navigate('/shop')}
-          className="bg-black text-white px-6 py-2 hover:bg-gray-800 transition-colors"
-        >
-          Continue Shopping
-        </button>
+      <div className="flex justify-center mb-8">
+        {steps.map((step, index) => (
+          <div key={step.id} className="flex items-center">
+            {/* Step circle */}
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              currentStep === step.id 
+                ? 'bg-black text-white' 
+                : steps.indexOf(steps.find(s => s.id === currentStep)) > index
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-200 text-gray-700'
+            }`}>
+              {steps.indexOf(steps.find(s => s.id === currentStep)) > index ? (
+                <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                index + 1
+              )}
+            </div>
+            
+            {/* Step label */}
+            <div className={`text-sm ml-2 ${
+              currentStep === step.id ? 'text-black font-medium' : 'text-gray-600'
+            }`}>
+              {step.label}
+            </div>
+            
+            {/* Connector line (except after last step) */}
+            {index < steps.length - 1 && (
+              <div className="w-16 h-[1px] bg-gray-300 mx-4"></div>
+            )}
+          </div>
+        ))}
       </div>
     );
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Checkout progress */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center max-w-3xl mx-auto">
-          <div className={`flex flex-col items-center ${step >= 1 ? 'text-black' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 1 ? 'bg-black text-white' : 'bg-gray-200'}`}>
-              1
+  };
+  
+  // Calculate order summary for the current state
+  const getOrderSummary = () => {
+    const { subtotal, itemCount } = getCartTotals();
+    const tax = Math.round(subtotal * 0.05); // 5% tax
+    const packagingCost = selectedPackaging ? selectedPackaging.price : 0;
+    const total = subtotal + (shippingCost || 0) + tax + packagingCost;
+    
+    return {
+      subtotal,
+      itemCount,
+      shipping: shippingCost || 0,
+      tax,
+      packaging: packagingCost,
+      total
+    };
+  };
+  
+  // Render the appropriate step content
+  const renderStepContent = () => {
+    const summary = getOrderSummary();
+    
+    switch(currentStep) {
+      case 'shipping':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <ShippingForm 
+                onSubmit={handleShippingSubmit} 
+                isLoading={isProcessingOrder}
+                initialData={shippingAddress}
+              />
             </div>
-            <span className="text-sm">Shipping</span>
-          </div>
-          <div className={`h-1 flex-1 mx-4 ${step >= 2 ? 'bg-black' : 'bg-gray-200'}`}></div>
-          <div className={`flex flex-col items-center ${step >= 2 ? 'text-black' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 2 ? 'bg-black text-white' : 'bg-gray-200'}`}>
-              2
+            <div>
+              <OrderSummary {...summary} />
             </div>
-            <span className="text-sm">Payment</span>
           </div>
-          <div className={`h-1 flex-1 mx-4 ${step >= 3 ? 'bg-black' : 'bg-gray-200'}`}></div>
-          <div className={`flex flex-col items-center ${step >= 3 ? 'text-black' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 3 ? 'bg-black text-white' : 'bg-gray-200'}`}>
-              3
-            </div>
-            <span className="text-sm">Confirmation</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Main content */}
-        <div className="md:w-2/3">
-          {/* Step 1: Shipping information */}
-          {step === 1 && (
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h2 className="text-xl font-medium mb-6">Shipping Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm text-gray-600 mb-1">Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">State</label>
-                  <select
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  >
-                    {shippingService.getNigerianStates().map(state => (
-                      <option key={state} value={state}>{state}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Country</label>
-                  <input
-                    type="text"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                    disabled
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">ZIP Code</label>
-                  <input
-                    type="text"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-                  />
-                </div>
-              </div>
-
-              {/* Shipping Methods */}
-              <div className="mb-6">
-                <h3 className="text-lg font-medium mb-3">Shipping Method</h3>
-                {loading ? (
-                  <div className="p-4 border border-gray-200 rounded">
-                    <div className="flex items-center justify-center">
-                      <svg className="animate-spin h-5 w-5 text-gray-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>Calculating shipping options...</span>
-                    </div>
-                  </div>
-                ) : shippingMethods.length === 0 ? (
-                  <div className="p-4 border border-gray-200 rounded text-center">
-                    <p>Please enter your shipping address to see delivery options.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {shippingMethods.map(method => (
-                      <div 
-                        key={method.id} 
-                        className={`p-4 border rounded cursor-pointer transition-colors ${
-                          selectedShippingMethod?.id === method.id 
-                            ? 'border-black bg-gray-50' 
-                            : 'border-gray-200 hover:border-gray-400'
-                        }`}
-                        onClick={() => handleSelectShippingMethod(method)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <input 
-                              type="radio" 
-                              checked={selectedShippingMethod?.id === method.id}
-                              onChange={() => handleSelectShippingMethod(method)}
-                              className="mr-3"
-                            />
-                            <div>
-                              <div className="font-medium">{method.name}</div>
-                              <div className="text-sm text-gray-600">{method.description}</div>
-                            </div>
-                          </div>
-                          <div className="font-medium">₦{method.cost.toLocaleString()}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Packaging Options */}
-              <div className="mb-6">
-                <h3 className="text-lg font-medium mb-3">Packaging Options</h3>
-                <div className="space-y-3">
-                  {packagingOptions.map(option => (
-                    <div 
-                      key={option.id} 
-                      className={`p-4 border rounded cursor-pointer transition-colors ${
-                        selectedPackaging?.id === option.id 
-                          ? 'border-black bg-gray-50' 
-                          : 'border-gray-200 hover:border-gray-400'
-                      }`}
-                      onClick={() => handleSelectPackaging(option)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <input 
-                            type="radio" 
-                            checked={selectedPackaging?.id === option.id}
-                            onChange={() => handleSelectPackaging(option)}
-                            className="mr-3"
-                          />
-                          <div>
-                            <div className="font-medium">{option.name}</div>
-                            <div className="text-sm text-gray-600">{option.description}</div>
-                          </div>
-                        </div>
-                        <div className="font-medium">
-                          {option.price > 0 ? `₦${option.price.toLocaleString()}` : 'Free'}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Gift Message */}
-              {selectedPackaging?.id === 'gift' && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-3">Gift Message</h3>
-                  <textarea
-                    value={giftMessage}
-                    onChange={handleGiftMessageChange}
-                    placeholder="Enter your gift message here..."
-                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black"
-                    rows={4}
-                    maxLength={200}
-                  ></textarea>
-                  <div className="text-right text-sm text-gray-500">
-                    {giftMessage.length}/200 characters
-                  </div>
-                </div>
-              )}
-
-              {/* Continue button */}
-              <div className="mt-8">
+        );
+        
+      case 'packaging':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <PackagingSelection
+                selectedPackaging={selectedPackaging}
+                onSelectPackaging={setSelectedPackaging}
+                giftMessage={giftMessage}
+                onGiftMessageChange={setGiftMessage}
+              />
+              
+              <div className="mt-8 flex justify-between">
+                <button
+                  onClick={handleBackClick}
+                  className="text-gray-600 hover:text-black flex items-center"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                  Back to Shipping
+                </button>
+                
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-black text-white py-3 text-sm uppercase tracking-wide"
-                  onClick={handleProceedToPayment}
-                  disabled={loading}
+                  onClick={handlePackagingSubmit}
+                  className="px-6 py-2 bg-black text-white"
                 >
-                  {loading ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : (
-                    'Proceed to Payment'
-                  )}
+                  Continue to Review
                 </motion.button>
               </div>
             </div>
-          )}
-
-          {/* Step 2: Payment */}
-          {step === 2 && createdOrder && (
-            <PaymentProcessor
-              orderData={{
-                id: createdOrder.id,
-                reference: createdOrder.reference,
-                email: formData.email,
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                subtotal: orderSummary.subtotal,
-                shipping: orderSummary.shipping,
-                tax: orderSummary.tax,
-                packaging: orderSummary.packaging,
-                total: orderSummary.total,
-                items: cartItems
-              }}
-              onPaymentSuccess={handlePaymentSuccess}
-              onPaymentCancel={handlePaymentCancel}
-            />
-          )}
-
-          {/* Step 3: Confirmation */}
-          {step === 3 && (
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-medium mb-4">Thank you for your order!</h2>
-              <p className="text-gray-600 mb-8">
-                Your order has been received and is now being processed. You will receive an email confirmation shortly.
-              </p>
-              <p className="text-gray-700 mb-2">
-                Order reference: <span className="font-medium">{createdOrder?.reference}</span>
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
-                <button
-                  onClick={handleGoToOrders}
-                  className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition-colors"
-                >
-                  View My Orders
-                </button>
-                <button
-                  onClick={handleGoToHome}
-                  className="border border-black px-6 py-3 rounded hover:bg-gray-50 transition-colors"
-                >
-                  Continue Shopping
-                </button>
-              </div>
+            <div>
+              <OrderSummary {...summary} />
             </div>
-          )}
-        </div>
-
-        {/* Order summary */}
-        <div className="md:w-1/3">
-          <div className="bg-white p-6 rounded-lg shadow-sm sticky top-24">
-            <h2 className="text-xl font-medium mb-6">Order Summary</h2>
-            
-            {/* Items */}
-            <div className="mb-6">
-              <h3 className="font-medium mb-3 pb-3 border-b">Items ({cartItems.length})</h3>
-              <div className="space-y-4 max-h-60 overflow-y-auto mb-4">
-                {cartItems.map(item => (
-                  <div key={item.id} className="flex items-center">
-                    <div className="w-16 h-16 bg-gray-100 flex-shrink-0">
-                      <img
-                        src={item.image || (item.images && item.images[0]) || "/images/placeholder.jpg"}
-                        alt={item.name || item.title}
-                        className="w-full h-full object-cover"
-                      />
+          </div>
+        );
+        
+      case 'review':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="space-y-8">
+                {/* Order review section */}
+                <div>
+                  <h3 className="text-xl font-medium mb-4">Review Your Order</h3>
+                  
+                  {/* Shipping information */}
+                  <div className="border rounded-lg p-6 mb-6">
+                    <div className="flex justify-between mb-4">
+                      <h4 className="font-medium">Shipping Information</h4>
+                      <button
+                        onClick={() => setCurrentStep('shipping')}
+                        className="text-sm text-gray-600 hover:text-black underline"
+                      >
+                        Edit
+                      </button>
                     </div>
-                    <div className="ml-4 flex-1">
-                      <div className="text-sm font-medium truncate">{item.name || item.title}</div>
-                      <div className="text-xs text-gray-500">
-                        Qty: {item.quantity || 1}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-gray-600 text-sm">Contact</p>
+                        <p>{currentUser.email}</p>
+                        <p>{shippingAddress.phone}</p>
                       </div>
-                      <div className="text-sm">
-                        ₦{typeof item.price === 'string' 
-                          ? parseFloat(item.price.replace(/,/g, '')).toLocaleString() 
-                          : item.price.toLocaleString()}
+                      <div>
+                        <p className="text-gray-600 text-sm">Ship to</p>
+                        <p>{shippingAddress.firstName} {shippingAddress.lastName}</p>
+                        <p>{shippingAddress.address}</p>
+                        <p>{shippingAddress.city}, {shippingAddress.state}</p>
+                        <p>{shippingAddress.country}</p>
                       </div>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <p className="text-gray-600 text-sm">Shipping Method</p>
+                      <p>{shippingMethod} (₦{shippingCost.toLocaleString()}) - Estimated delivery: 3-5 business days</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Totals */}
-            <div className="space-y-2 mb-6">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span>₦{orderSummary.subtotal.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span>{selectedShippingMethod ? `₦${orderSummary.shipping.toLocaleString()}` : '-'}</span>
-              </div>
-              {selectedPackaging && selectedPackaging.price > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Packaging ({selectedPackaging.name})</span>
-                  <span>₦{selectedPackaging.price.toLocaleString()}</span>
+                  
+                  {/* Packaging information */}
+                  <div className="border rounded-lg p-6 mb-6">
+                    <div className="flex justify-between mb-4">
+                      <h4 className="font-medium">Packaging</h4>
+                      <button
+                        onClick={() => setCurrentStep('packaging')}
+                        className="text-sm text-gray-600 hover:text-black underline"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                    <div className="flex items-center">
+                      <img 
+                        src={selectedPackaging.imageUrl} 
+                        alt={selectedPackaging.name} 
+                        className="w-16 h-16 object-cover rounded mr-4"
+                      />
+                      <div>
+                        <p className="font-medium">{selectedPackaging.name}</p>
+                        <p className="text-sm text-gray-600">{selectedPackaging.description}</p>
+                        {selectedPackaging.price > 0 ? (
+                          <p className="text-sm">₦{selectedPackaging.price.toLocaleString()}</p>
+                        ) : (
+                          <p className="text-sm text-green-600">Free</p>
+                        )}
+                      </div>
+                    </div>
+                    {selectedPackaging.id === 'gift' && giftMessage && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-gray-600 text-sm mb-2">Gift Message:</p>
+                        <p className="text-sm italic bg-gray-50 p-3 rounded">{giftMessage}</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Items */}
+                  <div className="border rounded-lg p-6">
+                    <h4 className="font-medium mb-4">Order Items ({cartItems.length})</h4>
+                    <div className="space-y-4">
+                      {cartItems.map((item) => (
+                        <div key={item.id} className="flex items-center border-b border-gray-100 pb-4">
+                          <img 
+                            src={item.image || (item.images && item.images[0])} 
+                            alt={item.name || item.title} 
+                            className="w-16 h-16 object-cover rounded mr-4"
+                          />
+                          <div className="flex-1">
+                            <p className="font-medium">{item.name || item.title}</p>
+                            <p className="text-sm text-gray-600">
+                              Quantity: {item.quantity || 1}
+                            </p>
+                          </div>
+                          <div className="ml-4">
+                            <p className="font-medium">
+                              ₦{((typeof item.price === 'string' ? parseFloat(item.price) * 1000 : item.price) * (item.quantity || 1)).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-gray-600">VAT (5%)</span>
-                <span>₦{orderSummary.tax.toLocaleString()}</span>
-              </div>
-              <div className="border-t pt-2 mt-2 flex justify-between font-medium text-lg">
-                <span>Total</span>
-                <span>₦{orderSummary.total.toLocaleString()}</span>
+                
+                <div className="flex justify-between">
+                  <button
+                    onClick={handleBackClick}
+                    className="text-gray-600 hover:text-black flex items-center"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Packaging
+                  </button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleReviewSubmit}
+                    disabled={isProcessingOrder}
+                    className="px-6 py-2 bg-black text-white flex items-center justify-center min-w-[150px]"
+                  >
+                    {isProcessingOrder ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      'Proceed to Payment'
+                    )}
+                  </motion.button>
+                </div>
               </div>
             </div>
-            
-            {/* Return to cart */}
-            {step === 1 && (
-              <button
-                onClick={() => navigate('/shopping-bag')}
-                className="text-sm text-gray-600 hover:text-black underline"
-              >
-                Return to cart
-              </button>
-            )}
+            <div>
+              <OrderSummary {...summary} />
+            </div>
           </div>
+        );
+        
+      case 'payment':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <PaymentProcessor 
+                orderData={orderData}
+                onPaymentSuccess={handlePaymentSuccess}
+                onPaymentCancel={handlePaymentCancel}
+              />
+            </div>
+            <div>
+              <OrderSummary {...summary} />
+            </div>
+          </div>
+        );
+        
+      default:
+        return <p>Loading...</p>;
+    }
+  };
+  
+  // If cart is empty, don't render the checkout page
+  if (cartItems.length === 0 || !isAuthenticated) {
+    return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  }
+  
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      <CheckoutNavbar />
+      
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <h1 className="text-2xl font-light mb-8 text-center uppercase tracking-wider">Checkout</h1>
+        
+        {/* Progress steps indicator */}
+        {renderProgressSteps()}
+        
+        {/* Main content */}
+        <div className="mb-16">
+          {renderStepContent()}
         </div>
       </div>
+      {isRedirecting && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg text-center">
+          <div className="animate-spin w-16 h-16 border-4 border-black border-t-transparent rounded-full mx-auto mb-4"></div>
+          <h2 className="text-xl font-medium mb-2">Processing Your Order</h2>
+          <p>Please wait while we complete your purchase...</p>
+        </div>
+      </div>
+        )}
     </div>
   );
 };

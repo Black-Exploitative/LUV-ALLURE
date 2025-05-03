@@ -1,5 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -19,10 +17,12 @@ const SearchBar = ({ darkNavbar }) => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const navigate = useNavigate();
   const searchTimeoutRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   // Close search when clicking outside
   useEffect(() => {
@@ -64,6 +64,19 @@ const SearchBar = ({ darkNavbar }) => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
+    
+    // Set typing state to true whenever the search query changes
+    setIsTyping(true);
+    
+    // Clear the typing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set a new typing timeout to set isTyping to false after 1.5 seconds
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+    }, 1500);
 
     if (searchQuery.trim().length >= 2) {
       setLoading(true);
@@ -87,6 +100,9 @@ const SearchBar = ({ darkNavbar }) => {
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
       }
     };
   }, [searchQuery, selectedColor, selectedSize, selectedCategory]);
@@ -118,6 +134,11 @@ const SearchBar = ({ darkNavbar }) => {
       });
 
       setSearchResults(response.products || []);
+      
+      // If search is successful with results, hide suggestions
+      if (response.products && response.products.length > 0) {
+        setShowSuggestions(false);
+      }
 
       // Save search query to recent searches if it's meaningful
       if (searchQuery.trim().length >= 3) {
@@ -214,6 +235,13 @@ const SearchBar = ({ darkNavbar }) => {
     }
   };
 
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+    // When the user starts typing, show suggestions again
+    setIsTyping(true);
+    setShowSuggestions(true);
+  };
+
   const handleColorSelect = (colorId) => {
     setSelectedColor(colorId === selectedColor ? null : colorId);
   };
@@ -252,6 +280,12 @@ const SearchBar = ({ darkNavbar }) => {
     handleCloseSearch();
   };
 
+  // Determine if we should show suggestions
+  const shouldShowSuggestions = showSuggestions && 
+                               suggestions.length > 0 && 
+                               isTyping && 
+                               (!searchResults.length || loading);
+
   return (
     <div ref={searchRef} className="relative z-40">
       {/* Search icon button */}
@@ -263,7 +297,7 @@ const SearchBar = ({ darkNavbar }) => {
         <motion.img 
           src={darkNavbar ? "/icons/search.svg" : "/icons/search-black.svg"} 
           alt="Search" 
-          className="w-5 h-5 cursor-pointer" 
+          className="w-[15px] h-[15px] cursor-pointer" 
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         />
@@ -282,14 +316,14 @@ const SearchBar = ({ darkNavbar }) => {
             <div className="max-w-screen-xl mx-auto">
               {/* Search input */}
               <div className="flex items-center border-b border-gray-200 py-4 px-4">
-                <FaSearch className="text-gray-400 mr-3" />
+                <img src="/icons/search-black.svg" className="mr-3" />
                 <input
                   ref={inputRef}
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="SEARCH..."
-                  className="flex-grow text-base uppercase font-light focus:outline-none text-gray-700"
+                  onChange={handleSearchInputChange}
+                  placeholder="Search for products, colors, categories..."
+                  className="flex-grow text-base font-thin tracking-wide focus:outline-none text-gray-700"
                   autoComplete="off"
                 />
                 <button 
@@ -329,8 +363,8 @@ const SearchBar = ({ darkNavbar }) => {
               </div>
             )}
 
-            {/* Search suggestions */}
-            {showSuggestions && suggestions.length > 0 && (
+            {/* Search suggestions - only shown while typing and before results are found */}
+            {shouldShowSuggestions && (
               <div className="max-w-screen-xl mx-auto p-4">
                 <h4 className="text-xs text-gray-500 mb-2">SUGGESTIONS</h4>
                 <div className="flex flex-wrap gap-2">

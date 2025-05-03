@@ -1,10 +1,11 @@
-// controllers/orderController.js - Complete controller with packaging options
+// backend/controllers/orderController.js - Enhanced to handle Shopify integration
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const User = require('../models/User');
 const shopifyClient = require('../utils/shopifyClient');
 const axios = require('axios');
 const crypto = require('crypto');
+const { createShopifyOrder } = require('../utils/orderUtils');
 
 // Create a new order and initialize payment
 exports.createOrder = async (req, res, next) => {
@@ -14,23 +15,21 @@ exports.createOrder = async (req, res, next) => {
       subtotal, 
       tax, 
       shipping, 
-      packagingOption, // New packaging option field
-      giftMessage, // New gift message field
+      packagingOption, // Packaging option object
+      giftMessage, // Gift message for gift packaging
       total, 
       transactionId, 
+      reference, 
       shippingProvider,
       estimatedDeliveryDays,
       shippingAddress 
     } = req.body;
     
-    // Generate a unique reference for Paystack
-    const reference = `LA-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-    
     // Create order in our database
     const order = new Order({
       userId: req.user ? req.user.id : null,
       items: items.map(item => ({
-        variantId: item.id || item.variantId,
+        variantId: item.variantId || item.id,
         quantity: item.quantity || 1,
         title: item.name || item.title,
         price: item.price,
@@ -72,7 +71,7 @@ exports.createOrder = async (req, res, next) => {
 // Verify Paystack payment and update order
 exports.verifyPayment = async (req, res, next) => {
   try {
-    const { orderId, reference, transactionId } = req.body;
+    const { orderId, reference } = req.body;
     
     // Find the order
     const order = await Order.findById(orderId);
@@ -102,6 +101,7 @@ exports.verifyPayment = async (req, res, next) => {
         channel: data.channel,
         paymentDate: new Date(),
         transactionId: data.id,
+        authCode: data.authorization?.authorization_code || null,
         cardLast4: data.authorization?.last4 || null,
         cardBrand: data.authorization?.card_type || null
       };
@@ -109,7 +109,13 @@ exports.verifyPayment = async (req, res, next) => {
       await order.save();
       
       // Create order in Shopify
-      await createShopifyOrder(order);
+      try {
+        await createShopifyOrder(order);
+      } catch (shopifyError) {
+        console.error('Error creating Shopify order:', shopifyError);
+        // Continue with success response even if Shopify sync fails
+        // We'll retry Shopify sync later
+      }
       
       // Clear user's cart if they are logged in
       if (order.userId) {
@@ -147,92 +153,55 @@ exports.verifyPayment = async (req, res, next) => {
   }
 };
 
-// Helper function to create order in Shopify
-async function createShopifyOrder(order) {
+// Verify that an order was created in Shopify
+exports.verifyShopifyOrder = async (req, res, next) => {
   try {
-    // Format line items for Shopify
-    const lineItems = order.items.map(item => ({
-      variantId: item.variantId.includes('gid://') 
-        ? item.variantId 
-        : `gid://shopify/ProductVariant/${item.variantId}`,
-      quantity: item.quantity,
-      title: item.title
-    }));
+    const { id } = req.params;
     
-    // If using luxe or gift packaging, add it as a separate line item
-    if (order.packagingDetails?.packagingType !== 'normal' && order.packagingDetails?.packagingPrice > 0) {
-      lineItems.push({
-        title: order.packagingDetails.packagingName,
-        price: order.packagingDetails.packagingPrice.toString(),
-        quantity: 1,
-        requires_shipping: false,
-        taxable: false
-      });
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
     }
     
-    // Prepare shipping address
-    const shippingAddress = {
-      firstName: order.shippingAddress.firstName,
-      lastName: order.shippingAddress.lastName,
-      address1: order.shippingAddress.address,
-      city: order.shippingAddress.city,
-      province: order.shippingAddress.state,
-      country: order.shippingAddress.country,
-      zip: order.shippingAddress.zipCode,
-      phone: order.shippingAddress.phone
-    };
+    return res.status(200).json({
+      success: true,
+      shopifyOrderId: order.shopifyOrderId || null
+    });
+  } catch (error) {
+    console.error('Error verifying Shopify order:', error);
+    next(error);
+  }
+};
+
+// Create a Shopify order for an existing order
+exports.createShopifyOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
     
-    // Create draft order in Shopify
-    const shopifyOrderData = {
-      lineItems,
-      shippingAddress,
-      customer: {
-        firstName: order.shippingAddress.firstName,
-        lastName: order.shippingAddress.lastName,
-        email: order.shippingAddress.email
-      },
-      customAttributes: [
-        { key: "Source", value: "Luv's Allure Website" },
-        { key: "Original Order ID", value: order._id.toString() },
-        { key: "Payment Gateway", value: order.paymentGateway },
-        { key: "Transaction ID", value: order.transactionId },
-        { key: "Shipping Provider", value: order.shippingProvider || "Not specified" },
-        { key: "Estimated Delivery", value: order.estimatedDeliveryDays || "Not specified" },
-        { key: "Packaging Type", value: order.packagingDetails?.packagingName || "Normal Packaging" },
-        // If there's a gift message, add it as a custom attribute
-        ...(order.packagingDetails?.giftMessage ? [{ key: "Gift Message", value: order.packagingDetails.giftMessage }] : [])
-      ],
-      shippingLine: {
-        title: `${order.shippingProvider || "Standard"} Shipping (${order.estimatedDeliveryDays || "3-5"} days)`,
-        price: order.shipping.toString()
-      },
-      note: `Order processed through Luv's Allure website. 
-      Payment via ${order.paymentGateway.toUpperCase()}. 
-      Reference: ${order.reference}.
-      Shipping via: ${order.shippingProvider || "Standard delivery"}.
-      Estimated delivery: ${order.estimatedDeliveryDays || "3-5"} business days.
-      Packaging: ${order.packagingDetails?.packagingName || "Normal Packaging"}
-      ${order.packagingDetails?.giftMessage ? `Gift Message: "${order.packagingDetails.giftMessage}"` : ''}
-      Customer Email: ${order.shippingAddress.email}
-      Customer Phone: ${order.shippingAddress.phone}`
-    };
-    
-    // Create the order in Shopify
-    const shopifyOrder = await shopifyClient.createOrder(shopifyOrderData);
-    
-    // Update our order with Shopify order ID
-    if (shopifyOrder && shopifyOrder.id) {
-      order.shopifyOrderId = shopifyOrder.id;
-      await order.save();
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
     }
     
-    return shopifyOrder;
+    // Don't create Shopify order if payment isn't complete
+    if (order.paymentStatus !== 'paid') {
+      return res.status(400).json({ success: false, message: 'Cannot create Shopify order for unpaid order' });
+    }
+    
+    // Create the Shopify order
+    const shopifyOrder = await createShopifyOrder(order);
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Shopify order created successfully',
+      shopifyOrderId: order.shopifyOrderId
+    });
   } catch (error) {
     console.error('Error creating Shopify order:', error);
-    // Still return successfully even if Shopify order creation fails
-    // The order exists in our system, and we can retry Shopify sync later
+    next(error);
   }
-}
+};
+
 
 // Get all orders for a user
 exports.getOrders = async (req, res, next) => {
@@ -300,11 +269,12 @@ exports.paystackWebhook = async (req, res) => {
         order.status = 'processing';
         order.paymentDetails = {
           reference: data.reference,
-          amount: data.amount / 100,
+          amount: data.amount / 100, // Convert from kobo to naira
           currency: data.currency,
           channel: data.channel,
           paymentDate: new Date(),
           transactionId: data.id,
+          authCode: data.authorization?.authorization_code || null,
           cardLast4: data.authorization?.last4 || null,
           cardBrand: data.authorization?.card_type || null
         };
@@ -312,8 +282,21 @@ exports.paystackWebhook = async (req, res) => {
         await order.save();
         
         // Create Shopify order if it wasn't created earlier
-        if (!order.shopifyOrderId) {
-          await createShopifyOrder(order);
+        try {
+          if (!order.shopifyOrderId) {
+            await createShopifyOrder(order);
+          }
+        } catch (shopifyError) {
+          console.error('Error creating Shopify order from webhook:', shopifyError);
+          // Continue processing even if Shopify sync fails
+        }
+        
+        // Clear the user's cart
+        if (order.userId) {
+          await Cart.findOneAndUpdate(
+            { userId: order.userId },
+            { items: [] }
+          );
         }
       }
     }
@@ -324,6 +307,31 @@ exports.paystackWebhook = async (req, res) => {
     console.error('Error processing Paystack webhook:', error);
     // Always return success to Paystack to prevent them from retrying
     return res.status(200).send('Webhook processed');
+  }
+};
+
+exports.getOrderByReference = async (req, res, next) => {
+  try {
+    const { reference } = req.params;
+    
+    const order = await Order.findOne({
+      reference: reference,
+      userId: req.user ? req.user.id : null
+    });
+    
+    if (!order) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Order not found' 
+      });
+    }
+    
+    res.status(200).json({ 
+      success: true,
+      order 
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -367,4 +375,6 @@ exports.updateOrderStatus = async (req, res, next) => {
     console.error('Error updating order:', error);
     next(error);
   }
+
+  
 };
