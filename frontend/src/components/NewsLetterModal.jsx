@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes } from 'react-icons/fa';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaTimes } from "react-icons/fa";
 
 const NewsletterModal = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Show modal after 1 minute (60000ms)
@@ -28,21 +28,21 @@ const NewsletterModal = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
+      setError("Please enter a valid email address");
       return;
     }
-    
-    console.log('Email submitted:', email);
-    
+
+    console.log("Email submitted:", email);
+
     // Save to localStorage to prevent showing again
-    localStorage.setItem('hasSubscribed', 'true');
-    
+    localStorage.setItem("hasSubscribed", "true");
+
     // Show success state
     setSubmitted(true);
-    setError('');
-    
+    setError("");
+
     // Close modal after 3 seconds
     setTimeout(() => {
       setIsVisible(false);
@@ -75,21 +75,26 @@ const NewsletterModal = () => {
               className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors cursor-pointer"
               aria-label="Close"
             >
-              <FaTimes  size={24} />
+              <FaTimes size={24} />
             </button>
-            
+
             {/* Modal content */}
             <div className="flex flex-col items-center text-center">
               {!submitted ? (
                 <>
-                  <div className="font-serif tracking-wider text-xl mb-1">LUV'S ALLURE</div>
+                  <div className="font-serif tracking-wider text-xl mb-1">
+                    LUV'S ALLURE
+                  </div>
                   {/* Border line */}
                   <div className="w-16 h-px bg-black my-3"></div>
                   {/* Modal header */}
-                  <h2 className="font-serif text-2xl mb-6 uppercase tracking-widest">Join the exclusive list</h2>
+                  <h2 className="font-serif text-2xl mb-6 uppercase tracking-widest">
+                    Join the exclusive list
+                  </h2>
                   {/* Message */}
-                  <p className="text-sm  mb-8 max-w-xs font-light  text-gray-800 font-base font-[Raleway] ">
-                    Be the first to know about new collections, and the latest in high fashion.
+                  <p className="text-sm  mb-8 max-w-xs font-thin  text-gray-800 font-base font-[Raleway] ">
+                    Be the first to know about new collections, and the latest
+                    in high fashion.
                   </p>
                   {/* Form */}
                   <form onSubmit={handleSubmit} className="w-full">
@@ -102,9 +107,13 @@ const NewsletterModal = () => {
                         className="w-full border-b border-gray-300 py-2 px-1 text-sm focus:outline-none focus:border-black transition-colors"
                         required
                       />
-                      {error && <p className="text-xs text-red-500 mt-1 absolute">{error}</p>}
+                      {error && (
+                        <p className="text-xs text-red-500 mt-1 absolute">
+                          {error}
+                        </p>
+                      )}
                     </div>
-                    
+
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -113,9 +122,10 @@ const NewsletterModal = () => {
                     >
                       Subscribe
                     </motion.button>
-                    
+
                     <p className="text-xs text-gray-500 mt-4">
-                      By subscribing, you agree to our Privacy Policy and consent to receive updates from our company.
+                      By subscribing, you agree to our Privacy Policy and
+                      consent to receive updates from our company.
                     </p>
                   </form>
                 </>
@@ -123,10 +133,13 @@ const NewsletterModal = () => {
                 <>
                   {/* Success message */}
                   <div className="py-6">
-                    <h2 className="font-serif text-2xl mb-3 uppercase tracking-widest">Thank You</h2>
+                    <h2 className="font-serif text-2xl mb-3 uppercase tracking-widest">
+                      Thank You
+                    </h2>
                     <div className="w-16 h-px bg-black my-3 mx-auto"></div>
                     <p className="text-sm text-gray-700 mt-4 font-[Raleway]">
-                      You've been added to our exclusive list. Expect the unexpected.
+                      You've been added to our exclusive list. Expect the
+                      unexpected.
                     </p>
                   </div>
                 </>

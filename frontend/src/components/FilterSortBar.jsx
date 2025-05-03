@@ -5,7 +5,11 @@ import { IoCloseOutline } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) => {
+const FilterSortBar = ({
+  onGridChange,
+  onFiltersChange,
+  initialFilters = {},
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -53,7 +57,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       "Orange",
       "Brown",
       "Cream",
-      "Ivory"
+      "Ivory",
     ],
     size: ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"],
     length: ["Mini", "Midi", "Maxi", "Knee-Length", "Ankle-Length"],
@@ -71,13 +75,16 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
     "Price: Low to High",
     "Price: High to Low",
     "Newest",
-    "Alphabetical: A-Z"
+    "Alphabetical: A-Z",
   ];
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sortOptionsRef.current && !sortOptionsRef.current.contains(event.target)) {
+      if (
+        sortOptionsRef.current &&
+        !sortOptionsRef.current.contains(event.target)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -89,17 +96,17 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
   // Parse query parameters on mount and when location changes
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    
+
     // Parse query parameters for filters
     let updatedFilters = { ...selectedFilters };
     let hasUpdates = false;
-    
+
     // Parse each filter type from URL
     for (const filterType of Object.keys(selectedFilters)) {
-      if (filterType === 'price') {
-        const priceRange = searchParams.get('price');
+      if (filterType === "price") {
+        const priceRange = searchParams.get("price");
         if (priceRange) {
-          const [min, max] = priceRange.split('-').map(Number);
+          const [min, max] = priceRange.split("-").map(Number);
           updatedFilters.price = [min || 0, max || 5000];
           hasUpdates = true;
         }
@@ -111,74 +118,74 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
         }
       }
     }
-    
+
     // Special handling for query parameter
-    const query = searchParams.get('q');
+    const query = searchParams.get("q");
     if (query) {
       // If there's a search query, add it as a special filter
       updatedFilters.query = query;
       hasUpdates = true;
     }
-    
+
     // Special handling for color parameter (which might be spelled differently than 'colour')
-    const colorParam = searchParams.get('color');
+    const colorParam = searchParams.get("color");
     if (colorParam && !updatedFilters.colour.includes(colorParam)) {
       updatedFilters.colour = [...updatedFilters.colour, colorParam];
       hasUpdates = true;
     }
-    
+
     // Get sort parameter
-    const sortParam = searchParams.get('sort');
+    const sortParam = searchParams.get("sort");
     if (sortParam) {
       // Map API sort parameter to display sort option
       let displaySort = "Most Popular";
-      switch(sortParam.toLowerCase()) {
-        case 'price-low-high':
+      switch (sortParam.toLowerCase()) {
+        case "price-low-high":
           displaySort = "Price: Low to High";
           break;
-        case 'price-high-low':
+        case "price-high-low":
           displaySort = "Price: High to Low";
           break;
-        case 'newest':
+        case "newest":
           displaySort = "Newest";
           break;
-        case 'alphabetical':
-        case 'alphabetical: a-z':
+        case "alphabetical":
+        case "alphabetical: a-z":
           displaySort = "Alphabetical: A-Z";
           break;
-        case 'best-selling':
-        case 'most popular':
+        case "best-selling":
+        case "most popular":
           displaySort = "Most Popular";
           break;
       }
       setCurrentSort(displaySort);
     }
-    
+
     // Get grid type
-    const gridParam = parseInt(searchParams.get('grid') || '0');
+    const gridParam = parseInt(searchParams.get("grid") || "0");
     if (gridParam === 2 || gridParam === 4) {
       setGridType(gridParam);
       if (onGridChange) {
         onGridChange(gridParam);
       }
     }
-    
+
     // Update states if we found any filters in URL
     if (hasUpdates) {
       setSelectedFilters(updatedFilters);
-      
+
       // Generate active filters from the URL parameters
       const newActiveFilters = [];
-      
+
       for (const [type, values] of Object.entries(updatedFilters)) {
-        if (type === 'price') {
+        if (type === "price") {
           if (values[0] > 0 || values[1] < 5000) {
             newActiveFilters.push({
               type,
               values: [...values],
             });
           }
-        } else if (type === 'query' && values) {
+        } else if (type === "query" && values) {
           newActiveFilters.push({
             type,
             values: [values],
@@ -190,11 +197,11 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
           });
         }
       }
-      
+
       setActiveFilters(newActiveFilters);
     }
   }, [location.search]);
-  
+
   // Setup scroll event listener to detect when to make the filter bar sticky
   useEffect(() => {
     const handleScroll = () => {
@@ -202,7 +209,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
 
       const navbarHeight = 100; // Approximate height of your navbar
       const filterBarTop = stickyWrapperRef.current.getBoundingClientRect().top;
-      
+
       if (filterBarTop <= navbarHeight) {
         setIsSticky(true);
       } else {
@@ -215,46 +222,51 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  
+
   // Update URL when filters or sort change
   useEffect(() => {
-    if (activeFilters.length === 0 && currentSort === "Most Popular" && gridType === 4) {
+    if (
+      activeFilters.length === 0 &&
+      currentSort === "Most Popular" &&
+      gridType === 4
+    ) {
       return; // Don't update URL if using default values
     }
-    
+
     // Get current search parameters to preserve search query
     const currentParams = new URLSearchParams(location.search);
-    const searchQuery = currentParams.get('q');
-    
+    const searchQuery = currentParams.get("q");
+
     // Build new search params
     const searchParams = new URLSearchParams();
-    
+
     // Keep original search query if it exists
     if (searchQuery) {
-      searchParams.set('q', searchQuery);
+      searchParams.set("q", searchQuery);
     }
-    
+
     // Add active filters to URL
-    activeFilters.forEach(filter => {
-      if (filter.type === 'price') {
-        searchParams.set('price', `${filter.values[0]}-${filter.values[1]}`);
-      } else if (filter.type !== 'query') { // Don't duplicate the query parameter
-        filter.values.forEach(value => {
+    activeFilters.forEach((filter) => {
+      if (filter.type === "price") {
+        searchParams.set("price", `${filter.values[0]}-${filter.values[1]}`);
+      } else if (filter.type !== "query") {
+        // Don't duplicate the query parameter
+        filter.values.forEach((value) => {
           // Special handling for colour/color
-          if (filter.type === 'colour') {
-            searchParams.append('color', value);
+          if (filter.type === "colour") {
+            searchParams.append("color", value);
           } else {
             searchParams.append(filter.type, value);
           }
         });
       }
     });
-    
+
     // Add sort parameter
     if (currentSort !== "Most Popular") {
       // Convert display sort option to API sort parameter
       let sortParam = "";
-      switch(currentSort) {
+      switch (currentSort) {
         case "Price: Low to High":
           sortParam = "price-low-high";
           break;
@@ -270,22 +282,22 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
         default:
           sortParam = "most-popular";
       }
-      searchParams.set('sort', sortParam);
+      searchParams.set("sort", sortParam);
     }
-    
+
     // Add grid type
     if (gridType !== 4) {
-      searchParams.set('grid', gridType.toString());
+      searchParams.set("grid", gridType.toString());
     }
-    
+
     // Update URL without reload
     const queryString = searchParams.toString();
-    const newUrl = queryString 
-      ? `${location.pathname}?${queryString}` 
+    const newUrl = queryString
+      ? `${location.pathname}?${queryString}`
       : location.pathname;
-    
+
     navigate(newUrl, { replace: true });
-    
+
     // Call the filter change callback if provided
     if (onFiltersChange) {
       // Convert the filter data to the format expected by the API
@@ -293,16 +305,23 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
         filters: selectedFilters,
         activeFilters,
         sort: mapSortToApiParameter(currentSort),
-        gridType
+        gridType,
       };
-      
+
       onFiltersChange(filterData);
     }
-  }, [activeFilters, currentSort, gridType, location.pathname, navigate, onFiltersChange]);
+  }, [
+    activeFilters,
+    currentSort,
+    gridType,
+    location.pathname,
+    navigate,
+    onFiltersChange,
+  ]);
 
   // Convert UI sort option to API parameter
   const mapSortToApiParameter = (sortOption) => {
-    switch(sortOption) {
+    switch (sortOption) {
       case "Price: Low to High":
         return "price-low-high";
       case "Price: High to Low":
@@ -360,7 +379,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
   const handleClearFilters = () => {
     // Preserve the search query if it exists
     const query = selectedFilters.query;
-    
+
     setSelectedFilters({
       query, // Keep the search query
       colour: [],
@@ -374,16 +393,16 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       fabric: [],
       price: [0, 5000],
     });
-    
+
     // Keep only the query in active filters if it exists
     const newActiveFilters = [];
     if (query) {
       newActiveFilters.push({
-        type: 'query',
-        values: [query]
+        type: "query",
+        values: [query],
       });
     }
-    
+
     setActiveFilters(newActiveFilters);
   };
 
@@ -440,7 +459,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       [filterType]: newValues,
     });
   };
-  
+
   const handleSortChange = (sortOption) => {
     setCurrentSort(sortOption);
     setIsDropdownOpen(false);
@@ -494,7 +513,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
             ));
           }
         })}
-        {activeFilters.some(filter => filter.type !== 'query') && (
+        {activeFilters.some((filter) => filter.type !== "query") && (
           <button
             className="text-xs underline ml-2 mb-2 cursor-pointer"
             onClick={handleClearFilters}
@@ -526,7 +545,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
       Orange: "#FFA500",
       Brown: "#A52A2A",
       Cream: "#FFFDD0",
-      Ivory: "#FFFFF0"
+      Ivory: "#FFFFF0",
     };
 
     return (
@@ -549,7 +568,10 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
               }`}
               style={{
                 backgroundColor: colorMap[color] || color,
-                border: color === "White" || color === "Ivory" || color === "Cream" ? "1px solid #e5e5e5" : "none",
+                border:
+                  color === "White" || color === "Ivory" || color === "Cream"
+                    ? "1px solid #e5e5e5"
+                    : "none",
               }}
             />
             <span className="text-xs text-center">{color}</span>
@@ -637,7 +659,10 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
   useEffect(() => {
     if (filterBarRef.current) {
       // Set an attribute with the height that we can use for the placeholder
-      filterBarRef.current.setAttribute('data-height', `${filterBarRef.current.offsetHeight}px`);
+      filterBarRef.current.setAttribute(
+        "data-height",
+        `${filterBarRef.current.offsetHeight}px`
+      );
     }
   }, [activeFilters]);
 
@@ -645,12 +670,22 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
     <div ref={stickyWrapperRef} className="mb-6">
       {/* This div will take up space when the filter bar becomes fixed */}
       {isSticky && (
-        <div style={{ height: filterBarRef.current ? filterBarRef.current.getAttribute('data-height') : '0px' }}></div>
+        <div
+          style={{
+            height: filterBarRef.current
+              ? filterBarRef.current.getAttribute("data-height")
+              : "0px",
+          }}
+        ></div>
       )}
-      
-      <div 
+
+      <div
         ref={filterBarRef}
-        className={`${isSticky ? 'fixed top-[70px] left-0 right-0 z-30 bg-white shadow-md' : ''}`}
+        className={`${
+          isSticky
+            ? "fixed top-[70px] left-0 right-0 z-30 bg-white shadow-md"
+            : ""
+        }`}
       >
         <div className="flex items-center justify-between p-4 border-y-[0.5px] border-gray-300">
           <div className="flex items-center">
@@ -658,7 +693,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
               className="flex items-center text-gray-800 focus:outline-none cursor-pointer"
               onClick={toggleFilter}
             >
-              <span className="tracking-wider text-sm uppercase font-thin">
+              <span className="tracking-wide text-sm uppercase font-thin">
                 Filter
               </span>
               <span className="ml-2 text-sm leading-none">+</span>
@@ -685,7 +720,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
             <span className="text-gray-400">|</span>
             <div className="relative">
               <button
-                className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-thin tracking-wider focus:outline-none"
+                className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-thin tracking-wide focus:outline-none"
                 onClick={toggleDropdown}
               >
                 Sort <IoMdArrowDropdown className="ml-1" />
@@ -701,7 +736,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
                   >
                     <ul className="text-gray-700 text-xs py-1">
                       {sortOptions.map((option) => (
-                        <li 
+                        <li
                           key={option}
                           className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors uppercase tracking-wide ${
                             currentSort === option ? "bg-gray-100" : ""
@@ -734,7 +769,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
             <div className="flex flex-col h-full">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-light uppercase tracking-widest">
+                  <h3 className="text-sm font-thin uppercase tracking-wider">
                     Filter
                   </h3>
                   <button
@@ -873,13 +908,13 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
               <div className="p-6 border-t border-gray-200">
                 <button
                   onClick={handleApplyFilters}
-                  className="w-full py-3 bg-black text-white text-xs uppercase tracking-widest cursor-pointer font-light hover:bg-gray-900 transition-colors"
+                  className="w-full py-3 bg-black text-white text-xs uppercase tracking-wide cursor-pointer font-thin hover:bg-gray-900 transition-colors"
                 >
                   See Results
                 </button>
                 <button
                   onClick={handleClearFilters}
-                  className="w-full mt-3 text-xs text-gray-700 underline cursor-pointer font-light tracking-wide"
+                  className="w-full mt-3 text-xs text-gray-700 underline cursor-pointer font-thin tracking-wide"
                 >
                   Clear All Filters
                 </button>
@@ -895,7 +930,7 @@ const FilterSortBar = ({ onGridChange, onFiltersChange, initialFilters = {} }) =
 FilterSortBar.propTypes = {
   onGridChange: PropTypes.func,
   onFiltersChange: PropTypes.func,
-  initialFilters: PropTypes.object
+  initialFilters: PropTypes.object,
 };
 
 export default FilterSortBar;

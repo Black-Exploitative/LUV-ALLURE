@@ -94,7 +94,7 @@ export default function Hero() {
               {titleLetters.map((letter, index) => (
                 <motion.h1 
                   key={`${letter}-${index}`}
-                  className={`text-[20px] font-thin ${index === 0 ? "border-b-[3px] border-white pb-[5px] group-hover:border-b-0" : ""}`}
+                  className={`text-[20px] font-thin tracking-wider ${index === 0 ? "border-b-[3px] border-white pb-[5px] group-hover:border-b-0" : ""}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index, duration: 0.5 }}
