@@ -140,7 +140,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
             </button>
 
             <div className="px-6 pt-8 pb-4">
-              <h2 className="text-2xl font-thin tracking-wide text-center">
+              <h2 className="text-2xl font-thin tracking-wider text-center">
                 SIZE GUIDE
               </h2>
               <motion.div
@@ -221,7 +221,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
                           {size.map((cell, cellIndex) => (
                             <td
                               key={cellIndex}
-                              className="px-4 py-3 text-center text-gray-800 font-thin"
+                              className="px-4 py-3 text-center text-gray-800 font-thin tracking-wide"
                             >
                               {cell}
                             </td>

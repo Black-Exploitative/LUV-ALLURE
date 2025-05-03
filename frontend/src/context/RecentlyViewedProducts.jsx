@@ -164,7 +164,7 @@ const RecentlyViewedProductCard = ({ product, addToCart }) => {
         </div>
 
         <div className="mt-3">
-          <h3 className="text-sm font-thin uppercase tracking-wide truncate">
+          <h3 className="text-sm font-thin uppercase tracking-wider truncate">
             {product.name}
           </h3>
           <p className="text-sm mt-1">₦{product.price}</p>

@@ -66,7 +66,7 @@ const ServicesPage = () => {
           LUVS ALLURE SERVICES
         </motion.h1>
         <motion.p
-          className="text-xl md:text-2xl text-gray-700 text-center mt-6 font-thin"
+          className="text-xl md:text-2xl text-gray-700 text-center mt-6 font-thin tracking-wide"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -145,7 +145,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-thin tracking-wide text-center">
+                <h3 className="text-xl font-thin tracking-wider text-center">
                   Complimentary Shipping & Returns
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -184,7 +184,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-thin tracking-wide text-center">
+                <h3 className="text-xl font-thin tracking-wider text-center">
                   Order & Return Tracking
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -223,7 +223,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-thin tracking-wide text-center">
+                <h3 className="text-xl font-thin tracking-wider text-center">
                   Expedited Delivery Options
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -305,7 +305,7 @@ const ServicesPage = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-thin tracking-wide text-center">
+                  <h3 className="text-2xl font-thin tracking-wider text-center">
                     Personal Styling Consultation
                   </h3>
                   <p className="text-gray-600 text-center mt-4">
@@ -320,7 +320,7 @@ const ServicesPage = () => {
             </div>
 
             <div className="text-center mt-16">
-              <h3 className="text-xl font-thin mb-4">CURATED ELEGANCE</h3>
+              <h3 className="text-xl font-thin tracking-wider mb-4">CURATED ELEGANCE</h3>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 Our signature styling service goes beyond fashion its about
                 creating a personal narrative through carefully curated pieces.
@@ -356,7 +356,7 @@ const ServicesPage = () => {
                 <div className="absolute inset-0 bg-[url('/packaging-image.jpg')] bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105"></div>
                 <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity duration-700"></div>
                 <div className="relative z-10 text-white text-center">
-                  <h3 className="text-2xl font-thin tracking-wide mb-4">
+                  <h3 className="text-2xl font-thin tracking-wider mb-4">
                     Signature Packaging
                   </h3>
                   <p className="max-w-md">
@@ -384,7 +384,7 @@ const ServicesPage = () => {
                 <div className="absolute inset-0 bg-[url('/gifting-image.jpg')] bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105"></div>
                 <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity duration-700"></div>
                 <div className="relative z-10 text-white text-center">
-                  <h3 className="text-2xl font-thin tracking-wide mb-4">
+                  <h3 className="text-2xl font-thin tracking-wider mb-4">
                     Bespoke Gifting
                   </h3>
                   <p className="max-w-md">
@@ -435,7 +435,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-thin tracking-wide text-center">
+                <h3 className="text-2xl font-thin tracking-wider text-center">
                   In-Store Tailoring
                 </h3>
                 <p className="text-gray-600 text-center mt-4 max-w-lg">
@@ -525,7 +525,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-thin tracking-wide text-center">
+                <h3 className="text-2xl font-thin tracking-wider text-center">
                   At-Home Tailoring
                 </h3>
                 <p className="text-gray-600 text-center mt-4 max-w-lg">
@@ -657,7 +657,7 @@ const ServicesPage = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-thin tracking-wide mb-6">
+                  <h3 className="text-2xl font-thin tracking-wider mb-6">
                     Exclusive Member Benefits
                   </h3>
                   <ul className="text-left text-gray-700 space-y-4 max-w-lg mx-auto mb-8">
@@ -760,7 +760,7 @@ const ServicesPage = () => {
         <section className="py-20 md:py-28 border-t border-gray-100">
           <div className="max-w-4xl mx-auto text-center">
             <motion.h2
-              className="text-3xl md:text-4xl font-thin tracking-wide"
+              className="text-3xl md:text-4xl font-thin tracking-wider"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}

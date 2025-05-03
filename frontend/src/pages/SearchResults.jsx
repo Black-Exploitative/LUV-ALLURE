@@ -186,7 +186,7 @@ const SearchResults = () => {
             </div>
           ) : results.length === 0 ? (
             <div className="text-center py-16">
-              <h2 className="text-2xl font-thin mb-4">No Results Found</h2>
+              <h2 className="text-2xl font-thin tracking-wider mb-4">No Results Found</h2>
               <p className="text-gray-600 max-w-md mx-auto mb-6">
                 We couldn't find any products matching "{searchQuery}". Try
                 adjusting your filters or browse our curated collections.
