@@ -628,7 +628,7 @@ class ShopifyClient {
       // Format custom line items using the correct Shopify format
       const formattedLineItems = [...orderData.lineItems];
       
-      // If custom line items exist, add them to the formatted line items with correct structure
+      // If custom line items exist, add them
       if (orderData.customLineItems && orderData.customLineItems.length > 0) {
         orderData.customLineItems.forEach(item => {
           formattedLineItems.push({
@@ -693,34 +693,39 @@ class ShopifyClient {
       
       const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
       
-      // Now mark the order as paid AFTER we have the orderId
-      const markAsPaidQuery = `
-        mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
-          orderMarkAsPaid(input: $input) {
-            order {
-              id
-              name
-              displayFinancialStatus
-            }
-            userErrors {
-              field
-              message
+      // TRY to mark the order as paid, but don't fail if it doesn't work
+      try {
+        const markAsPaidQuery = `
+          mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
+            orderMarkAsPaid(input: $input) {
+              order {
+                id
+                name
+                displayFinancialStatus
+              }
+              userErrors {
+                field
+                message
+              }
             }
           }
-        }
-      `;
+        `;
   
-      const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
-        input: { 
-          id: orderId,
+        const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
+          input: { 
+            id: orderId
+          }
+        });
+        
+        if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
+          console.warn(`Warning: Could not mark order as paid: ${JSON.stringify(markAsPaidResult.orderMarkAsPaid.userErrors)}`);
         }
-      });
-      
-      if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
-        throw new Error(`Mark as paid errors: ${JSON.stringify(markAsPaidResult.orderMarkAsPaid.userErrors)}`);
+      } catch (paymentError) {
+        // Log the error but don't fail the order creation
+        console.warn('Warning: Could not mark order as paid:', paymentError.message);
       }
       
-      // Return the order data
+      // Return the order data regardless of payment marking status
       return {
         id: orderId,
         name: completeResult.draftOrderComplete.draftOrder.order.name,
@@ -731,6 +736,6 @@ class ShopifyClient {
       console.error('Error creating Shopify order:', error);
       throw error;
     }
-  }}
-
+  }
+}
 module.exports = new ShopifyClient();

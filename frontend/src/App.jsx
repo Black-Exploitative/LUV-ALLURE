@@ -109,7 +109,7 @@ const AppContent = () => {
 
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        <Route path="/order-confirmation/:reference" element={<OrderConfirmation />} />
+        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
         {/*<Route path="/payment-failed" element={<PaymentFailed />} />*/}
 
         <Route path="/collections" element={<CollectionsPage />} /> 

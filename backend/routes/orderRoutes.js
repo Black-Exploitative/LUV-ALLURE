@@ -28,8 +28,7 @@ router.post('/:id/create-shopify', orderController.createShopifyOrder);
 // Update order status (admin only)
 router.put('/:orderId/status', orderController.updateOrderStatus);
 
+router.get('/reference/:reference', orderController.getOrderByReference);
+
 // Export the router
 module.exports = router;
-
-// Note: The Paystack webhook endpoint should be registered separately 
-// in server.js as it doesn't require authentication and needs raw body parsing

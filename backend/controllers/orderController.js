@@ -310,6 +310,31 @@ exports.paystackWebhook = async (req, res) => {
   }
 };
 
+exports.getOrderByReference = async (req, res, next) => {
+  try {
+    const { reference } = req.params;
+    
+    const order = await Order.findOne({
+      reference: reference,
+      userId: req.user ? req.user.id : null
+    });
+    
+    if (!order) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Order not found' 
+      });
+    }
+    
+    res.status(200).json({ 
+      success: true,
+      order 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Update order status
 exports.updateOrderStatus = async (req, res, next) => {
   try {
@@ -350,4 +375,6 @@ exports.updateOrderStatus = async (req, res, next) => {
     console.error('Error updating order:', error);
     next(error);
   }
+
+  
 };

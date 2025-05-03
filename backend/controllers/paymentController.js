@@ -337,7 +337,7 @@ exports.handlePaymentCallback = async (req, res) => {
           }
           
           // Redirect to success page
-          return res.redirect(`${process.env.FRONTEND_URL}/order-confirmation/${order.reference}`);
+          return res.redirect(`${process.env.FRONTEND_URL}/user-account?tab=orders&success=true&order=${order.reference}`);
         } else {
           // Payment wasn't successful
           return res.redirect(`${process.env.FRONTEND_URL}/payment-failed?reference=${reference}`);
