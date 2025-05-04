@@ -1,7 +1,8 @@
+// Updates to Navbar.jsx component
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { useCart } from "../context/CartContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import MiniCartPreview from "../components/MiniCartPreview";
 import AnimatedCartBadge from "../components/AnimatedCartBadge";
@@ -15,6 +16,7 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const { cartItemCount, setIsCartDrawerOpen } = useCart();
   const location = useLocation();
+  const navigate = useNavigate();
   const navRef = useRef(null);
   const dropdownRefs = useRef({});
 
@@ -28,7 +30,6 @@ export default function Navbar() {
   // New state to track screen size for responsive behavior
   const [isMobileView, setIsMobileView] = useState(false);
   const [isTabletView, setIsTabletView] = useState(false);
-
 
   // Load navigation images from CMS
   const loadNavigationImages = async () => {
@@ -58,7 +59,6 @@ export default function Navbar() {
       console.error("Error loading navigation images:", error);
     }
   };
-
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -129,6 +129,36 @@ export default function Navbar() {
     setActiveDropdown(null);
   };
 
+  // New function to handle navigation with filters
+  const handleNavLinkClick = (category, e) => {
+    e.preventDefault();
+    
+    // Close any open dropdowns
+    setActiveDropdown(null);
+    setIsMobileMenuOpen(false);
+    
+    // Navigate based on the category
+    if (category === 'collections') {
+      navigate('/collections');
+    } else {
+      // Add the appropriate filter parameter
+      let filterParam = '';
+      
+      if (category === 'shop') {
+        // Navigate to shop without specific filters
+        filterParam = '';
+      } else if (category === 'dresses') {
+        // Filter by dresses category
+        filterParam = '?category=dresses';
+      } else if (category === 'newin') {
+        // Filter by newest sort option
+        filterParam = '?sort=newest';
+      }
+      
+      navigate(`/shop${filterParam}`);
+    }
+  };
+
   // Animation variants
   const menuVariants = {
     closed: {
@@ -178,6 +208,9 @@ export default function Navbar() {
     }
   };
 
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  const toggleFilter = () => setIsFilterOpen(!isFilterOpen);
+
   const ThemedMiniCartPreview = () => {
     return (
       <div className="relative">
@@ -208,22 +241,22 @@ export default function Navbar() {
         {
           title: "ALL CLOTHING",
           links: [
-            { name: "Dresses", href: "#" },
-            { name: "Tops", href: "#" },
-            { name: "Skirts & Skorts", href: "#" },
-            { name: "Sets", href: "#" },
-            { name: "Pants", href: "#" },
-            { name: "Playsuits & Jumpsuits", href: "#" },
+            { name: "Dresses", href: "/shop?category=dresses" },
+            { name: "Tops", href: "/shop?category=tops" },
+            { name: "Skirts & Skorts", href: "/shop?category=skirts" },
+            { name: "Sets", href: "/shop?category=sets" },
+            { name: "Pants", href: "/shop?category=pants" },
+            { name: "Playsuits & Jumpsuits", href: "/shop?category=playsuits" },
             { name: "All Clothing", href: "/shop" }
           ]
         },
         {
           title: "ALL GIFTING",
           links: [
-            { name: "Gift Cards", href: "#" },
-            { name: "Vouchers", href: "#" },
-            { name: "Membership", href: "#" },
-            { name: "All Gifting", href: "#" }
+            { name: "Gift Cards", href: "/shop?category=gift-cards" },
+            { name: "Vouchers", href: "/shop?category=vouchers" },
+            { name: "Membership", href: "/shop?category=membership" },
+            { name: "All Gifting", href: "/shop?category=gifting" }
           ]
         }
       ],
@@ -231,12 +264,12 @@ export default function Navbar() {
         {
           image: "https://plus.unsplash.com/premium_photo-1682097559861-d5d5027868b5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fE1heGklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MAXI DRESSES",
-          href: "#"
+          href: "/shop?category=maxi-dresses"
         },
         {
           image: "https://images.unsplash.com/photo-1719610894782-7b376085e200?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG1pbmklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MINI DRESSES",
-          href: "#"
+          href: "/shop?category=mini-dresses"
         }
       ]
     },
@@ -245,35 +278,34 @@ export default function Navbar() {
         {
           title: "DRESSES BY LENGTH",
           links: [
-            { name: "All Dresses", href: "#" },
-            { name: "Mini Dresses", href: "#" },
-            { name: "Maxi Dresses", href: "#" },
-            { name: "Midi Dresses", href: "#" }
+            { name: "All Dresses", href: "/shop?category=dresses" },
+            { name: "Mini Dresses", href: "/shop?category=mini-dresses" },
+            { name: "Maxi Dresses", href: "/shop?category=maxi-dresses" },
+            { name: "Midi Dresses", href: "/shop?category=midi-dresses" }
           ]
         },
         {
           title: "DRESSES BY STYLE",
           links: [
-            { name: "Prom Dresses", href: "#" },
-            { name: "Formal Dresses", href: "#" },
-            { name: "Party Dresses", href: "#" },
-            { name: "Wedding Guest Dresses", href: "#" },
-            { name: "Bridesmaid Dresses", href: "#" },
-//            { name: "Bridal Dresses", href: "#" },
-            { name: "Corset Dresses", href: "#" },
-            { name: "Bubblehem Dresses", href: "#" },
-            { name: "Flowy Dresses", href: "#" }
+            { name: "Prom Dresses", href: "/shop?category=prom-dresses" },
+            { name: "Formal Dresses", href: "/shop?category=formal-dresses" },
+            { name: "Party Dresses", href: "/shop?category=party-dresses" },
+            { name: "Wedding Guest Dresses", href: "/shop?category=wedding-guest-dresses" },
+            { name: "Bridesmaid Dresses", href: "/shop?category=bridesmaid-dresses" },
+            { name: "Corset Dresses", href: "/shop?category=corset-dresses" },
+            { name: "Bubblehem Dresses", href: "/shop?category=bubblehem-dresses" },
+            { name: "Flowy Dresses", href: "/shop?category=flowy-dresses" }
           ]
         },
         {
           title: "DRESSES BY COLOUR",
           links: [
-            { name: "White Dresses", href: "#" },
-            { name: "Red Dresses", href: "#" },
-            { name: "Pink Dresses", href: "#" },
-            { name: "Yellow Dresses", href: "#" },
-            { name: "Blue Dresses", href: "#" },
-            { name: "Embelishment Dresses", href: "#" }
+            { name: "White Dresses", href: "/shop?category=dresses&color=White" },
+            { name: "Red Dresses", href: "/shop?category=dresses&color=Red" },
+            { name: "Pink Dresses", href: "/shop?category=dresses&color=Pink" },
+            { name: "Yellow Dresses", href: "/shop?category=dresses&color=Yellow" },
+            { name: "Blue Dresses", href: "/shop?category=dresses&color=Blue" },
+            { name: "Embelishment Dresses", href: "/shop?category=embelishment-dresses" }
           ]
         }
       ],
@@ -281,7 +313,7 @@ export default function Navbar() {
         {
           image: "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "SHOP ALL DRESSES",
-          href: "#"
+          href: "/shop?category=dresses"
         }
       ]
     },
@@ -290,33 +322,32 @@ export default function Navbar() {
         {
           title: "COLLECTIONS",
           links: [
-            { name: "All Collections", href: "#s" }
+            { name: "All Collections", href: "/collections" }
           ]
         },
         {
           title: "OCCASION",
           links: [
-            { name: "Birthdays", href: "#" },
-            { name: "Formal", href: "#" },
-            { name: "Party", href: "#" },
-            { name: "Wedding Guest", href: "#" },
-            { name: "Bridesmaid", href: "#" },
-            { name: "Bridal", href: "#" },
-            { name: "Holiday", href: "#" },
-            { name: "Festival", href: "#" }
+            { name: "Birthdays", href: "/collections/birthdays" },
+            { name: "Formal", href: "/collections/formal" },
+            { name: "Party", href: "/collections/party" },
+            { name: "Wedding Guest", href: "/collections/wedding-guest" },
+            { name: "Bridesmaid", href: "/collections/bridesmaid" },
+            { name: "Bridal", href: "/collections/bridal" },
+            { name: "Holiday", href: "/collections/holiday" },
+            { name: "Festival", href: "/collections/festival" }
           ]
         },
         {
           title: "TRENDING",
-          links: [
-          ]
+          links: []
         }
       ],
       featuredItems: [
         {
           image: "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "THE WEDDING EDIT",
-          href: "#"
+          href: "/collections/wedding"
         }
       ]
     },
@@ -325,9 +356,9 @@ export default function Navbar() {
         {
           title: "NEW IN",
           links: [
-            { name: "New Arrivals", href: "#" },
-            { name: "Back In Stock", href: "#" },
-            { name: "Most Popular", href: "#" },
+            { name: "New Arrivals", href: "/shop?sort=newest" },
+            { name: "Back In Stock", href: "/shop?category=back-in-stock" },
+            { name: "Most Popular", href: "/shop?sort=most-popular" },
           ]
         }
       ],
@@ -335,12 +366,12 @@ export default function Navbar() {
         {
           image: "https://images.unsplash.com/photo-1642447411662-59ab77473a8d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "NEW ARRIVALS",
-          href: "#"
+          href: "/shop?sort=newest"
         },
         {
           image: "https://images.unsplash.com/photo-1626818590159-04cb9274a5e0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDJ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "SEASONAL SALE | 25% OFF",
-          href: "#"
+          href: "/shop?category=sale"
         }
       ]
     }
@@ -355,11 +386,18 @@ export default function Navbar() {
         title: image.name.toUpperCase(),
         href: image.link || "#"
       }));
-
     }
     
     // Fallback to the default items if no CMS images
     return dropdownContent[category].featuredItems;
+  };
+
+  // Function to handle direct navigation for dropdown links
+  const handleDropdownLinkClick = (href, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(href);
+    setActiveDropdown(null);
   };
 
   return (
@@ -380,14 +418,11 @@ export default function Navbar() {
             ref={el => dropdownRefs.current['shop'] = el}
           >
             <a 
-              href="#" 
+              href="/shop" 
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
                 activeDropdown === 'shop' ? 'active-nav-item' : ''
               }`}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveDropdown(activeDropdown === 'shop' ? null : 'shop');
-              }}
+              onClick={(e) => handleNavLinkClick('shop', e)}
             >
               SHOP
             </a>
@@ -405,14 +440,11 @@ export default function Navbar() {
             ref={el => dropdownRefs.current['dresses'] = el}
           >
             <a 
-              href="#" 
+              href="/shop?category=dresses" 
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
                 activeDropdown === 'dresses' ? 'active-nav-item' : ''
               }`}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveDropdown(activeDropdown === 'dresses' ? null : 'dresses');
-              }}
+              onClick={(e) => handleNavLinkClick('dresses', e)}
             >
               DRESSES
             </a>
@@ -430,14 +462,11 @@ export default function Navbar() {
             ref={el => dropdownRefs.current['collections'] = el}
           >
             <a 
-              href="#" 
+              href="/collections" 
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
                 activeDropdown === 'collections' ? 'active-nav-item' : ''
               }`}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveDropdown(activeDropdown === 'collections' ? null : 'collections');
-              }}
+              onClick={(e) => handleNavLinkClick('collections', e)}
             >
               LOOKBOOK
             </a>
@@ -455,14 +484,11 @@ export default function Navbar() {
             ref={el => dropdownRefs.current['newin'] = el}
           >
             <a 
-              href="#" 
+              href="/shop?sort=newest" 
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
                 activeDropdown === 'newin' ? 'active-nav-item' : ''
               }`}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveDropdown(activeDropdown === 'newin' ? null : 'newin');
-              }}
+              onClick={(e) => handleNavLinkClick('newin', e)}
             >
               NEW ARRIVALS
             </a>
@@ -590,7 +616,12 @@ export default function Navbar() {
                   <h3 className="font-medium text-sm mb-4">{column.title}</h3>
                   <div className="flex flex-col space-y-2">
                     {column.links.map((link, linkIndex) => (
-                      <a key={linkIndex} href={link.href} className="text-sm hover:underline">
+                      <a 
+                        key={linkIndex} 
+                        href={link.href} 
+                        className="text-sm hover:underline"
+                        onClick={(e) => handleDropdownLinkClick(link.href, e)}
+                      >
                         {link.name}
                       </a>
                     ))}
@@ -601,7 +632,11 @@ export default function Navbar() {
               {/* Right Side - Featured Images from CMS */}
               {getDropdownFeaturedItems(activeDropdown).map((item, itemIndex) => (
                 <div key={itemIndex} className="col-span-3">
-                  <a href={item.href} className="block">
+                  <a 
+                    href={item.href} 
+                    className="block"
+                    onClick={(e) => handleDropdownLinkClick(item.href, e)}
+                  >
                     <div className="aspect-[3/4] overflow-hidden">
                       <img 
                         src={item.image} 
@@ -630,12 +665,12 @@ export default function Navbar() {
           >
             <div className="flex flex-col space-y-8 text-black text-2xl font-medium">
               {[
-                { name: "SHOP", link: "shop" },
-                { name: "DRESSES", link: "#" },
-                { name: "COLLECTIONS", link: "#" },
-                { name: "NEW IN", link: "#" },
-                { name: "CONTACT US", link: "#" },
-                { name: "SERVICES", link: "#" }
+                { name: "SHOP", link: "/shop", category: "shop" },
+                { name: "DRESSES", link: "/shop?category=dresses", category: "dresses" },
+                { name: "COLLECTIONS", link: "/collections", category: "collections" },
+                { name: "NEW IN", link: "/shop?sort=newest", category: "newin" },
+                { name: "CONTACT US", link: "/contact-us", category: "contact" },
+                { name: "SERVICES", link: "/services", category: "services" }
               ].map((item, index) => (
                 <motion.a
                   key={item.name}
@@ -644,6 +679,11 @@ export default function Navbar() {
                   custom={index}
                   variants={linkVariants}
                   whileHover={{ x: 10 }}
+                  onClick={(e) => {
+                    if (["shop", "dresses", "collections", "newin"].includes(item.category)) {
+                      handleNavLinkClick(item.category, e);
+                    }
+                  }}
                 >
                   {item.name}
                 </motion.a>
