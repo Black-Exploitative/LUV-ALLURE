@@ -6,33 +6,18 @@ import { fetchProducts } from "../services/api";
 import ProductCard from "./ProductCard";
 import ProductSkeletonLoader from "./ProductSkeletonLoader";
 
-const ProductGrid = ({ gridType, filters, collectionHandle }) => {
+const ProductGrid = ({ gridType }) => {
   const navigate = useNavigate();
   const gridRef = useRef(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Load products with filters applied
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        
-        // Prepare filter parameters for API call
-        const apiParams = {
-          collection: collectionHandle,
-          category: filters?.category?.[0] || undefined,
-          color: filters?.colour?.[0] || undefined,
-          size: filters?.size?.[0] || undefined,
-          sort: filters?.sort || undefined,
-          price: filters?.price?.join('-') || undefined
-        };
-        
-        console.log("Fetching products with filters:", apiParams);
-        
-        // Call API with filter parameters
-        const data = await fetchProducts(apiParams);
+        const data = await fetchProducts();
         
         // Transform the response data to match component expectations
         if (data && data.products) {
@@ -105,13 +90,12 @@ const ProductGrid = ({ gridType, filters, collectionHandle }) => {
     };
     
     loadProducts();
-  }, [filters, collectionHandle]);
+  }, []);
 
   // Updated to only pass productId to handle navigation
   const handleProductClick = (productId, productSlug) => {
     navigate(`/product/${productSlug}_${productId}`);
   };
-  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -150,35 +134,7 @@ const ProductGrid = ({ gridType, filters, collectionHandle }) => {
   });
 
   if (error) {
-    return (
-      <div className="text-red-500 text-center py-8">
-        {error}
-        <button
-          onClick={() => window.location.reload()}
-          className="ml-4 underline text-blue-500"
-        >
-          Try again
-        </button>
-      </div>
-    );
-  }
-
-  // No products found after applying filters
-  if (!loading && groupedProducts.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <h2 className="text-2xl font-thin tracking-wider mb-4">No Products Found</h2>
-        <p className="text-gray-600 max-w-lg text-center mb-8">
-          We couldn't find any products matching your filters. Try adjusting your search criteria or browse our other collections.
-        </p>
-        <button
-          onClick={() => navigate('/shop')}
-          className="px-8 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
-        >
-          View All Products
-        </button>
-      </div>
-    );
+    return <div className="text-red-500 text-center py-8">{error}</div>;
   }
 
   return (
@@ -222,13 +178,6 @@ const ProductGrid = ({ gridType, filters, collectionHandle }) => {
 
 ProductGrid.propTypes = {
   gridType: PropTypes.oneOf([2, 4]).isRequired,
-  filters: PropTypes.object,
-  collectionHandle: PropTypes.string
-};
-
-ProductGrid.defaultProps = {
-  filters: {},
-  collectionHandle: null
 };
 
 export default ProductGrid;
