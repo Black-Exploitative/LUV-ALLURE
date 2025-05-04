@@ -5,17 +5,14 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FilterSortBar from "../components/FilterSortBar";
 import ProductGrid from "../components/ProductGrid";
-import ProductSkeletonLoader from "../components/ProductSkeletonLoader";
 import api from "../services/api";
 
 const DynamicCollectionPage = () => {
   const { handle } = useParams();
   const [collection, setCollection] = useState(null);
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [gridType, setGridType] = useState(4);
-  const [initialFilters, setInitialFilters] = useState({});
   
   // Get collection data
   useEffect(() => {
@@ -24,64 +21,20 @@ const DynamicCollectionPage = () => {
         const response = await api.get(`/collections/${handle}`);
         if (response.data.success) {
           setCollection(response.data.data);
-          
-          // Set initial filters based on collection settings
-          const filters = {};
-          if (response.data.data.filters?.tags?.length > 0) {
-            filters.tags = response.data.data.filters.tags;
-          }
-          if (response.data.data.filters?.categories?.length > 0) {
-            filters.category = response.data.data.filters.categories;
-          }
-          setInitialFilters(filters);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error fetching collection:", error);
         setError("Collection not found");
+        setLoading(false);
       }
     };
     
     fetchCollection();
   }, [handle]);
   
-  // Fetch products with filters
-  const fetchProducts = async (filters = {}) => {
-    try {
-      setLoading(true);
-      const queryParams = new URLSearchParams();
-      
-      // Add filters to query
-      Object.entries(filters).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach(v => queryParams.append(key, v));
-        } else if (value) {
-          queryParams.append(key, value);
-        }
-      });
-      
-      const response = await api.get(`/collections/${handle}/products?${queryParams.toString()}`);
-      
-      if (response.data.success) {
-        setProducts(response.data.products);
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setError("Failed to load products");
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  // Initial product load
-  useEffect(() => {
-    if (collection) {
-      fetchProducts(initialFilters);
-    }
-  }, [collection]);
-  
-  // Handle filter changes
-  const handleFiltersChange = (filterData) => {
-    fetchProducts(filterData.filters);
+  const handleGridChange = (type) => {
+    setGridType(type);
   };
   
   if (error) {
@@ -132,21 +85,9 @@ const DynamicCollectionPage = () => {
         </div>
       )}
       
-      <div className="container mx-auto px-4">
-        {/* Filter and Sort Bar */}
-        <FilterSortBar 
-          onGridChange={setGridType} 
-          onFiltersChange={handleFiltersChange}
-          initialFilters={initialFilters}
-        />
-        
-        {/* Products Grid */}
-        {loading ? (
-          <ProductSkeletonLoader gridType={gridType} count={gridType === 2 ? 6 : 8} />
-        ) : (
-          <ProductGrid products={products} gridType={gridType} />
-        )}
-      </div>
+      {/* Matching Shop page structure */}
+      <FilterSortBar onGridChange={handleGridChange} />
+      <ProductGrid gridType={gridType} collectionHandle={handle} />
       
       <Footer />
     </div>
