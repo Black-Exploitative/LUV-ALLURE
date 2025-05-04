@@ -1,4 +1,4 @@
-// frontend/src/pages/DynamicCollectionPage.jsx
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";

@@ -702,7 +702,7 @@ const FilterSortBar = ({
 
           <div className="flex items-center space-x-4" ref={sortOptionsRef}>
             <img
-              src="./icons/grid4.svg"
+              src="/icons/grid4.svg"
               alt="Two column grid"
               className={`cursor-pointer h-5 w-5 ${
                 gridType === 2 ? "opacity-100" : "opacity-50"
@@ -710,7 +710,7 @@ const FilterSortBar = ({
               onClick={() => handleGridChange(2)}
             />
             <img
-              src="./icons/grid8.svg"
+              src="/icons/grid8.svg"
               alt="Four column grid"
               className={`cursor-pointer h-5 w-5 ${
                 gridType === 4 ? "opacity-100" : "opacity-50"
