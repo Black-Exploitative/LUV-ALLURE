@@ -64,7 +64,6 @@ export const RecentlyViewedProvider = ({ children }) => {
     </RecentlyViewedContext.Provider>
   );
 };
-  
 
 export const useRecentlyViewed = () => {
   const context = useContext(RecentlyViewedContext);
@@ -88,7 +87,7 @@ const RecentlyViewedProducts = () => {
     <div className="py-12 px-4 border-t border-gray-200">
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-light uppercase tracking-wider">
+          <h2 className="text-xl font-thin uppercase tracking-wider">
             Recently Viewed
           </h2>
           <button
@@ -165,7 +164,7 @@ const RecentlyViewedProductCard = ({ product, addToCart }) => {
         </div>
 
         <div className="mt-3">
-          <h3 className="text-sm font-light uppercase tracking-wide truncate">
+          <h3 className="text-sm font-thin uppercase tracking-wider truncate">
             {product.name}
           </h3>
           <p className="text-sm mt-1">₦{product.price}</p>
@@ -176,8 +175,8 @@ const RecentlyViewedProductCard = ({ product, addToCart }) => {
 };
 
 RecentlyViewedProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-  };
+  children: PropTypes.node.isRequired,
+};
 
 RecentlyViewedProductCard.propTypes = {
   product: PropTypes.shape({
@@ -188,7 +187,6 @@ RecentlyViewedProductCard.propTypes = {
     images: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   addToCart: PropTypes.func.isRequired,
- 
 };
 
 export default RecentlyViewedProducts;

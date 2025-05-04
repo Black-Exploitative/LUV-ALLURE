@@ -152,7 +152,7 @@ const CustomersReviews = ({
       <div className="flex flex-col md:flex-row justify-between max-w-4xl mx-auto px-4 sm:px-6 md:px-0 gap-8 md:gap-4">
         {/* Left side: Overall Rating */}
         <div className="flex flex-col items-center mb-6 md:mb-0">
-          <div className="text-5xl sm:text-6xl font-light">{averageRating}</div>
+          <div className="text-5xl sm:text-6xl font-thin tracking-wide">{averageRating}</div>
           <div className="flex my-2">
             {[...Array(5)].map((_, i) => (
               <svg

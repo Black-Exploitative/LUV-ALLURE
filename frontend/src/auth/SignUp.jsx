@@ -151,7 +151,7 @@ export default function SignUp() {
         <div className="w-full max-w-md space-y-10">
           {/* Title */}
           <div className="text-center">
-            <h1 className="text-3xl font-thin tracking-wide text-gray-900">CREATE AN ACCOUNT</h1>
+            <h1 className="text-3xl font-thin tracking-wider text-gray-900">CREATE AN ACCOUNT</h1>
             <p className="mt-6 text-sm text-gray-600">
               Join us to receive personalized updates and access exclusive content.
             </p>

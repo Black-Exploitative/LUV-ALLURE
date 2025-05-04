@@ -9,10 +9,10 @@ import { toast } from "react-hot-toast";
 export default function ResetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();
-  
+
   const [passwords, setPasswords] = useState({
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -33,54 +33,54 @@ export default function ResetPassword() {
     const { name, value } = e.target;
     setPasswords({
       ...passwords,
-      [name]: value
+      [name]: value,
     });
-    
+
     // Clear specific error when field is edited
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: null
+        [name]: null,
       });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!passwords.newPassword) {
       newErrors.newPassword = "New password is required";
     } else if (passwords.newPassword.length < 6) {
       newErrors.newPassword = "Password must be at least 6 characters";
     }
-    
+
     if (passwords.newPassword !== passwords.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Call API to reset password
       await authService.resetPassword(token, passwords.newPassword);
-      
+
       // Show success message
       toast.success("Password has been reset successfully");
-      
+
       // Update UI to show success
       setResetSuccess(true);
-      
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
         navigate("/signin");
@@ -89,14 +89,15 @@ export default function ResetPassword() {
       // Handle specific errors
       if (error.message?.includes("expired")) {
         setErrors({
-          general: "Password reset link has expired. Please request a new one."
+          general: "Password reset link has expired. Please request a new one.",
         });
       } else {
         setErrors({
-          general: error.message || "Failed to reset password. Please try again."
+          general:
+            error.message || "Failed to reset password. Please try again.",
         });
       }
-      
+
       toast.error(error.message || "Failed to reset password");
     } finally {
       setIsSubmitting(false);
@@ -135,7 +136,7 @@ export default function ResetPassword() {
       <div className="min-h-screen bg-white flex flex-col">
         {/* Top background banner */}
         <div className="h-16 bg-black w-full"></div>
-        
+
         <div className="flex-grow flex flex-col items-center justify-center px-6 py-12">
           {/* Logo */}
           <div className="mb-12">
@@ -145,7 +146,9 @@ export default function ResetPassword() {
           <div className="w-full max-w-md space-y-10">
             {/* Title */}
             <div className="text-center">
-              <h1 className="text-3xl font-light tracking-wide text-gray-900">RESET PASSWORD</h1>
+              <h1 className="text-3xl font-thin tracking-wider text-gray-900">
+                RESET PASSWORD
+              </h1>
               <p className="mt-6 text-sm text-gray-600">
                 Enter your new password below.
               </p>
@@ -154,8 +157,19 @@ export default function ResetPassword() {
             {resetSuccess ? (
               <div className="text-center space-y-6">
                 <div className="rounded-full bg-green-50 w-16 h-16 flex items-center justify-center mx-auto">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-green-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <p className="text-sm text-gray-700">
@@ -172,9 +186,12 @@ export default function ResetPassword() {
                     {errors.general}
                   </div>
                 )}
-                
+
                 <div>
-                  <label htmlFor="newPassword" className="block text-xs font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="newPassword"
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     NEW PASSWORD
                   </label>
                   <input
@@ -185,16 +202,21 @@ export default function ResetPassword() {
                     value={passwords.newPassword}
                     onChange={handleChange}
                     className={`appearance-none block w-full px-3 py-3 border ${
-                      errors.newPassword ? 'border-red-500' : 'border-gray-300'
+                      errors.newPassword ? "border-red-500" : "border-gray-300"
                     } focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm`}
                   />
                   {errors.newPassword && (
-                    <p className="mt-1 text-xs text-red-500">{errors.newPassword}</p>
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.newPassword}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-xs font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-xs font-medium text-gray-700 mb-1"
+                  >
                     CONFIRM PASSWORD
                   </label>
                   <input
@@ -205,11 +227,15 @@ export default function ResetPassword() {
                     value={passwords.confirmPassword}
                     onChange={handleChange}
                     className={`appearance-none block w-full px-3 py-3 border ${
-                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                      errors.confirmPassword
+                        ? "border-red-500"
+                        : "border-gray-300"
                     } focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm`}
                   />
                   {errors.confirmPassword && (
-                    <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.confirmPassword}
+                    </p>
                   )}
                 </div>
 

@@ -461,7 +461,7 @@ const PromoSectionForm = () => {
                 
                 <div className="md:w-1/2 flex flex-col justify-center">
                   <div className={`text-${formData.content.alignment} max-w-lg mx-auto`}>
-                    <h2 className="text-2xl font-light mb-4">{formData.content.title}</h2>
+                    <h2 className="text-2xl font-thin tracking-wider mb-4">{formData.content.title}</h2>
                     <p className="text-base mb-4">{formData.content.description}</p>
                     
                     <div className="inline-block relative">

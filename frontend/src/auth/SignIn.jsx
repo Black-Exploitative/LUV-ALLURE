@@ -89,7 +89,7 @@ export default function SignIn() {
           <div className="w-full max-w-md space-y-10">
             {/* Title */}
             <div className="text-center">
-              <h1 className="text-3xl font-thin tracking-wide text-gray-900">SIGN IN</h1>
+              <h1 className="text-3xl font-thin tracking-wider text-gray-900">SIGN IN</h1>
               <p className="mt-6 text-sm text-gray-600">
                 Sign in to access your account and manage your preferences.
               </p>

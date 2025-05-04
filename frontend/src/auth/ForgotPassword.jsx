@@ -72,7 +72,7 @@ export default function ForgotPassword() {
         <div className="w-full max-w-md space-y-10">
           {/* Title */}
           <div className="text-center">
-            <h1 className="text-3xl font-light tracking-wide text-gray-900">FORGOT PASSWORD</h1>
+            <h1 className="text-3xl font-thin tracking-wider text-gray-900">FORGOT PASSWORD</h1>
             <p className="mt-6 text-sm text-gray-600">
               Enter your email address and we will send you a link to reset your password.
             </p>

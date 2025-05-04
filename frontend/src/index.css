@@ -17,6 +17,13 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  
+}
 
 /* Add these styles to your index.css or create a new styles.css file */
 

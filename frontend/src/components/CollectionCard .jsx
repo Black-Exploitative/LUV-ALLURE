@@ -16,7 +16,7 @@ const CollectionCard = ({ imageUrl, title, onClick, onShopNowClick }) => {
 
       <div className="absolute inset-0 bg-black/30 flex flex-col justify-between">
         <div className="flex-grow flex items-center justify-center">
-          <h2 className="text-gray-200 text-4xl font-light tracking-wider">
+          <h2 className="text-gray-200 text-4xl font-thin tracking-wider">
             {title}
           </h2>
         </div>
@@ -41,7 +41,7 @@ const CollectionCard = ({ imageUrl, title, onClick, onShopNowClick }) => {
             </span>
           </button>
         </div>
-      </div> 
+      </div>
     </motion.div>
   );
 };

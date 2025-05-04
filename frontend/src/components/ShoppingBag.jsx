@@ -234,12 +234,12 @@ export default function ShoppingBag() {
                   
                   <button className="w-full border border-gray-300 py-3 flex items-center justify-center">
                     <span className="mr-2">PAY WITH</span>
-                    <img src="/icons/apple-pay.svg" alt="Apple Pay" className="h-6" />
+                    <img src="/icons/applepay.svg" alt="Apple Pay" className="h-12" />
                   </button>
                   
                   <button className="w-full border border-gray-300 py-3 flex items-center justify-center">
                     <span className="mr-2">PAY WITH</span>
-                    <img src="/icons/google-pay.svg" alt="Google Pay" className="h-6" />
+                    <img src="/icons/googlepay.svg" alt="Google Pay" className="h-4" />
                   </button>
                 </div>
               </div>
