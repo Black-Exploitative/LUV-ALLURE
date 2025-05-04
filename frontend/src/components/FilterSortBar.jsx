@@ -469,7 +469,7 @@ const FilterSortBar = ({
     return `NGN${price}`;
   };
 
-  // Display active filters as tags
+  
   const renderActiveFilters = () => {
     if (activeFilters.length === 0) return null;
 
