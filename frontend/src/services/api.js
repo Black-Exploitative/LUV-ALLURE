@@ -146,15 +146,121 @@ export const authService = {
 };
 
 // Product Services - Compatible with your ProductGrid component
-export const fetchProducts = async () => {
+
+export const fetchProducts = async (filters = {}) => {
   try {
-    const response = await api.get('/products');
+    // Build query parameters from filters
+    const params = new URLSearchParams();
+    
+    // Add collection filter if provided
+    if (filters.collection) {
+      params.append('collection', filters.collection);
+    }
+    
+    // Add category filter if provided
+    if (filters.category) {
+      params.append('category', filters.category);
+    }
+    
+    // Add color filter if provided
+    if (filters.color) {
+      params.append('color', filters.color);
+    }
+    
+    // Add size filter if provided
+    if (filters.size) {
+      params.append('size', filters.size);
+    }
+    
+    // Add sort parameter if provided
+    if (filters.sort) {
+      params.append('sort', filters.sort);
+    }
+    
+    // Add price range if provided
+    if (filters.price) {
+      params.append('price', filters.price);
+    }
+    
+    // Add limit if provided
+    if (filters.limit) {
+      params.append('limit', filters.limit);
+    }
+    
+    // Add pagination cursor if provided
+    if (filters.cursor) {
+      params.append('after', filters.cursor);
+    }
+    
+    // Create query string
+    const queryString = params.toString();
+    const url = queryString ? `/products?${queryString}` : '/products';
+    
+    console.log(`Fetching products from ${url}`);
+    
+    const response = await api.get(url);
     return response.data;
   } catch (error) {
     console.error('Error fetching products:', error);
     throw error;
   }
+};export const searchProductsWithFilters = async (query, filters = {}) => {
+  try {
+    // Build query parameters
+    const params = new URLSearchParams();
+    
+    // Add search query
+    if (query) {
+      params.append('q', query);
+    }
+    
+    // Add category filter
+    if (filters.category) {
+      params.append('category', filters.category);
+    }
+    
+    // Add color filter
+    if (filters.color) {
+      params.append('color', filters.color);
+    }
+    
+    // Add size filter
+    if (filters.size) {
+      params.append('size', filters.size);
+    }
+    
+    // Add sort parameter
+    if (filters.sort) {
+      params.append('sort', filters.sort);
+    }
+    
+    // Add price range
+    if (filters.price) {
+      params.append('price', filters.price);
+    }
+    
+    // Add limit
+    if (filters.limit) {
+      params.append('limit', filters.limit.toString());
+    }
+    
+    // Add pagination cursor
+    if (filters.cursor) {
+      params.append('cursor', filters.cursor);
+    }
+    
+    // Create query string
+    const queryString = params.toString();
+    
+    const response = await api.get(`/search/products?${queryString}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error searching products:', error);
+    throw error;
+  }
 };
+
+
 
 export const getProductByHandle = async (handle) => {
   try {
