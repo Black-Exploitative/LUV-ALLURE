@@ -498,7 +498,7 @@ const FilterSortBar = ({
           } else {
             return filter.values.map((value) => (
               <div
-                key={`${filter.type}-${value}`}
+                key={`${filter.type}-{value}`}
                 className="flex items-center bg-gray-100 px-3 py-1 mr-2 mb-2 text-sm"
               >
                 <span className="mr-1">
