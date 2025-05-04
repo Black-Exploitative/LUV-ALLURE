@@ -13,6 +13,20 @@ const DynamicCollectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [gridType, setGridType] = useState(4);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+
+  const isMobile = windowWidth < 768;
   
   // Get collection data
   useEffect(() => {
@@ -54,30 +68,30 @@ const DynamicCollectionPage = () => {
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Dynamic Shop Header */}
+      {/* Dynamic Shop Header - Responsive */}
       {collection && (
-        <div className="relative w-full h-70 mt-[70px]">
+        <div className={`relative w-full ${isMobile ? 'h-40' : 'h-70'} mt-[70px]`}>
           {/* Background image */}
           <div 
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${collection.headerImage || '/images/banner.webp'})` }}
           ></div>
           
-          {/* Overlay with dynamic opacity */}
+  
           <div 
             className="absolute inset-0 bg-black"
             style={{ opacity: collection.headerOverlayOpacity || 0.5 }}
           ></div>
           
-          {/* Content */}
+   
           <div className="relative h-full z-10 flex flex-col justify-center items-center text-center">
             {collection.headerTitle && (
-              <h1 className="text-white text-4xl font-bold mb-2">
+              <h1 className={`text-white ${isMobile ? 'text-2xl' : 'text-4xl'} font-bold mb-2`}>
                 {collection.headerTitle}
               </h1>
             )}
             {collection.headerDescription && (
-              <p className="text-white text-lg max-w-2xl">
+              <p className={`text-white ${isMobile ? 'text-sm px-4' : 'text-lg'} max-w-2xl`}>
                 {collection.headerDescription}
               </p>
             )}
@@ -85,9 +99,14 @@ const DynamicCollectionPage = () => {
         </div>
       )}
       
-      {/* Matching Shop page structure */}
+    
       <FilterSortBar onGridChange={handleGridChange} />
-      <ProductGrid gridType={gridType} collectionHandle={handle} />
+      <ProductGrid 
+        gridType={gridType} 
+        collectionHandle={handle} 
+        isMobile={isMobile} 
+        className="grid-cols-2"
+      />
       
       <Footer />
     </div>
