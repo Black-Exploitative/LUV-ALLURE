@@ -208,22 +208,22 @@ export default function Navbar() {
         {
           title: "ALL CLOTHING",
           links: [
-            { name: "Dresses", href: "#" },
-            { name: "Tops", href: "#" },
-            { name: "Skirts & Skorts", href: "#" },
-            { name: "Sets", href: "#" },
-            { name: "Pants", href: "#" },
-            { name: "Playsuits & Jumpsuits", href: "#" },
+            { name: "Dresses", href: "/shop/dresses" },
+            { name: "Tops", href: "/shop/tops" },
+            { name: "Skirts & Skorts", href: "#/shop/skirts&skorts" },
+            { name: "Sets", href: "#/shop/sets" },
+            { name: "Pants & Capris'", href: "/shop/pants" },
+            { name: "Jumpsuits", href: "/shop/jumpsuits" },
             { name: "All Clothing", href: "/shop" }
           ]
         },
         {
           title: "ALL GIFTING",
           links: [
-            { name: "Gift Cards", href: "#" },
-            { name: "Vouchers", href: "#" },
-            { name: "Membership", href: "#" },
-            { name: "All Gifting", href: "#" }
+            { name: "Gift Cards", href: "/Shop/gift-cards" },
+            { name: "Vouchers", href: "/Shop/vouchers" },
+            { name: "Membership", href: "/Shop/membership" },
+            { name: "All Gifting", href: "/shop/gifting" }
           ]
         }
       ],
@@ -231,12 +231,12 @@ export default function Navbar() {
         {
           image: "https://plus.unsplash.com/premium_photo-1682097559861-d5d5027868b5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fE1heGklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MAXI DRESSES",
-          href: "#"
+          href: ""
         },
         {
           image: "https://images.unsplash.com/photo-1719610894782-7b376085e200?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG1pbmklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MINI DRESSES",
-          href: "#"
+          href: ""
         }
       ]
     },
@@ -245,24 +245,24 @@ export default function Navbar() {
         {
           title: "DRESSES BY LENGTH",
           links: [
-            { name: "All Dresses", href: "#" },
-            { name: "Mini Dresses", href: "#" },
-            { name: "Maxi Dresses", href: "#" },
-            { name: "Midi Dresses", href: "#" }
+            { name: "All Dresses", href: "/shop/dresses" },
+            { name: "Mini Dresses", href: "/shop/mini-dresses" },
+            { name: "Maxi Dresses", href: "/shop/maxi-dresses" },
+            { name: "Midi Dresses", href: "/shop/midi-dresses" }
           ]
         },
         {
           title: "DRESSES BY STYLE",
           links: [
-            { name: "Prom Dresses", href: "#" },
-            { name: "Formal Dresses", href: "#" },
-            { name: "Party Dresses", href: "#" },
-            { name: "Wedding Guest Dresses", href: "#" },
-            { name: "Bridesmaid Dresses", href: "#" },
+            { name: "Prom Dresses", href: "/shop/prom-dresses" },
+            { name: "Formal Dresses", href: "/shop/formal-dresses" },
+            { name: "Party Dresses", href: "/shop/party-dresses" },
+            { name: "Wedding Guest Dresses", href: "/shop/wedding-guest-dresses" },
+//            { name: "Bridesmaid Dresses", href: "/shop/bridesmaide-dresses" },
 //            { name: "Bridal Dresses", href: "#" },
-            { name: "Corset Dresses", href: "#" },
-            { name: "Bubblehem Dresses", href: "#" },
-            { name: "Flowy Dresses", href: "#" }
+            { name: "Corset Dresses", href: "/shop/corset-dresses" },
+            { name: "Bubblehem Dresses", href: "/shop/bubblehem-dresses" },
+            { name: "Flowy Dresses", href: "/shop/flowy-dresses" }
           ]
         },
         {
@@ -272,7 +272,10 @@ export default function Navbar() {
             { name: "Red Dresses", href: "#" },
             { name: "Pink Dresses", href: "#" },
             { name: "Yellow Dresses", href: "#" },
+            { name: "Green Dresses", href: "#" },
+            { name: "Brown Dresses", href: "#" },
             { name: "Blue Dresses", href: "#" },
+            { name: "Black Dresses", href: "#" },
             { name: "Embelishment Dresses", href: "#" }
           ]
         }
@@ -290,7 +293,7 @@ export default function Navbar() {
         {
           title: "COLLECTIONS",
           links: [
-            { name: "All Collections", href: "#s" }
+            { name: "All Collections", href: "/collections" }
           ]
         },
         {
@@ -300,8 +303,6 @@ export default function Navbar() {
             { name: "Formal", href: "#" },
             { name: "Party", href: "#" },
             { name: "Wedding Guest", href: "#" },
-            { name: "Bridesmaid", href: "#" },
-            { name: "Bridal", href: "#" },
             { name: "Holiday", href: "#" },
             { name: "Festival", href: "#" }
           ]
@@ -325,9 +326,9 @@ export default function Navbar() {
         {
           title: "NEW IN",
           links: [
-            { name: "New Arrivals", href: "#" },
-            { name: "Back In Stock", href: "#" },
-            { name: "Most Popular", href: "#" },
+            { name: "New Arrivals", href: "/collections/new-arrivals" },
+            { name: "Back In Stock", href: "/collections/back-in-stock" },
+            { name: "Most Popular", href: "/collections/most-popular" },
           ]
         }
       ],

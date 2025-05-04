@@ -1,12 +1,24 @@
-// controllers/searchController.js - Enhanced to search all fields
 const shopifyClient = require('../utils/shopifyClient');
 
-// Search products based on query
+// Search products based on query with enhanced filter support
 exports.searchProducts = async (req, res, next) => {
   try {
-    const { q, category, limit = 20, page = 1, sort = 'relevance', color, size } = req.query;
+    const { 
+      q, 
+      category, 
+      limit = 20, 
+      page = 1, 
+      sort = 'relevance', 
+      color, 
+      size,
+      price,
+      cursor
+    } = req.query;
     
-    if (!q || q.trim().length < 2) {
+    console.log('Search request with params:', { q, category, limit, page, sort, color, size, price, cursor });
+    
+    // For empty searches, return empty results immediately
+    if (q !== undefined && (!q || q.trim().length < 2)) {
       return res.status(200).json({ 
         products: [],
         totalCount: 0,
@@ -37,7 +49,7 @@ exports.searchProducts = async (req, res, next) => {
         sortDirection = true; // ASC
         break;
       case 'best-selling':
-      case 'most popular':
+      case 'most-popular':
         sortKey = 'BEST_SELLING';
         sortDirection = false; // DESC
         break;
@@ -46,42 +58,54 @@ exports.searchProducts = async (req, res, next) => {
         sortDirection = false; // DESC
     }
     
-    // Build search query with multiple fields
-    let searchQuery = q;
+    // Build search query with filters
+    let filterParts = [];
     
-    // Create advanced GraphQL query to search across all fields
-    // This builds a more comprehensive search that includes:
-    // - title
-    // - description (partial matches)
-    // - tags
-    // - handle (product URL/slug)
-    // - product type (category)
-    // - variant titles (options)
+    // Add search query if provided
+    if (q) {
+      filterParts.push(q);
+    }
     
     // Add category filter if specified
     if (category && category !== 'all') {
-      searchQuery += ` AND product_type:${category}`;
+      filterParts.push(`product_type:${category}`);
     }
     
     // Add color filter if specified
     if (color) {
       // Search for color in tags, variant titles, and option values
-      searchQuery += ` AND (tag:${color} OR variant:${color} OR option:${color})`;
+      filterParts.push(`(title:${color} OR variants:${color} OR tag:${color} OR option:${color})`);
     }
     
     // Add size filter if specified
     if (size) {
       // Search for size in variant titles and option values
-      searchQuery += ` AND (variant:${size} OR option:${size})`;
+      filterParts.push(`(variants:${size} OR tag:${size} OR option:${size})`);
     }
+    
+    // Add price filter if specified
+    if (price) {
+      const [minPrice, maxPrice] = price.split('-');
+      if (minPrice && !isNaN(minPrice)) {
+        filterParts.push(`variants.price:>=${minPrice}`);
+      }
+      if (maxPrice && !isNaN(maxPrice)) {
+        filterParts.push(`variants.price:<=${maxPrice}`);
+      }
+    }
+    
+    // Combine filter parts into a single search query
+    const searchQuery = filterParts.join(' AND ');
+    console.log('Combined search query:', searchQuery);
     
     // Calculate pagination
     const first = parseInt(limit);
+    const after = cursor || null;
     
     // Execute the query
     const gqlQuery = `
-      query SearchProducts($query: String!, $first: Int!, $sortKey: ProductSortKeys!, $reverse: Boolean!) {
-        products(query: $query, first: $first, sortKey: $sortKey, reverse: $reverse) {
+      query SearchProducts($query: String!, $first: Int!, $after: String, $sortKey: ProductSortKeys!, $reverse: Boolean!) {
+        products(query: $query, first: $first, after: $after, sortKey: $sortKey, reverse: $reverse) {
           edges {
             node {
               id
@@ -96,7 +120,7 @@ exports.searchProducts = async (req, res, next) => {
                   currencyCode
                 }
               }
-              images(first: 3) {
+              images(first: 5) {
                 edges {
                   node {
                     url
@@ -138,28 +162,13 @@ exports.searchProducts = async (req, res, next) => {
     const variables = {
       query: searchQuery,
       first: first,
+      after: after,
       sortKey: sortKey,
       reverse: sortDirection
     };
     
+    // Execute the GraphQL query with Shopify client
     const result = await shopifyClient.query(gqlQuery, variables);
-    
-    // If no results found, try a more lenient search (partial word matching)
-    if (!result.products || result.products.edges.length === 0) {
-      // Try breaking the search term into individual words for better matching
-      const words = q.split(/\s+/).filter(word => word.length > 2);
-      
-      if (words.length > 1) {
-        // Create a new query using OR to match any of the words
-        const wordsQuery = words.join(' OR ');
-        variables.query = wordsQuery;
-        
-        const secondResult = await shopifyClient.query(gqlQuery, variables);
-        if (secondResult.products) {
-          result.products = secondResult.products;
-        }
-      }
-    }
     
     // Transform products for the frontend
     const products = result.products?.edges?.map(({ node }) => {
@@ -213,11 +222,49 @@ exports.searchProducts = async (req, res, next) => {
     res.status(200).json({
       products,
       pageInfo: result.products?.pageInfo || { hasNextPage: false },
-      query: q,
+      query: q || '',
       totalCount: products.length
     });
   } catch (error) {
     console.error('Search error:', error);
+    next(error);
+  }
+};
+
+// Create a specialized endpoint for category filtering (for navbar links)
+exports.getProductsByCategory = async (req, res, next) => {
+  try {
+    const { category, sort = 'relevance', limit = 20, page = 1 } = req.query;
+    
+    if (!category) {
+      return res.status(400).json({
+        success: false,
+        message: 'Category parameter is required'
+      });
+    }
+    
+    // Use the search endpoint logic with a category filter
+    req.query.q = ''; // Empty search term
+    
+    // Call the standard search function
+    await exports.searchProducts(req, res, next);
+  } catch (error) {
+    console.error('Category filter error:', error);
+    next(error);
+  }
+};
+
+// Endpoint for "New Arrivals" (newest products)
+exports.getNewArrivals = async (req, res, next) => {
+  try {
+    // Override the sort parameter to get newest products
+    req.query.sort = 'newest';
+    req.query.q = ''; // Empty search term
+    
+    // Call the standard search function
+    await exports.searchProducts(req, res, next);
+  } catch (error) {
+    console.error('New arrivals error:', error);
     next(error);
   }
 };
@@ -319,7 +366,7 @@ exports.getTrendingSearches = async (req, res, next) => {
   }
 };
 
-// Search products by tag
+// Search products by tag - used for related products and collections
 exports.searchProductsByTag = async (req, res, next) => {
   try {
     const { tag } = req.query;
@@ -341,7 +388,7 @@ exports.searchProductsByTag = async (req, res, next) => {
               title
               handle
               description
-              images(first: 1) {
+              images(first: 5) {
                 edges {
                   node {
                     url
