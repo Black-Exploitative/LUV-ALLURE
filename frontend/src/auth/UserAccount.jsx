@@ -296,75 +296,10 @@ export default function UserAccount() {
 
                   <div className="space-y-4">
                     <h2 className="text-lg pl-4 font-medium">RECENT ORDERS</h2>
-                    {orders.length > 0 ? (
-                      <div className="border border-gray-200 ml-4">
-                        {orders.map((order, index) => (
-                          <div
-                            key={order.id}
-                            className={`p-6 ${
-                              index !== orders.length - 1
-                                ? "border-b border-gray-200"
-                                : ""
-                            }`}
-                          >
-                            <div className="flex flex-col md:flex-row justify-between mb-4">
-                              <div>
-                                <p className="font-medium">{order.id}</p>
-                                <p className="text-sm text-gray-600">
-                                  {order.date}
-                                </p>
-                              </div>
-                              <div className="mt-2 md:mt-0">
-                                <span className="inline-block px-3 py-1 text-xs bg-green-50 text-green-800">
-                                  {order.status}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="text-sm">
-                              <p className="font-medium">Items:</p>
-                              <div className="ml-4">
-                              <ul className="ml-4 list-disc font-normal font-[Raleway]">
-                                {order.items.map((item, i) => (
-                                  <li key={i}>
-                                    {item.name} x{item.quantity} - {item.price}
-                                  </li>
-                                ))}
-                              </ul>
-                              </div>
-                              <p className="mt-2 font-medium">
-                                Total: {order.total}
-                              </p>
-                            </div>
-                            <div className="mt-4">
-                              <motion.button
-                                whileHover={{ x: 5 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="text-xs underline cursor-pointer"
-                              >
-                                VIEW ORDER DETAILS
-                              </motion.button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-600">
-                        You have not placed any orders yet.
-                      </p>
-                    )}
-
-                    {orders.length > 0 && (
-                      <div className="text-right">
-                        <motion.button
-                          whileHover={{ x: 5 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="text-sm underline cursor-pointer"
-                          onClick={() => setActiveSection("orders")}
-                        >
-                          VIEW ALL ORDERS
-                        </motion.button>
-                      </div>
-                    )}
+                    <div className="ml-4">
+                      {/* We'll use the Orders component with limited display for dashboard */}
+                      <Orders dashboard={true} limit={2} />
+                    </div>
                   </div>
                 </div>
               )}

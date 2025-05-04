@@ -42,6 +42,7 @@ import ServicesPage from "./pages/ServicesPage";
 import CollectionHeroForm from "./admin/forms/CollectionHeroForm";
 import CollectionForm from "./admin/forms/CollectionForm"; // New collection form
 import OrderConfirmation from "./pages/OrderConfirmation";
+import OrderDetails from "./pages/OrderDetailsPage";
 
 const AppContent = () => {
   const location = useLocation();
@@ -109,7 +110,8 @@ const AppContent = () => {
 
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+        <Route path="/order-confirmation/:reference" element={<OrderConfirmation />} />
+        <Route path="/order-details/:orderId" element={<OrderDetails />} />
         {/*<Route path="/payment-failed" element={<PaymentFailed />} />*/}
 
         <Route path="/collections" element={<CollectionsPage />} /> 
