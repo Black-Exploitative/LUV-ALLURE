@@ -3,7 +3,7 @@ import { motion, useInView, useAnimation } from "framer-motion";
 import AnimatedImage from "./AnimatedImage";
 import PropTypes from "prop-types";
 
-const EnhancedProductCard = ({ product, index, onProductClick }) => {
+const EnhancedProductCard = ({ product, index, onProductClick, isMobile }) => {
   const { id, title, images = [], price } = product;
   
   // Animation controls
@@ -65,7 +65,7 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
   return (
     <motion.div
       ref={cardRef}
-      className="w-[380px] h-auto rounded-none overflow-hidden cursor-pointer"
+      className={`w-full ${isMobile ? 'max-w-full' : 'max-w-[380px]'} h-auto rounded-none overflow-hidden cursor-pointer`}
       variants={{
         hidden: { opacity: 0, y: 50 },
         visible: { opacity: 1, y: 0 },
@@ -81,7 +81,7 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
       onHoverEnd={() => setIsHovered(false)}
       onClick={handleClick}
     >
-      <div className="relative w-full h-[500px]">
+      <div className={`relative w-full ${isMobile ? 'h-[350px]' : 'h-[500px]'}`}>
         {/* Image carousel */}
         {images.length > 0 ? (
           images.map((image, imgIndex) => (
@@ -109,8 +109,8 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
           </div>
         )}
         
-        {/* Image indicator dots (only show if multiple images and hovering) */}
-        {images.length > 1 && isHovered && (
+        {/* Image indicator dots (only show if multiple images) */}
+        {images.length > 1 && (isHovered || isMobile) && (
           <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
             {images.map((_, imgIndex) => (
               <motion.div
@@ -130,7 +130,7 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
       </div>
 
       <motion.h3
-        className="text-[15px] text-center font-medium text-black mt-3"
+        className={`${isMobile ? 'text-[13px]' : 'text-[15px]'} text-center font-medium text-black mt-3`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 + index * 0.15 }}
@@ -140,7 +140,7 @@ const EnhancedProductCard = ({ product, index, onProductClick }) => {
       
       {price && (
         <motion.p
-          className="text-[14px] text-center font-normal text-gray-700 mt-1"
+          className={`${isMobile ? 'text-[12px]' : 'text-[14px]'} text-center font-normal text-gray-700 mt-1`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 + index * 0.15 }}
@@ -168,6 +168,11 @@ EnhancedProductCard.propTypes = {
   }).isRequired,
   index: PropTypes.number.isRequired,
   onProductClick: PropTypes.func,
+  isMobile: PropTypes.bool,
+};
+
+EnhancedProductCard.defaultProps = {
+  isMobile: false
 };
 
 export default EnhancedProductCard;

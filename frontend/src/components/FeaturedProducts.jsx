@@ -43,7 +43,21 @@ const FeaturedProducts = () => {
   const [sectionTitle, setSectionTitle] = useState("HERE'S WHAT THE SEASON OFFERS");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
+
+  // Add resize listener to track window width
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Helper function to check if mobile view
+  const isMobile = windowWidth < 768;
 
   // Fetch featured products and section configuration
   useEffect(() => {
@@ -99,21 +113,21 @@ const FeaturedProducts = () => {
   };
 
   return (
-    <section className="py-16 mt-[90px]">
+    <section className="py-12 md:py-16 mt-[60px] md:mt-[90px]">
       {/* Dynamic Section Heading */}
-      <div className="mx-[100px] text-center">
-        <AnimatedHeading className="tracking-wider text-[30px] font-normal text-black mb-[103px]">
+      <div className="mx-4 sm:mx-8 md:mx-[100px] text-center">
+        <AnimatedHeading className="tracking-wider text-[22px] md:text-[30px] font-normal text-black mb-[50px] md:mb-[103px]">
           {sectionTitle}
         </AnimatedHeading>
       </div>
 
-      {/* Enhanced Product Grid with Auto-Carousel Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mx-[100px]">
+      
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-8 mx-2 sm:mx-8 md:mx-[100px]">
         {loading ? (
           // Loading skeleton
           Array.from({ length: 4 }).map((_, index) => (
             <div key={`skeleton-${index}`} className="flex justify-center">
-              <div className="w-[380px] h-[500px] bg-gray-200 animate-pulse"></div>
+              <div className="w-full max-w-[160px] sm:max-w-[240px] md:w-[300px] lg:w-[380px] h-[280px] sm:h-[350px] md:h-[420px] lg:h-[500px] bg-gray-200 animate-pulse"></div>
             </div>
           ))
         ) : (
@@ -123,6 +137,7 @@ const FeaturedProducts = () => {
                 product={product}
                 index={index}
                 onProductClick={() => handleProductClick(product)}
+                isMobile={isMobile}
               />
             </div>
           ))
