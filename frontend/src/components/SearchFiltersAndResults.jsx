@@ -303,7 +303,7 @@ const SearchFiltersAndResults = ({
                         />
                         {/* Quick view overlay on hover */}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                          <span className="bg-white bg-opacity-90 px-4 py-2 text-xs uppercase tracking-wider">
+                          <span className="bg-white bg-opacity-90 px-4 py-2 text-xs uppercase tracking-wider text-black">
                             Quick View
                           </span>
                         </div>
