@@ -466,7 +466,7 @@ const FilterSortBar = ({
   };
 
   const formatPrice = (price) => {
-    return `$${price}`;
+    return `NGN${price}`;
   };
 
   // Display active filters as tags

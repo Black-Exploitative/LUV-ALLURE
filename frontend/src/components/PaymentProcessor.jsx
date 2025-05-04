@@ -135,7 +135,7 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
           }`}
           onClick={() => handlePaymentMethodChange('card')}
         >
-          <img src="/icons/credit-card.svg" alt="Credit Card" className="w-8 h-8 mb-2" />
+          <img src="/icons/creditcard.png" alt="Credit Card" className="w-8 h-8 mb-2" />
           <span className="text-sm">Card Payment</span>
         </button>
         
@@ -147,7 +147,7 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
           }`}
           onClick={() => handlePaymentMethodChange('bank')}
         >
-          <img src="/icons/bank.svg" alt="Bank Transfer" className="w-8 h-8 mb-2" />
+          <img src="/icons/banktransfer.svg" alt="Bank Transfer" className="w-8 h-8 mb-2" />
           <span className="text-sm">Bank Transfer</span>
         </button>
       </div>
