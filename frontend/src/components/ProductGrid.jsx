@@ -26,6 +26,10 @@ const ProductGrid = ({ gridType }) => {
   
   // Determine if we're on mobile
   const isMobile = windowWidth < 768;
+  
+  // For mobile, we use gridType directly from the parent component
+  // This works with the existing FilterSortBar's grid toggles (2 or 4)
+  const mobileColumns = isMobile && gridType === 2 ? 1 : 2;
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -152,10 +156,12 @@ const ProductGrid = ({ gridType }) => {
     return <div className="text-red-500 text-center py-8">{error}</div>;
   }
 
-  // Get responsive grid classes
+  // Get responsive grid classes based on gridType and mobile status
   const getGridClasses = () => {
     if (isMobile) {
-      return "grid-cols-2 gap-x-[5px] gap-y-[15px] mx-[10px]";
+      return mobileColumns === 1 
+        ? "grid-cols-1 gap-y-[20px] mx-[15px]" 
+        : "grid-cols-2 gap-x-[5px] gap-y-[15px] mx-[10px]";
     } else if (gridType === 2) {
       return "grid-cols-1 md:grid-cols-2 gap-x-[10px] gap-y-[30px] mx-[20px]";
     } else {
@@ -164,7 +170,7 @@ const ProductGrid = ({ gridType }) => {
   };
 
   return (
-    <div className={isMobile ? "mx-[10px]" : "mx-[20px]"}>
+    <div className={isMobile ? (mobileColumns === 1 ? "mx-[15px]" : "mx-[10px]") : "mx-[20px]"}>
       {loading ? (
         <ProductSkeletonLoader gridType={gridType} count={gridType === 2 ? 6 : 8} />
       ) : (
@@ -190,6 +196,7 @@ const ProductGrid = ({ gridType }) => {
                 gridType={gridType}
                 onProductClick={handleProductClick}
                 isMobile={isMobile}
+                mobileColumns={mobileColumns}
               />
             </div>
           ))}
