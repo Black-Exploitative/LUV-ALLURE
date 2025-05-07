@@ -12,6 +12,20 @@ const ProductGrid = ({ gridType }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  // Track window width for responsive adjustments
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Determine if we're on mobile
+  const isMobile = windowWidth < 768;
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -96,6 +110,7 @@ const ProductGrid = ({ gridType }) => {
   const handleProductClick = (productId, productSlug) => {
     navigate(`/product/${productSlug}_${productId}`);
   };
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -120,7 +135,7 @@ const ProductGrid = ({ gridType }) => {
       
       groupedProducts.push({
         id: `${product.id}-${color}`,
-        originalId: product.id, // Store the original product ID for navigation
+        originalId: product.id, 
         title: product.title,
         displayName: `${product.title} - ${color}`,
         description: product.description,
@@ -128,7 +143,7 @@ const ProductGrid = ({ gridType }) => {
         priceValue: product.priceValue,
         sizes: sizesForColor,
         images: product.images,
-        originalProduct: product // Keep reference to original product
+        originalProduct: product 
       });
     });
   });
@@ -137,18 +152,25 @@ const ProductGrid = ({ gridType }) => {
     return <div className="text-red-500 text-center py-8">{error}</div>;
   }
 
+  // Get responsive grid classes
+  const getGridClasses = () => {
+    if (isMobile) {
+      return "grid-cols-2 gap-x-[5px] gap-y-[15px] mx-[10px]";
+    } else if (gridType === 2) {
+      return "grid-cols-1 md:grid-cols-2 gap-x-[10px] gap-y-[30px] mx-[20px]";
+    } else {
+      return "grid-cols-2 md:grid-cols-4 gap-x-[10px] md:gap-x-[10px] gap-y-[30px] mx-[20px]";
+    }
+  };
+
   return (
-    <div className="mx-[20px]">
+    <div className={isMobile ? "mx-[10px]" : "mx-[20px]"}>
       {loading ? (
         <ProductSkeletonLoader gridType={gridType} count={gridType === 2 ? 6 : 8} />
       ) : (
         <motion.div
           ref={gridRef}
-          className={`
-            ${gridType === 2 
-              ? "grid grid-cols-1 md:grid-cols-2 gap-x-[10px] gap-y-[30px]" 
-              : "grid grid-cols-2 md:grid-cols-4 gap-x-[10px] md:gap-x-[10px] gap-y-[30px]"}
-          `}
+          className={`grid ${getGridClasses()}`}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -157,7 +179,7 @@ const ProductGrid = ({ gridType }) => {
             <div key={product.id} className="overflow-hidden w-full">
               <ProductCard
                 product={{
-                  id: product.originalId, // Use the original product ID for API fetching
+                  id: product.originalId,
                   name: product.displayName || product.title,
                   price: product.priceValue,
                   sizes: product.sizes,
@@ -167,6 +189,7 @@ const ProductGrid = ({ gridType }) => {
                 }}
                 gridType={gridType}
                 onProductClick={handleProductClick}
+                isMobile={isMobile}
               />
             </div>
           ))}

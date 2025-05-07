@@ -1,4 +1,4 @@
-// frontend/src/admin/Dashboard.jsx
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -23,7 +23,7 @@ const Dashboard = () => {
   const [promoSections, setPromoSections] = useState([]);
   const [shopHeaders, setShopHeaders] = useState([]);
   const [featuredSections, setFeaturedSections] = useState([]);
-  const [collections, setCollections] = useState([]); // New state for collections
+  const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [relationshipType, setRelationshipType] = useState('style-with');

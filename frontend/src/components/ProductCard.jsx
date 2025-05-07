@@ -7,7 +7,6 @@ import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 
 const ProductCard = ({ product, gridType, onProductClick }) => {
-  // Add safe defaults and error handling
   const { 
     id,
     name = "Product Name", 
@@ -26,14 +25,34 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
   const [isInWishlistState, setIsInWishlistState] = useState(false);
   const cardRef = useRef(null);
   const autoPlayRef = useRef(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
 
-  // Safe image handling
+  const isMobile = windowWidth < 768;
+
+ 
   const validImages = Array.isArray(images) ? images : ["/images/placeholder.jpg"];
   const hasMultipleImages = validImages.length > 1;
 
-  // Responsive sizing based on grid type
-  const cardWidthClass = "w-full"; // Always use full width of container
-  const imageHeightClass = gridType === 2 ? "h-[1300px] md:h-[1300px]" : "h-[700px] md:h-[700px]";
+  const cardWidthClass = "w-full";   
+  
+  const getImageHeightClass = () => {
+    if (isMobile) {
+      return "h-[300px]";
+    } else {
+      return gridType === 2 ? "h-[1300px]" : "h-[700px]";
+    }
+  };
 
   // Tracking manual navigation to pause auto-play
   const [manuallyNavigated, setManuallyNavigated] = useState(false);
@@ -171,14 +190,14 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     >
       {/* Image Carousel Section */}
       <div 
-        className={`relative overflow-hidden cursor-pointer ${imageHeightClass}`}
+        className={`relative overflow-hidden cursor-pointer ${getImageHeightClass()}`}
       >
         <AnimatePresence initial={false} custom={1}>
           <motion.img
             key={currentImage}
             src={validImages[currentImage]?.src || validImages[currentImage] || '/images/placeholder.jpg'}
             alt={name}
-            className={`w-full ${imageHeightClass} object-cover absolute top-0 left-0`}
+            className={`w-full ${getImageHeightClass()} object-cover absolute top-0 left-0`}
             variants={slideVariants}
             initial="enter"
             animate="center"
@@ -191,10 +210,10 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
           />
         </AnimatePresence>
 
-        {/* Wishlist Heart Icon */}
+        {/* Wishlist Heart Icon - Adjusted position and size for mobile */}
         <motion.button
           onClick={handleWishlistToggle}
-          className="absolute top-4 right-4 z-20 bg-white/70 hover:bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+          className={`absolute ${isMobile ? 'top-2 right-2 w-6 h-6' : 'top-4 right-4 w-8 h-8'} z-20 bg-white/70 hover:bg-white rounded-full flex items-center justify-center shadow-md`}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ opacity: 0 }}
@@ -202,16 +221,16 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
           transition={{ duration: 0.2 }}
         >
           {isInWishlistState ? (
-            <FaHeart className="text-red-500" size={16} />
+            <FaHeart className="text-red-500" size={isMobile ? 12 : 16} />
           ) : (
-            <FiHeart className="text-gray-700" size={16} />
+            <FiHeart className="text-gray-700" size={isMobile ? 12 : 16} />
           )}
         </motion.button>
 
-        {/* Image Indicator */}
+        {/* Image Indicator - Smaller on mobile */}
         {hasMultipleImages && (
           <motion.div 
-            className="absolute bottom-4 right-4 bg-white/80 px-2 py-1 text-xs font-medium rounded"
+            className={`absolute bottom-4 right-4 bg-white/80 px-2 py-1 ${isMobile ? 'text-[10px]' : 'text-xs'} font-medium rounded`}
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovered ? 1 : 0 }}
             transition={{ duration: 0.3 }}
@@ -220,11 +239,11 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
           </motion.div>
         )}
 
-        {/* Navigation Arrows - Made more visible */}
+        {/* Navigation Arrows - Resized for mobile */}
         {hasMultipleImages && (
           <>
             <motion.div
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 cursor-pointer z-10 bg-white/60 hover:bg-white/90 rounded-full w-8 h-8 flex items-center justify-center"
+              className={`absolute left-2 top-1/2 transform -translate-y-1/2 cursor-pointer z-10 bg-white/60 hover:bg-white/90 rounded-full ${isMobile ? 'w-6 h-6' : 'w-8 h-8'} flex items-center justify-center`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleImageChange(-1, e);
@@ -235,11 +254,11 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <FaChevronLeft className="text-black text-lg" />
+              <FaChevronLeft className={`text-black ${isMobile ? 'text-sm' : 'text-lg'}`} />
             </motion.div>
 
             <motion.div
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer z-10 bg-white/60 hover:bg-white/90 rounded-full w-8 h-8 flex items-center justify-center"
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer z-10 bg-white/60 hover:bg-white/90 rounded-full ${isMobile ? 'w-6 h-6' : 'w-8 h-8'} flex items-center justify-center`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleImageChange(1, e);
@@ -250,15 +269,15 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <FaChevronRight className="text-black text-lg" />
+              <FaChevronRight className={`text-black ${isMobile ? 'text-sm' : 'text-lg'}`} />
             </motion.div>
           </>
         )}
         
-        {/* Quick add button on hover */}
+        {/* Quick add button on hover - Smaller text on mobile */}
         {selectedSize && (
           <motion.div 
-            className="absolute left-0 right-0 bottom-0 bg-black text-white text-center py-3 cursor-pointer"
+            className={`absolute left-0 right-0 bottom-0 bg-black text-white text-center ${isMobile ? 'py-2 text-xs' : 'py-3 text-sm'} cursor-pointer`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
@@ -270,10 +289,10 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         )}
       </div>
 
-      {/* Product Details Section */}
-      <div className="cursor-pointer mt-3">
+
+      <div className="cursor-pointer mt-2">
         <motion.h3 
-          className="text-sm md:text-base font-medium text-gray-900 hover:underline"
+          className={`${isMobile ? 'text-xs' : 'text-sm md:text-base'} font-medium text-gray-900 hover:underline line-clamp-1`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -282,7 +301,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         </motion.h3>
         
         <motion.p 
-          className="text-gray-700 text-sm md:text-base mt-2"
+          className={`text-gray-700 ${isMobile ? 'text-xs mt-1' : 'text-sm md:text-base mt-2'}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
@@ -293,10 +312,10 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         </motion.p>
       </div>
 
-      {/* Size Selection */}
+
       {sizes.length > 0 && (
         <motion.div 
-          className="flex flex-wrap mt-4"
+          className={`flex flex-wrap ${isMobile ? 'mt-1 gap-1' : 'mt-4'}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
@@ -304,7 +323,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
           {sizes.map((size) => (
             <motion.div
               key={size}
-              className={`px-2 py-1 border mr-2 mb-2 cursor-pointer text-xs md:text-sm
+              className={`${isMobile ? 'px-1 py-0.5 text-[8px] mr-1 mb-1' : 'px-2 py-1 text-xs md:text-sm mr-2 mb-2'} border cursor-pointer
                 ${selectedSize === size 
                   ? "border-black bg-black text-white" 
                   : "border-gray-300 hover:border-gray-400"}
@@ -317,7 +336,8 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
               onClick={(e) => isSizeAvailable(size) && handleSizeClick(size, e)}
             >
               {size}
-              {!isSizeAvailable(size) && <span className="ml-1 text-xs">(Out of stock)</span>}
+              {!isSizeAvailable(size) && isMobile && <span className="ml-0.5 text-[6px]">(Out)</span>}
+              {!isSizeAvailable(size) && !isMobile && <span className="ml-1 text-xs">(Out of stock)</span>}
             </motion.div>
           ))}
         </motion.div>
