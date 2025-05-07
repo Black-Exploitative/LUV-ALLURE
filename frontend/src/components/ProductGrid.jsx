@@ -27,8 +27,7 @@ const ProductGrid = ({ gridType }) => {
   // Determine if we're on mobile
   const isMobile = windowWidth < 768;
   
-  // For mobile, we use gridType directly from the parent component
-  // This works with the existing FilterSortBar's grid toggles (2 or 4)
+
   const mobileColumns = isMobile && gridType === 2 ? 1 : 2;
 
   useEffect(() => {

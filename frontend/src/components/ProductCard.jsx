@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 
-const ProductCard = ({ product, gridType, onProductClick }) => {
+const ProductCard = ({ product, gridType, onProductClick, mobileColumns = 2 }) => {
   const { 
     id,
     name = "Product Name", 
@@ -27,7 +27,6 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
   const autoPlayRef = useRef(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
-  
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -37,10 +36,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-
   const isMobile = windowWidth < 768;
-
- 
   const validImages = Array.isArray(images) ? images : ["/images/placeholder.jpg"];
   const hasMultipleImages = validImages.length > 1;
 
@@ -48,9 +44,10 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
   
   const getImageHeightClass = () => {
     if (isMobile) {
-      return "h-[300px]";
+      
+      return mobileColumns === 1 ? "h-[600px]" : "h-[300px]";
     } else {
-      return gridType === 2 ? "h-[1300px]" : "h-[700px]";
+      return gridType === 2 ? "h-[300px]" : "h-[300px]";
     }
   };
 
@@ -62,9 +59,8 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
     setIsInWishlistState(isInWishlist(id));
   }, [id, isInWishlist]);
   
-  // Auto play carousel on hover
   useEffect(() => {
-    // Only auto-play if hovered and not manually navigated
+   
     if (isHovered && hasMultipleImages && !manuallyNavigated) {
       autoPlayRef.current = setInterval(() => {
         setCurrentImage(prev => (prev + 1) % validImages.length);
@@ -289,7 +285,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         )}
       </div>
 
-
+      {/* Product Details Section - Condensed for mobile */}
       <div className="cursor-pointer mt-2">
         <motion.h3 
           className={`${isMobile ? 'text-xs' : 'text-sm md:text-base'} font-medium text-gray-900 hover:underline line-clamp-1`}
@@ -312,7 +308,7 @@ const ProductCard = ({ product, gridType, onProductClick }) => {
         </motion.p>
       </div>
 
-
+      {/* Size Selection with smaller boxes on mobile */}
       {sizes.length > 0 && (
         <motion.div 
           className={`flex flex-wrap ${isMobile ? 'mt-1 gap-1' : 'mt-4'}`}
@@ -364,6 +360,7 @@ ProductCard.propTypes = {
   }),
   gridType: PropTypes.oneOf([2, 4]),
   onProductClick: PropTypes.func,
+  mobileColumns: PropTypes.oneOf([1, 2])
 };
 
 ProductCard.defaultProps = {
@@ -374,7 +371,8 @@ ProductCard.defaultProps = {
     images: ["/images/placeholder.jpg"],
     inventory: {}
   },
-  gridType: 4
+  gridType: 4,
+  mobileColumns: 2
 };
 
 export default ProductCard;
