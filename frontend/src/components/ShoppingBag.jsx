@@ -140,10 +140,12 @@ export default function ShoppingBag() {
     <>
       <div className="min-h-screen bg-white pb-20 md:pb-0">
         <Navbar />
-        {/* Reduced banner height for mobile */}
-        <div className="h-[100px] md:h-[150px] bg-gray-100 flex items-center justify-center">
-          <h1 className="text-xl md:text-2xl font-medium uppercase">Shopping Bag</h1>
-        </div>
+        {/* Use the Banner component instead of the custom div */}
+        <Banner 
+          title="Shopping Bag" 
+          className="h-[100px] md:h-[150px]" 
+          textClassName="text-xl md:text-2xl font-medium uppercase"
+        />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-4 lg:mt-8 max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
