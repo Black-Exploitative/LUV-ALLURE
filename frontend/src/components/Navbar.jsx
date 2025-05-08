@@ -245,7 +245,7 @@ export default function Navbar() {
         {
           title: "DRESSES BY LENGTH",
           links: [
-            { name: "All Dresses", href: "/shop/dresses" },
+            { name: "All Dresses", href: "/shop" },
             { name: "Mini Dresses", href: "/shop/mini-dresses" },
             { name: "Maxi Dresses", href: "/shop/maxi-dresses" },
             { name: "Midi Dresses", href: "/shop/midi-dresses" }
