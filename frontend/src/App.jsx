@@ -24,7 +24,28 @@ import { RecentlyViewedProvider } from "./context/RecentlyViewedProducts";
 import NewsletterModal from "./components/NewsLetterModal";
 import SearchResults from "./pages/SearchResults";
 import CollectionsPage from "./pages/CollectionsPage";
-import DynamicCollectionPage from "./pages/DynamicCollectionPage"; // New dynamic collection page
+import DynamicCollectionPage from "./pages/DynamicCollectionPage"; 
+
+//Collections Pages
+import BlackDresses from "./pages/navpages/dresses/BlackDresses"
+import BlueDresses from "./pages/navpages/dresses/BlueDresses"
+import BrownDresses from "./pages/navpages/dresses/BrownDresses"
+import BubblehemDresses from "./pages/navpages/dresses/BubblehemDresses"
+import CorsetDresses from "./pages/navpages/dresses/CorsetDresses"
+import EmbelishmentDresses from "./pages/navpages/dresses/EmbelishmentDresses"
+import FlowyDresses from "./pages/navpages/dresses/FlowyDresses"
+import FormalDresses from "./pages/navpages/dresses/FormalDresses"
+import GreenDresses from "./pages/navpages/dresses/GreenDresses"
+import MaxiDresses from "./pages/navpages/dresses/MaxiDresses"
+import MidiDresses from "./pages/navpages/dresses/MidiDresses"
+import MiniDresses from "./pages/navpages/dresses/MiniDresses"
+import PartyDresses from "./pages/navpages/dresses/PartyDresses"
+import PinkDresses from "./pages/navpages/dresses/PinkDresses"
+import PromDresses from "./pages/navpages/dresses/PromDresses"
+import RedDresses from "./pages/navpages/dresses/RedDresses"
+import WeddingGuestDresses from "./pages/navpages/dresses/WeddingGuestDresses"
+import WhiteDresses from "./pages/navpages/dresses/WhiteDresses"
+import YellowDresses from "./pages/navpages/dresses/YellowDresses"
 
 // Admin CMS imports
 import Dashboard from "./admin/Dashboard";
@@ -40,7 +61,7 @@ import PromoSectionForm from "./admin/forms/PromoSectionForm";
 import ShopHeaderForm from "./admin/forms/ShopHeaderForm";
 import ServicesPage from "./pages/ServicesPage";
 import CollectionHeroForm from "./admin/forms/CollectionHeroForm";
-import CollectionForm from "./admin/forms/CollectionForm"; // New collection form
+import CollectionForm from "./admin/forms/CollectionForm";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderDetails from "./pages/OrderDetailsPage";
 
@@ -115,7 +136,27 @@ const AppContent = () => {
         {/*<Route path="/payment-failed" element={<PaymentFailed />} />*/}
 
         <Route path="/collections" element={<CollectionsPage />} /> 
+        <Route path="/alldresses" element={<Shop />} /> 
         <Route path="/collections/:handle" element={<DynamicCollectionPage />} /> 
+        <Route path="/collections/:handle" element={<BlackDresses />} /> 
+        <Route path="/collections/:handle" element={<BlueDresses />} /> 
+        <Route path="/collections/:handle" element={<BrownDresses />} /> 
+        <Route path="/collections/:handle" element={<BubblehemDresses />} /> 
+        <Route path="/collections/:handle" element={<CorsetDresses />} /> 
+        <Route path="/collections/:handle" element={<EmbelishmentDresses />} /> 
+        <Route path="/collections/:handle" element={<FlowyDresses />} /> 
+        <Route path="/collections/:handle" element={<FormalDresses />} /> 
+        <Route path="/collections/:handle" element={<GreenDresses />} /> 
+        <Route path="/collections/:handle" element={<MaxiDresses />} /> 
+        <Route path="/collections/:handle" element={<MidiDresses />} /> 
+        <Route path="/collections/:handle" element={<MiniDresses />} /> 
+        <Route path="/collections/:handle" element={<PartyDresses />} /> 
+        <Route path="/collections/:handle" element={<PinkDresses />} /> 
+        <Route path="/collections/:handle" element={<PromDresses />} /> 
+        <Route path="/collections/:handle" element={<RedDresses />} /> 
+        <Route path="/collections/:handle" element={<WeddingGuestDresses />} /> 
+        <Route path="/collections/:handle" element={<WhiteDresses />} /> 
+        <Route path="/collections/:handle" element={<YellowDresses />} /> 
         <Route path="/services" element={<ServicesPage />} /> 
         <Route path="/user-account" element={<UserAccount />} /> 
         

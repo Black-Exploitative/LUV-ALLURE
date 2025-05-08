@@ -1,4 +1,3 @@
-// frontend/src/components/Banner.jsx
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import cmsService from "../services/cmsService";
@@ -109,7 +108,7 @@ Banner.propTypes = {
   description: PropTypes.string,
   buttonText: PropTypes.string,
   buttonLink: PropTypes.string,
-  pageName: PropTypes.string, // New prop for CMS integration
+  pageName: PropTypes.string, 
 };
 
 Banner.defaultProps = {

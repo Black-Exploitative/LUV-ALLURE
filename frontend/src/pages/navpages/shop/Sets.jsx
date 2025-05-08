@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import FilterSortBar from "../components/FilterSortBar";
-import ProductGrid from "../components/ProductGrid";
-import api from "../services/api";
+import Navbar from "../../../components/Navbar";
+import Footer from "../../../components/Footer";
+import FilterSortBar from "../../../components/FilterSortBar";
+import ProductGrid from "../../../components/ProductGrid";
+import api from "../../../services/api";
 
-const DynamicCollectionPage = () => {
+const Sets = () => {
   const { handle } = useParams();
   const [collection, setCollection] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -113,4 +113,4 @@ const DynamicCollectionPage = () => {
   );
 };
 
-export default DynamicCollectionPage;
+export default Sets;

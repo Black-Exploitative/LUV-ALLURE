@@ -1482,4 +1482,4 @@ const ProductDetailsPage = () => {
   );
 };
 
-export default ProductDetailsPage
+export default ProductDetailsPage;

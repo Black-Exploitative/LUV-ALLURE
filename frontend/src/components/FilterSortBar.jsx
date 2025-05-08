@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import PropTypes from "prop-types";
 import { useState, useEffect, useRef } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -19,7 +20,7 @@ const FilterSortBar = ({
   const [isSticky, setIsSticky] = useState(false);
   const filterBarRef = useRef(null);
   const stickyWrapperRef = useRef(null);
-  const [currentSort, setCurrentSort] = useState("Most Popular"); // Track current sort
+  const [currentSort, setCurrentSort] = useState("Most Popular"); 
   const sortOptionsRef = useRef(null);
 
   // Filter state management
@@ -36,6 +37,21 @@ const FilterSortBar = ({
     fabric: initialFilters.fabric || [],
     price: initialFilters.price || [0, 5000],
   });
+
+  // Get count of active filters (excluding query)
+  const getActiveFilterCount = () => {
+    let count = 0;
+    activeFilters.forEach(filter => {
+      if (filter.type === 'price' && (filter.values[0] > 0 || filter.values[1] < 5000)) {
+        count += 1;
+      } else if (filter.type !== 'query') {
+        count += filter.values.length;
+      }
+    });
+    return count;
+  };
+  
+  const activeFilterCount = getActiveFilterCount();
 
   // Filter options mock data
   const filterOptions = {
@@ -469,62 +485,6 @@ const FilterSortBar = ({
     return `NGN${price}`;
   };
 
-  // Display active filters as tags
-  const renderActiveFilters = () => {
-    if (activeFilters.length === 0) return null;
-
-    return (
-      <div className="flex flex-wrap items-center mt-3 ml-4">
-        {activeFilters.map((filter) => {
-          if (filter.type === "price") {
-            return (
-              <div
-                key="price-range"
-                className="flex items-center bg-gray-100 px-3 py-1 mr-2 mb-2 text-sm"
-              >
-                <span className="mr-1">
-                  Price: {formatPrice(filter.values[0])} -{" "}
-                  {formatPrice(filter.values[1])}
-                </span>
-                <IoCloseOutline
-                  className="cursor-pointer"
-                  onClick={() => handleRemoveFilter("price")}
-                />
-              </div>
-            );
-          } else if (filter.type === "query") {
-            // Don't display the query as a removable filter
-            return null;
-          } else {
-            return filter.values.map((value) => (
-              <div
-                key={`${filter.type}-${value}`}
-                className="flex items-center bg-gray-100 px-3 py-1 mr-2 mb-2 text-sm"
-              >
-                <span className="mr-1">
-                  {filter.type.charAt(0).toUpperCase() + filter.type.slice(1)}:{" "}
-                  {value}
-                </span>
-                <IoCloseOutline
-                  className="cursor-pointer"
-                  onClick={() => handleRemoveFilter(filter.type, value)}
-                />
-              </div>
-            ));
-          }
-        })}
-        {activeFilters.some((filter) => filter.type !== "query") && (
-          <button
-            className="text-xs underline ml-2 mb-2 cursor-pointer"
-            onClick={handleClearFilters}
-          >
-            Clear All
-          </button>
-        )}
-      </div>
-    );
-  };
-
   // Render color swatches
   const renderColorOptions = () => {
     const colorMap = {
@@ -694,10 +654,20 @@ const FilterSortBar = ({
               onClick={toggleFilter}
             >
               <span className="tracking-wide text-sm uppercase font-thin">
-                Filter
+                Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
               </span>
               <span className="ml-2 text-sm leading-none">+</span>
             </button>
+            
+            {/* Add Clear All button if there are active filters */}
+            {activeFilterCount > 0 && (
+              <button
+                className="ml-4 text-xs underline cursor-pointer"
+                onClick={handleClearFilters}
+              >
+                Clear All
+              </button>
+            )}
           </div>
 
           <div className="flex items-center space-x-4" ref={sortOptionsRef}>
@@ -753,8 +723,6 @@ const FilterSortBar = ({
             </div>
           </div>
         </div>
-
-        {renderActiveFilters()}
       </div>
 
       <AnimatePresence>
