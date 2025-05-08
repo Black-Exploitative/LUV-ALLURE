@@ -44,10 +44,9 @@ const ProductCard = ({ product, gridType, onProductClick, mobileColumns = 2 }) =
   
   const getImageHeightClass = () => {
     if (isMobile) {
-      
       return mobileColumns === 1 ? "h-[600px]" : "h-[300px]";
     } else {
-      return gridType === 2 ? "h-[300px]" : "h-[300px]";
+      return gridType === 2 ? "h-[751px]" : "h-[500px]";
     }
   };
 
