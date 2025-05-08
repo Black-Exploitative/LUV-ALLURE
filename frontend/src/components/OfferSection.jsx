@@ -44,9 +44,7 @@ const OfferSection = () => {
     fetchHomepageLayout();
   }, []);
 
-  // Default rendering, always show all sections in set order
-  // The CMS data would only be used if you want to change the structure dynamically
-  // For now, we'll maintain the original layout
+  
   return (
     <div className="overflow-x-hidden w-full">
       <FeaturedProducts />
