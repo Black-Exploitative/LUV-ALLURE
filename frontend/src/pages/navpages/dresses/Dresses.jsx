@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import FilterSortBar from "../../../components/FilterSortBar";
-import ProductGrid from "../../../components/ProductGrid";
+import ProductGrid from "../../../components/AltProductGrid";
 import productService from "../../../services/productService";
 
 const Dresses = () => {

@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+// frontend/src/components/FilterSortBar.jsx - Improved filter handling
 import PropTypes from "prop-types";
 import { useState, useEffect, useRef } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -10,6 +10,7 @@ const FilterSortBar = ({
   onGridChange,
   onFiltersChange,
   initialFilters = {},
+  availableFilters = null
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,7 +54,8 @@ const FilterSortBar = ({
   
   const activeFilterCount = getActiveFilterCount();
 
-  // Filter options mock data
+  // Filter options - these can come from API or be predefined based on your product catalog
+  // We'll use a combination of predefined options and dynamically loaded options if available
   const filterOptions = {
     colour: [
       "Black",
@@ -74,12 +76,13 @@ const FilterSortBar = ({
       "Brown",
       "Cream",
       "Ivory",
+      ...(availableFilters?.colors || [])
     ],
-    size: ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"],
+    size: ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", ...(availableFilters?.sizes || [])],
     length: ["Mini", "Midi", "Maxi", "Knee-Length", "Ankle-Length"],
     style: ["Casual", "Formal", "Bohemian", "Street", "Minimalist"],
     occasion: ["Everyday", "Party", "Wedding", "Business", "Vacation"],
-    category: ["Tops", "Dresses", "Bottoms", "Outerwear", "Accessories"],
+    category: ["Tops", "Dresses", "Bottoms", "Outerwear", "Accessories", ...(availableFilters?.categories || [])],
     features: ["Sequined", "Embroidered", "Pockets", "Cut-outs", "Open back"],
     collection: ["Spring/Summer", "Fall/Winter", "Resort", "Limited Edition"],
     fabric: ["Cotton", "Silk", "Satin", "Linen", "Wool", "Polyester", "Velvet"],
@@ -899,6 +902,7 @@ FilterSortBar.propTypes = {
   onGridChange: PropTypes.func,
   onFiltersChange: PropTypes.func,
   initialFilters: PropTypes.object,
+  availableFilters: PropTypes.object
 };
 
 export default FilterSortBar;
