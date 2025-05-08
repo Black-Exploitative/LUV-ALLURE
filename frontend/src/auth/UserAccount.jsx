@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-
+import { FiChevronDown, FiChevronUp, FiMenu, FiX } from "react-icons/fi";
 
 import Orders from "./Orders";
 import ProfileManagement from "./ProfileManagement";
@@ -22,6 +22,23 @@ export default function UserAccount() {
     email: currentUser?.email || "",
     phoneNumber: currentUser?.phoneNumber || "",
   });
+
+  // Mobile menu state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Update window width when resized
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Mock order history
   const [orders, setOrders] = useState([
@@ -187,6 +204,12 @@ export default function UserAccount() {
     setAddresses(addresses.filter(addr => addr.id !== id));
   };
 
+  // Handler for selecting section - also closes mobile menu
+  const handleSectionSelect = (sectionId) => {
+    setActiveSection(sectionId);
+    setIsMobileMenuOpen(false);
+  };
+
   // Show loading state while fetching user data
   if (loading) {
     return (
@@ -196,6 +219,8 @@ export default function UserAccount() {
     );
   }
   
+  // Get current section label for mobile display
+  const currentSectionLabel = sections.find(section => section.id === activeSection)?.label || "DASHBOARD";
 
   return (
     <>
@@ -206,15 +231,59 @@ export default function UserAccount() {
 
         {/* Main content area with side navigation */}
         <div className="container mx-auto py-12 px-4 md:px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold tracking-wide text-gray-900">
               MY ACCOUNT
             </h1>
           </div>
 
+          {/* Mobile section selector - only visible on mobile */}
+          <div className="md:hidden mb-6">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="w-full flex items-center justify-between py-3 px-4 border border-gray-300 focus:outline-none"
+            >
+              <span className="font-medium">{currentSectionLabel}</span>
+              {isMobileMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+            </button>
+            
+            {/* Dropdown menu for mobile */}
+            <AnimatePresence>
+              {isMobileMenuOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden border-x border-b border-gray-300"
+                >
+                  {sections.map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() => handleSectionSelect(section.id)}
+                      className={`block w-full text-left py-3 px-4 transition ${
+                        activeSection === section.id
+                          ? "bg-black text-white"
+                          : "text-gray-800 hover:bg-gray-100"
+                      }`}
+                    >
+                      {section.label}
+                    </button>
+                  ))}
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left py-3 px-4 transition text-gray-800 hover:bg-gray-100"
+                  >
+                    SIGN OUT
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Side navigation */}
-            <div className="md:w-1/4">
+            {/* Side navigation - hidden on mobile */}
+            <div className="hidden md:block md:w-1/4">
               <div className="sticky top-24">
                 <nav className="space-y-1 font-normal">
                   {sections.map((section) => (
@@ -245,8 +314,8 @@ export default function UserAccount() {
               </div>
             </div>
 
-            {/* Main content area - conditionally render based on active section */}
-            <div className="md:w-3/4">
+            {/* Main content area - takes full width on mobile */}
+            <div className="w-full md:w-3/4">
               {activeSection === "dashboard" && (
                 <div className="space-y-8">
                   <div className="p-2">
@@ -272,21 +341,21 @@ export default function UserAccount() {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className="mt-4 text-xs underline font-normal cursor-pointer"
-                          onClick={() => setActiveSection("profile")}
+                          onClick={() => handleSectionSelect("profile")}
                         >
                           EDIT
                         </motion.button>
                       </div>
                       <div className="p-4 border border-gray-200 bg-white">
                         <h3 className="font-medium mb-2">DEFAULT ADDRESS</h3>
-                        <p className="text-sm font-normal  font-[Raleway]">135 W 50th Street</p>
-                        <p className="text-sm font-normal  font-[Raleway]">New York, NY 10020</p>
-                        <p className="text-sm font-normal  font-[Raleway]">United States</p>
+                        <p className="text-sm font-normal font-[Raleway]">135 W 50th Street</p>
+                        <p className="text-sm font-normal font-[Raleway]">New York, NY 10020</p>
+                        <p className="text-sm font-normal font-[Raleway]">United States</p>
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className="mt-4 text-xs underline cursor-pointer"
-                          onClick={() => setActiveSection("addresses")}
+                          onClick={() => handleSectionSelect("addresses")}
                         >
                           EDIT
                         </motion.button>
@@ -586,9 +655,9 @@ export default function UserAccount() {
                         </span>
                       </div>
 
-                      <p className="text-sm font-normal  font-[Raleway]">{user.firstName} {user.lastName}</p>
-                      <p className="text-sm font-normal  font-[Raleway]">Expiry: 05/27</p>
-                      <p className="text-sm font-normal  font-[Raleway]">
+                      <p className="text-sm font-normal font-[Raleway]">{user.firstName} {user.lastName}</p>
+                      <p className="text-sm font-normal font-[Raleway]">Expiry: 05/27</p>
+                      <p className="text-sm font-normal font-[Raleway]">
                         Billing Address: 135 W 50th Street, New York
                       </p>
                     </div>
