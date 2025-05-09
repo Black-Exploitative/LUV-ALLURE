@@ -1,7 +1,7 @@
 // frontend/src/admin/forms/ShopBannerForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
+import { FiArrowLeft, FiSave, FiImage, FiAlertCircle, FiInfo } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
@@ -17,10 +17,11 @@ const ShopBannerForm = () => {
     content: {
       buttonText: 'SHOP NOW',
       buttonLink: '/collections',
-      alignment: 'center'
+      alignment: 'center',
+      buttonPosition: 'left' // Default changed to left
     },
     media: {
-      imageUrl: '/images/photo3.jpg',
+      imageUrl: '',
       altText: 'Fashion Model',
       overlayOpacity: 0.4
     },
@@ -32,6 +33,24 @@ const ShopBannerForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [imageWarning, setImageWarning] = useState('');
+
+  // Image resolution warning thresholds
+  const MIN_RECOMMENDED_WIDTH = 1920;
+  const MIN_RECOMMENDED_HEIGHT = 1080;
+  
+  // Button position options - using more explicit labels
+  const buttonPositions = [
+    { value: 'top-left', label: 'Top Left' },
+    { value: 'top', label: 'Top Center' },
+    { value: 'top-right', label: 'Top Right' },
+    { value: 'left', label: 'Middle Left' },
+    { value: 'center', label: 'Middle Center' },
+    { value: 'right', label: 'Middle Right' },
+    { value: 'bottom-left', label: 'Bottom Left' },
+    { value: 'bottom', label: 'Bottom Center' },
+    { value: 'bottom-right', label: 'Bottom Right' }
+  ];
   
   // Load section data if editing
   useEffect(() => {
@@ -40,10 +59,41 @@ const ShopBannerForm = () => {
         try {
           setLoading(true);
           const response = await api.get(`/cms/sections/${id}`);
-          setFormData(response.data.data);
+          
+          if (response.data.success) {
+            // Initialize form fields that might be missing
+            const section = response.data.data;
+            
+            // Log what we're getting from the server
+            console.log("Loaded section data:", section);
+            console.log("Button position:", section.content?.buttonPosition);
+            
+            setFormData({
+              ...section,
+              type: 'shop-banner', // Ensure correct type
+              content: {
+                buttonText: section.content?.buttonText || 'SHOP NOW',
+                buttonLink: section.content?.buttonLink || '/collections',
+                alignment: section.content?.alignment || 'center',
+                buttonPosition: section.content?.buttonPosition || 'left' // Changed default to left
+              },
+              media: {
+                imageUrl: section.media?.imageUrl || '',
+                altText: section.media?.altText || 'Shop Header',
+                overlayOpacity: section.media?.overlayOpacity !== undefined ? section.media.overlayOpacity : 0.4
+              }
+            });
+            
+            // Check image resolution if image URL exists
+            if (section.media?.imageUrl) {
+              checkImageResolution(section.media.imageUrl);
+            }
+          } else {
+            setError('Failed to load section data');
+          }
         } catch (err) {
+          console.error('Error loading section:', err);
           setError('Failed to load section data');
-          console.error(err);
         } finally {
           setLoading(false);
         }
@@ -57,8 +107,14 @@ const ShopBannerForm = () => {
   useEffect(() => {
     const loadMedia = async () => {
       try {
-        const response = await api.get('/cms/media?type=image');
-        setMediaLibrary(response.data.data || []);
+        const response = await api.get('/cms/media');
+        if (response.data.success) {
+          // Sort media by creation date (newest first)
+          const sortedMedia = response.data.data.sort((a, b) => 
+            new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setMediaLibrary(sortedMedia || []);
+        }
       } catch (err) {
         console.error('Failed to load media:', err);
       }
@@ -67,12 +123,33 @@ const ShopBannerForm = () => {
     loadMedia();
   }, []);
   
+  // Check image resolution
+  const checkImageResolution = (url) => {
+    if (!url) return;
+    
+    const img = new Image();
+    img.onload = () => {
+      if (img.width < MIN_RECOMMENDED_WIDTH || img.height < MIN_RECOMMENDED_HEIGHT) {
+        setImageWarning(
+          `This image is low resolution (${img.width}x${img.height}px). ` +
+          `For best quality, use an image at least ${MIN_RECOMMENDED_WIDTH}x${MIN_RECOMMENDED_HEIGHT}px.`
+        );
+      } else {
+        setImageWarning('');
+      }
+    };
+    img.onerror = () => {
+      setImageWarning('Could not load image to check resolution.');
+    };
+    img.src = url;
+  };
+  
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
     if (name.includes('.')) {
-      // Handle nested properties
+      // Handle nested fields (e.g., content.title)
       const [parent, child] = name.split('.');
       setFormData({
         ...formData,
@@ -81,12 +158,22 @@ const ShopBannerForm = () => {
           [child]: type === 'checkbox' ? checked : value
         }
       });
+      
+      // Check image resolution if changing the image URL
+      if (name === 'media.imageUrl') {
+        checkImageResolution(value);
+      }
     } else {
-      // Handle top-level properties
+      // Handle top-level fields
       setFormData({
         ...formData,
         [name]: type === 'checkbox' ? checked : value
       });
+    }
+    
+    // Log when setting button position
+    if (name === 'content.buttonPosition') {
+      console.log("Setting button position to:", value);
     }
     
     // Clear any previous error/success messages
@@ -104,6 +191,10 @@ const ShopBannerForm = () => {
         altText: formData.media.altText || mediaItem.altText || mediaItem.name
       }
     });
+    
+    // Check resolution of selected image
+    checkImageResolution(mediaItem.url);
+    
     setShowMediaLibrary(false);
   };
   
@@ -126,6 +217,9 @@ const ShopBannerForm = () => {
       setLoading(true);
       setError('');
       setSuccess('');
+      
+      // Log the data being saved to help debug button position issues
+      console.log("Saving shop banner with data:", JSON.stringify(formData, null, 2));
       
       // API endpoint and method based on editing or creating
       const url = isEditing 
@@ -191,13 +285,24 @@ const ShopBannerForm = () => {
     }
   };
   
-  // Media library modal
+  // Media library modal with improved filtering
   const renderMediaLibrary = () => {
     if (!showMediaLibrary) return null;
     
+    // Filter to show only images (not videos or other media)
+    const imageMedia = mediaLibrary.filter(media => 
+      media.type === 'image' || 
+      media.url?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/)
+    );
+    
+    // Sort by creation date (newest first)
+    const sortedMedia = [...imageMedia].sort((a, b) => 
+      new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+    );
+    
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-md p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+        <div className="bg-white rounded-md p-6 w-full max-w-5xl max-h-screen overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">Media Library</h3>
             <button 
@@ -208,20 +313,34 @@ const ShopBannerForm = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {mediaLibrary.length > 0 ? (
-              mediaLibrary.map(media => (
+          <div className="mb-4">
+            <p className="text-sm text-gray-600 flex items-center">
+              <FiInfo className="mr-2" /> 
+              For banner images, high-resolution images (at least 1920x1080) provide the best results
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {sortedMedia.length > 0 ? (
+              sortedMedia.map(media => (
                 <div 
                   key={media._id} 
                   className="border border-gray-200 p-2 cursor-pointer hover:border-black"
                   onClick={() => handleMediaSelect(media)}
                 >
-                  <div className="h-40 bg-gray-100 flex items-center justify-center mb-2">
+                  <div className="h-40 bg-gray-100 flex items-center justify-center mb-2 relative">
                     <img 
                       src={media.url} 
                       alt={media.name}
                       className="max-h-full max-w-full object-contain"
                     />
+                    
+                    {/* Show dimensions if available */}
+                    {media.dimensions && (
+                      <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-1 py-0.5 rounded">
+                        {media.dimensions.width}x{media.dimensions.height}
+                      </div>
+                    )}
                   </div>
                   <p className="text-xs truncate">{media.name}</p>
                 </div>
@@ -232,9 +351,49 @@ const ShopBannerForm = () => {
               </p>
             )}
           </div>
+          
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={() => navigate('/admin/media/new')}
+              className="text-black hover:underline text-sm flex items-center"
+            >
+              <FiPlus className="mr-1" /> Upload new image
+            </button>
+          </div>
         </div>
       </div>
     );
+  };
+
+  // Helper function to position button in preview based on selected position
+  const getButtonPositionStyle = () => {
+    const position = formData.content.buttonPosition || 'left';
+    
+    // Set position based on the value
+    let positionStyle = {};
+    
+    if (position.includes('top')) {
+      positionStyle.top = '8%';
+    } else if (position.includes('bottom')) {
+      positionStyle.bottom = '8%';
+    } else {
+      positionStyle.top = '50%';
+      positionStyle.transform = 'translateY(-50%)';
+    }
+    
+    if (position.includes('left')) {
+      positionStyle.left = '8%';
+    } else if (position.includes('right')) {
+      positionStyle.right = '8%';
+    } else {
+      positionStyle.left = '50%';
+      positionStyle.transform = positionStyle.transform 
+        ? 'translate(-50%, -50%)' 
+        : 'translateX(-50%)';
+    }
+    
+    return positionStyle;
   };
 
   return (
@@ -309,6 +468,14 @@ const ShopBannerForm = () => {
               <p className="mt-1 text-xs text-gray-500">
                 Select an image from the media library or enter a URL
               </p>
+              
+              {/* Image resolution warning */}
+              {imageWarning && (
+                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded text-xs flex items-start">
+                  <FiAlertCircle className="mr-1 mt-0.5 flex-shrink-0" />
+                  <span>{imageWarning}</span>
+                </div>
+              )}
             </div>
             
             <div className="mb-6">
@@ -377,6 +544,27 @@ const ShopBannerForm = () => {
               />
             </div>
             
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Button Position
+              </label>
+              <select
+                name="content.buttonPosition"
+                value={formData.content.buttonPosition}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                {buttonPositions.map(position => (
+                  <option key={position.value} value={position.value}>
+                    {position.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Position of the button on the banner
+              </p>
+            </div>
+            
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -398,7 +586,7 @@ const ShopBannerForm = () => {
           <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
             <div className="p-6">
               <h3 className="text-md font-medium mb-4">Banner Preview</h3>
-              <div className="relative h-96 overflow-hidden">
+              <div className="relative h-96 overflow-hidden rounded">
                 <img
                   src={formData.media.imageUrl}
                   alt={formData.media.altText || 'Shop Now Banner'}
@@ -410,7 +598,10 @@ const ShopBannerForm = () => {
                   style={{ opacity: formData.media.overlayOpacity }}
                 ></div>
                 
-                <div className="absolute inset-0 flex items-end justify-center pb-8">
+                <div 
+                  className="absolute"
+                  style={getButtonPositionStyle()}
+                >
                   <div className="relative inline-block px-8 py-3 border-2 border-white text-white text-lg overflow-hidden cursor-pointer">
                     <span className="relative z-10">
                       {formData.content.buttonText}
@@ -418,6 +609,9 @@ const ShopBannerForm = () => {
                   </div>
                 </div>
               </div>
+              <p className="mt-2 text-xs text-gray-500 text-center">
+                Note: This is a preview. The actual banner may appear differently on the website.
+              </p>
             </div>
           </div>
         )}
@@ -437,7 +631,7 @@ const ShopBannerForm = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            {loading ? (
+                        {loading ? (
               <>
                 <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
                 <span>Saving...</span>

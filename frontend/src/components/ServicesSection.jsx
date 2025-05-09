@@ -139,7 +139,7 @@ const ServicesSection = () => {
 
   return (
     <AnimatedSection delay={0.4}>
-      <div className="w-full my-[100px]">
+      <div className="w-full my-[50px]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <AnimatedHeading className="tracking-wider text-[25px] font-normal text-black mb-[50px]">

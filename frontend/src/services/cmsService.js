@@ -179,20 +179,82 @@ const cmsService = {
     }
   }
 };
-// Add this function to your cmsService.js
+
 export const getShopBanner = async () => {
   try {
-    // Make a direct call to get all sections of type shop-banner
+    console.log("Fetching shop banner data from API...");
+    
+    // Make a direct call to get sections of type shop-banner
     const response = await api.get('/cms/sections?type=shop-banner');
+    
+    // Log the full response for debugging
+    console.log("API Response:", response.data);
+    
     const banners = response.data.data || [];
     
-    // Get the first active banner
+    // Find the first active banner
     const activeBanner = banners.find(banner => banner.isActive);
     
-    return activeBanner;
+    if (activeBanner) {
+      console.log("Active shop banner found:", activeBanner);
+      
+      // Important: Log the button position specifically
+      console.log("Button position in banner:", activeBanner.content?.buttonPosition);
+      
+      // Check if content and media objects exist
+      if (!activeBanner.content) {
+        console.warn("Banner content is missing!");
+        activeBanner.content = {};
+      }
+      
+      if (!activeBanner.media) {
+        console.warn("Banner media is missing!");
+        activeBanner.media = {};
+      }
+      
+      return activeBanner;
+    } else {
+      console.log("No active shop banner found in response");
+      return null;
+    }
   } catch (error) {
     console.error('Error fetching shop banner:', error);
     return null;
   }
 };
+
+export const getPromoSection = async () => {
+  try {
+    // Make a direct call to get all sections of type promo-section
+    const response = await api.get('/cms/sections?type=promo-section');
+    const promoSections = response.data.data || [];
+    
+    // Get the first active promo section
+    const activePromo = promoSections.find(section => section.isActive);
+    
+    return activePromo;
+  } catch (error) {
+    console.error('Error fetching promo section:', error);
+    return null;
+  }
+};
+
+// Get the active collection hero
+export const getCollectionHero = async () => {
+  try {
+    // Make a direct call to get all sections of type collection-hero
+    const response = await api.get('/cms/sections?type=collection-hero');
+    const collectionHeroes = response.data.data || [];
+    
+    // Get the first active collection hero
+    const activeHero = collectionHeroes.find(hero => hero.isActive);
+    
+    return activeHero;
+  } catch (error) {
+    console.error('Error fetching collection hero:', error);
+    return null;
+  }
+};
+
+
 export default cmsService;

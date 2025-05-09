@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
 import PropTypes from "prop-types";
 import AnimatedImage from "./AnimatedImage";
+import api from "../services/api";
 
 // Animated Section component with animations
 const AnimatedSection = ({ children, delay = 0 }) => {
@@ -37,15 +38,87 @@ AnimatedSection.propTypes = {
   delay: PropTypes.number,
 };
 
+// Skeleton loading component for PromoSection
+const PromoSectionSkeleton = () => {
+  return (
+    <div className="w-full mt-[103px] mb-[162px] px-4 md:px-8 lg:px-16">
+      <div className="flex flex-col md:flex-row items-center justify-center max-w-6xl mx-auto gap-8">
+        {/* Left Image Skeleton */}
+        <div className="w-full md:w-1/2">
+          <div className="w-full max-w-[500px] h-[600px] bg-gray-200 animate-pulse mx-auto"></div>
+        </div>
+
+        {/* Right Content Skeleton */}
+        <div className="w-full md:w-1/2 px-4">
+          <div className="text-center max-w-lg mx-auto space-y-4">
+            {/* Heading skeleton */}
+            <div className="h-8 bg-gray-200 animate-pulse rounded w-3/4 mx-auto"></div>
+            
+            {/* Description skeleton - multiple lines */}
+            <div className="space-y-2">
+              <div className="h-5 bg-gray-200 animate-pulse rounded w-full"></div>
+              <div className="h-5 bg-gray-200 animate-pulse rounded w-5/6 mx-auto"></div>
+              <div className="h-5 bg-gray-200 animate-pulse rounded w-4/5 mx-auto"></div>
+            </div>
+            
+            {/* Link skeleton */}
+            <div className="h-4 bg-gray-200 animate-pulse rounded w-1/3 mx-auto mt-6"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const PromoSection = () => {
-  // This could be fetched from CMS
-  const promoData = {
-    title: "We Share the Love of Valentine",
-    description: "As the lofty and flory presence of valentine ensumes the air and fills our heart. We bring you a subtlyty of blah blah blah this that that.",
+  // Default data in case CMS fails
+  const defaultData = {
+    title: "Betty Butter",
+    description: "Dress in a glaze, not a blaze.",
     imageUrl: "/images/grid1.avif",
-    linkText: "Explore Collection",
-    linkUrl: "#"
+    linkText: "Reveal the Collection",
+    linkUrl: "/shop"
   };
+
+  const [promoData, setPromoData] = useState(defaultData);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPromoData = async () => {
+      try {
+        setLoading(true);
+        // Get promo sections from CMS - filter for active sections
+        const response = await api.get('/cms/sections?type=promo-section');
+        
+        if (response.data?.data && response.data.data.length > 0) {
+          // Find the first active promo section
+          const activePromo = response.data.data.find(section => section.isActive);
+          
+          if (activePromo) {
+            setPromoData({
+              title: activePromo.content?.title || defaultData.title,
+              description: activePromo.content?.description || defaultData.description,
+              imageUrl: activePromo.media?.imageUrl || defaultData.imageUrl,
+              linkText: activePromo.content?.linkText || defaultData.linkText,
+              linkUrl: activePromo.content?.linkUrl || defaultData.linkUrl
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching promo section data:', error);
+        // Keep default data on error
+      } finally {
+        // Short timeout to prevent flickering if loading is very fast
+        setTimeout(() => setLoading(false), 300);
+      }
+    };
+    
+    fetchPromoData();
+  }, []);
+
+  if (loading) {
+    return <PromoSectionSkeleton />;
+  }
 
   return (
     <AnimatedSection delay={0.3}>
@@ -74,7 +147,7 @@ const PromoSection = () => {
           >
             <div className="text-center max-w-lg mx-auto">
               <motion.h2
-                className="text-[30px] font-extralight mb-[40px] text-center"
+                className="text-[30px] font-thin tracking-wider mb-[40px] text-center"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
@@ -97,9 +170,9 @@ const PromoSection = () => {
                 className="flex justify-center"
               >
                 <a href={promoData.linkUrl}>
-                  <p className="text-[15px] text-center relative group inline-block">
-                    <span className="border-b-[3px] pb-[3px] group-hover:border-b-0">Ex</span>
-                    <span>plore Collection</span>
+                  <p className="text-[15px] text-center font-thin tracking-wider relative group inline-block">
+                    <span className="border-b-[3px] pb-[3px] group-hover:border-b-0">{promoData.linkText.substring(0, 2)}</span>
+                    <span>{promoData.linkText.substring(2)}</span>
                     <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-current group-hover:w-full transition-all duration-300"></span>
                   </p>
                 </a>
