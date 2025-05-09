@@ -199,7 +199,26 @@ const productService = {
       console.error('Error fetching products by attributes:', error);
       throw error;
     }
+  },
+
+  /**
+ * Fetch products by vendor
+ * 
+ * @param {string} vendor - Vendor name
+ * @param {Object} additionalFilters - Additional filters
+ * @param {string} sort - Sort parameter
+ * @param {number} limit - Number of products to fetch
+ * @returns {Promise<Object>} - Promise with products data
+ */
+async getProductsByVendor(vendor, additionalFilters = {}, sort = 'relevance', limit = 12) {
+  try {
+    return await this.getProducts({ ...additionalFilters, vendor }, sort, limit);
+  } catch (error) {
+    console.error(`Error fetching products by vendor ${vendor}:`, error);
+    throw error;
   }
+}
 };
+
 
 export default productService;
