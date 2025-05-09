@@ -1,7 +1,7 @@
 // frontend/src/admin/forms/ShopBannerForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiSave, FiImage, FiAlertCircle, FiInfo } from 'react-icons/fi';
+import { FiArrowLeft, FiSave, FiImage, FiAlertCircle, FiInfo, FiMonitor, FiSmartphone, FiPlus } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
@@ -14,11 +14,12 @@ const ShopBannerForm = () => {
   const [formData, setFormData] = useState({
     name: 'Shop Now Banner',
     type: 'shop-banner',
+    deviceType: 'desktop', // Default to desktop, can be 'mobile' or 'desktop'
     content: {
       buttonText: 'SHOP NOW',
       buttonLink: '/collections',
       alignment: 'center',
-      buttonPosition: 'left' // Default changed to left
+      buttonPosition: 'bottom' // Default position
     },
     media: {
       imageUrl: '',
@@ -35,6 +36,22 @@ const ShopBannerForm = () => {
   const [success, setSuccess] = useState('');
   const [imageWarning, setImageWarning] = useState('');
 
+  useEffect(() => {
+  if (!isEditing) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const deviceParam = urlParams.get('device');
+    
+    // If device param exists, update the form data
+    if (deviceParam && (deviceParam === 'mobile' || deviceParam === 'desktop')) {
+      setFormData(prev => ({
+        ...prev,
+        deviceType: deviceParam,
+        name: `Shop Now Banner - ${deviceParam === 'mobile' ? 'Mobile' : 'Desktop'}`
+      }));
+    }
+  }
+}, [isEditing]);
+  
   // Image resolution warning thresholds
   const MIN_RECOMMENDED_WIDTH = 1920;
   const MIN_RECOMMENDED_HEIGHT = 1080;
@@ -67,19 +84,21 @@ const ShopBannerForm = () => {
             // Log what we're getting from the server
             console.log("Loaded section data:", section);
             console.log("Button position:", section.content?.buttonPosition);
+            console.log("Device type:", section.deviceType || 'desktop');
             
             setFormData({
               ...section,
               type: 'shop-banner', // Ensure correct type
+              deviceType: section.deviceType || 'desktop', // Use desktop as fallback
               content: {
                 buttonText: section.content?.buttonText || 'SHOP NOW',
                 buttonLink: section.content?.buttonLink || '/collections',
                 alignment: section.content?.alignment || 'center',
-                buttonPosition: section.content?.buttonPosition || 'left' // Changed default to left
+                buttonPosition: section.content?.buttonPosition || 'bottom' 
               },
               media: {
                 imageUrl: section.media?.imageUrl || '',
-                altText: section.media?.altText || 'Shop Header',
+                altText: section.media?.altText || 'Shop Banner',
                 overlayOpacity: section.media?.overlayOpacity !== undefined ? section.media.overlayOpacity : 0.4
               }
             });
@@ -171,14 +190,17 @@ const ShopBannerForm = () => {
       });
     }
     
-    // Log when setting button position
-    if (name === 'content.buttonPosition') {
-      console.log("Setting button position to:", value);
-    }
-    
     // Clear any previous error/success messages
     setError('');
     setSuccess('');
+  };
+  
+  // Switch between device types
+  const handleDeviceTypeChange = (deviceType) => {
+    setFormData(prev => ({
+      ...prev,
+      deviceType
+    }));
   };
   
   // Handle media selection
@@ -284,7 +306,7 @@ const ShopBannerForm = () => {
       setLoading(false);
     }
   };
-  
+
   // Media library modal with improved filtering
   const renderMediaLibrary = () => {
     if (!showMediaLibrary) return null;
@@ -367,34 +389,45 @@ const ShopBannerForm = () => {
   };
 
   // Helper function to position button in preview based on selected position
-  const getButtonPositionStyle = () => {
-    const position = formData.content.buttonPosition || 'left';
+  const getButtonPositionStyle = (position) => {
+  // Default to bottom if no position is provided
+  const pos = position ? position.trim().toLowerCase() : 'bottom';
+  
+  // Log position for debugging
+  console.log("Calculating button position for:", pos);
+  
+  // Create position style object
+  let positionStyle = {};
+  
+  // Set vertical position
+  if (pos.includes('top')) {
+    positionStyle.top = '8%';
+  } else if (pos.includes('bottom')) {
+    positionStyle.bottom = '8%';
+  } else {
+    positionStyle.top = '50%';
+    positionStyle.transform = 'translateY(-50%)';
+  }
+  
+  // Set horizontal position
+  if (pos.includes('left')) {
+    positionStyle.left = '8%';
+  } else if (pos.includes('right')) {
+    positionStyle.right = '8%';
+  } else {
+    positionStyle.left = '50%';
     
-    // Set position based on the value
-    let positionStyle = {};
-    
-    if (position.includes('top')) {
-      positionStyle.top = '8%';
-    } else if (position.includes('bottom')) {
-      positionStyle.bottom = '8%';
+    // Combine transforms if we already have one
+    if (positionStyle.transform) {
+      positionStyle.transform = 'translate(-50%, -50%)';
     } else {
-      positionStyle.top = '50%';
-      positionStyle.transform = 'translateY(-50%)';
+      positionStyle.transform = 'translateX(-50%)';
     }
-    
-    if (position.includes('left')) {
-      positionStyle.left = '8%';
-    } else if (position.includes('right')) {
-      positionStyle.right = '8%';
-    } else {
-      positionStyle.left = '50%';
-      positionStyle.transform = positionStyle.transform 
-        ? 'translate(-50%, -50%)' 
-        : 'translateX(-50%)';
-    }
-    
-    return positionStyle;
-  };
+  }
+  
+  console.log("Final button position style:", positionStyle);
+  return positionStyle;
+};
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

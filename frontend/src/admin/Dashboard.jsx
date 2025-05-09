@@ -210,7 +210,8 @@ const Dashboard = () => {
   const navItems = [
     { id: 'homepage', label: 'Homepage Layouts', icon: FiHome },
     { id: 'sections', label: 'Content Sections', icon: FiGrid },
-    { id: 'collections', label: 'Collections', icon: FiFolder }, // New Collections item
+    { id: 'shop-banners', label: 'Shop Banners', icon: FiLayout }, 
+    { id: 'collections', label: 'Collections', icon: FiFolder },
     { id: 'featured-products', label: 'Featured Products', icon: FiStar },
     { id: 'collection-hero', label: 'Collection Hero', icon: FiTarget },
     { id: 'promo-section', label: 'Promo Section', icon: FiBookOpen },
@@ -234,6 +235,134 @@ const Dashboard = () => {
     { value: 'also-viewed', label: 'Also Viewed', icon: FiEye },
     { value: 'recommended', label: 'Recommended', icon: FiStar }
   ];
+
+  // Shop Banners section renderer
+  const renderShopBanners = () => (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-medium">Shop Banners</h2>
+        <div className="flex space-x-2">
+          <Link
+            to="/admin/shop-banner/new?device=desktop"
+            className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          >
+            <FiMonitor className="mr-2" /> <FiPlus className="mr-1" /> Desktop Banner
+          </Link>
+          <Link
+            to="/admin/shop-banner/new?device=mobile"
+            className="flex items-center px-4 py-2 bg-gray-700 text-white hover:bg-gray-800"
+          >
+            <FiSmartphone className="mr-2" /> <FiPlus className="mr-1" /> Mobile Banner
+          </Link>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        </div>
+      ) : (
+        <>
+          <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
+            <h3 className="font-medium flex items-center mb-2">
+              <FiMonitor className="mr-2" /> Desktop Shop Banners
+            </h3>
+            {/* Desktop Banners List */}
+            {renderShopBannerList('desktop')}
+          </div>
+          
+          <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
+            <h3 className="font-medium flex items-center mb-2">
+              <FiSmartphone className="mr-2" /> Mobile Shop Banners
+            </h3>
+            {/* Mobile Banners List */}
+            {renderShopBannerList('mobile')}
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  // Helper function to render shop banners by device type
+  const renderShopBannerList = (deviceType) => {
+    // Filter sections to show only shop-banner type with matching deviceType
+    const shopBanners = sections.filter(section => 
+      section.type === 'shop-banner' && 
+      (section.deviceType === deviceType || (!section.deviceType && deviceType === 'desktop'))
+    );
+    
+    if (shopBanners.length === 0) {
+      return (
+        <p className="text-sm text-gray-500 py-2">
+          No {deviceType} shop banners found. Click the button above to create one.
+        </p>
+      );
+    }
+    
+    return (
+      <div className="grid gap-4">
+        {shopBanners.map(banner => (
+          <div
+            key={banner._id}
+            className={`border ${banner.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h4 className="font-medium">{banner.name}</h4>
+                <div className="flex items-center mt-1">
+                  <span className={`inline-block w-2 h-2 rounded-full ${banner.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                  <p className="text-sm text-gray-600">
+                    {banner.isActive ? 'Active' : 'Inactive'} • Button position: {banner.content?.buttonPosition || 'default'}
+                  </p>
+                </div>
+                
+                {banner.content?.buttonText && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Button: "{banner.content.buttonText}" → {banner.content.buttonLink || '#'}
+                  </p>
+                )}
+              </div>
+              
+              <div className="w-24 h-24 bg-gray-100 flex-shrink-0 ml-4">
+                {banner.media?.imageUrl && (
+                  <img 
+                    src={banner.media.imageUrl} 
+                    alt={banner.media.altText || banner.name} 
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2 mt-2">
+              <button
+                onClick={() => toggleActive('sections', banner._id, banner.isActive)}
+                className={`px-3 py-1 text-xs rounded-md ${
+                  banner.isActive 
+                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                    : 'bg-green-50 text-green-700 hover:bg-green-100'
+                }`}
+              >
+                {banner.isActive ? 'Deactivate' : 'Activate'}
+              </button>
+              <Link 
+                to={`/admin/shop-banner/edit/${banner._id}`}
+                className="p-2 text-gray-600 hover:text-black"
+              >
+                <FiEdit />
+              </Link>
+              <button 
+                onClick={() => handleDelete('sections', banner._id)}
+                className="p-2 text-gray-600 hover:text-red-600"
+              >
+                <FiTrash />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   // Determine content to render based on active section
   const renderContent = () => {
@@ -259,7 +388,7 @@ const Dashboard = () => {
       );
     }
 
-    switch (activeSection) {
+     switch (activeSection) {
       case 'homepage':
         return renderLayouts();
       case 'sections':
@@ -280,8 +409,10 @@ const Dashboard = () => {
         return renderShopHeaders();
       case 'featured-products':
         return renderFeaturedProducts();
-      case 'collections': // Add new collections case
+      case 'collections': 
         return renderCollections();
+      case 'shop-banners': // Add the new case for shop banners
+        return renderShopBanners();
       case 'settings':
         return renderSettings();
       default:

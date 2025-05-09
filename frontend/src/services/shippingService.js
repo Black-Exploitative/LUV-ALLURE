@@ -37,7 +37,31 @@ const STORE_ADDRESS = {
   zipCode: "106104",
   city: "Lekki",
   state: "Lagos",
-  country: "Nigeria"
+  country: "Nigeria",
+  // Added approximate coordinates for distance calculations
+  coordinates: {
+    latitude: 6.4358,
+    longitude: 3.4796
+  }
+};
+
+// Lagos area locations with approximate coordinates for distance estimation
+const LAGOS_LOCATIONS = {
+  'Lekki': { latitude: 6.4698, longitude: 3.5852 },
+  'Ikoyi': { latitude: 6.4541, longitude: 3.4358 },
+  'Victoria Island': { latitude: 6.4281, longitude: 3.4219 },
+  'Ajah': { latitude: 6.4698, longitude: 3.5652 },
+  'Ikeja': { latitude: 6.6018, longitude: 3.3515 },
+  'Surulere': { latitude: 6.5059, longitude: 3.3509 },
+  'Yaba': { latitude: 6.5105, longitude: 3.3726 },
+  'Gbagada': { latitude: 6.5555, longitude: 3.3887 },
+  'Magodo': { latitude: 6.6174, longitude: 3.3819 },
+  'Ojodu': { latitude: 6.6372, longitude: 3.3705 },
+  'Ikorodu': { latitude: 6.6194, longitude: 3.5105 },
+  'Epe': { latitude: 6.5944, longitude: 3.9792 },
+  'Badagry': { latitude: 6.4149, longitude: 2.8819 },
+  'Apapa': { latitude: 6.4553, longitude: 3.3641 },
+  'Oshodi': { latitude: 6.5355, longitude: 3.3087 }
 };
 
 // Weight estimation for products (in kg)
@@ -49,7 +73,61 @@ const PRODUCT_WEIGHTS = {
   accessories: 0.2
 };
 
-// Zones grouping states (used for fallback)
+// State-based shipping rates (in Naira)
+const STATE_SHIPPING_RATES = {
+  // Confirmed prices from the data
+  'Delta': 8722,
+  'Anambra': 8722,
+  'Edo': 8722,
+  'Oyo': 8722,
+  'Abia': 9512,
+  'Adamawa': 9512,
+  'Akwa Ibom': 9512,
+  'Bauchi': 9698,
+  'Bayelsa': 9698,
+  'Benue': 9698,
+  'Nasarawa': 9698,
+  'Borno': 11110,
+  
+  // Estimated prices based on proximity and region
+  // South West (similar to Oyo)
+  'Ogun': 8722,
+  'Osun': 8722,
+  'Ondo': 8722,
+  'Ekiti': 8722,
+  
+  // South East (similar to Anambra/Abia)
+  'Ebonyi': 9512,
+  'Enugu': 9512,
+  'Imo': 9512,
+  
+  // South South (similar to Delta/Edo or Akwa Ibom/Bayelsa)
+  'Cross River': 9512,
+  'Rivers': 9512,
+  
+  // North Central (similar to Benue/Nasarawa)
+  'FCT': 9698,
+  'Kogi': 9698,
+  'Kwara': 9698,
+  'Niger': 9698,
+  'Plateau': 9698,
+  
+  // North East (similar to Adamawa/Bauchi or Borno)
+  'Gombe': 9698,
+  'Taraba': 9698,
+  'Yobe': 11110,
+  
+  // North West (estimated based on distance)
+  'Jigawa': 10200,
+  'Kaduna': 9698,
+  'Kano': 10200,
+  'Katsina': 10200,
+  'Kebbi': 10200,
+  'Sokoto': 10700,
+  'Zamfara': 10200
+};
+
+// Zones grouping states (used as fallback if state is not in rates table)
 const ZONES = {
   southwest: ['Lagos', 'Ogun', 'Oyo', 'Osun', 'Ondo', 'Ekiti'],
   southeast: ['Abia', 'Anambra', 'Ebonyi', 'Enugu', 'Imo'],
@@ -145,8 +223,8 @@ const shippingService = {
           city: STORE_ADDRESS.city,
           state: STORE_ADDRESS.state,
           coordinates: {
-            latitude: 6.4281, // Replace with actual store coordinates
-            longitude: 3.4219  // Replace with actual store coordinates
+            latitude: STORE_ADDRESS.coordinates.latitude,
+            longitude: STORE_ADDRESS.coordinates.longitude
           }
         },
         dropoff: {
@@ -210,6 +288,101 @@ const shippingService = {
   },
   
   /**
+   * Calculate approximate distance between two coordinates using Haversine formula
+   */
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c; // Distance in kilometers
+    return distance;
+  },
+  
+  /**
+   * Estimate distance for a Lagos address
+   */
+  estimateDistanceInLagos(city, address) {
+    // Start with an estimated distance based on city/area
+    let estimatedDistance = 15; // Default distance in km
+    
+    // Check if we can get a closer estimate based on known locations
+    const cityLower = city.toLowerCase();
+    const addressLower = address.toLowerCase();
+    
+    // Try to find matching Lagos location
+    for (const [location, coords] of Object.entries(LAGOS_LOCATIONS)) {
+      if (cityLower.includes(location.toLowerCase()) || addressLower.includes(location.toLowerCase())) {
+        estimatedDistance = this.calculateDistance(
+          STORE_ADDRESS.coordinates.latitude,
+          STORE_ADDRESS.coordinates.longitude,
+          coords.latitude,
+          coords.longitude
+        );
+        break;
+      }
+    }
+    
+    // Look for specific locations in address
+    if (addressLower.includes('admiralty way') || addressLower.includes('admiralty')) {
+      return 17; // Based on provided data
+    } else if (addressLower.includes('ojodu berger') || addressLower.includes('berger')) {
+      return 50; // Based on provided data
+    } else if (addressLower.includes('magodo') || addressLower.includes('gra phase 1')) {
+      return 34; // Based on provided data
+    }
+    
+    // Apply some adjustments based on areas we know
+    if (cityLower.includes('lekki') || addressLower.includes('lekki')) {
+      // Since our store is in Lekki, distances will be shorter
+      estimatedDistance = Math.min(estimatedDistance, 20);
+    } else if (cityLower.includes('ikeja') || addressLower.includes('ikeja')) {
+      estimatedDistance = Math.max(estimatedDistance, 30);
+    } else if (cityLower.includes('ikorodu') || addressLower.includes('ikorodu')) {
+      estimatedDistance = Math.max(estimatedDistance, 40);
+    }
+    
+    return Math.round(estimatedDistance);
+  },
+  
+  /**
+   * Calculate shipping cost based on distance for Lagos deliveries
+   */
+  calculateLagosShippingByDistance(distance, weight) {
+    // New distance-based pricing model based on the provided data points
+    // Base fee + distance rate + weight factor
+    
+    let baseFee = 1500; // Base fee in Naira
+    let distanceRate = 0;
+    let weightFactor = weight * 100; // 100 Naira per kg
+    
+    // Calculate distance rate with tiered pricing
+    if (distance <= 15) {
+      // Short distance
+      distanceRate = distance * 30; // 30 Naira per km
+    } else if (distance <= 25) {
+      // Medium distance
+      distanceRate = 15 * 30 + (distance - 15) * 60; // 60 Naira per km after 15km
+    } else if (distance <= 40) {
+      // Longer distance
+      distanceRate = 15 * 30 + 10 * 60 + (distance - 25) * 180; // 180 Naira per km after 25km
+    } else {
+      // Very long distance within Lagos
+      distanceRate = 15 * 30 + 10 * 60 + 15 * 180 + (distance - 40) * 100; // 100 Naira per km after 40km
+    }
+    
+    // Total shipping cost
+    const totalCost = baseFee + distanceRate + weightFactor;
+    
+    // Round to nearest 10 Naira
+    return Math.ceil(totalCost / 10) * 10;
+  },
+  
+  /**
    * Fallback shipping calculation in case API calls fail
    */
   calculateFallbackShipping(orderData, shippingAddress, provider = 'GIGL') {
@@ -218,58 +391,79 @@ const shippingService = {
     const isSameState = destinationState === STORE_ADDRESS.state;
     const isLagos = destinationState === 'Lagos';
     
-    // Base rates for different scenarios
-    const FALLBACK_RATES = {
-      // Within Lagos (Bolt typically)
-      lagos: {
-        base: 2000,
-        perKg: 400
-      },
-      // Within same state but not Lagos
-      sameState: {
-        base: 2500,
-        perKg: 500
-      },
-      // Same zone (e.g., South West)
-      sameZone: {
-        base: 3500,
-        perKg: 700
-      },
-      // Cross-zone (e.g., South West to South East)
-      crossZone: {
-        base: 4500,
-        perKg: 900
-      }
-    };
-    
-    // Determine which rate to use
-    let rate;
+    // For Lagos deliveries, use the new distance-based calculation
     if (isLagos) {
-      rate = FALLBACK_RATES.lagos;
-    } else if (isSameState) {
-      rate = FALLBACK_RATES.sameState;
+      // Estimate distance based on address
+      const estimatedDistance = this.estimateDistanceInLagos(
+        shippingAddress.city,
+        shippingAddress.address
+      );
+      
+      // Calculate shipping cost based on distance and weight
+      const shippingCost = this.calculateLagosShippingByDistance(estimatedDistance, totalWeight);
+      
+      return {
+        success: true,
+        provider: provider === 'GIGL' ? 'GIGL' : 'Bolt',
+        cost: shippingCost,
+        estimatedDeliveryDays: estimatedDistance > 30 ? '2-3' : '1-2',
+        weight: totalWeight,
+        distance: estimatedDistance,
+        isEstimate: true
+      };
+    }
+    
+    // For non-Lagos deliveries, use the fixed state-based rates
+    let baseShippingCost = 0;
+    
+    // Check if we have a fixed rate for this state
+    if (STATE_SHIPPING_RATES[destinationState]) {
+      baseShippingCost = STATE_SHIPPING_RATES[destinationState];
     } else {
-      // Check if destination is in same zone as store
+      // Fallback to zone-based estimation if state not found in rates table
       const storeZone = this.getZone(STORE_ADDRESS.state);
       const destinationZone = this.getZone(destinationState);
       
       if (storeZone === destinationZone) {
-        rate = FALLBACK_RATES.sameZone;
+        baseShippingCost = 8722; // Same zone as Lagos (Southwest)
+      } else if (destinationZone === 'southeast' || destinationZone === 'southsouth') {
+        baseShippingCost = 9512; // Southern states
+      } else if (destinationZone === 'northcentral') {
+        baseShippingCost = 9698; // North Central
       } else {
-        rate = FALLBACK_RATES.crossZone;
+        baseShippingCost = 10700; // Far North
       }
     }
     
-    // Calculate shipping cost
-    const shippingCost = rate.base + (totalWeight * rate.perKg);
+    // Add weight surcharge for heavier packages
+    let weightSurcharge = 0;
+    if (totalWeight > 1) {
+      weightSurcharge = Math.ceil(totalWeight - 1) * 500; // ₦500 per kg over 1kg
+    }
+    
+    // Calculate total shipping cost
+    const shippingCost = baseShippingCost + weightSurcharge;
+    
+    // Calculate estimated delivery days based on region
+    let estimatedDeliveryDays = '3-5';
+    
+    if (this.getZone(destinationState) === 'southwest') {
+      estimatedDeliveryDays = '2-3';
+    } else if (this.getZone(destinationState) === 'southeast' || this.getZone(destinationState) === 'southsouth') {
+      estimatedDeliveryDays = '3-4';
+    } else if (this.getZone(destinationState) === 'northcentral') {
+      estimatedDeliveryDays = '3-5';
+    } else {
+      estimatedDeliveryDays = '4-7'; // Far northern states
+    }
     
     return {
       success: true,
-      provider: provider,
+      provider: 'GIGL', // GIGL is used for interstate shipping
       cost: Math.round(shippingCost),
-      estimatedDeliveryDays: isLagos ? '1-2' : '2-5',
+      estimatedDeliveryDays: estimatedDeliveryDays,
       weight: totalWeight,
-      isEstimate: true // Flag that this is an estimate, not from API
+      isEstimate: true
     };
   },
   

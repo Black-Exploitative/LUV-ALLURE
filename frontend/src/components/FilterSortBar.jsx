@@ -78,8 +78,8 @@ const FilterSortBar = ({
       "Ivory",
       ...(availableFilters?.colors || [])
     ],
-    vendor: ["Fashion Nova", "Baby Boo Fashion", "Laluvia", "Adika", "Shein", 
-      "Zara", "Forever 21", "H&M", "Boohoo", ...(availableFilters?.vendors || [])],
+    /*vendor: ["Fashion Nova", "Baby Boo Fashion", "Laluvia", "Adika", "Shein", 
+      "Zara", "Forever 21", "H&M", "Boohoo", ...(availableFilters?.vendors || [])],*/
     size: ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", ...(availableFilters?.sizes || [])],
     length: ["Mini", "Midi", "Maxi", "Knee-Length", "Ankle-Length"],
     style: ["Casual", "Formal", "Bohemian", "Street", "Minimalist"],
@@ -769,11 +769,11 @@ const FilterSortBar = ({
                     renderButtonOptions("size")
                   )}
 
-                  {renderFilterSection(
+                  {/*{renderFilterSection(
                     "Vendor/Brand",
                     "vendor",
                     renderButtonOptions("vendor")
-                  )}
+                  )}*/}
 
                   {renderFilterSection(
                     "Length",

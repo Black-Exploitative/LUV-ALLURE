@@ -8,6 +8,7 @@ let contentCache = {
   banners: {},
   navImages: {},
   productRelationships: {},
+  shopBanners: {},
   expiryTime: 5 * 60 * 1000 // 5 minutes
 };
 
@@ -18,6 +19,7 @@ export const clearCmsCache = () => {
     banners: {},
     navImages: {},
     productRelationships: {},
+    shopBanners: {},
     expiryTime: 5 * 60 * 1000
   };
 };
@@ -180,26 +182,44 @@ const cmsService = {
   }
 };
 
-export const getShopBanner = async () => {
+export const getShopBanner = async (deviceType = 'desktop') => {
   try {
-    console.log("Fetching shop banner data from API...");
+    console.log(`Fetching shop banner data for ${deviceType}...`);
     
-    // Make a direct call to get sections of type shop-banner
-    const response = await api.get('/cms/sections?type=shop-banner');
+    // Check cache first
+    const cacheKey = `shop-banner-${deviceType}`;
+    if (contentCache.shopBanners[cacheKey] && 
+        contentCache.shopBanners[cacheKey].timestamp > Date.now() - contentCache.expiryTime) {
+      console.log(`Using cached shop banner for ${deviceType}`);
+      return contentCache.shopBanners[cacheKey].data;
+    }
+    
+    // Make a direct call to get sections of type shop-banner with device type filter
+    const response = await api.get('/cms/sections', {
+      params: {
+        type: 'shop-banner',
+        deviceType: deviceType
+      }
+    });
     
     // Log the full response for debugging
-    console.log("API Response:", response.data);
+    console.log(`API Response for ${deviceType} shop banner:`, response.data);
     
     const banners = response.data.data || [];
     
-    // Find the first active banner
-    const activeBanner = banners.find(banner => banner.isActive);
+    // Find the first active banner for the specified device type
+    const activeBanner = banners.find(banner => {
+      // Check if banner is active and matches the deviceType or has no deviceType specified (for backward compatibility)
+      return banner.isActive && 
+             (banner.deviceType === deviceType || 
+              (!banner.deviceType && deviceType === 'desktop')); // Treat banners with no device type as desktop banners
+    });
     
     if (activeBanner) {
-      console.log("Active shop banner found:", activeBanner);
+      console.log(`Active ${deviceType} shop banner found:`, activeBanner);
       
       // Important: Log the button position specifically
-      console.log("Button position in banner:", activeBanner.content?.buttonPosition);
+      console.log(`Button position in ${deviceType} banner:`, activeBanner.content?.buttonPosition);
       
       // Check if content and media objects exist
       if (!activeBanner.content) {
@@ -212,16 +232,36 @@ export const getShopBanner = async () => {
         activeBanner.media = {};
       }
       
+      // Cache the result
+      contentCache.shopBanners[cacheKey] = {
+        data: activeBanner,
+        timestamp: Date.now()
+      };
+      
       return activeBanner;
     } else {
-      console.log("No active shop banner found in response");
-      return null;
+      console.log(`No active ${deviceType} shop banner found in response`);
+      
+      // Create a default empty banner as a fallback
+      const defaultBanner = {
+        content: {},
+        media: {}
+      };
+      
+      // Cache the result
+      contentCache.shopBanners[cacheKey] = {
+        data: defaultBanner,
+        timestamp: Date.now()
+      };
+      
+      return defaultBanner;
     }
   } catch (error) {
-    console.error('Error fetching shop banner:', error);
+    console.error(`Error fetching ${deviceType} shop banner:`, error);
     return null;
   }
 };
+
 
 export const getPromoSection = async () => {
   try {
