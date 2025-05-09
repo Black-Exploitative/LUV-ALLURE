@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { useCart } from "../context/CartContext";
@@ -22,43 +23,43 @@ export default function Navbar() {
     shop: [],
     dresses: [],
     collections: [],
-    newin: []
+    newin: [],
   });
-  
+
   // New state to track screen size for responsive behavior
   const [isMobileView, setIsMobileView] = useState(false);
   const [isTabletView, setIsTabletView] = useState(false);
-
 
   // Load navigation images from CMS
   const loadNavigationImages = async () => {
     try {
       console.log("Fetching nav images...");
-      
+
       // Load images for each category
-      const shopImages = await cmsService.getNavigationImages('shop');
+      const shopImages = await cmsService.getNavigationImages("shop");
       console.log("Shop images:", shopImages);
-      
-      const dressesImages = await cmsService.getNavigationImages('dresses');
+
+      const dressesImages = await cmsService.getNavigationImages("dresses");
       console.log("Dresses images:", dressesImages);
-      
-      const collectionsImages = await cmsService.getNavigationImages('collections');
+
+      const collectionsImages = await cmsService.getNavigationImages(
+        "collections"
+      );
       console.log("Collections images:", collectionsImages);
-      
-      const newinImages = await cmsService.getNavigationImages('newin');
+
+      const newinImages = await cmsService.getNavigationImages("newin");
       console.log("New In images:", newinImages);
-      
+
       setNavImages({
         shop: shopImages,
         dresses: dressesImages,
         collections: collectionsImages,
-        newin: newinImages
+        newin: newinImages,
       });
     } catch (error) {
       console.error("Error loading navigation images:", error);
     }
   };
-
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -91,7 +92,7 @@ export default function Navbar() {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
       setIsTabletView(window.innerWidth >= 768 && window.innerWidth < 1024);
-      
+
       // Close dropdown if screen gets too small
       if (window.innerWidth < 1024 && activeDropdown) {
         setActiveDropdown(null);
@@ -100,7 +101,7 @@ export default function Navbar() {
 
     // Initial check
     handleResize();
-    
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [activeDropdown]);
@@ -136,52 +137,52 @@ export default function Navbar() {
       y: "-100%",
       transition: {
         duration: 0.5,
-        ease: [0.22, 1, 0.36, 1]
-      }
+        ease: [0.22, 1, 0.36, 1],
+      },
     },
     open: {
       opacity: 1,
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.22, 1, 0.36, 1]
-      }
-    }
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
   };
 
   const linkVariants = {
     closed: { opacity: 0, y: 20 },
-    open: index => ({
+    open: (index) => ({
       opacity: 1,
       y: 0,
       transition: {
         delay: 0.3 + index * 0.1,
-        duration: 0.5
-      }
-    })
+        duration: 0.5,
+      },
+    }),
   };
 
   const dropdownVariants = {
-    hidden: { 
+    hidden: {
       opacity: 0,
       y: 10,
       transition: {
-        duration: 0.2
-      }
+        duration: 0.2,
+      },
     },
-    visible: { 
+    visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.3
-      }
-    }
+        duration: 0.3,
+      },
+    },
   };
 
   const ThemedMiniCartPreview = () => {
     return (
       <div className="relative">
-        <div 
+        <div
           className="cart-icon-container relative cursor-pointer flex items-center"
           onClick={handleCartClick}
         >
@@ -191,10 +192,12 @@ export default function Navbar() {
             className="w-[15px] h-[15px]"
           />
           <div className="relative">
-            {cartItemCount > 0 && <AnimatedCartBadge theme={darkNavbar ? "light" : "dark"} />}
+            {cartItemCount > 0 && (
+              <AnimatedCartBadge theme={darkNavbar ? "light" : "dark"} />
+            )}
           </div>
         </div>
-        
+
         {/* Only render preview if there are items */}
         {cartItemCount > 0 && <MiniCartPreview />}
       </div>
@@ -214,8 +217,8 @@ export default function Navbar() {
             { name: "Sets", href: "#/shop/sets" },
             { name: "Pants & Capris'", href: "/shop/pants" },
             { name: "Jumpsuits", href: "/shop/jumpsuits" },
-            { name: "All Clothing", href: "/shop" }
-          ]
+            { name: "All Clothing", href: "/shop" },
+          ],
         },
         {
           title: "ALL GIFTING",
@@ -223,22 +226,24 @@ export default function Navbar() {
             { name: "Gift Cards", href: "/Shop/gift-cards" },
             { name: "Vouchers", href: "/Shop/vouchers" },
             { name: "Membership", href: "/Shop/membership" },
-            { name: "All Gifting", href: "/shop/gifting" }
-          ]
-        }
+            { name: "All Gifting", href: "/shop/gifting" },
+          ],
+        },
       ],
       featuredItems: [
         {
-          image: "https://plus.unsplash.com/premium_photo-1682097559861-d5d5027868b5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fE1heGklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
+          image:
+            "https://plus.unsplash.com/premium_photo-1682097559861-d5d5027868b5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fE1heGklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MAXI DRESSES",
-          href: ""
+          href: "",
         },
         {
-          image: "https://images.unsplash.com/photo-1719610894782-7b376085e200?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG1pbmklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
+          image:
+            "https://images.unsplash.com/photo-1719610894782-7b376085e200?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG1pbmklMjBkcmVzc3xlbnwwfHwwfHx8MA%3D%3D",
           title: "MINI DRESSES",
-          href: ""
-        }
-      ]
+          href: "",
+        },
+      ],
     },
     dresses: {
       columns: [
@@ -248,8 +253,8 @@ export default function Navbar() {
             { name: "All Dresses", href: "/shop" },
             { name: "Mini Dresses", href: "/shop/mini-dresses" },
             { name: "Maxi Dresses", href: "/shop/maxi-dresses" },
-            { name: "Midi Dresses", href: "/shop/midi-dresses" }
-          ]
+            { name: "Midi Dresses", href: "/shop/midi-dresses" },
+          ],
         },
         {
           title: "DRESSES BY STYLE",
@@ -257,13 +262,16 @@ export default function Navbar() {
             { name: "Prom Dresses", href: "/shop/prom-dresses" },
             { name: "Formal Dresses", href: "/shop/formal-dresses" },
             { name: "Party Dresses", href: "/shop/party-dresses" },
-            { name: "Wedding Guest Dresses", href: "/shop/wedding-guest-dresses" },
-//            { name: "Bridesmaid Dresses", href: "/shop/bridesmaide-dresses" },
-//            { name: "Bridal Dresses", href: "#" },
+            {
+              name: "Wedding Guest Dresses",
+              href: "/shop/wedding-guest-dresses",
+            },
+            //            { name: "Bridesmaid Dresses", href: "/shop/bridesmaide-dresses" },
+            //            { name: "Bridal Dresses", href: "#" },
             { name: "Corset Dresses", href: "/shop/corset-dresses" },
             { name: "Bubblehem Dresses", href: "/shop/bubblehem-dresses" },
-            { name: "Flowy Dresses", href: "/shop/flowy-dresses" }
-          ]
+            { name: "Flowy Dresses", href: "/shop/flowy-dresses" },
+          ],
         },
         {
           title: "DRESSES BY COLOUR",
@@ -276,25 +284,24 @@ export default function Navbar() {
             { name: "Brown Dresses", href: "#" },
             { name: "Blue Dresses", href: "#" },
             { name: "Black Dresses", href: "#" },
-            { name: "Embelishment Dresses", href: "#" }
-          ]
-        }
+            { name: "Embelishment Dresses", href: "#" },
+          ],
+        },
       ],
       featuredItems: [
         {
-          image: "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
+          image:
+            "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "SHOP ALL DRESSES",
-          href: "#"
-        }
-      ]
+          href: "#",
+        },
+      ],
     },
     collections: {
       columns: [
         {
           title: "Collections",
-          links: [
-            { name: "All Vendors", href: "/collections" }
-          ]
+          links: [{ name: "All Vendors", href: "/collections" }],
         },
         {
           title: "OCCASION",
@@ -304,8 +311,8 @@ export default function Navbar() {
             { name: "Party", href: "#" },
             { name: "Wedding Guest", href: "#" },
             { name: "Holiday", href: "#" },
-            { name: "Festival", href: "#" }
-          ]
+            { name: "Festival", href: "#" },
+          ],
         },
         /*{
           title: "TRENDING",
@@ -315,11 +322,12 @@ export default function Navbar() {
       ],
       featuredItems: [
         {
-          image: "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
+          image:
+            "https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "THE WEDDING EDIT",
-          href: "#"
-        }
-      ]
+          href: "#",
+        },
+      ],
     },
     newin: {
       columns: [
@@ -329,36 +337,37 @@ export default function Navbar() {
             { name: "New Arrivals", href: "/collections/new-arrivals" },
             { name: "Back In Stock", href: "/collections/back-in-stock" },
             { name: "Most Popular", href: "/collections/most-popular" },
-          ]
-        }
+          ],
+        },
       ],
       featuredItems: [
         {
-          image: "https://images.unsplash.com/photo-1642447411662-59ab77473a8d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
+          image:
+            "https://images.unsplash.com/photo-1642447411662-59ab77473a8d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "NEW ARRIVALS",
-          href: "/collections/new-arrivals"
+          href: "/collections/new-arrivals",
         },
         {
-          image: "https://images.unsplash.com/photo-1626818590159-04cb9274a5e0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDJ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
+          image:
+            "https://images.unsplash.com/photo-1626818590159-04cb9274a5e0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDJ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "SEASONAL SALE | 25% OFF",
-          href: "#"
-        }
-      ]
-    }
+          href: "#",
+        },
+      ],
+    },
   };
 
   // Update how featured items are generated in the dropdownContent object
   const getDropdownFeaturedItems = (category) => {
     // If CMS images are available for this category
     if (navImages[category] && navImages[category].length > 0) {
-      return navImages[category].map(image => ({
+      return navImages[category].map((image) => ({
         image: image.imageUrl,
         title: image.name.toUpperCase(),
-        href: image.link || "#"
+        href: image.link || "#",
       }));
-
     }
-    
+
     // Fallback to the default items if no CMS images
     return dropdownContent[category].featuredItems;
   };
@@ -367,115 +376,127 @@ export default function Navbar() {
     <nav
       ref={navRef}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md" : (location.pathname !== "/" ? "bg-white" : "bg-transparent")
+        isScrolled
+          ? "bg-white shadow-md"
+          : location.pathname !== "/"
+          ? "bg-white"
+          : "bg-transparent"
       }`}
-    >                                      
+    >
       <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
         {/* Left-side Navigation Links (Desktop and Tablet) */}
-        <div className={`hidden md:flex space-x-2 lg:space-x-6 text-xs lg:text-[12px] ${darkNavbar ? "text-white" : "text-black"}`}>
+        <div
+          className={`hidden md:flex space-x-2 lg:space-x-6 text-xs lg:text-[12px] ${
+            darkNavbar ? "text-white" : "text-black"
+          }`}
+        >
           {/* SHOP Dropdown */}
-          <div 
+          <div
             className="nav-dropdown-container relative"
-            onMouseEnter={() => handleDropdownEnter('shop')}
+            onMouseEnter={() => handleDropdownEnter("shop")}
             onMouseLeave={handleDropdownLeave}
-            ref={el => dropdownRefs.current['shop'] = el}
+            ref={(el) => (dropdownRefs.current["shop"] = el)}
           >
-            <a 
-              href="#" 
+            <a
+              href="#"
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
-                activeDropdown === 'shop' ? 'active-nav-item' : ''
+                activeDropdown === "shop" ? "active-nav-item" : ""
               }`}
               onClick={(e) => {
                 e.preventDefault();
-                setActiveDropdown(activeDropdown === 'shop' ? null : 'shop');
+                setActiveDropdown(activeDropdown === "shop" ? null : "shop");
               }}
             >
               SHOP
             </a>
             {/* Highlight indicator that appears at the bottom of navbar */}
-            {activeDropdown === 'shop' && (
+            {activeDropdown === "shop" && (
               <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
             )}
           </div>
 
           {/* DRESSES Dropdown */}
-          <div 
+          <div
             className="nav-dropdown-container relative"
-            onMouseEnter={() => handleDropdownEnter('dresses')}
+            onMouseEnter={() => handleDropdownEnter("dresses")}
             onMouseLeave={handleDropdownLeave}
-            ref={el => dropdownRefs.current['dresses'] = el}
+            ref={(el) => (dropdownRefs.current["dresses"] = el)}
           >
-            <a 
-              href="/shop/dresses" 
+            <a
+              href="/shop/dresses"
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
-                activeDropdown === 'dresses' ? 'active-nav-item' : ''
+                activeDropdown === "dresses" ? "active-nav-item" : ""
               }`}
               onClick={(e) => {
                 e.preventDefault();
-                setActiveDropdown(activeDropdown === 'dresses' ? null : 'dresses');
+                setActiveDropdown(
+                  activeDropdown === "dresses" ? null : "dresses"
+                );
               }}
             >
               DRESSES
             </a>
             {/* Highlight indicator that appears at the bottom of navbar */}
-            {activeDropdown === 'dresses' && (
+            {activeDropdown === "dresses" && (
               <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
             )}
           </div>
 
           {/* COLLECTIONS Dropdown - Hide on smaller tablets */}
-          <div 
+          <div
             className="nav-dropdown-container relative hidden lg:block"
-            onMouseEnter={() => handleDropdownEnter('collections')}
+            onMouseEnter={() => handleDropdownEnter("collections")}
             onMouseLeave={handleDropdownLeave}
-            ref={el => dropdownRefs.current['collections'] = el}
+            ref={(el) => (dropdownRefs.current["collections"] = el)}
           >
-            <a 
-              href="#" 
+            <a
+              href="#"
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
-                activeDropdown === 'collections' ? 'active-nav-item' : ''
+                activeDropdown === "collections" ? "active-nav-item" : ""
               }`}
               onClick={(e) => {
                 e.preventDefault();
-                setActiveDropdown(activeDropdown === 'collections' ? null : 'collections');
+                setActiveDropdown(
+                  activeDropdown === "collections" ? null : "collections"
+                );
               }}
             >
               LOOKBOOK
             </a>
             {/* Highlight indicator that appears at the bottom of navbar */}
-            {activeDropdown === 'collections' && (
+            {activeDropdown === "collections" && (
               <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
             )}
           </div>
 
           {/* NEW IN Dropdown - Hide on smaller tablets */}
-          <div 
+          <div
             className="nav-dropdown-container relative hidden lg:block"
-            onMouseEnter={() => handleDropdownEnter('newin')}
+            onMouseEnter={() => handleDropdownEnter("newin")}
             onMouseLeave={handleDropdownLeave}
-            ref={el => dropdownRefs.current['newin'] = el}
+            ref={(el) => (dropdownRefs.current["newin"] = el)}
           >
-            <a 
-              href="#" 
+            <a
+              href="#"
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
-                activeDropdown === 'newin' ? 'active-nav-item' : ''
+                activeDropdown === "newin" ? "active-nav-item" : ""
               }`}
               onClick={(e) => {
                 e.preventDefault();
-                setActiveDropdown(activeDropdown === 'newin' ? null : 'newin');
+                setActiveDropdown(activeDropdown === "newin" ? null : "newin");
               }}
             >
               NEW ARRIVALS
             </a>
             {/* Highlight indicator that appears at the bottom of navbar */}
-            {activeDropdown === 'newin' && (
+            {activeDropdown === "newin" && (
               <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
             )}
           </div>
         </div>
 
         {/* Hamburger Menu Button (Mobile only, Left) */}
-        <motion.button 
+        <motion.button
           className="md:hidden relative z-50 cursor-pointer"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           whileTap={{ scale: 0.9 }}
@@ -483,59 +504,85 @@ export default function Navbar() {
           {isMobileMenuOpen ? (
             <div className="relative flex items-center">
               <div className="absolute bg-black rounded-full w-10 h-10 flex items-center justify-center">
-                <img src="/icons/close-menu.svg" alt="Close Menu" className="w-5 h-5" />
+                <img
+                  src="/icons/close-menu.svg"
+                  alt="Close Menu"
+                  className="w-5 h-5"
+                />
               </div>
             </div>
           ) : (
-            <img 
-              src={darkNavbar ? "/icons/hamburger.svg" : "/icons/hamburger-black.svg"} 
-              alt="Menu" 
-              className="w-[15px] h-[12px]" 
+            <img
+              src={
+                darkNavbar
+                  ? "/icons/hamburger.svg"
+                  : "/icons/hamburger-black.svg"
+              }
+              alt="Menu"
+              className="w-[15px] h-[12px]"
             />
           )}
         </motion.button>
 
         {/* Logo (Center) */}
-        
+
         <div className="text-xl font-bold absolute left-1/2 transform -translate-x-1/2">
-        <a href="/">
-          <motion.img 
-            src={darkNavbar ? "/images/LA-2.png" : "/images/LA-1.png"} 
-            alt="Logo" 
-            className="h-[55px]"
-            initial={{ opacity: 0.8 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          /></a>
+          <a href="/">
+            <motion.img
+              src={darkNavbar ? "/images/LA-2.png" : "/images/LA-1.png"}
+              alt="Logo"
+              className="h-[55px]"
+              initial={{ opacity: 0.8 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            />
+          </a>
         </div>
 
         {/* Right-side Navigation (Desktop and Tablet) */}
-        <div className={`hidden md:flex items-center space-x-6 text-xs lg:text-[12px] ${darkNavbar ? "text-white" : "text-black"}`}>
+        <div
+          className={`hidden md:flex items-center space-x-6 text-xs lg:text-[12px] ${
+            darkNavbar ? "text-white" : "text-black"
+          }`}
+        >
           {/* Show these links only on larger screens */}
-          <a href="/contact-us" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">CONTACT US</a>
-          <a href="/services" className="hover:opacity-80 h-full flex items-center whitespace-nowrap">SERVICES</a>
-          
+          <a
+            href="/contact-us"
+            className="hover:opacity-80 h-full flex items-center whitespace-nowrap"
+          >
+            CONTACT US
+          </a>
+          <a
+            href="/services"
+            className="hover:opacity-80 h-full flex items-center whitespace-nowrap"
+          >
+            SERVICES
+          </a>
+
           {/* Icons - wrapped in a flex container with consistent alignment */}
           <div className="flex items-center space-x-6">
-            
-            <motion.div className="flex items-center h-full"> 
+            <motion.div className="flex items-center h-full">
               <SearchBar darkNavbar={darkNavbar} />
             </motion.div>
-            
+
             <a href="/user-account">
-            <motion.div className="flex items-center h-full">
-              <motion.img 
-                src={darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"} 
-                alt="Phone" 
-                className="w-[12.6px] h-[15px] cursor-pointer"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              />
-            </motion.div>
+              <motion.div className="flex items-center h-full">
+                <motion.img
+                  src={
+                    darkNavbar
+                      ? "/icons/contact.svg"
+                      : "/icons/contact-black.svg"
+                  }
+                  alt="Phone"
+                  className="w-[12.6px] h-[15px] cursor-pointer"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                />
+              </motion.div>
             </a>
 
             {/* Enhanced Cart Icon with Preview */}
-            <motion.div 
+            <motion.div
               className="flex items-center h-full"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -544,17 +591,23 @@ export default function Navbar() {
             </motion.div>
           </div>
         </div>
-                
+
         {/* Mobile Right Icons */}
-        <div className={`md:hidden flex space-x-4 items-center ${darkNavbar ? "text-white" : "text-black"}`}>
+        <div
+          className={`md:hidden flex space-x-4 items-center ${
+            darkNavbar ? "text-white" : "text-black"
+          }`}
+        >
           <motion.div className="flex items-center">
             <SearchBar darkNavbar={darkNavbar} />
           </motion.div>
-          
+
           <motion.div className="flex items-center">
-            <motion.img 
-              src={darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"} 
-              alt="Phone" 
+            <motion.img
+              src={
+                darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"
+              }
+              alt="Phone"
               className="w-[12.6px] h-[15px] cursor-pointer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -562,7 +615,7 @@ export default function Navbar() {
           </motion.div>
 
           {/* Mobile Cart with Preview */}
-          <motion.div 
+          <motion.div
             className="flex items-center"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -575,7 +628,7 @@ export default function Navbar() {
       {/* Dropdowns Container - Outside the navbar, only for desktop */}
       <AnimatePresence>
         {activeDropdown && !isMobileView && !isTabletView && (
-          <motion.div 
+          <motion.div
             className="absolute left-0 w-full bg-white text-black shadow-lg z-40"
             initial="hidden"
             animate="visible"
@@ -586,34 +639,44 @@ export default function Navbar() {
           >
             <div className="container mx-auto py-8 px-6 grid grid-cols-12 gap-6">
               {/* Left Side - Text Links */}
-              {dropdownContent[activeDropdown].columns.map((column, colIndex) => (
-                <div key={colIndex} className="col-span-3">
-                  <h3 className="font-medium text-sm mb-4">{column.title}</h3>
-                  <div className="flex flex-col space-y-2">
-                    {column.links.map((link, linkIndex) => (
-                      <a key={linkIndex} href={link.href} className="text-sm hover:underline">
-                        {link.name}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              
-              {/* Right Side - Featured Images from CMS */}
-              {getDropdownFeaturedItems(activeDropdown).map((item, itemIndex) => (
-                <div key={itemIndex} className="col-span-3">
-                  <a href={item.href} className="block">
-                    <div className="aspect-[3/4] overflow-hidden">
-                      <img 
-                        src={item.image} 
-                        alt={item.title} 
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      />
+              {dropdownContent[activeDropdown].columns.map(
+                (column, colIndex) => (
+                  <div key={colIndex} className="col-span-3">
+                    <h3 className="font-medium text-sm mb-4">{column.title}</h3>
+                    <div className="flex flex-col space-y-2">
+                      {column.links.map((link, linkIndex) => (
+                        <a
+                          key={linkIndex}
+                          href={link.href}
+                          className="text-sm hover:underline"
+                        >
+                          {link.name}
+                        </a>
+                      ))}
                     </div>
-                    <p className="text-center font-medium text-sm mt-2">{item.title}</p>
-                  </a>
-                </div>
-              ))}
+                  </div>
+                )
+              )}
+
+              {/* Right Side - Featured Images from CMS */}
+              {getDropdownFeaturedItems(activeDropdown).map(
+                (item, itemIndex) => (
+                  <div key={itemIndex} className="col-span-3">
+                    <a href={item.href} className="block">
+                      <div className="aspect-[3/4] overflow-hidden">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                        />
+                      </div>
+                      <p className="text-center font-medium text-sm mt-2">
+                        {item.title}
+                      </p>
+                    </a>
+                  </div>
+                )
+              )}
             </div>
           </motion.div>
         )}
@@ -622,7 +685,7 @@ export default function Navbar() {
       {/* Full Screen Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 bg-white z-40 flex flex-col justify-center items-center overflow-y-auto"
             initial="closed"
             animate="open"
@@ -636,7 +699,7 @@ export default function Navbar() {
                 { name: "COLLECTIONS", link: "#" },
                 { name: "NEW IN", link: "#" },
                 { name: "CONTACT US", link: "#" },
-                { name: "SERVICES", link: "#" }
+                { name: "SERVICES", link: "#" },
               ].map((item, index) => (
                 <motion.a
                   key={item.name}
@@ -662,3 +725,4 @@ export default function Navbar() {
     </nav>
   );
 }
+

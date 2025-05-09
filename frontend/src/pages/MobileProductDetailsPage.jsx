@@ -1210,75 +1210,78 @@ const ProductDetailsPage = () => {
 
   return (
     <>
-      <div className="mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]">
-        <div className="mt-[60px] sm:mt-[80px] md:mt-[100px] flex flex-col md:flex-row">
-          {/* Left Side: Product Carousel */}
-          <div className="mb-8 md:mb-0 md:mr-[50px] w-full md:w-auto md:flex-1">
+      <div className="px-4">
+        <div className="mt-16 flex flex-col">
+          {/* Product Carousel */}
+          <div className="mb-8 w-full">
             <ProductCarousel images={displayImages} />
 
-            {/* Related Products - Also inside the max-w-screen-xl container */}
-            <div className="mt-[50px]">
-              <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
+            {/* STYLE IT WITH */}
+            <div className="mt-10">
+              <h2 className="text-sm mb-4 text-center">STYLE IT WITH</h2>
               {loadingRelated ? (
                 <div className="flex justify-center items-center py-8">
                   <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
                 </div>
-              ) : styleWithProducts.length > 0 ? (
-                <div className="grid gap-4 md:gap-6">
-                  {styleWithProducts.map((product, index) => (
-                    <SmallProductCard
-                      key={product.id || index}
-                      image={
-                        product.images?.[0] ||
-                        product.image ||
-                        "/images/placeholder.jpg"
-                      }
-                      name={product.title || product.name}
-                      color={product.color || "Default"}
-                      price={`₦${parseFloat(product.price).toLocaleString()}`}
-                      onViewProduct={() => navigate(`/product/${product.id}`)}
-                    />
-                  ))}
-                </div>
               ) : (
-                <div className="grid gap-4 md:gap-6">
-                  {relatedProducts.map((product, index) => (
-                    <SmallProductCard
+                <div className="flex gap-4 overflow-x-auto px-2 no-scrollbar snap-x snap-mandatory scroll-smooth">
+                  {(styleWithProducts.length > 0
+                    ? styleWithProducts
+                    : relatedProducts
+                  ).map((product, index) => (
+                    <div
                       key={index}
-                      image={product.image}
-                      name={product.name}
-                      color={product.color}
-                      price={product.price}
-                      onViewProduct={() =>
-                        console.log(`Viewing ${product.name}`)
-                      }
-                    />
+                      className="snap-start min-w-[85%] max-w-[85%] bg-white rounded-md shadow-md flex flex-col justify-between"
+                    >
+                      <img
+                        src={
+                          product.images?.[0] ||
+                          product.image ||
+                          "/images/placeholder.jpg"
+                        }
+                        alt={product.title || product.name}
+                        className="w-full h-72 object-cover rounded-t-md"
+                      />
+                      <div className="p-3 flex flex-col gap-1">
+                        <p className="text-xs uppercase text-gray-600">
+                          {product.color || "Color"}
+                        </p>
+                        <h3 className="text-sm font-semibold">
+                          {product.title || product.name}
+                        </h3>
+                        <p className="text-sm font-medium mt-1">
+                          ₦{parseFloat(product.price).toLocaleString()}
+                        </p>
+                        <button
+                          onClick={() => navigate(`/product/${product.id}`)}
+                          className="mt-2 bg-black text-white text-xs py-2 w-full rounded-md tracking-wide"
+                        >
+                          VIEW PRODUCT
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
             </div>
-            {renderStyleItWith()}
           </div>
 
-          {/* Right Side: Product Details */}
-          <div className="w-full md:w-[400px] flex flex-col justify-start">
-            {/* Product Name */}
+          {/* Product Details */}
+          <div className="w-full">
             <h1 className="text-xl font-normal">{product.name}</h1>
-            {/*  Star Rating */}
+
             <StarRating
               rating={4.9}
               reviewCount={90}
               scrollToReviews={scrollToReviews}
             />
 
-            {/* Product Price */}
             <p className="text-lg font-semibold text-gray-700">
               ₦ {product.price}
             </p>
 
             <hr className="border-t border-gray-300 my-4" />
 
-            {/* Color Selection - Only show if there are colors */}
             <ColorVariants
               product={product}
               productId={productId}
@@ -1299,20 +1302,20 @@ const ProductDetailsPage = () => {
                 </button>
               </div>
 
-              {/* Size Guide Modal */}
               <SizeGuideModal
                 isOpen={isSizeGuideOpen}
                 onClose={() => setSizeGuideOpen(false)}
               />
+
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size, index) => (
                   <button
                     key={index}
-                    className={`border w-[40px] h-[40px] text-[10px] font-normal items-center cursor-pointer ${
+                    className={`border w-[40px] h-[40px] text-[10px] font-normal flex items-center justify-center ${
                       selectedSize === size
-                        ? "border-black border-width-[0.5px]"
+                        ? "border-black"
                         : "border-gray-300 hover:bg-gray-100"
-                    } transition-colors`}
+                    }`}
                     onClick={() => setSelectedSize(size)}
                   >
                     {size}
@@ -1323,7 +1326,7 @@ const ProductDetailsPage = () => {
 
             {/* Add to Cart Button */}
             <motion.button
-              className={`w-full py-3 transition-colors cursor-pointer text-[13.7px] ${
+              className={`w-full py-3 text-[13.7px] transition-colors ${
                 canAddToCart
                   ? "bg-black text-white hover:bg-gray-800"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -1331,9 +1334,7 @@ const ProductDetailsPage = () => {
               onClick={handleAddToCart}
               disabled={!canAddToCart || isAddingToCart}
               whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
-              animate={{
-                opacity: isAddingToCart ? 0.7 : 1,
-              }}
+              animate={{ opacity: isAddingToCart ? 0.7 : 1 }}
             >
               {isAddingToCart
                 ? "ADDING TO BAG..."
@@ -1342,9 +1343,9 @@ const ProductDetailsPage = () => {
                 : `SELECT ${product.colors.length > 0 ? "COLOR AND " : ""}SIZE`}
             </motion.button>
 
-            {/* Wishlist Button */}
+            {/* Wishlist */}
             <div
-              className="flex items-center justify-start gap-2 text-[13px] mt-4 mb-2 cursor-pointer"
+              className="flex items-center gap-2 text-[13px] mt-4 mb-2 cursor-pointer"
               onClick={handleToggleWishlist}
             >
               {isInWishlist ? (
@@ -1472,8 +1473,6 @@ const ProductDetailsPage = () => {
           </>
         )}
       </div>
-
-   
 
       <Footer />
     </>
