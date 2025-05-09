@@ -1,9 +1,9 @@
+// frontend/src/components/ShopBanner.jsx
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
-import Button from "./Button";
-import AnimatedImage from "./AnimatedImage";
 import { getShopBanner } from "../services/cmsService";
 import PropTypes from "prop-types";
+import { DeviceView } from "../utils/MediaQuery";
 
 // Animated Section component
 const AnimatedSection = ({ children, delay = 0 }) => {
@@ -50,96 +50,129 @@ const ShopBannerSkeleton = () => (
 );
 
 export default function ShopBanner() {
-  const [shopBanner, setShopBanner] = useState({
-    imageUrl: "/images/photo3.jpg",
-    altText: "Fashion Model",
-    overlayOpacity: 0.4,
-    buttonText: "SHOP NOW",
-    buttonLink: "#shop-now",
-    buttonPosition: "bottom" // Default position
+  // Separate state for desktop and mobile data
+  const [shopBannerData, setShopBannerData] = useState({
+    desktop: {
+      imageUrl: "/images/photo3.jpg",
+      altText: "Fashion Model",
+      overlayOpacity: 0.4,
+      buttonText: "SHOP NOW",
+      buttonLink: "#shop-now",
+      buttonPosition: "bottom" // Default position
+    },
+    mobile: {
+      imageUrl: "/images/mobile-banner.jpg", // Default mobile image
+      altText: "Fashion Collection",
+      overlayOpacity: 0.5,
+      buttonText: "SHOP NOW",
+      buttonLink: "#shop-now",
+      buttonPosition: "center" // Default position for mobile
+    }
   });
   const [loading, setLoading] = useState(true);
 
   // Fetch shop banner data
   useEffect(() => {
-    const fetchShopBanner = async () => {
+    const fetchShopBanners = async () => {
       try {
         setLoading(true);
         
-        // Get shop banner data from CMS
-        const shopBannerData = await getShopBanner();
-        console.log("Raw shop banner data:", shopBannerData);
+        // Get desktop shop banner data from CMS
+        const desktopBannerData = await getShopBanner('desktop');
+        console.log("Desktop shop banner data:", desktopBannerData);
         
-        if (shopBannerData) {
-          // Extract button position with explicit logging
-          const buttonPosition = shopBannerData.content?.buttonPosition;
-          console.log("Button position from CMS:", buttonPosition);
-          
-          // Update shop banner state
-          setShopBanner({
-            imageUrl: shopBannerData.media?.imageUrl || "/images/photo3.jpg",
-            altText: shopBannerData.media?.altText || "Fashion Model",
-            overlayOpacity: shopBannerData.media?.overlayOpacity || 0.4,
-            buttonText: shopBannerData.content?.buttonText || "SHOP NOW",
-            buttonLink: shopBannerData.content?.buttonLink || "#shop-now",
-            buttonPosition: buttonPosition || "bottom" // Use default if not set
-          });
+        // Get mobile shop banner data from CMS
+        const mobileBannerData = await getShopBanner('mobile');
+        console.log("Mobile shop banner data:", mobileBannerData);
+        
+        // Update desktop banner if found
+        if (desktopBannerData) {
+          setShopBannerData(prev => ({
+            ...prev,
+            desktop: {
+              imageUrl: desktopBannerData.media?.imageUrl || prev.desktop.imageUrl,
+              altText: desktopBannerData.media?.altText || prev.desktop.altText,
+              overlayOpacity: desktopBannerData.media?.overlayOpacity || prev.desktop.overlayOpacity,
+              buttonText: desktopBannerData.content?.buttonText || prev.desktop.buttonText,
+              buttonLink: desktopBannerData.content?.buttonLink || prev.desktop.buttonLink,
+              buttonPosition: desktopBannerData.content?.buttonPosition || prev.desktop.buttonPosition
+            }
+          }));
+        }
+        
+        // Update mobile banner if found
+        if (mobileBannerData) {
+          setShopBannerData(prev => ({
+            ...prev,
+            mobile: {
+              imageUrl: mobileBannerData.media?.imageUrl || prev.mobile.imageUrl,
+              altText: mobileBannerData.media?.altText || prev.mobile.altText,
+              overlayOpacity: mobileBannerData.media?.overlayOpacity || prev.mobile.overlayOpacity,
+              buttonText: mobileBannerData.content?.buttonText || prev.mobile.buttonText,
+              buttonLink: mobileBannerData.content?.buttonLink || prev.mobile.buttonLink,
+              buttonPosition: mobileBannerData.content?.buttonPosition || prev.mobile.buttonPosition
+            }
+          }));
         }
       } catch (error) {
-        console.error("Error fetching shop banner:", error);
+        console.error("Error fetching shop banners:", error);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchShopBanner();
+    fetchShopBanners();
   }, []);
 
-  // Manual button positioning for different positions
-  const getButtonPosition = () => {
-    const position = (shopBanner.buttonPosition || "bottom").toLowerCase().trim();
-    console.log("Using button position:", position);
+  // Get button position style based on position value
+  const getButtonPositionStyle = (position) => {
+    // Log the position value for debugging
+    console.log("Calculating position for:", position);
     
-    // Set positions explicitly based on the position name
-    switch (position) {
-      case "top-left":
-        return { top: "8%", left: "8%" };
-      case "top":
-        return { top: "8%", left: "50%", transform: "translateX(-50%)" };
-      case "top-right":
-        return { top: "8%", right: "8%" };
-      case "left":
-        return { top: "50%", left: "8%", transform: "translateY(-50%)" };
-      case "center":
-        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
-      case "right":
-        return { top: "50%", right: "8%", transform: "translateY(-50%)" };
-      case "bottom-left":
-        return { bottom: "8%", left: "8%" };
-      case "bottom-right":
-        return { bottom: "8%", right: "8%" };
-      case "bottom":
-      default:
-        return { bottom: "8%", left: "50%", transform: "translateX(-50%)" };
+    // Default position is center if none provided
+    const pos = position ? position.trim().toLowerCase() : 'center';
+    
+    // Create position object
+    let positionStyle = {};
+    
+    // Set vertical position
+    if (pos.includes('top')) {
+      positionStyle.top = '8%';
+    } else if (pos.includes('bottom')) {
+      positionStyle.bottom = '8%';
+    } else {
+      positionStyle.top = '50%';
+      positionStyle.transform = 'translateY(-50%)';
     }
+    
+    // Set horizontal position
+    if (pos.includes('left')) {
+      positionStyle.left = '8%';
+    } else if (pos.includes('right')) {
+      positionStyle.right = '8%';
+    } else {
+      positionStyle.left = '50%';
+      // If we already have a transform, we need to include both transformations
+      if (positionStyle.transform) {
+        positionStyle.transform = 'translate(-50%, -50%)';
+      } else {
+        positionStyle.transform = 'translateX(-50%)';
+      }
+    }
+    
+    console.log("Final position style:", positionStyle);
+    return positionStyle;
   };
 
-  if (loading) {
-    return <ShopBannerSkeleton />;
-  }
-
-  // Get the position style for the button
-  const buttonPositionStyle = getButtonPosition();
-  console.log("Final button position style:", buttonPositionStyle);
-
-  return (
-    <AnimatedSection delay={0.2}>
+  // Render banner for a specific device type
+  const renderBanner = (data) => {
+    return (
       <div className="relative w-full h-screen mt-[90px]">
         {/* Background image */}
         <div className="absolute inset-0">
-          <AnimatedImage
-            src={shopBanner.imageUrl}
-            alt={shopBanner.altText}
+          <img
+            src={data.imageUrl}
+            alt={data.altText}
             className="w-full h-full object-cover"
           />
         </div>
@@ -147,13 +180,13 @@ export default function ShopBanner() {
         {/* Overlay */}
         <div 
           className="absolute inset-0 bg-black"
-          style={{ opacity: shopBanner.overlayOpacity }}
+          style={{ opacity: data.overlayOpacity }}
         />
 
-        {/* Button - Fixed button implementation for clickability */}
+        {/* Button with proper positioning */}
         <div 
           className="absolute z-10"
-          style={buttonPositionStyle}
+          style={getButtonPositionStyle(data.buttonPosition)}
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -161,14 +194,27 @@ export default function ShopBanner() {
             transition={{ delay: 0.5, duration: 0.8 }}
           >
             <a 
-              href={shopBanner.buttonLink}
+              href={data.buttonLink}
               className="inline-block px-8 py-3 border-2 border-white text-white text-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300"
             >
-              {shopBanner.buttonText}
+              {data.buttonText}
             </a>
           </motion.div>
         </div>
       </div>
+    );
+  };
+
+  if (loading) {
+    return <ShopBannerSkeleton />;
+  }
+
+  return (
+    <AnimatedSection delay={0.2}>
+      <DeviceView
+        mobile={renderBanner(shopBannerData.mobile)}
+        desktop={renderBanner(shopBannerData.desktop)}
+      />
     </AnimatedSection>
   );
 }

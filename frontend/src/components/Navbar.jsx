@@ -291,9 +291,9 @@ export default function Navbar() {
     collections: {
       columns: [
         {
-          title: "COLLECTIONS",
+          title: "Collections",
           links: [
-            { name: "All Collections", href: "/collections" }
+            { name: "All Vendors", href: "/collections" }
           ]
         },
         {
@@ -307,11 +307,11 @@ export default function Navbar() {
             { name: "Festival", href: "#" }
           ]
         },
-        {
+        /*{
           title: "TRENDING",
           links: [
           ]
-        }
+        }*/
       ],
       featuredItems: [
         {
@@ -336,7 +336,7 @@ export default function Navbar() {
         {
           image: "https://images.unsplash.com/photo-1642447411662-59ab77473a8d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
           title: "NEW ARRIVALS",
-          href: "#"
+          href: "/collections/new-arrivals"
         },
         {
           image: "https://images.unsplash.com/photo-1626818590159-04cb9274a5e0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDJ8fGRyZXNzZXN8ZW58MHx8MHx8fDA%3D",
@@ -406,7 +406,7 @@ export default function Navbar() {
             ref={el => dropdownRefs.current['dresses'] = el}
           >
             <a 
-              href="#" 
+              href="/shop/dresses" 
               className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
                 activeDropdown === 'dresses' ? 'active-nav-item' : ''
               }`}

@@ -12,6 +12,7 @@ const searchService = {
         page = 1, 
         color, 
         size,
+        vendor,
         sort = 'relevance'
       } = options;
       
@@ -25,6 +26,7 @@ const searchService = {
       // Add filter parameters
       if (color) params.append('color', color);
       if (size) params.append('size', size);
+      if (vendor) params.append('vendor', vendor);
       if (sort) params.append('sort', sort);
       
       // Use the correct endpoint - /search/products instead of /products/search
