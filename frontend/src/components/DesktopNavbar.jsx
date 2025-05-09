@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unknown-property */
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
@@ -9,10 +11,7 @@ import AnimatedCartBadge from "../components/AnimatedCartBadge";
 import SearchBar from "./SearchBar";
 import cmsService from "../services/cmsService";
 
-export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [darkNavbar, setDarkNavbar] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export default function DesktopNavbar({ darkNavbar }) {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const { cartItemCount, setIsCartDrawerOpen } = useCart();
   const location = useLocation();
@@ -25,10 +24,6 @@ export default function Navbar() {
     collections: [],
     newin: [],
   });
-
-  // New state to track screen size for responsive behavior
-  const [isMobileView, setIsMobileView] = useState(false);
-  const [isTabletView, setIsTabletView] = useState(false);
 
   // Load navigation images from CMS
   const loadNavigationImages = async () => {
@@ -61,54 +56,10 @@ export default function Navbar() {
     }
   };
 
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isMobileMenuOpen]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Load navigation images on mount
   useEffect(() => {
     loadNavigationImages();
   }, []);
-
-  // Add responsive breakpoint detection
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768);
-      setIsTabletView(window.innerWidth >= 768 && window.innerWidth < 1024);
-
-      // Close dropdown if screen gets too small
-      if (window.innerWidth < 1024 && activeDropdown) {
-        setActiveDropdown(null);
-      }
-    };
-
-    // Initial check
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [activeDropdown]);
-
-  useEffect(() => {
-    setDarkNavbar(location.pathname === "/" && !isScrolled);
-  }, [location.pathname, isScrolled]);
 
   const handleCartClick = () => {
     if (cartItemCount === 0) {
@@ -120,9 +71,7 @@ export default function Navbar() {
 
   // Handle mouse enter for dropdown
   const handleDropdownEnter = (dropdown) => {
-    if (!isMobileView && !isTabletView) {
-      setActiveDropdown(dropdown);
-    }
+    setActiveDropdown(dropdown);
   };
 
   // Handle mouse leave for entire dropdown area
@@ -131,37 +80,6 @@ export default function Navbar() {
   };
 
   // Animation variants
-  const menuVariants = {
-    closed: {
-      opacity: 0,
-      y: "-100%",
-      transition: {
-        duration: 0.5,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    },
-    open: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    },
-  };
-
-  const linkVariants = {
-    closed: { opacity: 0, y: 20 },
-    open: (index) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: 0.3 + index * 0.1,
-        duration: 0.5,
-      },
-    }),
-  };
-
   const dropdownVariants = {
     hidden: {
       opacity: 0,
@@ -266,8 +184,6 @@ export default function Navbar() {
               name: "Wedding Guest Dresses",
               href: "/shop/wedding-guest-dresses",
             },
-            //            { name: "Bridesmaid Dresses", href: "/shop/bridesmaide-dresses" },
-            //            { name: "Bridal Dresses", href: "#" },
             { name: "Corset Dresses", href: "/shop/corset-dresses" },
             { name: "Bubblehem Dresses", href: "/shop/bubblehem-dresses" },
             { name: "Flowy Dresses", href: "/shop/flowy-dresses" },
@@ -314,11 +230,6 @@ export default function Navbar() {
             { name: "Festival", href: "#" },
           ],
         },
-        /*{
-          title: "TRENDING",
-          links: [
-          ]
-        }*/
       ],
       featuredItems: [
         {
@@ -373,20 +284,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      ref={navRef}
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white shadow-md"
-          : location.pathname !== "/"
-          ? "bg-white"
-          : "bg-transparent"
-      }`}
-    >
+    <>
       <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
-        {/* Left-side Navigation Links (Desktop and Tablet) */}
+        {/* Left-side Navigation Links */}
         <div
-          className={`hidden md:flex space-x-2 lg:space-x-6 text-xs lg:text-[12px] ${
+          className={`flex space-x-2 lg:space-x-6 text-xs lg:text-[12px] ${
             darkNavbar ? "text-white" : "text-black"
           }`}
         >
@@ -495,37 +397,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Hamburger Menu Button (Mobile only, Left) */}
-        <motion.button
-          className="md:hidden relative z-50 cursor-pointer"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          whileTap={{ scale: 0.9 }}
-        >
-          {isMobileMenuOpen ? (
-            <div className="relative flex items-center">
-              <div className="absolute bg-black rounded-full w-10 h-10 flex items-center justify-center">
-                <img
-                  src="/icons/close-menu.svg"
-                  alt="Close Menu"
-                  className="w-5 h-5"
-                />
-              </div>
-            </div>
-          ) : (
-            <img
-              src={
-                darkNavbar
-                  ? "/icons/hamburger.svg"
-                  : "/icons/hamburger-black.svg"
-              }
-              alt="Menu"
-              className="w-[15px] h-[12px]"
-            />
-          )}
-        </motion.button>
-
         {/* Logo (Center) */}
-
         <div className="text-xl font-bold absolute left-1/2 transform -translate-x-1/2">
           <a href="/">
             <motion.img
@@ -539,9 +411,9 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Right-side Navigation (Desktop and Tablet) */}
+        {/* Right-side Navigation */}
         <div
-          className={`hidden md:flex items-center space-x-6 text-xs lg:text-[12px] ${
+          className={`flex items-center space-x-6 text-xs lg:text-[12px] ${
             darkNavbar ? "text-white" : "text-black"
           }`}
         >
@@ -591,43 +463,11 @@ export default function Navbar() {
             </motion.div>
           </div>
         </div>
-
-        {/* Mobile Right Icons */}
-        <div
-          className={`md:hidden flex space-x-4 items-center ${
-            darkNavbar ? "text-white" : "text-black"
-          }`}
-        >
-          <motion.div className="flex items-center">
-            <SearchBar darkNavbar={darkNavbar} />
-          </motion.div>
-
-          <motion.div className="flex items-center">
-            <motion.img
-              src={
-                darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"
-              }
-              alt="Phone"
-              className="w-[12.6px] h-[15px] cursor-pointer"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            />
-          </motion.div>
-
-          {/* Mobile Cart with Preview */}
-          <motion.div
-            className="flex items-center"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <ThemedMiniCartPreview />
-          </motion.div>
-        </div>
       </div>
 
-      {/* Dropdowns Container - Outside the navbar, only for desktop */}
+      {/* Dropdowns Container - Outside the navbar */}
       <AnimatePresence>
-        {activeDropdown && !isMobileView && !isTabletView && (
+        {activeDropdown && (
           <motion.div
             className="absolute left-0 w-full bg-white text-black shadow-lg z-40"
             initial="hidden"
@@ -682,47 +522,11 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Full Screen Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            className="fixed inset-0 bg-white z-40 flex flex-col justify-center items-center overflow-y-auto"
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
-          >
-            <div className="flex flex-col space-y-8 text-black text-2xl font-medium">
-              {[
-                { name: "SHOP", link: "shop" },
-                { name: "DRESSES", link: "#" },
-                { name: "COLLECTIONS", link: "#" },
-                { name: "NEW IN", link: "#" },
-                { name: "CONTACT US", link: "#" },
-                { name: "SERVICES", link: "#" },
-              ].map((item, index) => (
-                <motion.a
-                  key={item.name}
-                  href={item.link}
-                  className="hover:text-gray-600 transition-colors tracking-wide"
-                  custom={index}
-                  variants={linkVariants}
-                  whileHover={{ x: 10 }}
-                >
-                  {item.name}
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <style jsx>{`
         .active-nav-item {
           position: relative;
         }
       `}</style>
-    </nav>
+    </>
   );
 }
-
