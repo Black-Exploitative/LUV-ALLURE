@@ -2,28 +2,20 @@
 const mongoose = require('mongoose');
 
 const ContentSectionSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
+name: { 
+    type: String, 
+    required: true 
   },
-  type: {
-    type: String,
+  type: { 
+    type: String, 
     required: true,
-    enum: [
-      'hero', 
-      'featured-products', 
-      'banner', 
-      'collection',
-      'testimonial', 
-      'shop-banner',
-      'collection-hero',  // Type for the collection hero (renamed from shop-banner)
-      'promo-section',    // Type for the promo section
-      'shop-header',      // Type for the shop page header
-      'services',         // Type for services section
-      'custom'            // For any custom section type
-    ],
-    default: 'custom'
+    enum: ['hero', 'banner', 'featured-products', 'custom', 'collection', 'testimonial', 'shop-banner', 'promo-section', 'collection-hero', 'shop-header']
+  },
+  // Add deviceType field to distinguish between mobile and desktop versions
+  deviceType: { 
+    type: String, 
+    enum: ['mobile', 'desktop'],
+    default: 'desktop' // Default to desktop for backward compatibility
   },
   content: {
     title: String,
@@ -31,13 +23,18 @@ const ContentSectionSchema = new mongoose.Schema({
     description: String,
     buttonText: String,
     buttonLink: String,
-    linkText: String,    // For promo section explore link text
-    linkUrl: String,     // For promo section explore link URL
-    alignment: {
+    alignment: { 
+      type: String, 
+      default: 'center',
+      enum: ['left', 'center', 'right']
+    },
+    buttonPosition: { // Add button position support
       type: String,
-      enum: ['left', 'center', 'right'],
-      default: 'center'
-    }
+      default: 'bottom',
+      enum: ['top-left', 'top', 'top-right', 'left', 'center', 'right', 'bottom-left', 'bottom', 'bottom-right']
+    },
+    linkText: String,  // For promo sections
+    linkUrl: String    // For promo sections
   },
   media: {
     imageUrl: String,
@@ -45,39 +42,27 @@ const ContentSectionSchema = new mongoose.Schema({
     altText: String,
     overlayOpacity: {
       type: Number,
+      default: 0.3,
       min: 0,
-      max: 1,
-      default: 0.5
-    },
-    mediaType: {
-      type: String,
-      enum: ['image', 'video'],
-      default: 'image'
+      max: 1
     }
   },
-  shopifyProductIds: [String],  // For linking to Shopify products
-  products: [String],           // Generic products field
-  services: [{                  // For the services section
-    title: String,
-    description: String,
-    iconUrl: String,
-    imageUrl: String
-  }],
-  isActive: {
-    type: Boolean,
-    default: true
+  products: [String], // Array of product IDs
+  isActive: { 
+    type: Boolean, 
+    default: true 
   },
-  order: {
-    type: Number,
-    default: 0
+  order: { 
+    type: Number, 
+    default: 0 
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+  updatedAt: { 
+    type: Date, 
+    default: Date.now 
   }
 });
 
@@ -87,4 +72,19 @@ ContentSectionSchema.pre('save', function(next) {
   next();
 });
 
+ContentSectionSchema.statics.findActiveByType = function(type, deviceType) {
+  const query = { type, isActive: true };
+  
+  // If deviceType is specified, filter by that as well
+  if (deviceType) {
+    // If deviceType is 'desktop', also include sections with null deviceType (for backward compatibility)
+    if (deviceType === 'desktop') {
+      query.$or = [{ deviceType: 'desktop' }, { deviceType: { $exists: false } }];
+    } else {
+      query.deviceType = deviceType;
+    }
+  }
+  
+  return this.find(query).sort({ order: 1 });
+};
 module.exports = mongoose.model('ContentSection', ContentSectionSchema);

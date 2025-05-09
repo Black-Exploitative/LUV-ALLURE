@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
 import { getShopBanner } from "../services/cmsService";
 import PropTypes from "prop-types";
-import { DeviceView } from "../utils/MediaQuery";
 
 // Animated Section component
 const AnimatedSection = ({ children, delay = 0 }) => {
@@ -211,10 +210,15 @@ export default function ShopBanner() {
 
   return (
     <AnimatedSection delay={0.2}>
-      <DeviceView
-        mobile={renderBanner(shopBannerData.mobile)}
-        desktop={renderBanner(shopBannerData.desktop)}
-      />
+      {/* Mobile Banner - shown only on small screens */}
+      <div className="block md:hidden">
+        {renderBanner(shopBannerData.mobile)}
+      </div>
+      
+      {/* Desktop Banner - hidden on small screens, shown on md and up */}
+      <div className="hidden md:block">
+        {renderBanner(shopBannerData.desktop)}
+      </div>
     </AnimatedSection>
   );
 }

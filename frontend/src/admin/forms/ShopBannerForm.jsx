@@ -1,7 +1,7 @@
 // frontend/src/admin/forms/ShopBannerForm.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FiArrowLeft, FiSave, FiImage, FiAlertCircle, FiInfo, FiMonitor, FiSmartphone, FiPlus } from 'react-icons/fi';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { FiArrowLeft, FiSave, FiImage, FiAlertCircle, FiInfo, FiMonitor, FiSmartphone } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
@@ -9,6 +9,7 @@ import api from '../../services/api';
 const ShopBannerForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const isEditing = Boolean(id);
   
   const [formData, setFormData] = useState({
@@ -36,21 +37,23 @@ const ShopBannerForm = () => {
   const [success, setSuccess] = useState('');
   const [imageWarning, setImageWarning] = useState('');
 
+  // Parse device type from query parameters
   useEffect(() => {
-  if (!isEditing) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const deviceParam = urlParams.get('device');
-    
-    // If device param exists, update the form data
-    if (deviceParam && (deviceParam === 'mobile' || deviceParam === 'desktop')) {
-      setFormData(prev => ({
-        ...prev,
-        deviceType: deviceParam,
-        name: `Shop Now Banner - ${deviceParam === 'mobile' ? 'Mobile' : 'Desktop'}`
-      }));
+    if (!isEditing) {
+      // Extract device type from URL query parameters
+      const urlParams = new URLSearchParams(location.search);
+      const deviceParam = urlParams.get('device');
+      
+      // If device param exists and is valid, update the form data
+      if (deviceParam && (deviceParam === 'mobile' || deviceParam === 'desktop')) {
+        setFormData(prev => ({
+          ...prev,
+          deviceType: deviceParam,
+          name: `Shop Now Banner - ${deviceParam === 'mobile' ? 'Mobile' : 'Desktop'}`
+        }));
+      }
     }
-  }
-}, [isEditing]);
+  }, [isEditing, location.search]);
   
   // Image resolution warning thresholds
   const MIN_RECOMMENDED_WIDTH = 1920;
@@ -197,9 +200,22 @@ const ShopBannerForm = () => {
   
   // Switch between device types
   const handleDeviceTypeChange = (deviceType) => {
+    // Update URL to reflect device type without reloading page
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('device', deviceType);
+    
+    // Update the URL with the new search parameters
+    window.history.replaceState(
+      {},
+      '',
+      `${location.pathname}?${urlParams.toString()}`
+    );
+    
+    // Update form data with new device type
     setFormData(prev => ({
       ...prev,
-      deviceType
+      deviceType,
+      name: `Shop Now Banner - ${deviceType === 'mobile' ? 'Mobile' : 'Desktop'}`
     }));
   };
   
@@ -295,7 +311,7 @@ const ShopBannerForm = () => {
       
       // Redirect after short delay
       setTimeout(() => {
-        navigate('/admin');
+        navigate('/admin/shop-banners');
       }, 1500);
       
     } catch (err) {
@@ -306,7 +322,7 @@ const ShopBannerForm = () => {
       setLoading(false);
     }
   };
-
+  
   // Media library modal with improved filtering
   const renderMediaLibrary = () => {
     if (!showMediaLibrary) return null;
@@ -338,7 +354,9 @@ const ShopBannerForm = () => {
           <div className="mb-4">
             <p className="text-sm text-gray-600 flex items-center">
               <FiInfo className="mr-2" /> 
-              For banner images, high-resolution images (at least 1920x1080) provide the best results
+              {formData.deviceType === 'mobile' 
+                ? 'Select a portrait (vertical) image for the best mobile experience'
+                : 'Select a landscape (horizontal) image for the best desktop experience'}
             </p>
           </div>
           
@@ -390,51 +408,47 @@ const ShopBannerForm = () => {
 
   // Helper function to position button in preview based on selected position
   const getButtonPositionStyle = (position) => {
-  // Default to bottom if no position is provided
-  const pos = position ? position.trim().toLowerCase() : 'bottom';
-  
-  // Log position for debugging
-  console.log("Calculating button position for:", pos);
-  
-  // Create position style object
-  let positionStyle = {};
-  
-  // Set vertical position
-  if (pos.includes('top')) {
-    positionStyle.top = '8%';
-  } else if (pos.includes('bottom')) {
-    positionStyle.bottom = '8%';
-  } else {
-    positionStyle.top = '50%';
-    positionStyle.transform = 'translateY(-50%)';
-  }
-  
-  // Set horizontal position
-  if (pos.includes('left')) {
-    positionStyle.left = '8%';
-  } else if (pos.includes('right')) {
-    positionStyle.right = '8%';
-  } else {
-    positionStyle.left = '50%';
+    // Default to bottom if no position is provided
+    const pos = position ? position.trim().toLowerCase() : 'bottom';
     
-    // Combine transforms if we already have one
-    if (positionStyle.transform) {
-      positionStyle.transform = 'translate(-50%, -50%)';
+    // Create position style object
+    let positionStyle = {};
+    
+    // Set vertical position
+    if (pos.includes('top')) {
+      positionStyle.top = '8%';
+    } else if (pos.includes('bottom')) {
+      positionStyle.bottom = '8%';
     } else {
-      positionStyle.transform = 'translateX(-50%)';
+      positionStyle.top = '50%';
+      positionStyle.transform = 'translateY(-50%)';
     }
-  }
-  
-  console.log("Final button position style:", positionStyle);
-  return positionStyle;
-};
+    
+    // Set horizontal position
+    if (pos.includes('left')) {
+      positionStyle.left = '8%';
+    } else if (pos.includes('right')) {
+      positionStyle.right = '8%';
+    } else {
+      positionStyle.left = '50%';
+      
+      // Combine transforms if we already have one
+      if (positionStyle.transform) {
+        positionStyle.transform = 'translate(-50%, -50%)';
+      } else {
+        positionStyle.transform = 'translateX(-50%)';
+      }
+    }
+    
+    return positionStyle;
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center mb-6">
         <button
           type="button"
-          onClick={() => navigate('/admin')}
+          onClick={() => navigate('/admin/shop-banners')}
           className="mr-2 text-gray-500 hover:text-black"
         >
           <FiArrowLeft size={20} />
@@ -457,6 +471,42 @@ const ShopBannerForm = () => {
       )}
       
       <form onSubmit={handleSubmit}>
+        {/* Device type selector tabs */}
+        <div className="mb-6">
+          <div className="flex border-b border-gray-200">
+            <button
+              type="button"
+              onClick={() => handleDeviceTypeChange('desktop')}
+              className={`flex items-center py-2 px-4 ${
+                formData.deviceType === 'desktop' 
+                  ? 'border-b-2 border-black text-black font-medium'
+                  : 'text-gray-500 hover:text-black'
+              }`}
+            >
+              <FiMonitor className="mr-2" />
+              Desktop Version
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDeviceTypeChange('mobile')}
+              className={`flex items-center py-2 px-4 ${
+                formData.deviceType === 'mobile' 
+                  ? 'border-b-2 border-black text-black font-medium'
+                  : 'text-gray-500 hover:text-black'
+              }`}
+            >
+              <FiSmartphone className="mr-2" />
+              Mobile Version
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-gray-500 flex items-center">
+            <FiInfo className="mr-1" />
+            {formData.deviceType === 'mobile' 
+              ? 'Creating the mobile version of the shop banner. This will be shown on small screens only.'
+              : 'Creating the desktop version of the shop banner. This will be shown on tablets and larger screens.'}
+          </p>
+        </div>
+        
         <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
           <div className="p-6">
             <div className="mb-6">
@@ -472,7 +522,7 @@ const ShopBannerForm = () => {
                 className="w-full p-2 border border-gray-300 rounded-md"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Internal name for this section
+                Internal name for this section (e.g., "Shop Now Banner - {formData.deviceType === 'mobile' ? 'Mobile' : 'Desktop'}")
               </p>
             </div>
             
@@ -499,7 +549,10 @@ const ShopBannerForm = () => {
                 </button>
               </div>
               <p className="mt-1 text-xs text-gray-500">
-                Select an image from the media library or enter a URL
+                {formData.deviceType === 'mobile' 
+                  ? 'Use a portrait orientation image for best results on mobile devices'
+                  : 'Use a landscape orientation image for best results on desktop devices'
+                }
               </p>
               
               {/* Image resolution warning */}
@@ -618,8 +671,26 @@ const ShopBannerForm = () => {
         {formData.media.imageUrl && (
           <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
             <div className="p-6">
-              <h3 className="text-md font-medium mb-4">Banner Preview</h3>
-              <div className="relative h-96 overflow-hidden rounded">
+              <h3 className="flex items-center text-md font-medium mb-4">
+                {formData.deviceType === 'mobile' ? (
+                  <>
+                    <FiSmartphone className="mr-2" />
+                    Mobile Banner Preview
+                  </>
+                ) : (
+                  <>
+                    <FiMonitor className="mr-2" />
+                    Desktop Banner Preview
+                  </>
+                )}
+              </h3>
+              <div 
+                className={`relative overflow-hidden rounded ${
+                  formData.deviceType === 'mobile' 
+                    ? 'h-96 max-w-xs mx-auto' // Mobile preview size
+                    : 'h-96 w-full' // Desktop preview size
+                }`}
+              >
                 <img
                   src={formData.media.imageUrl}
                   alt={formData.media.altText || 'Shop Now Banner'}
@@ -632,8 +703,8 @@ const ShopBannerForm = () => {
                 ></div>
                 
                 <div 
-                  className="absolute"
-                  style={getButtonPositionStyle()}
+                  className="absolute z-10"
+                  style={getButtonPositionStyle(formData.content.buttonPosition)}
                 >
                   <div className="relative inline-block px-8 py-3 border-2 border-white text-white text-lg overflow-hidden cursor-pointer">
                     <span className="relative z-10">
@@ -652,7 +723,7 @@ const ShopBannerForm = () => {
         <div className="flex justify-end space-x-2">
           <button
             type="button"
-            onClick={() => navigate('/admin')}
+            onClick={() => navigate('/admin/shop-banners')}
             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
           >
             Cancel
@@ -664,7 +735,7 @@ const ShopBannerForm = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-                        {loading ? (
+            {loading ? (
               <>
                 <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
                 <span>Saving...</span>
@@ -672,7 +743,7 @@ const ShopBannerForm = () => {
             ) : (
               <>
                 <FiSave className="mr-2" />
-                <span>Save Banner</span>
+                <span>Save {formData.deviceType === 'mobile' ? 'Mobile' : 'Desktop'} Banner</span>
               </>
             )}
           </motion.button>

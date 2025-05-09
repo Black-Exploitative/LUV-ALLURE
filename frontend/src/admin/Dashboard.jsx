@@ -6,7 +6,9 @@ import {
   FiHome, FiImage, FiGrid, FiLayers, FiLayout, 
   FiSettings, FiLogOut, FiEdit, FiTrash, FiPlus,
   FiLink, FiShoppingBag, FiEye, FiStar, FiAward,
-  FiBookOpen, FiDatabase, FiTarget, FiFolder
+  FiBookOpen, FiDatabase, FiTarget, FiFolder,
+  FiMonitor,
+  FiSmartphone
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
@@ -211,6 +213,7 @@ const Dashboard = () => {
     { id: 'homepage', label: 'Homepage Layouts', icon: FiHome },
     { id: 'sections', label: 'Content Sections', icon: FiGrid },
     { id: 'shop-banners', label: 'Shop Banners', icon: FiLayout }, 
+    { id: 'hero', label: 'Hero Sections', icon: FiLayout },
     { id: 'collections', label: 'Collections', icon: FiFolder },
     { id: 'featured-products', label: 'Featured Products', icon: FiStar },
     { id: 'collection-hero', label: 'Collection Hero', icon: FiTarget },
@@ -395,6 +398,8 @@ const Dashboard = () => {
         return renderSections();
       case 'banners':
         return renderBanners();
+      case 'hero': // Add this new case
+        return renderHeroSections();
       case 'navigation':
         return renderNavImages();
       case 'media':
@@ -482,7 +487,142 @@ const Dashboard = () => {
       )}
     </div>
   );
+  const renderHeroSections = () => (
+  <div>
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-xl font-medium">Hero Sections</h2>
+      <div className="flex space-x-2">
+        <Link
+          to="/admin/sections/new?type=hero&device=desktop"
+          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+        >
+          <FiMonitor className="mr-2" /> <FiPlus className="mr-1" /> Desktop Hero
+        </Link>
+        <Link
+          to="/admin/sections/new?type=hero&device=mobile"
+          className="flex items-center px-4 py-2 bg-gray-700 text-white hover:bg-gray-800"
+        >
+          <FiSmartphone className="mr-2" /> <FiPlus className="mr-1" /> Mobile Hero
+        </Link>
+      </div>
+    </div>
 
+    {loading ? (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+      </div>
+    ) : (
+      <>
+        <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
+          <h3 className="font-medium flex items-center mb-2">
+            <FiMonitor className="mr-2" /> Desktop Heroes
+          </h3>
+          {/* Desktop Hero List */}
+          {renderHeroList('desktop')}
+        </div>
+        
+        <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
+          <h3 className="font-medium flex items-center mb-2">
+            <FiSmartphone className="mr-2" /> Mobile Heroes
+          </h3>
+          {/* Mobile Hero List */}
+          {renderHeroList('mobile')}
+        </div>
+      </>
+    )}
+  </div>
+);
+
+// Step 5: Add the helper function for rendering hero lists:
+const renderHeroList = (deviceType) => {
+  // Filter sections to show only hero type with matching deviceType
+  const heroSections = sections.filter(section => 
+    section.type === 'hero' && 
+    (section.deviceType === deviceType || (!section.deviceType && deviceType === 'desktop'))
+  );
+  
+  if (heroSections.length === 0) {
+    return (
+      <p className="text-sm text-gray-500 py-2">
+        No {deviceType} heroes found. Click the button above to create one.
+      </p>
+    );
+  }
+  
+  return (
+    <div className="grid gap-4">
+      {heroSections.map(hero => (
+        <div
+          key={hero._id}
+          className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h4 className="font-medium">{hero.name}</h4>
+              <div className="flex items-center mt-1">
+                <span className={`inline-block w-2 h-2 rounded-full ${hero.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                <p className="text-sm text-gray-600">
+                  {hero.isActive ? 'Active' : 'Inactive'} • 
+                  {hero.media?.videoUrl ? ' Video' : ' Image'} background
+                </p>
+              </div>
+              
+              {hero.content?.title && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Title: "{hero.content.title}"
+                  {hero.content.buttonText && ` • Button: "${hero.content.buttonText}"`}
+                </p>
+              )}
+            </div>
+            
+            <div className="w-24 h-24 bg-gray-100 flex-shrink-0 ml-4">
+              {hero.media?.videoUrl ? (
+                <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                  <span className="text-sm text-gray-600">Video Preview</span>
+                </div>
+              ) : hero.media?.imageUrl ? (
+                <img 
+                  src={hero.media.imageUrl} 
+                  alt={hero.media.altText || hero.name} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                  <span className="text-sm text-gray-600">No media</span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-2 mt-2">
+            <button
+              onClick={() => toggleActive('sections', hero._id, hero.isActive)}
+              className={`px-3 py-1 text-xs rounded-md ${
+                hero.isActive 
+                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                  : 'bg-green-50 text-green-700 hover:bg-green-100'
+              }`}
+            >
+              {hero.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+            <Link 
+              to={`/admin/sections/edit/${hero._id}`}
+              className="p-2 text-gray-600 hover:text-black"
+            >
+              <FiEdit />
+            </Link>
+            <button 
+              onClick={() => handleDelete('sections', hero._id)}
+              className="p-2 text-gray-600 hover:text-red-600"
+            >
+              <FiTrash />
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
   const renderSections = () => (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -539,7 +679,6 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
-              
               {/* Preview of section content */}
               <div className="mt-3 pt-3 border-t border-gray-100 text-sm text-gray-600">
                 {section.content?.title && (

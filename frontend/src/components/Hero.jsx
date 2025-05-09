@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import cmsService from "../services/cmsService";
-import { DeviceView } from "../utils/MediaQuery";;
 
 export default function Hero() {
   const [heroData, setHeroData] = useState({
@@ -86,12 +85,12 @@ export default function Hero() {
   }, []);
 
   // Hero content renderer for a specific device type
-  const renderHeroContent = (data) => {
+  const renderHeroContent = (data, deviceClass) => {
     // Break the title into individual characters for animation
     const titleLetters = data.title.split("");
 
     return (
-      <>
+      <div className={`relative w-full h-screen overflow-hidden ${deviceClass}`}>
         {/* Background Media: Video or Image */}
         {data.mediaType === "video" ? (
           <video
@@ -142,20 +141,27 @@ export default function Hero() {
             <div className="absolute bottom-0 left-0 w-full h-[3px] bg-white origin-left transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></div>
           </a>
         </div>
-      </>
+      </div>
     );
   };
 
   return (
-    <section className="relative w-full h-screen overflow-hidden">
+    <section>
       {/* Show loading state */}
       {loading ? (
         <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
       ) : (
-        <DeviceView
-          mobile={renderHeroContent(heroData.mobile)}
-          desktop={renderHeroContent(heroData.desktop)}
-        />
+        <>
+          {/* Mobile Hero - shown only on small screens */}
+          <div className="block md:hidden">
+            {renderHeroContent(heroData.mobile, "mobile-hero")}
+          </div>
+          
+          {/* Desktop Hero - hidden on small screens, shown on md and up */}
+          <div className="hidden md:block">
+            {renderHeroContent(heroData.desktop, "desktop-hero")}
+          </div>
+        </>
       )}
     </section>
   );

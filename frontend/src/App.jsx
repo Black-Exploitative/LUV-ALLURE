@@ -95,6 +95,8 @@ const AppContent = () => {
           <Route path="/admin/sections/edit/:id" element={<SectionForm />} />
           <Route path="/admin/banners/new" element={<BannerForm />} />
           <Route path="/admin/banners/edit/:id" element={<BannerForm />} />
+           <Route path="/admin/shop-banner/new" element={<ShopBannerForm />} />
+          <Route path="/admin/shop-banner/edit/:id" element={<ShopBannerForm />} />
           <Route
             path="/admin/featured-products/new"
             element={<FeaturedProductsForm />}
