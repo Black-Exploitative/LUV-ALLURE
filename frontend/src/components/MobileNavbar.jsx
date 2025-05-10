@@ -13,7 +13,7 @@ export default function MobileNavbar({ darkNavbar }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const { cartItemCount, setIsCartDrawerOpen } = useCart();
 
-
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -77,6 +77,7 @@ export default function MobileNavbar({ darkNavbar }) {
     closed: { 
       height: 0,
       opacity: 0,
+      marginTop: 0,
       transition: {
         duration: 0.3,
         ease: "easeInOut"
@@ -85,6 +86,7 @@ export default function MobileNavbar({ darkNavbar }) {
     open: { 
       height: "auto",
       opacity: 1,
+      marginTop: 8,
       transition: {
         duration: 0.3,
         ease: "easeInOut"
@@ -92,7 +94,7 @@ export default function MobileNavbar({ darkNavbar }) {
     }
   };
 
-  // Dropdown content configuration - similar structure to your current navbar
+  // Dropdown content configuration 
   const dropdownContent = {
     shop: {
       columns: [
@@ -221,7 +223,7 @@ export default function MobileNavbar({ darkNavbar }) {
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
         {/* Hamburger Menu Button */}
         <motion.button
           className="relative z-50 cursor-pointer"
@@ -300,24 +302,24 @@ export default function MobileNavbar({ darkNavbar }) {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 bg-white z-40 flex flex-col pt-24 px-6 overflow-y-auto"
+            className="fixed inset-0 bg-white z-40 flex flex-col pt-20 overflow-y-auto"
             initial="closed"
             animate="open"
             exit="closed"
             variants={menuVariants}
           >
-            <div className="flex flex-col text-black">
+            <div className="container mx-auto px-6 flex flex-col text-black">
               {/* Main Navigation Links with Expandable Sections */}
-              <div className="space-y-4 mt-4">
+              <div className="space-y-2 mt-6">
                 {/* SHOP Section */}
                 <div className="border-b border-gray-200 pb-4">
                   <motion.div 
-                    className="flex justify-between items-center cursor-pointer"
+                    className="flex justify-between items-center cursor-pointer py-2"
                     variants={linkVariants}
                     custom={0}
                     onClick={() => toggleSection('shop')}
                   >
-                    <span className="text-xl font-medium">SHOP</span>
+                    <span className="text-xl tracking-wide font-medium">SHOP</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -337,13 +339,13 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.shop.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-base mb-2">{column.title}</h3>
-                              <div className="flex flex-col space-y-2">
+                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
                                     key={linkIndex}
                                     href={link.href}
-                                    className="text-sm hover:underline"
+                                    className="text-sm text-gray-700 hover:text-black"
                                   >
                                     {link.name}
                                   </a>
@@ -360,12 +362,12 @@ export default function MobileNavbar({ darkNavbar }) {
                 {/* DRESSES Section */}
                 <div className="border-b border-gray-200 pb-4">
                   <motion.div 
-                    className="flex justify-between items-center cursor-pointer"
+                    className="flex justify-between items-center cursor-pointer py-2"
                     variants={linkVariants}
                     custom={1}
                     onClick={() => toggleSection('dresses')}
                   >
-                    <span className="text-xl font-medium">DRESSES</span>
+                    <span className="text-xl tracking-wide font-medium">DRESSES</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -385,13 +387,13 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.dresses.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-base mb-2">{column.title}</h3>
-                              <div className="flex flex-col space-y-2">
+                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
                                     key={linkIndex}
                                     href={link.href}
-                                    className="text-sm hover:underline"
+                                    className="text-sm text-gray-700 hover:text-black"
                                   >
                                     {link.name}
                                   </a>
@@ -408,12 +410,12 @@ export default function MobileNavbar({ darkNavbar }) {
                 {/* COLLECTIONS Section */}
                 <div className="border-b border-gray-200 pb-4">
                   <motion.div 
-                    className="flex justify-between items-center cursor-pointer"
+                    className="flex justify-between items-center cursor-pointer py-2"
                     variants={linkVariants}
                     custom={2}
                     onClick={() => toggleSection('collections')}
                   >
-                    <span className="text-xl font-medium">LOOKBOOK</span>
+                    <span className="text-xl tracking-wide font-medium">LOOKBOOK</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -433,13 +435,13 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.collections.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-base mb-2">{column.title}</h3>
-                              <div className="flex flex-col space-y-2">
+                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
                                     key={linkIndex}
                                     href={link.href}
-                                    className="text-sm hover:underline"
+                                    className="text-sm text-gray-700 hover:text-black"
                                   >
                                     {link.name}
                                   </a>
@@ -456,12 +458,12 @@ export default function MobileNavbar({ darkNavbar }) {
                 {/* NEW IN Section */}
                 <div className="border-b border-gray-200 pb-4">
                   <motion.div 
-                    className="flex justify-between items-center cursor-pointer"
+                    className="flex justify-between items-center cursor-pointer py-2"
                     variants={linkVariants}
                     custom={3}
                     onClick={() => toggleSection('newin')}
                   >
-                    <span className="text-xl font-medium">NEW ARRIVALS</span>
+                    <span className="text-xl tracking-wide font-medium">NEW ARRIVALS</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -481,13 +483,13 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.newin.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-base mb-2">{column.title}</h3>
-                              <div className="flex flex-col space-y-2">
+                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
                                     key={linkIndex}
                                     href={link.href}
-                                    className="text-sm hover:underline"
+                                    className="text-sm text-gray-700 hover:text-black"
                                   >
                                     {link.name}
                                   </a>
@@ -504,18 +506,22 @@ export default function MobileNavbar({ darkNavbar }) {
                 {/* Additional Links without dropdowns */}
                 <motion.a
                   href="/contact-us"
-                  className="block text-xl font-medium py-4 border-b border-gray-200"
+                  className="block text-xl tracking-wide font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={4}
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
                 >
                   CONTACT US
                 </motion.a>
                 
                 <motion.a
                   href="/services"
-                  className="block text-xl font-medium py-4 border-b border-gray-200"
+                  className="block text-xl tracking-wide font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={5}
+                  whileHover={{ x: 4 }}
+                  transition={{ duration: 0.2 }}
                 >
                   SERVICES
                 </motion.a>

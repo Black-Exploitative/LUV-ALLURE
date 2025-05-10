@@ -1216,7 +1216,7 @@ const ProductDetailsPage = () => {
           <div className="mb-8 md:mb-0 md:mr-[50px] w-full md:w-auto md:flex-1">
             <ProductCarousel images={displayImages} />
 
-            {/* Related Products - Also inside the max-w-screen-xl container */}
+            {/* Related Products */}
             <div className="mt-[50px]">
               <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
               {loadingRelated ? (
