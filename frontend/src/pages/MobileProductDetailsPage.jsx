@@ -1415,7 +1415,7 @@ const ProductDetailsPage = () => {
                 
                     <img
                       src={
-                        product.images?.[0] ||
+                        product.image?.[0] ||
                         product.image ||
                         "/images/photo11.jpg"
                       }
@@ -1424,7 +1424,7 @@ const ProductDetailsPage = () => {
                       onClick={() => navigate(`/product/${product.id}`)}
                     />
 
-                    {/* Text centered under image (also clickable) */}
+                    {/* Text centered under image  */}
                     <div
                       className="mt-2 px-1 text-center cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
@@ -1466,10 +1466,11 @@ const ProductDetailsPage = () => {
                     key={index}
                     className="min-w-[70%] max-w-[70%] snap-start"
                   >
+                   
                
                     <img
                       src={
-                        product.images?.[0] ||
+                        product.image?.[0] ||
                         product.image ||
                         "/images/photo12.jpg"
                       }
@@ -1478,7 +1479,7 @@ const ProductDetailsPage = () => {
                       onClick={() => navigate(`/product/${product.id}`)}
                     />
 
-                    {/* Text centered under image (also clickable) */}
+                    {/* Text centered under image */}
                     <div
                       className="mt-2 px-1 text-center cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
