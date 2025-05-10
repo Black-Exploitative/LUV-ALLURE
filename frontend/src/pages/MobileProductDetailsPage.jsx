@@ -1359,7 +1359,6 @@ const ProductDetailsPage = () => {
               : relatedProducts
             ).map((product, index) => (
               <div key={index} className="min-w-[60%] max-w-[60%] snap-start">
-
                 <img
                   src={
                     product.images?.[0] ||
@@ -1391,39 +1390,55 @@ const ProductDetailsPage = () => {
 
       {renderStyleItWith()}
 
-      <div className="mx-[20px] mt-[50px] mb-[100px]">
+      <div className="mx-4 mt-8 mb-16">
         {/* Customers Also Purchased Section */}
         {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
           <>
-            <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
+            <h2 className="text-sm text-center uppercase mt-8 mb-4 tracking-wider">
               ALLURVERS ALSO PURCHASED
             </h2>
             {loadingRelated ? (
               <div className="flex justify-center items-center py-8">
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
-            ) : alsoPurchasedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
-                {alsoPurchasedProducts.map((product) => (
-                  <PurchasedCard
-                    key={product.id}
-                    product={{
-                      id: product.id,
-                      name: product.title || product.name,
-                      price: parseFloat(product.price),
-                      color: product.color || "DEFAULT",
-                      images:
+            ) : (
+              <div className="flex gap-2 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
+                {(alsoPurchasedProducts.length > 0
+                  ? alsoPurchasedProducts
+                  : purchasedProducts
+                ).map((product, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[70%] max-w-[70%] snap-start"
+                  >
+                
+                    <img
+                      src={
                         product.images?.[0] ||
                         product.image ||
-                        "/images/placeholder.jpg",
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
-                {purchasedProducts.map((product, index) => (
-                  <PurchasedCard key={index} product={product} />
+                        "/images/photo3.jpg"
+                      }
+                      alt={product.title || product.name}
+                      className="w-full h-64 object-cover cursor-pointer"
+                      onClick={() => navigate(`/product/${product.id}`)}
+                    />
+
+                    {/* Text centered under image (also clickable) */}
+                    <div
+                      className="mt-2 px-1 text-center cursor-pointer"
+                      onClick={() => navigate(`/product/${product.id}`)}
+                    >
+                      <p className="text-xs uppercase text-gray-600 tracking-wider">
+                        {product.color || "DEFAULT"}
+                      </p>
+                      <h3 className="text-sm font-semibold tracking-wide">
+                        {product.title || product.name}
+                      </h3>
+                      <p className="text-sm font-medium mt-1 tracking-wide">
+                        ₦{parseFloat(product.price).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -1433,35 +1448,51 @@ const ProductDetailsPage = () => {
         {/* Customers Also Viewed Section */}
         {(alsoViewedProducts.length > 0 || !loadingRelated) && (
           <>
-            <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
+            <h2 className="text-sm text-center uppercase mt-8 mb-4 tracking-wider">
               ALLURVERS ALSO VIEWED
             </h2>
             {loadingRelated ? (
               <div className="flex justify-center items-center py-8">
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
-            ) : alsoViewedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
-                {alsoViewedProducts.map((product) => (
-                  <PurchasedCard
-                    key={product.id}
-                    product={{
-                      id: product.id,
-                      name: product.title || product.name,
-                      price: parseFloat(product.price),
-                      color: product.color || "DEFAULT",
-                      images:
+            ) : (
+              <div className="flex gap-2 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
+                {(alsoViewedProducts.length > 0
+                  ? alsoViewedProducts
+                  : purchasedProducts
+                ).map((product, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[70%] max-w-[70%] snap-start"
+                  >
+               
+                    <img
+                      src={
                         product.images?.[0] ||
                         product.image ||
-                        "/images/placeholder.jpg",
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
-                {purchasedProducts.map((product, index) => (
-                  <PurchasedCard key={index} product={product} />
+                        "/images/photo4.jpg"
+                      }
+                      alt={product.title || product.name}
+                      className="w-full h-64 object-cover cursor-pointer"
+                      onClick={() => navigate(`/product/${product.id}`)}
+                    />
+
+                    {/* Text centered under image (also clickable) */}
+                    <div
+                      className="mt-2 px-1 text-center cursor-pointer"
+                      onClick={() => navigate(`/product/${product.id}`)}
+                    >
+                      <p className="text-xs uppercase text-gray-600 tracking-wider">
+                        {product.color || "DEFAULT"}
+                      </p>
+                      <h3 className="text-sm font-semibold tracking-wide">
+                        {product.title || product.name}
+                      </h3>
+                      <p className="text-sm font-medium mt-1 tracking-wide">
+                        ₦{parseFloat(product.price).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}

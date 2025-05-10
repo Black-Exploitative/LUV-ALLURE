@@ -6,7 +6,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-mo
 const ProductCarousel = ({ images }) => {
   const [currentPair, setCurrentPair] = useState([0, 1]);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
-  const [slideDirection, setSlideDirection] = useState(1); // 1 for right, -1 for left
+  const [slideDirection, setSlideDirection] = useState(1); 
   const [showArrows, setShowArrows] = useState(false);
   const thumbnailsContainerRef = useRef(null);
   const dragX = useMotionValue(0);
