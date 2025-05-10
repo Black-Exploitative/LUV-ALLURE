@@ -1215,59 +1215,6 @@ const ProductDetailsPage = () => {
           {/* Product Carousel */}
           <div className="mb-8 w-full">
             <ProductCarousel images={displayImages} />
-
-            {/* STYLE IT WITH */}
-            <div className="mt-[50px]">
-  <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
-  {loadingRelated ? (
-    <div className="flex justify-center items-center py-8">
-      <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-    </div>
-  ) : (
-    <div className="flex gap-4 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
-      {(styleWithProducts.length > 0 ? styleWithProducts : relatedProducts).map(
-        (product, index) => (
-          <div key={index} className="min-w-[85%] max-w-[85%] snap-start">
-            {/* Full Image Card */}
-            <img
-              src={product.images?.[0] || product.image || "/images/placeholder.jpg"}
-              alt={product.title || product.name}
-              className="w-full h-[400px] object-cover"
-              onClick={() => navigate(`/product/${product.id}`)}
-            />
-
-            {/* Text and Original Button BELOW image */}
-            <div className="mt-2 px-1">
-              <p className="text-xs uppercase text-gray-600">
-                {product.color || "Color"}
-              </p>
-              <h3 className="text-sm font-semibold">
-                {product.title || product.name}
-              </h3>
-              <p className="text-sm font-medium mt-1">
-                ₦{parseFloat(product.price).toLocaleString()}
-              </p>
-              {/* Your original button style (unchanged) */}
-              <motion.button
-                className={`w-full py-3 transition-colors cursor-pointer text-[13.7px] ${
-                  canAddToCart
-                    ? "bg-black text-white hover:bg-gray-800"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-                onClick={() => navigate(`/product/${product.id}`)}
-                whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
-              >
-                VIEW PRODUCT
-              </motion.button>
-            </div>
-          </div>
-        )
-      )}
-    </div>
-  )}
-</div>
-
-            {renderStyleItWith()}
           </div>
 
           {/* Product Details */}
@@ -1396,9 +1343,63 @@ const ProductDetailsPage = () => {
         </div>
       </div>
 
-      <div ref={reviewsRef}>
-        <CustomersReviews productName={product.name} />
+      {/* STYLE IT WITH */}
+      <div className="mt-[50px]">
+        <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
+        {loadingRelated ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
+            {(styleWithProducts.length > 0
+              ? styleWithProducts
+              : relatedProducts
+            ).map((product, index) => (
+              <div key={index} className="min-w-[85%] max-w-[85%] snap-start">
+                {/* Full Image Card */}
+                <img
+                  src={
+                    product.images?.[0] ||
+                    product.image ||
+                    "/images/placeholder.jpg"
+                  }
+                  alt={product.title || product.name}
+                  className="w-full h-[400px] object-cover"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                />
+
+                {/* Text and Original Button BELOW image */}
+                <div className="mt-2 px-1">
+                  <p className="text-xs uppercase text-gray-600">
+                    {product.color || "Color"}
+                  </p>
+                  <h3 className="text-sm font-semibold">
+                    {product.title || product.name}
+                  </h3>
+                  <p className="text-sm font-medium mt-1">
+                    ₦{parseFloat(product.price).toLocaleString()}
+                  </p>
+                  {/* Your original button style (unchanged) */}
+                  <motion.button
+                    className={`w-full py-3 transition-colors cursor-pointer text-[13.7px] ${
+                      canAddToCart
+                        ? "bg-black text-white hover:bg-gray-800"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                    onClick={() => navigate(`/product/${product.id}`)}
+                    whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
+                  >
+                    VIEW PRODUCT
+                  </motion.button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {renderStyleItWith()}
 
       <div className="mx-[20px] mt-[50px] mb-[100px]">
         {/* Customers Also Purchased Section */}
@@ -1476,6 +1477,10 @@ const ProductDetailsPage = () => {
             )}
           </>
         )}
+      </div>
+
+      <div ref={reviewsRef}>
+        <CustomersReviews productName={product.name} />
       </div>
 
       <Footer />
