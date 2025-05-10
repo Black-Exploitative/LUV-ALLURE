@@ -18,6 +18,7 @@ import SizeGuideModal from "../components/SizeGuideModal";
 import api from "../services/api";
 import ColorVariants from "../components/ColorVaraint";
 import { useWishlist } from "../context/WishlistContext";
+import MobileProductCarousel from "../components/MobileProductCarousel";
 
 const ProductDetailsPage = () => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
@@ -1214,7 +1215,7 @@ const ProductDetailsPage = () => {
         <div className="mt-16 flex flex-col">
           {/* Product Carousel */}
           <div className="mb-8 w-full">
-            <ProductCarousel images={displayImages} />
+            <MobileProductCarousel images={displayImages} />
           </div>
 
           {/* Product Details */}
