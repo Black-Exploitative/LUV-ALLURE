@@ -25,17 +25,25 @@ html {
   display: none;  
 }
 
-/* Add these styles to your index.css or create a new styles.css file */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;   
+}
+
+
 
 /* Hide scrollbar but allow scrolling */
 @layer utilities {
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
   }
 
   .no-scrollbar::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera */
+    display: none;  
   }
   
   /* Text truncation utility */

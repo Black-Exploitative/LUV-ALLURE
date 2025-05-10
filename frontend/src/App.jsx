@@ -1,4 +1,3 @@
-// frontend/src/App.jsx - Updated with dynamic collection routes
 import {
   BrowserRouter as Router,
   Routes,
