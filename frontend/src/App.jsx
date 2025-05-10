@@ -70,6 +70,7 @@ import CollectionForm from "./admin/forms/CollectionForm";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderDetails from "./pages/OrderDetailsPage";
 import NotFound from "./pages/NotFound";
+import HeroForm from "./admin/forms/HeroForm";
 
 const AppContent = () => {
   const location = useLocation();
@@ -149,6 +150,8 @@ const AppContent = () => {
             path="/admin/collections/edit/:id"
             element={<CollectionForm />}
           />
+          <Route path="/admin/hero/new" element={<HeroForm />} />
+            <Route path="/admin/hero/edit/:id" element={<HeroForm />} />
         </Routes>
       </>
     );

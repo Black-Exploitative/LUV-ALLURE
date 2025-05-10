@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
+import HeroForm from './forms/HeroForm';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('homepage');
@@ -491,20 +492,12 @@ const Dashboard = () => {
   <div>
     <div className="flex justify-between items-center mb-6">
       <h2 className="text-xl font-medium">Hero Sections</h2>
-      <div className="flex space-x-2">
-        <Link
-          to="/admin/sections/new?type=hero&device=desktop"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
-        >
-          <FiMonitor className="mr-2" /> <FiPlus className="mr-1" /> Desktop Hero
-        </Link>
-        <Link
-          to="/admin/sections/new?type=hero&device=mobile"
-          className="flex items-center px-4 py-2 bg-gray-700 text-white hover:bg-gray-800"
-        >
-          <FiSmartphone className="mr-2" /> <FiPlus className="mr-1" /> Mobile Hero
-        </Link>
-      </div>
+      <Link
+        to="/admin/hero/new"
+        className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+      >
+        <FiPlus className="mr-2" /> Create Hero Section
+      </Link>
     </div>
 
     {loading ? (
@@ -512,26 +505,133 @@ const Dashboard = () => {
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
       </div>
     ) : (
-      <>
-        <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
-          <h3 className="font-medium flex items-center mb-2">
-            <FiMonitor className="mr-2" /> Desktop Heroes
-          </h3>
-          {/* Desktop Hero List */}
-          {renderHeroList('desktop')}
-        </div>
-        
-        <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
-          <h3 className="font-medium flex items-center mb-2">
-            <FiSmartphone className="mr-2" /> Mobile Heroes
-          </h3>
-          {/* Mobile Hero List */}
-          {renderHeroList('mobile')}
-        </div>
-      </>
+      <div className="grid gap-4">
+        {/* Get all hero sections, combining related desktop and mobile pairs */}
+        {groupHeroSections().map(hero => (
+          <div
+            key={hero._id}
+            className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h4 className="font-medium">{hero.name}</h4>
+                <div className="flex items-center mt-1">
+                  <span className={`inline-block w-2 h-2 rounded-full ${hero.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                  <p className="text-sm text-gray-600">
+                    {hero.isActive ? 'Active' : 'Inactive'} • 
+                    {hero.hasMobileVersion ? ' Desktop & Mobile' : ' Desktop only'}
+                  </p>
+                </div>
+                
+                {hero.content?.title && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Title: "{hero.content.title}"
+                    {hero.content.buttonText && ` • Button: "${hero.content.buttonText}"`}
+                  </p>
+                )}
+              </div>
+              
+              <div className="flex flex-col md:flex-row gap-2">
+                {/* Desktop preview thumbnail */}
+                <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
+                  {hero.media?.videoUrl ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                      <FiVideo className="text-gray-500 text-xl" />
+                    </div>
+                  ) : hero.media?.imageUrl ? (
+                    <img 
+                      src={hero.media.imageUrl} 
+                      alt={hero.media.altText || hero.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                      <span className="text-sm text-gray-600">No media</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Mobile preview thumbnail if available */}
+                {hero.mobileMedia && (
+                  <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
+                    {hero.mobileMedia.videoUrl ? (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <div className="relative w-10 h-16 bg-gray-300 flex items-center justify-center">
+                          <FiVideo className="text-gray-500" />
+                          <FiSmartphone className="absolute bottom-0 right-0 text-gray-500" />
+                        </div>
+                      </div>
+                    ) : hero.mobileMedia.imageUrl ? (
+                      <div className="relative w-full h-full">
+                        <img 
+                          src={hero.mobileMedia.imageUrl} 
+                          alt={hero.mobileMedia.altText || `${hero.name} (Mobile)`} 
+                          className="w-full h-full object-cover"
+                        />
+                        <FiSmartphone className="absolute bottom-1 right-1 text-white" />
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2 mt-2">
+              <button
+                onClick={() => toggleActive('sections', hero._id, hero.isActive)}
+                className={`px-3 py-1 text-xs rounded-md ${
+                  hero.isActive 
+                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                    : 'bg-green-50 text-green-700 hover:bg-green-100'
+                }`}
+              >
+                {hero.isActive ? 'Deactivate' : 'Activate'}
+              </button>
+              <Link 
+                to={`/admin/hero/edit/${hero._id}`}
+                className="p-2 text-gray-600 hover:text-black"
+              >
+                <FiEdit />
+              </Link>
+              <button 
+                onClick={() => handleDelete('sections', hero._id)}
+                className="p-2 text-gray-600 hover:text-red-600"
+              >
+                <FiTrash />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     )}
   </div>
 );
+
+// Helper function to group related desktop and mobile hero sections
+const groupHeroSections = () => {
+  // Filter to only get hero type sections
+  const heroSections = sections.filter(section => section.type === 'hero');
+  
+  // Group by related content (button link or title)
+  const desktopHeroes = heroSections.filter(
+    hero => !hero.deviceType || hero.deviceType === 'desktop'
+  );
+  
+  return desktopHeroes.map(desktopHero => {
+    // Try to find matching mobile hero
+    const mobileHero = heroSections.find(hero => 
+      hero.deviceType === 'mobile' && 
+      (hero.content?.buttonLink === desktopHero.content?.buttonLink ||
+       hero.content?.title === desktopHero.content?.title)
+    );
+    
+    return {
+      ...desktopHero,
+      hasMobileVersion: !!mobileHero,
+      mobileMedia: mobileHero?.media,
+    };
+  });
+};
 
 // Step 5: Add the helper function for rendering hero lists:
 const renderHeroList = (deviceType) => {

@@ -7,20 +7,22 @@ export default function Hero() {
   const [heroData, setHeroData] = useState({
     desktop: {
       mediaType: "video",
-      mediaUrl: "https://cdn.pixabay.com/video/2023/05/15/163117-827112884_large.mp4",
+      mediaUrl:
+        "https://cdn.pixabay.com/video/2023/05/15/163117-827112884_large.mp4",
       title: "EXPLORE",
       buttonLink: "shop",
-      backgroundColor: "rgba(0, 0, 0, 0.3)"
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
     },
     mobile: {
       mediaType: "image",
       mediaUrl: "/images/mobile-hero.jpg", // Default mobile hero image
       title: "EXPLORE",
       buttonLink: "shop",
-      backgroundColor: "rgba(0, 0, 0, 0.4)" // Slightly darker for mobile
-    }
+      backgroundColor: "rgba(0, 0, 0, 0.4)", // Slightly darker for mobile
+    },
   });
   const [loading, setLoading] = useState(true);
+const [debug, setDebug] = useState({ sections: [] }); // For debugging
 
   useEffect(() => {
     const fetchHeroSection = async () => {
@@ -29,7 +31,12 @@ export default function Hero() {
         // Get the active homepage layout
         const homepageLayout = await cmsService.getHomepageContent();
         
+        // Save sections for debugging
+        setDebug(homepageLayout);
+        
         if (homepageLayout && homepageLayout.sections) {
+          console.log("All homepage sections:", homepageLayout.sections);
+          
           // Find desktop hero section
           const desktopHeroSection = homepageLayout.sections.find(
             section => section.sectionId?.type === 'hero' && 
@@ -41,6 +48,9 @@ export default function Hero() {
             section => section.sectionId?.type === 'hero' && 
                       section.sectionId?.deviceType === 'mobile'
           );
+          
+          console.log("Found desktop hero:", desktopHeroSection);
+          console.log("Found mobile hero:", mobileHeroSection);
           
           // Update desktop hero data if found
           if (desktopHeroSection && desktopHeroSection.sectionId) {
@@ -56,6 +66,8 @@ export default function Hero() {
                 backgroundColor: `rgba(0, 0, 0, ${sectionData.media?.overlayOpacity || 0.3})` 
               }
             }));
+            
+            console.log("Updated desktop hero data:", sectionData.content?.buttonLink);
           }
           
           // Update mobile hero data if found
@@ -72,6 +84,8 @@ export default function Hero() {
                 backgroundColor: `rgba(0, 0, 0, ${sectionData.media?.overlayOpacity || 0.4})` 
               }
             }));
+            
+            console.log("Updated mobile hero data:", sectionData.content?.buttonLink);
           }
         }
       } catch (error) {
@@ -90,7 +104,9 @@ export default function Hero() {
     const titleLetters = data.title.split("");
 
     return (
-      <div className={`relative w-full h-screen overflow-hidden ${deviceClass}`}>
+      <div
+        className={`relative w-full h-screen overflow-hidden ${deviceClass}`}
+      >
         {/* Background Media: Video or Image */}
         {data.mediaType === "video" ? (
           <video
@@ -105,30 +121,34 @@ export default function Hero() {
             Your browser does not support the video tag.
           </video>
         ) : (
-          <img 
-            src={data.mediaUrl} 
-            alt="Hero Background" 
+          <img
+            src={data.mediaUrl}
+            alt="Hero Background"
             className="absolute top-0 left-0 w-full h-full object-cover"
           />
         )}
 
         {/* Overlay */}
-        <div 
-          className="absolute inset-0" 
+        <div
+          className="absolute inset-0"
           style={{ backgroundColor: data.backgroundColor }}
         ></div>
 
         {/* Content */}
         <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
-          <a 
-            href={data.buttonLink} 
+          <a
+            href={data.buttonLink}
             className="text-white text-center flex flex-row gap-5 relative group"
           >
             {/* Render each letter with staggered animations */}
             {titleLetters.map((letter, index) => (
-              <motion.h1 
+              <motion.h1
                 key={`${letter}-${index}`}
-                className={`text-[20px] font-thin tracking-wider ${index === 0 ? "border-b-[3px] border-white pb-[5px] group-hover:border-b-0" : ""}`}
+                className={`text-[20px] font-thin tracking-wider ${
+                  index === 0
+                    ? "border-b-[3px] border-white pb-[5px] group-hover:border-b-0"
+                    : ""
+                }`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index, duration: 0.5 }}
@@ -136,7 +156,7 @@ export default function Hero() {
                 {letter}
               </motion.h1>
             ))}
-            
+
             {/* Animated underline effect */}
             <div className="absolute bottom-0 left-0 w-full h-[3px] bg-white origin-left transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></div>
           </a>
@@ -156,7 +176,7 @@ export default function Hero() {
           <div className="block md:hidden">
             {renderHeroContent(heroData.mobile, "mobile-hero")}
           </div>
-          
+
           {/* Desktop Hero - hidden on small screens, shown on md and up */}
           <div className="hidden md:block">
             {renderHeroContent(heroData.desktop, "desktop-hero")}
