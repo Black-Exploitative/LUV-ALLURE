@@ -7,9 +7,9 @@ const MobileProductCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   
-  // Safely handle the images array
+  
   const safeImages = Array.isArray(images) && images.length > 0 
-    ? images.filter(img => img) // Filter out null/undefined images
+    ? images.filter(img => img)
     : ["/images/placeholder.jpg"];
   
   const handleNext = () => {
@@ -69,7 +69,7 @@ const MobileProductCarousel = ({ images }) => {
           onClick={handlePrevious}
           aria-label="Previous image"
         >
-          <FaChevronLeft className="text-black text-xl" />
+          <FaChevronLeft className="text-black text-sm" />
         </button>
         
         {/* Right Arrow - no background */}
@@ -78,7 +78,7 @@ const MobileProductCarousel = ({ images }) => {
           onClick={handleNext}
           aria-label="Next image"
         >
-          <FaChevronRight className="text-black text-xl" />
+          <FaChevronRight className="text-black text-sm" />
         </button>
         
         {/* Dots Indicator */}
