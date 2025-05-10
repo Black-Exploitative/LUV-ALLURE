@@ -1417,7 +1417,7 @@ const ProductDetailsPage = () => {
                       src={
                         product.images?.[0] ||
                         product.image ||
-                        "/images/photo3.jpg"
+                        "/images/photo11.jpg"
                       }
                       alt={product.title || product.name}
                       className="w-full h-64 object-cover cursor-pointer"
@@ -1471,7 +1471,7 @@ const ProductDetailsPage = () => {
                       src={
                         product.images?.[0] ||
                         product.image ||
-                        "/images/photo4.jpg"
+                        "/images/photo12.jpg"
                       }
                       alt={product.title || product.name}
                       className="w-full h-64 object-cover cursor-pointer"
