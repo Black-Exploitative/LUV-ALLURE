@@ -141,7 +141,7 @@ const ProductDetailsPage = () => {
 
     // Cleanup when component unmounts
     return () => {
-      document.title = "Luv's Allure"; // Reset to default
+      document.title = "Luv's Allure";
     };
   }, [product, productName]);
 
@@ -1217,53 +1217,57 @@ const ProductDetailsPage = () => {
             <ProductCarousel images={displayImages} />
 
             {/* STYLE IT WITH */}
-            <div className="mt-10">
-              <h2 className="text-sm mb-4 text-center">STYLE IT WITH</h2>
-              {loadingRelated ? (
-                <div className="flex justify-center items-center py-8">
-                  <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-                </div>
-              ) : (
-                <div className="flex gap-4 overflow-x-auto px-2 no-scrollbar snap-x snap-mandatory scroll-smooth">
-                  {(styleWithProducts.length > 0
-                    ? styleWithProducts
-                    : relatedProducts
-                  ).map((product, index) => (
-                    <div
-                      key={index}
-                      className="snap-start min-w-[85%] max-w-[85%] bg-white rounded-md shadow-md flex flex-col justify-between"
-                    >
-                      <img
-                        src={
-                          product.images?.[0] ||
-                          product.image ||
-                          "/images/placeholder.jpg"
-                        }
-                        alt={product.title || product.name}
-                        className="w-full h-72 object-cover rounded-t-md"
-                      />
-                      <div className="p-3 flex flex-col gap-1">
-                        <p className="text-xs uppercase text-gray-600">
-                          {product.color || "Color"}
-                        </p>
-                        <h3 className="text-sm font-semibold">
-                          {product.title || product.name}
-                        </h3>
-                        <p className="text-sm font-medium mt-1">
-                          ₦{parseFloat(product.price).toLocaleString()}
-                        </p>
-                        <button
-                          onClick={() => navigate(`/product/${product.id}`)}
-                          className="mt-2 bg-black text-white text-xs py-2 w-full rounded-md tracking-wide"
-                        >
-                          VIEW PRODUCT
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div className="mt-[50px]">
+  <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
+  {loadingRelated ? (
+    <div className="flex justify-center items-center py-8">
+      <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+    </div>
+  ) : (
+    <div className="flex gap-4 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
+      {(styleWithProducts.length > 0 ? styleWithProducts : relatedProducts).map(
+        (product, index) => (
+          <div key={index} className="min-w-[85%] max-w-[85%] snap-start">
+            {/* Full Image Card */}
+            <img
+              src={product.images?.[0] || product.image || "/images/placeholder.jpg"}
+              alt={product.title || product.name}
+              className="w-full h-[400px] object-cover"
+              onClick={() => navigate(`/product/${product.id}`)}
+            />
+
+            {/* Text and Original Button BELOW image */}
+            <div className="mt-2 px-1">
+              <p className="text-xs uppercase text-gray-600">
+                {product.color || "Color"}
+              </p>
+              <h3 className="text-sm font-semibold">
+                {product.title || product.name}
+              </h3>
+              <p className="text-sm font-medium mt-1">
+                ₦{parseFloat(product.price).toLocaleString()}
+              </p>
+              {/* Your original button style (unchanged) */}
+              <motion.button
+                className={`w-full py-3 transition-colors cursor-pointer text-[13.7px] ${
+                  canAddToCart
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+                onClick={() => navigate(`/product/${product.id}`)}
+                whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
+              >
+                VIEW PRODUCT
+              </motion.button>
             </div>
+          </div>
+        )
+      )}
+    </div>
+  )}
+</div>
+
+            {renderStyleItWith()}
           </div>
 
           {/* Product Details */}

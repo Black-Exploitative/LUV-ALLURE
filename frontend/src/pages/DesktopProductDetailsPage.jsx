@@ -141,7 +141,7 @@ const ProductDetailsPage = () => {
 
     // Cleanup when component unmounts
     return () => {
-      document.title = "Luv's Allure"; // Reset to default
+      document.title = "Luv's Allure";
     };
   }, [product, productName]);
 
@@ -1278,7 +1278,7 @@ const ProductDetailsPage = () => {
 
             <hr className="border-t border-gray-300 my-4" />
 
-            {/* Color Selection - Only show if there are colors */}
+            {/* Color Selection  */}
             <ColorVariants
               product={product}
               productId={productId}
