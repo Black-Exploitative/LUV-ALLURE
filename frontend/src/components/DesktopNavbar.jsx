@@ -285,7 +285,7 @@ export default function DesktopNavbar({ darkNavbar }) {
 
   return (
     <>
-      <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
+      <div className="mx-[100px] py-4 flex flex-row justify-between items-center h-[70px] relative">
         {/* Left-side Navigation Links */}
         <div
           className={`flex space-x-2 lg:space-x-6 text-xs lg:text-[12px] ${

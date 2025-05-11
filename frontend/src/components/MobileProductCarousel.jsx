@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import PropTypes from "prop-types";
+import MobileProductCarouselSkeleton from "./loadingSkeleton/MobileProductCarouselSkeleton";
 
-const MobileProductCarousel = ({ images }) => {
+const MobileProductCarousel = ({ images, loading }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   
@@ -36,10 +37,15 @@ const MobileProductCarousel = ({ images }) => {
     setCurrentIndex(0);
   }, [images]);
 
+  if (loading) {
+    return MobileProductCarouselSkeleton;
+  }
+
+
   return (
     <div className="relative overflow-hidden">
       {/* Main Image Carousel */}
-      <div className="relative h-[550px] overflow-hidden">
+      <div className="relative h-[700px] overflow-hidden">
         <AnimatePresence initial={false} custom={direction}>
           <motion.img
             key={currentIndex}

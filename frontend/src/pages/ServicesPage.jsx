@@ -58,7 +58,7 @@ const ServicesPage = () => {
       {/* Main Header */}
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pt-24 pb-12">
         <motion.h1
-          className="text-4xl md:text-5xl xl:text-6xl font-thin tracking-wider text-center"
+          className="text-4xl md:text-5xl xl:text-6xl font-medium tracking-wide text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -66,7 +66,7 @@ const ServicesPage = () => {
           LUVS ALLURE SERVICES
         </motion.h1>
         <motion.p
-          className="text-xl md:text-2xl text-gray-700 text-center mt-6 font-thin tracking-wide"
+          className="text-xl md:text-2xl text-gray-700 text-center mt-6 font-thin tracking-widest"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -110,10 +110,10 @@ const ServicesPage = () => {
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
         {/* Delivery & Returns Section */}
         <section id="delivery" className="py-20 md:py-32">
-          <h2 className="text-3xl font-thin tracking-wider text-center mb-8">
+          <h2 className="text-3xl font-normal tracking-wider text-center mb-8">
             Delivery & Returns
           </h2>
-          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
+          <p className="text-center font-medium text-gray-600 max-w-3xl mx-auto mb-16">
             Experience seamless luxury with our premium delivery and hassle-free
             returns. Every aspect of your journey with Luvs Allure is designed
             with precision and elegance.
@@ -145,7 +145,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-thin tracking-wider text-center">
+                <h3 className="text-xl font-normal tracking-wider text-center">
                   Complimentary Shipping & Returns
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -184,7 +184,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-thin tracking-wider text-center">
+                <h3 className="text-xl font-normal tracking-wider text-center">
                   Order & Return Tracking
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -223,7 +223,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-thin tracking-wider text-center">
+                <h3 className="text-xl font-normal tracking-wide text-center">
                   Expedited Delivery Options
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -257,7 +257,7 @@ const ServicesPage = () => {
           </div>
 
           <div className="relative z-10">
-            <h2 className="text-3xl font-thin tracking-wider text-center mb-8">
+            <h2 className="text-3xl font-normal tracking-wider text-center mb-8">
               SIGNATURE STYLING SERVICE
             </h2>
             <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
@@ -305,7 +305,7 @@ const ServicesPage = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-thin tracking-wider text-center">
+                  <h3 className="text-2xl font-medium tracking-wider text-center">
                     Personal Styling Consultation
                   </h3>
                   <p className="text-gray-600 text-center mt-4">
@@ -320,8 +320,8 @@ const ServicesPage = () => {
             </div>
 
             <div className="text-center mt-16">
-              <h3 className="text-xl font-thin tracking-wider mb-4">CURATED ELEGANCE</h3>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <h3 className="text-xl font-normal tracking-wider mb-4">CURATED ELEGANCE</h3>
+              <p className="text-gray-600 tracking-wider text-[15px] max-w-xl mx-auto">
                 Our signature styling service goes beyond fashion its about
                 creating a personal narrative through carefully curated pieces.
                 Each styling session is approached with artistry and precision,
@@ -333,10 +333,10 @@ const ServicesPage = () => {
 
         {/* Packaging & Gifting Section */}
         <section id="packaging" className="py-20 md:py-32 bg-[#faf9f8]">
-          <h2 className="text-3xl font-thin tracking-wider text-center mb-8">
+          <h2 className="text-3xl font-medium tracking-wider text-center mb-8">
             Packaging & Gifting
           </h2>
-          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
+          <p className="text-center text-gray-600 tracking-wider text-[15px] max-w-3xl mx-auto mb-16">
             Every Luvs Allure purchase is a celebration of craftsmanship,
             presented with the same attention to detail that goes into our
             collections. Discover our signature packaging and exclusive gifting
@@ -400,7 +400,7 @@ const ServicesPage = () => {
 
         {/* Perfect Fit Tailoring Section */}
         <section id="tailoring" className="py-20 md:py-32">
-          <h2 className="text-3xl font-thin tracking-wider text-center mb-8">
+          <h2 className="text-3xl font-normal tracking-wider text-center mb-8">
             Perfect Fit Tailoring
           </h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
@@ -608,7 +608,7 @@ const ServicesPage = () => {
 
         {/* Allurvers Account Section */}
         <section id="allurvers" className="py-20 md:py-32 bg-[#faf9f8]">
-          <h2 className="text-3xl font-thin tracking-wider text-center mb-8">
+          <h2 className="text-3xl font-normal tracking-wider text-center mb-8">
             Allurvers Account
           </h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">

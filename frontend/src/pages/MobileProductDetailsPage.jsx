@@ -19,6 +19,7 @@ import api from "../services/api";
 import ColorVariants from "../components/ColorVaraint";
 import { useWishlist } from "../context/WishlistContext";
 import MobileProductCarousel from "../components/MobileProductCarousel";
+import MobileProductDetailsSkeleton from "../components/loadingSkeleton/MobileProductDetailsSkeleton";
 
 const ProductDetailsPage = () => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
@@ -816,67 +817,48 @@ const ProductDetailsPage = () => {
     }
 
     // ENHANCED: More flexible price extraction
-    let priceValue = null;
+let priceValue = 0; // Default to 0 in case nothing is found
 
-    if (typeof apiProduct.price === "number") {
-      priceValue = apiProduct.price;
-    } else if (
-      typeof apiProduct.price === "string" &&
-      !isNaN(parseFloat(apiProduct.price))
-    ) {
-      priceValue = parseFloat(apiProduct.price);
-    } else if (apiProduct.priceValue) {
-      priceValue =
-        typeof apiProduct.priceValue === "number"
-          ? apiProduct.priceValue
-          : parseFloat(apiProduct.priceValue);
-    } else if (apiProduct.variants && apiProduct.variants.length > 0) {
-      // Try to get price from first variant
-      const firstVariant = apiProduct.variants[0];
-      if (firstVariant.price) {
-        priceValue =
-          typeof firstVariant.price === "number"
-            ? firstVariant.price
-            : parseFloat(firstVariant.price);
-      } else if (firstVariant.price?.amount) {
-        priceValue = parseFloat(firstVariant.price.amount);
-      }
-    } else if (
-      apiProduct.variants &&
-      apiProduct.variants.edges &&
-      apiProduct.variants.edges.length > 0
-    ) {
-      // Try to get price from first edge variant (GraphQL)
-      const firstVariant = apiProduct.variants.edges[0].node;
-      if (firstVariant.price) {
-        priceValue =
-          typeof firstVariant.price === "number"
-            ? firstVariant.price
-            : parseFloat(firstVariant.price);
-      } else if (firstVariant.price?.amount) {
+// First check if there are variants with prices
+if (apiProduct.variants) {
+  if (Array.isArray(apiProduct.variants) && apiProduct.variants.length > 0) {
+    // Get price from first variant
+    const firstVariant = apiProduct.variants[0];
+    if (firstVariant.price) {
+      if (typeof firstVariant.price === 'number') {
+        priceValue = firstVariant.price;
+      } else if (typeof firstVariant.price === 'string') {
+        priceValue = parseFloat(firstVariant.price);
+      } else if (firstVariant.price.amount) {
         priceValue = parseFloat(firstVariant.price.amount);
       }
     }
+  }
+}
 
-    if (priceValue === null || isNaN(priceValue)) {
-      priceValue = 0;
-      console.warn(
-        "Could not extract valid price from product data, using default:",
-        priceValue
-      );
-    }
+// If we still have 0, try other sources
+if (priceValue === 0) {
+  if (typeof apiProduct.price === 'number') {
+    priceValue = apiProduct.price;
+  } else if (typeof apiProduct.price === 'string' && !isNaN(parseFloat(apiProduct.price))) {
+    priceValue = parseFloat(apiProduct.price);
+  } else if (apiProduct.priceRange && apiProduct.priceRange.minVariantPrice) {
+    priceValue = parseFloat(apiProduct.priceRange.minVariantPrice.amount);
+  }
+}
 
-    const processedProduct = {
-      id: apiProduct.id,
-      name: apiProduct.title || apiProduct.name || "Unnamed Product",
-      price: formatPrice(priceValue),
-      images:
-        productImages.length > 0 ? productImages : ["/images/placeholder.jpg"],
-      description: apiProduct.description || "No description available",
-      sizes: productSizes,
-      colors: productColors,
-      variants: productVariants,
-    };
+console.log("Extracted price value:", priceValue);
+
+const processedProduct = {
+  id: apiProduct.id,
+  name: apiProduct.title || apiProduct.name || "Unnamed Product",
+  price: priceValue, // Store as numeric value
+  images: productImages.length > 0 ? productImages : ["/images/placeholder.jpg"],
+  description: apiProduct.description || "No description available",
+  sizes: productSizes,
+  colors: productColors,
+  variants: productVariants,
+};
 
     console.log("Processed Product:", processedProduct);
     return processedProduct;
@@ -1141,12 +1123,8 @@ const ProductDetailsPage = () => {
 
   // Render loading state
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
-      </div>
-    );
-  }
+  return <MobileProductDetailsSkeleton />;
+}
 
   // Render error state
   if (error) {
@@ -1220,7 +1198,7 @@ const ProductDetailsPage = () => {
 
           {/* Product Details */}
           <div className="w-full">
-            <h1 className="text-xl font-normal">{product.name}</h1>
+            <h1 className="text-xl font-normal tracking-wider">{product.name}</h1>
 
             <StarRating
               rating={4.9}
@@ -1228,8 +1206,8 @@ const ProductDetailsPage = () => {
               scrollToReviews={scrollToReviews}
             />
 
-            <p className="text-lg font-semibold text-gray-700">
-              ₦ {product.price}
+            <p className="text-lg font-normal tracking-wide text-gray-700">
+              ₦ {product.price.toLocaleString()}
             </p>
 
             <hr className="border-t border-gray-300 my-4" />
@@ -1354,12 +1332,12 @@ const ProductDetailsPage = () => {
             <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div className="flex gap-2 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
+          <div className="flex mx-[20px] gap-2 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
             {(styleWithProducts.length > 0
               ? styleWithProducts
               : relatedProducts
             ).map((product, index) => (
-              <div key={index} className="min-w-[60%] max-w-[60%] snap-start">
+              <div key={index} className=" min-w-[60%] max-w-[60%] snap-start">
                 <img
                   src={
                     product.images?.[0] ||
@@ -1367,19 +1345,19 @@ const ProductDetailsPage = () => {
                     "/images/placeholder.jpg"
                   }
                   alt={product.title || product.name}
-                  className="w-full h-[350px] object-cover cursor-pointer"
+                  className="w-full object-cover cursor-pointer"
                   onClick={() => navigate(`/product/${product.id}`)}
                 />
 
                 {/* Text centered under image */}
                 <div
-                  className="mt-2 px-1 text-center text-gray-700 cursor-pointer"
+                  className="mt-2 px-1 text-left space-y-[5px] text-gray-700 cursor-pointer"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  <h3 className="text-sm uppercase tracking-wide">
+                  <h3 className="text-sm uppercase tracking-wider">
                     {product.title || product.name}
                   </h3>
-                  <p className="text-sm font-medium text-gray-700 mt-1 tracking-wide">
+                  <p className="text-sm font-normal text-gray-700 mt-1 tracking-wider">
                     ₦{parseFloat(product.price).toLocaleString()}
                   </p>
                 </div>
@@ -1420,22 +1398,22 @@ const ProductDetailsPage = () => {
                         "/images/photo11.jpg"
                       }
                       alt={product.title || product.name}
-                      className="w-full h-64 object-cover cursor-pointer"
+                      className="w-full object-cover cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
                     />
 
                     {/* Text centered under image  */}
                     <div
-                      className="mt-2 px-1 text-center cursor-pointer"
+                      className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
                     >
                       <p className="text-xs uppercase text-gray-600 tracking-wider">
                         {product.color || "DEFAULT"}
                       </p>
-                      <h3 className="text-sm font-semibold tracking-wide">
+                      <h3 className="text-sm font-semibold tracking-wider">
                         {product.title || product.name}
                       </h3>
-                      <p className="text-sm font-medium mt-1 tracking-wide">
+                      <p className="text-sm font-normal mt-1 tracking-wider">
                         ₦{parseFloat(product.price).toLocaleString()}
                       </p>
                     </div>
@@ -1475,22 +1453,22 @@ const ProductDetailsPage = () => {
                         "/images/photo12.jpg"
                       }
                       alt={product.title || product.name}
-                      className="w-full h-64 object-cover cursor-pointer"
+                      className="w-full object-cover cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
                     />
 
                     {/* Text centered under image */}
                     <div
-                      className="mt-2 px-1 text-center cursor-pointer"
+                      className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
                     >
                       <p className="text-xs uppercase text-gray-600 tracking-wider">
                         {product.color || "DEFAULT"}
                       </p>
-                      <h3 className="text-sm font-semibold tracking-wide">
+                      <h3 className="text-sm font-semibold tracking-wider">
                         {product.title || product.name}
                       </h3>
-                      <p className="text-sm font-medium mt-1 tracking-wide">
+                      <p className="text-sm font-normal mt-1 tracking-wider">
                         ₦{parseFloat(product.price).toLocaleString()}
                       </p>
                     </div>

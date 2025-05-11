@@ -18,6 +18,7 @@ import SizeGuideModal from "../components/SizeGuideModal";
 import api from "../services/api";
 import ColorVariants from "../components/ColorVaraint";
 import { useWishlist } from "../context/WishlistContext";
+import DesktopProductDetailsSkeleton from "../components/loadingSkeleton/DesktopProductDetailsSkeleton";
 
 const DesktopProductDetailsPage = () => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
@@ -226,6 +227,8 @@ const DesktopProductDetailsPage = () => {
     }
   }, [product]);
 
+  
+
   // Fetch product data when component mounts or productId changes
   useEffect(() => {
     let isMounted = true;
@@ -288,9 +291,7 @@ const DesktopProductDetailsPage = () => {
 
               // If we have a color from the URL, select it
               if (colorName) {
-                setSelectedColor(
-                  colorName.charAt(0).toUpperCase() + colorName.slice(1)
-                );
+                setSelectedColor(colorName); // Maintain original casing from URL
               }
 
               setProduct(processedProduct);
@@ -614,6 +615,24 @@ const DesktopProductDetailsPage = () => {
     }
   }, [selectedColor, product]);
 
+  const { colorName } = parseProductSlug(slug); // Parse color from slug
+
+// Then update the useEffect
+useEffect(() => {
+  if (product?.colors && colorName) {
+    // Find color with case-insensitive match but preserve original casing
+    const matchedColor = product.colors.find(c => 
+      c.name.toLowerCase() === colorName.toLowerCase()
+    );
+    if (matchedColor) {
+      setSelectedColor(matchedColor.name);
+    } else {
+      // Fallback to first color if no match
+      setSelectedColor(product.colors[0]?.name || "");
+    }
+  }
+}, [product, colorName]);
+
   // Process API product data to match component needs
   const processApiProduct = (apiProduct) => {
     if (!apiProduct) return null;
@@ -815,60 +834,51 @@ const DesktopProductDetailsPage = () => {
     }
 
     // ENHANCED: More flexible price extraction
-    let priceValue = null;
+    let priceValue = 0; // Default to 0 in case nothing is found
 
-    if (typeof apiProduct.price === "number") {
-      priceValue = apiProduct.price;
-    } else if (
-      typeof apiProduct.price === "string" &&
-      !isNaN(parseFloat(apiProduct.price))
-    ) {
-      priceValue = parseFloat(apiProduct.price);
-    } else if (apiProduct.priceValue) {
-      priceValue =
-        typeof apiProduct.priceValue === "number"
-          ? apiProduct.priceValue
-          : parseFloat(apiProduct.priceValue);
-    } else if (apiProduct.variants && apiProduct.variants.length > 0) {
-      // Try to get price from first variant
-      const firstVariant = apiProduct.variants[0];
-      if (firstVariant.price) {
-        priceValue =
-          typeof firstVariant.price === "number"
-            ? firstVariant.price
-            : parseFloat(firstVariant.price);
-      } else if (firstVariant.price?.amount) {
-        priceValue = parseFloat(firstVariant.price.amount);
-      }
-    } else if (
-      apiProduct.variants &&
-      apiProduct.variants.edges &&
-      apiProduct.variants.edges.length > 0
-    ) {
-      // Try to get price from first edge variant (GraphQL)
-      const firstVariant = apiProduct.variants.edges[0].node;
-      if (firstVariant.price) {
-        priceValue =
-          typeof firstVariant.price === "number"
-            ? firstVariant.price
-            : parseFloat(firstVariant.price);
-      } else if (firstVariant.price?.amount) {
-        priceValue = parseFloat(firstVariant.price.amount);
+    // First check if there are variants with prices
+    if (apiProduct.variants) {
+      if (
+        Array.isArray(apiProduct.variants) &&
+        apiProduct.variants.length > 0
+      ) {
+        // Get price from first variant
+        const firstVariant = apiProduct.variants[0];
+        if (firstVariant.price) {
+          if (typeof firstVariant.price === "number") {
+            priceValue = firstVariant.price;
+          } else if (typeof firstVariant.price === "string") {
+            priceValue = parseFloat(firstVariant.price);
+          } else if (firstVariant.price.amount) {
+            priceValue = parseFloat(firstVariant.price.amount);
+          }
+        }
       }
     }
 
-    if (priceValue === null || isNaN(priceValue)) {
-      priceValue = 0;
-      console.warn(
-        "Could not extract valid price from product data, using default:",
-        priceValue
-      );
+    // If we still have 0, try other sources
+    if (priceValue === 0) {
+      if (typeof apiProduct.price === "number") {
+        priceValue = apiProduct.price;
+      } else if (
+        typeof apiProduct.price === "string" &&
+        !isNaN(parseFloat(apiProduct.price))
+      ) {
+        priceValue = parseFloat(apiProduct.price);
+      } else if (
+        apiProduct.priceRange &&
+        apiProduct.priceRange.minVariantPrice
+      ) {
+        priceValue = parseFloat(apiProduct.priceRange.minVariantPrice.amount);
+      }
     }
+
+    console.log("Extracted price value:", priceValue);
 
     const processedProduct = {
       id: apiProduct.id,
       name: apiProduct.title || apiProduct.name || "Unnamed Product",
-      price: formatPrice(priceValue),
+      price: priceValue, // Store as numeric value
       images:
         productImages.length > 0 ? productImages : ["/images/placeholder.jpg"],
       description: apiProduct.description || "No description available",
@@ -877,7 +887,7 @@ const DesktopProductDetailsPage = () => {
       variants: productVariants,
     };
 
-    console.log("Processed Product:", processedProduct);
+    console.log("Processed Product with price:", processedProduct.price);
     return processedProduct;
   };
 
@@ -1140,11 +1150,7 @@ const DesktopProductDetailsPage = () => {
 
   // Render loading state
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
-      </div>
-    );
+    return <DesktopProductDetailsSkeleton />;
   }
 
   // Render error state
@@ -1263,7 +1269,7 @@ const DesktopProductDetailsPage = () => {
           {/* Right Side: Product Details */}
           <div className="w-[500px] flex flex-col justify-start">
             {/* Product Name */}
-            <h1 className="text-xl font-normal">{product.name}</h1>
+            <h1 className="text-xl font-normal tracking-wider">{product.name}</h1>
             {/*  Star Rating */}
             <StarRating
               rating={4.9}
@@ -1272,8 +1278,8 @@ const DesktopProductDetailsPage = () => {
             />
 
             {/* Product Price */}
-            <p className="text-lg font-semibold text-gray-700">
-              ₦ {product.price}
+            <p className="text-[18px] font-normal tracking-wide text-gray-700">
+              ₦{product.price ? product.price.toLocaleString() : "0"}
             </p>
 
             <hr className="border-t border-gray-300 my-4" />
@@ -1472,8 +1478,6 @@ const DesktopProductDetailsPage = () => {
           </>
         )}
       </div>
-
-     
 
       <Footer />
     </>

@@ -18,6 +18,94 @@ const ColorVariants = ({
   const [colorVariants, setColorVariants] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Extract color from product name 
+  const extractColorFromProductName = (productName) => {
+    if (productName && productName.includes(' - ')) {
+      const parts = productName.split(' - ');
+      if (parts.length >= 2) {
+        return parts[1].trim();
+      }
+    }
+    return null;
+  };
+
+  // Function to create default variants for products without actual variants
+  const createDefaultVariants = () => {
+    if (!product) return [];
+    
+    console.log('Creating default variants for product with no variants');
+    
+    // Try to extract color from product name
+    const extractedColor = extractColorFromProductName(product.name)?.trim();
+    
+    // Base name is either the part before " - " or the full name
+    let baseName = product.name;
+    if (baseName.includes(' - ')) {
+      baseName = baseName.split(' - ')[0].trim();
+    }
+    
+    // Create default color variants
+    let defaultVariants = [];
+    
+    // If product has colors defined, use those
+    if (product.colors && product.colors.length > 0) {
+      defaultVariants = product.colors.map(color => {
+        // Create a slug format consistent with variant products
+        const slug = `${baseName.toLowerCase().replace(/\s+/g, '-')}---${color.name.toLowerCase().replace(/\s+/g, '-')}_${productId}`;
+        
+        return {
+          id: productId,
+          name: `${baseName} - ${color.name}`,
+          baseName,
+          color: color.name,
+          slug,
+          image: product.images && product.images.length > 0 ? product.images[0] : "/images/placeholder.jpg",
+          price: product.price,
+          isCurrentVariant: extractedColor ? color.name === extractedColor : false
+        };
+      });
+    } 
+    // If no colors defined but we extracted a color from the name
+    else if (extractedColor) {
+      const slug = `${baseName.toLowerCase().replace(/\s+/g, '-')}---${extractedColor.toLowerCase().replace(/\s+/g, '-')}_${productId}`;
+      
+      defaultVariants = [{
+        id: productId,
+        name: product.name,
+        baseName,
+        color: extractedColor,
+        slug,
+        image: product.images && product.images.length > 0 ? product.images[0] : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true
+      }];
+    }
+    // If no colors at all, create a default "Black" option
+    else {
+      const defaultColor = "Black";
+      const slug = `${baseName.toLowerCase().replace(/\s+/g, '-')}---${defaultColor.toLowerCase()}_${productId}`;
+      
+      defaultVariants = [{
+        id: productId,
+        name: `${baseName} - ${defaultColor}`,
+        baseName,
+        color: defaultColor,
+        slug,
+        image: product.images && product.images.length > 0 ? product.images[0] : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true
+      }];
+    }
+    
+    // Update selectedColor if not already set
+    if (!selectedColor && defaultVariants.length > 0) {
+      const currentVariant = defaultVariants.find(v => v.isCurrentVariant) || defaultVariants[0];
+      setSelectedColor(currentVariant.color);
+    }
+    
+    return defaultVariants;
+  };
+
   // Fetch all color variants when the product loads
   useEffect(() => {
     if (!product || !productId) return;
@@ -41,7 +129,7 @@ const ColorVariants = ({
         // Use the correct endpoint for tag-based search
         const response = await api.get(`/search/tag?tag=${modelTag}`);
         
-        if (response.data && response.data.products) {
+        if (response.data && response.data.products && response.data.products.length > 0) {
           console.log(`Found ${response.data.products.length} potential color variants`);
           
           // Process variants to extract color information
@@ -86,9 +174,24 @@ const ColorVariants = ({
           });
           
           setColorVariants(processedVariants);
+          
+          // Set the selected color if not already set
+          if (!selectedColor) {
+            const currentVariant = processedVariants.find(v => v.isCurrentVariant);
+            if (currentVariant) {
+              setSelectedColor(currentVariant.color);
+            }
+          }
+        } else {
+          // No variants found from search, create default variants
+          const defaultVariants = createDefaultVariants();
+          setColorVariants(defaultVariants);
         }
       } catch (error) {
         console.error('Error fetching color variants:', error);
+        // On API error, still create default variants
+        const defaultVariants = createDefaultVariants();
+        setColorVariants(defaultVariants);
       } finally {
         setLoading(false);
       }
@@ -96,6 +199,8 @@ const ColorVariants = ({
     
     fetchColorVariants();
   }, [product, productId]);
+
+  
 
   // Function to get color code (hex value) from color name
   const getColorCode = (colorName) => {
@@ -196,7 +301,6 @@ const ColorVariants = ({
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
           <p className="text-xs font-medium">COLOR:</p>
-          {selectedColor && <p className="text-xs">{selectedColor}</p>}
         </div>
         <div className="flex flex-wrap gap-3">
           {[1, 2, 3, 4].map((index) => (
@@ -223,7 +327,6 @@ const ColorVariants = ({
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
           <p className="text-xs font-medium">COLOR:</p>
-          {selectedColor && <p className="text-xs">{selectedColor}</p>}
         </div>
         <div className="flex flex-wrap gap-3">
           {product?.colors?.map((color, index) => (
@@ -253,16 +356,14 @@ const ColorVariants = ({
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
-        <p className="text-xs font-medium">COLOR:</p>
-        {selectedColor && <p className="text-xs">{selectedColor}</p>}
+        <p className="text-xs font-medium">COLOR: {selectedColor}</p>
       </div>
       <div className="flex flex-wrap gap-3">
         {colorVariants.map((variant, index) => (
           <button
             key={index}
             className={`w-[40px] h-[40px] flex transition-all cursor-pointer duration-300 items-center justify-center overflow-hidden ${
-              (variant.isCurrentVariant && selectedColor === variant.color) || 
-              (!variant.isCurrentVariant && variant.id === productId)
+              selectedColor?.toLowerCase() === variant.color?.toLowerCase() 
                 ? "ring-1 ring-black"
                 : "ring-1 ring-gray-300"
             }`}
@@ -286,13 +387,6 @@ const ColorVariants = ({
           </button>
         ))}
       </div>
-      
-      {/* Display current selected color name if needed */}
-      {selectedColor && (
-        <div className="text-xs text-gray-600 mt-2">
-          Selected: {selectedColor}
-        </div>
-      )}
     </div>
   );
 };

@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import ProductCarouselSkeleton from "./loadingSkeleton/ProductCarouselSkeleton";
 
-const ProductCarousel = ({ images }) => {
+const ProductCarousel = ({ images, loading }) => {
   const [currentPair, setCurrentPair] = useState([0, 1]);
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(1); 
@@ -101,6 +102,10 @@ const ProductCarousel = ({ images }) => {
   };
 
   const visibleThumbnails = getVisibleThumbnails();
+  if (loading) {
+      return ProductCarouselSkeleton;
+    }
+  
 
   return (
     <div 
