@@ -19,7 +19,7 @@ import api from "../services/api";
 import ColorVariants from "../components/ColorVaraint";
 import { useWishlist } from "../context/WishlistContext";
 
-const ProductDetailsPage = () => {
+const DesktopProductDetailsPage = () => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
 
   const reviewsRef = useRef(null);
@@ -1473,13 +1473,11 @@ const ProductDetailsPage = () => {
         )}
       </div>
 
-      <div ref={reviewsRef}>
-        <CustomersReviews productName={product.name} />
-      </div>
+     
 
       <Footer />
     </>
   );
 };
 
-export default ProductDetailsPage
+export default DesktopProductDetailsPage;
