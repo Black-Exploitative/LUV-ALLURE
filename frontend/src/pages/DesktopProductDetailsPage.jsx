@@ -1211,9 +1211,9 @@ const DesktopProductDetailsPage = () => {
   return (
     <>
       <div className="mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]">
-        <div className="mt-[60px] sm:mt-[80px] md:mt-[100px] flex flex-col md:flex-row">
+        <div className="mt-[60px] md:mt-[100px] flex flex-row">
           {/* Left Side: Product Carousel */}
-          <div className="mb-8 md:mb-0 md:mr-[50px] w-full md:w-auto md:flex-1">
+          <div className="mb-8 md:mb-0 mr-[50px] ">
             <ProductCarousel images={displayImages} />
 
             {/* Related Products - Also inside the max-w-screen-xl container */}
@@ -1261,7 +1261,7 @@ const DesktopProductDetailsPage = () => {
           </div>
 
           {/* Right Side: Product Details */}
-          <div className="w-full md:w-[400px] flex flex-col justify-start">
+          <div className="w-[500px] flex flex-col justify-start">
             {/* Product Name */}
             <h1 className="text-xl font-normal">{product.name}</h1>
             {/*  Star Rating */}
