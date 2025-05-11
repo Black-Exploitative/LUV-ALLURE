@@ -10,6 +10,8 @@ const { createShopifyOrder } = require('../utils/orderUtils');
 // Create a new order and initialize payment
 exports.createOrder = async (req, res, next) => {
   try {
+    console.log('Creating order with data:', JSON.stringify(req.body, null, 2));
+    
     const { 
       items, 
       subtotal, 
@@ -25,27 +27,92 @@ exports.createOrder = async (req, res, next) => {
       shippingAddress 
     } = req.body;
     
-    // Create order in our database
-    const order = new Order({
-      userId: req.user ? req.user.id : null,
-      items: items.map(item => ({
+    // Validate required fields
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order must contain at least one item'
+      });
+    }
+    
+    if (!subtotal || isNaN(parseFloat(subtotal))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid subtotal'
+      });
+    }
+    
+    if (!reference) {
+      return res.status(400).json({
+        success: false,
+        message: 'Reference is required'
+      });
+    }
+    
+    if (!shippingAddress) {
+      return res.status(400).json({
+        success: false,
+        message: 'Shipping address is required'
+      });
+    }
+    
+    // Process and normalize numeric values
+    const normalizedSubtotal = parseFloat(subtotal);
+    const normalizedTax = parseFloat(tax || 0);
+    const normalizedShipping = parseFloat(shipping || 0);
+    const normalizedTotal = parseFloat(total);
+    
+    // Validate calculated total
+    const calculatedTotal = normalizedSubtotal + normalizedTax + normalizedShipping + 
+                          (packagingOption && packagingOption.price ? parseFloat(packagingOption.price) : 0);
+    
+    if (Math.abs(calculatedTotal - normalizedTotal) > 1) { // Allow small rounding differences
+      console.warn(`Total mismatch: provided ${normalizedTotal}, calculated ${calculatedTotal}`);
+    }
+    
+    // Check for existing order with same reference
+    const existingOrder = await Order.findOne({ reference });
+    if (existingOrder) {
+      console.log(`Order with reference ${reference} already exists`);
+      return res.status(409).json({
+        success: false,
+        message: 'An order with this reference already exists',
+        orderId: existingOrder._id
+      });
+    }
+
+    // Format items with consistent prices
+    const formattedItems = items.map(item => {
+      // Ensure price is a number
+      let itemPrice = item.price;
+      if (typeof itemPrice === 'string') {
+        itemPrice = parseFloat(itemPrice);
+      }
+      
+      return {
         variantId: item.variantId || item.id,
         shopifyProductId: item.productId || item.shopifyProductId || null,
         quantity: item.quantity || 1,
-        title: item.name || item.title,
-        price: item.price,
+        title: item.title || item.name,
+        price: itemPrice,
         image: item.image || (item.images && item.images[0])
-      })),
-      subtotal,
-      tax,
-      shipping,
+      };
+    });
+    
+    // Create order in our database
+    const order = new Order({
+      userId: req.user ? req.user.id : null,
+      items: formattedItems,
+      subtotal: normalizedSubtotal,
+      tax: normalizedTax,
+      shipping: normalizedShipping,
       packagingDetails: {
         packagingType: packagingOption?.id || 'normal',
         packagingName: packagingOption?.name || 'Normal Packaging',
-        packagingPrice: packagingOption?.price || 0,
+        packagingPrice: packagingOption?.price ? parseFloat(packagingOption.price) : 0,
         giftMessage: giftMessage || null
       },
-      total,
+      total: normalizedTotal,
       transactionId,
       reference,
       shippingProvider,
@@ -55,7 +122,9 @@ exports.createOrder = async (req, res, next) => {
       status: 'pending'
     });
     
+    console.log('Saving order to database...');
     await order.save();
+    console.log(`Order created successfully with ID: ${order._id}`);
     
     res.status(201).json({ 
       success: true, 
@@ -65,6 +134,25 @@ exports.createOrder = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error creating order:', error);
+    
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: 'An order with this reference already exists'
+      });
+    }
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
+    
     next(error);
   }
 };
@@ -222,11 +310,40 @@ exports.getOrders = async (req, res, next) => {
 exports.getOrderById = async (req, res, next) => {
   try {
     const { orderId } = req.params;
-    
-    const order = await Order.findOne({
-      _id: orderId,
-      userId: req.user ? req.user.id : null
-    });
+    let order;
+
+    // Check if orderId is a valid MongoDB ObjectId
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(orderId);
+
+    if (isValidObjectId) {
+      // Find by MongoDB ID
+      order = await Order.findOne({
+        _id: orderId,
+        userId: req.user ? req.user.id : null
+      });
+    } else {
+      // Find by Shopify order ID
+      order = await Order.findOne({
+        shopifyOrderId: orderId,
+        userId: req.user ? req.user.id : null
+      });
+
+      // If not found in our database, try to fetch from Shopify directly
+      if (!order && /^\d+$/.test(orderId)) {
+        try {
+          const shopifyOrder = await shopifyClient.getOrderById(orderId);
+          if (shopifyOrder) {
+            // Transform Shopify order to match our format
+            return res.status(200).json({
+              success: true,
+              order: transformShopifyOrder(shopifyOrder, req.user)
+            });
+          }
+        } catch (shopifyError) {
+          console.error('Error fetching from Shopify:', shopifyError);
+        }
+      }
+    }
     
     if (!order) {
       return res.status(404).json({ 
@@ -240,9 +357,56 @@ exports.getOrderById = async (req, res, next) => {
       order 
     });
   } catch (error) {
+    console.error(`Error retrieving order:`, error);
     next(error);
   }
 };
+
+// Helper function to transform Shopify orders
+function transformShopifyOrder(shopifyOrder, user) {
+  return {
+    _id: shopifyOrder.id,
+    shopifyOrderId: shopifyOrder.id,
+    reference: shopifyOrder.name || shopifyOrder.order_number,
+    createdAt: shopifyOrder.created_at,
+    status: mapShopifyStatusToOurs(shopifyOrder.fulfillment_status, shopifyOrder.financial_status),
+    total: parseFloat(shopifyOrder.total_price) || 0,
+    subtotal: parseFloat(shopifyOrder.subtotal_price) || 0,
+    tax: parseFloat(shopifyOrder.total_tax) || 0,
+    shipping: parseFloat(shopifyOrder.shipping_lines?.[0]?.price || 0),
+    userId: user?.id || null,
+    items: shopifyOrder.line_items.map(item => ({
+      title: item.title,
+      quantity: item.quantity,
+      price: parseFloat(item.price),
+      variantId: item.variant_id,
+      productId: item.product_id,
+      image: item.image?.src || '/images/placeholder.jpg'
+    })),
+    shippingAddress: {
+      firstName: shopifyOrder.shipping_address?.first_name || '',
+      lastName: shopifyOrder.shipping_address?.last_name || '',
+      address: shopifyOrder.shipping_address?.address1 || '',
+      city: shopifyOrder.shipping_address?.city || '',
+      state: shopifyOrder.shipping_address?.province || '',
+      country: shopifyOrder.shipping_address?.country || '',
+      zipCode: shopifyOrder.shipping_address?.zip || '',
+      phone: shopifyOrder.shipping_address?.phone || ''
+    },
+    shippingProvider: shopifyOrder.shipping_lines?.[0]?.title || 'Standard Shipping',
+    paymentStatus: mapShopifyFinancialStatus(shopifyOrder.financial_status),
+    paymentGateway: 'paystack'
+  };
+}
+
+function mapShopifyFinancialStatus(status) {
+  switch(status) {
+    case 'paid': return 'paid';
+    case 'refunded': return 'refunded';
+    case 'partially_refunded': return 'refunded';
+    default: return 'pending';
+  }
+}
 
 // Webhook handler for Paystack payment events
 exports.paystackWebhook = async (req, res) => {

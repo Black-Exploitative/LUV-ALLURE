@@ -1,4 +1,4 @@
-// utils/orderUtils.js
+// backend/utils/orderUtils.js - Fixed variable scoping issues
 const shopifyClient = require('./shopifyClient');
 const Order = require('../models/Order');
 
@@ -11,7 +11,9 @@ async function createShopifyOrder(order) {
         return { id: order.shopifyOrderId };
       }
       
+      // Initialize arrays for line items and custom line items
       const lineItems = [];
+      const customLineItems = []; // Define customLineItems before using it
     
       for (const item of order.items) {
         // Make sure we're using the correct variant ID format
@@ -36,46 +38,54 @@ async function createShopifyOrder(order) {
           
           if (!variant || !variant.availableForSale) {
             console.log(`Variant ${variantId} is not available, will use custom line item instead`);
-            // Don't add to lineItems - it will be added as custom line item instead
+            // Add as custom line item
+            customLineItems.push({
+              title: item.title || 'Product',
+              quantity: item.quantity || 1,
+              originalUnitPrice: parseFloat(item.price).toString(),
+              requiresShipping: true,
+              taxable: true,
+              properties: item.image ? [
+                { name: 'Image', value: item.image }
+              ] : undefined
+            });
           } else {
             // Add as a real product line item with the proper Shopify ID
             lineItems.push({
               variantId: formattedVariantId,
-              quantity: item.quantity || 1
+              quantity: item.quantity || 1,
+              // Add image URL as property if it's not available through the variant
+              properties: item.image ? [
+                { name: 'Image', value: item.image }
+              ] : undefined
             });
           }
         } catch (error) {
           console.log(`Error verifying variant ${variantId}, will use custom line item instead:`, error);
-          // Don't add to lineItems - it will be added as custom line item instead
+          // Add as custom line item
+          customLineItems.push({
+            title: item.title || 'Product',
+            quantity: item.quantity || 1,
+            originalUnitPrice: parseFloat(item.price).toString(),
+            requiresShipping: true,
+            taxable: true,
+            properties: item.image ? [
+              { name: 'Image', value: item.image }
+            ] : undefined
+          });
         }
       }
-
-        const customLineItems = order.items
-        .filter(item => {
-        const normalizedId = (typeof item.variantId === 'string' && item.variantId.includes('/'))
-            ? item.variantId.split('/').pop()
-            : item.variantId;
-        
-        return !lineItems.some(li => li.variantId.includes(normalizedId));
-        })
-        .map(item => ({
-        title: item.title || 'Product',
-        quantity: item.quantity || 1,
-        originalUnitPrice : ((parseFloat(item.price) || 0) * 100).toString(),
-        requiresShipping: true,
-        taxable: true
-        }));
       
-      
-        if (order.packagingDetails?.packagingType !== 'normal' && order.packagingDetails?.packagingPrice > 0) {
-            customLineItems.push({
-              title: order.packagingDetails.packagingName || "Premium Packaging",
-              quantity: 1,
-              originalUnitPrice: (order.packagingDetails.packagingPrice || 0).toString(),
-              requiresShipping: false,
-              taxable: false
-            });
-          }
+      // Add packaging if selected
+      if (order.packagingDetails?.packagingType !== 'normal' && order.packagingDetails?.packagingPrice > 0) {
+        customLineItems.push({
+          title: order.packagingDetails.packagingName || "Premium Packaging",
+          quantity: 1,
+          originalUnitPrice: order.packagingDetails.packagingPrice.toString(),
+          requiresShipping: false,
+          taxable: false
+        });
+      }
       
       // Prepare shipping address
       const shippingAddress = {
@@ -90,8 +100,29 @@ async function createShopifyOrder(order) {
       };
       
       // Create draft order in Shopify
-      const shopifyOrderData = {
-        lineItems,
+      const draftOrderQuery = `
+        mutation draftOrderCreate($input: DraftOrderInput!) {
+          draftOrderCreate(input: $input) {
+            draftOrder {
+              id
+              name
+              totalPrice
+              subtotalPrice
+              customer {
+                id
+              }
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      `;
+
+      // Create draft order input
+      const draftOrderInput = {
+        lineItems: lineItems,
         customLineItems: customLineItems.length > 0 ? customLineItems : undefined,
         shippingAddress,
         shippingLine: {
@@ -99,10 +130,7 @@ async function createShopifyOrder(order) {
           price: (order.shipping || 0).toString()
         },
         customer: {
-            id: order.customerId || null,
-          /*firstName: order.shippingAddress.firstName || "Customer",
-          lastName: order.shippingAddress.lastName || "",
-          email: order.shippingAddress.email || "customer@example.com"*/
+          id: order.customerId || null
         },
         customAttributes: [
           { key: "Source", value: "Luv's Allure Website" },
@@ -112,7 +140,6 @@ async function createShopifyOrder(order) {
           { key: "Shipping Provider", value: order.shippingProvider || "Not specified" },
           { key: "Estimated Delivery", value: order.estimatedDeliveryDays || "Not specified" },
           { key: "Packaging Type", value: order.packagingDetails?.packagingName || "Normal Packaging" },
-          // If there's a gift message, add it as a custom attribute
           ...(order.packagingDetails?.giftMessage ? [{ key: "Gift Message", value: order.packagingDetails.giftMessage }] : [])
         ],
         note: `Order processed through Luv's Allure website. 
@@ -128,87 +155,106 @@ async function createShopifyOrder(order) {
         tags: ["website-order"]
       };
       
-      // Create the order in Shopify
-      const shopifyOrder = await shopifyClient.createOrder(shopifyOrderData);
-      
-      // Update our order with Shopify order ID
-      if (shopifyOrder && shopifyOrder.id) {
-        order.shopifyOrderId = shopifyOrder.id;
-        order.shopifySyncAttempted = true;
-        await order.save();
-        
-        console.log(`Created Shopify order ${shopifyOrder.id} for order ${order._id}`);
-        return shopifyOrder;
-      } else {
-        throw new Error('Failed to create Shopify order: No ID returned');
+      // Execute the draft order creation
+      const draftOrderResult = await shopifyClient.adminQuery(draftOrderQuery, {
+        input: draftOrderInput
+      });
+
+      if (draftOrderResult.draftOrderCreate.userErrors.length > 0) {
+        throw new Error(
+          `Draft order creation errors: ${JSON.stringify(
+            draftOrderResult.draftOrderCreate.userErrors
+          )}`
+        );
       }
-    } catch (error) {
-      console.error(`Error creating Shopify order for order ${order._id}:`, error);
-      
-      // If the error is about product availability, try creating with just custom line items
-      if (error.message && error.message.includes('no longer available')) {
-        console.log('Attempting to create order with custom line items only...');
-        
-        try {
-          // Create custom line items for each product in the order
-          const customLineItems = order.items.map(item => ({
-            title: item.title || 'Product',
-            quantity: item.quantity || 1,
-            originalUnitPrice : ((parseFloat(item.price) || 0) * 100).toString(),
-            requiresShipping: true,
-            taxable: true
-          }));
-          
-          // Add packaging if applicable
-          if (order.packagingDetails?.packagingType !== 'normal' && order.packagingDetails?.packagingPrice > 0) {
-            customLineItems.push({
-              title: order.packagingDetails.packagingName || "Premium Packaging",
-              quantity: 1,
-              originalUnitPrice: (order.packagingDetails.packagingPrice || 0).toString(),
-              requiresShipping: false,
-              taxable: false
-            });
+
+      const draftOrderId = draftOrderResult.draftOrderCreate.draftOrder.id;
+
+      // Complete the draft order to create an actual order
+      const completeDraftOrderQuery = `
+        mutation draftOrderComplete($id: ID!) {
+          draftOrderComplete(id: $id) {
+            draftOrder {
+              id
+              order {
+                id
+                name
+                processedAt
+                totalPrice
+              }
+            }
+            userErrors {
+              field
+              message
+            }
           }
-          
-          // Create a new order data object with only custom line items
-          const fallbackOrderData = {
-            // Use only custom line items
-            customLineItems,
-            shippingAddress: shopifyOrderData.shippingAddress,
-            shippingLine: shopifyOrderData.shippingLine,
-            customer: shopifyOrderData.customer,
-            customAttributes: shopifyOrderData.customAttributes,
-            note: shopifyOrderData.note + '\n\nNote: Original product variants were unavailable, replaced with custom line items.',
-            email: shopifyOrderData.email,
-            tags: [...(shopifyOrderData.tags || []), "product-unavailable-fallback"]
-          };
-          
-          // Try creating the order again with only custom line items
-          const fallbackOrder = await shopifyClient.createOrder(fallbackOrderData);
-          
-          if (fallbackOrder && fallbackOrder.id) {
-            order.shopifyOrderId = fallbackOrder.id;
-            order.shopifySyncAttempted = true;
-            order.shopifySyncError = 'Created with custom line items due to product availability issues';
-            await order.save();
-            
-            console.log(`Created fallback Shopify order ${fallbackOrder.id} for order ${order._id}`);
-            return fallbackOrder;
-          }
-        } catch (fallbackError) {
-          console.error('Error creating fallback order:', fallbackError);
         }
+      `;
+
+      const completeResult = await shopifyClient.adminQuery(completeDraftOrderQuery, {
+        id: draftOrderId
+      });
+
+      if (completeResult.draftOrderComplete.userErrors.length > 0) {
+        throw new Error(
+          `Draft order completion errors: ${JSON.stringify(
+            completeResult.draftOrderComplete.userErrors
+          )}`
+        );
       }
-      
-      // Mark the order as processed even if Shopify sync fails
+
+      const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
+
+      // TRY to mark the order as paid, but don't fail if it doesn't work
       try {
-        order.shopifySyncAttempted = true;
-        order.shopifySyncError = error.message;
-        await order.save();
-      } catch (saveError) {
-        console.error('Error saving order sync status:', saveError);
+        const markAsPaidQuery = `
+          mutation orderMarkAsPaid($input: OrderMarkAsPaidInput!) {
+            orderMarkAsPaid(input: $input) {
+              order {
+                id
+                name
+                displayFinancialStatus
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `;
+
+        const markAsPaidResult = await shopifyClient.adminQuery(markAsPaidQuery, {
+          input: {
+            id: orderId
+          }
+        });
+
+        if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
+          console.warn(
+            `Warning: Could not mark order as paid: ${JSON.stringify(
+              markAsPaidResult.orderMarkAsPaid.userErrors
+            )}`
+          );
+        }
+      } catch (paymentError) {
+        // Log the error but don't fail the order creation
+        console.warn(
+          "Warning: Could not mark order as paid:",
+          paymentError.message
+        );
       }
-      
+
+      // Return the order data regardless of payment marking status
+      return {
+        id: orderId,
+        name: completeResult.draftOrderComplete.draftOrder.order.name,
+        processedAt:
+          completeResult.draftOrderComplete.draftOrder.order.processedAt,
+        totalPrice:
+          completeResult.draftOrderComplete.draftOrder.order.totalPrice
+      };
+    } catch (error) {
+      console.error("Error creating Shopify order:", error);
       throw error;
     }
   }

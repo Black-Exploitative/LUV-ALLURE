@@ -20,6 +20,8 @@ const paymentRoutes = require('./routes/paymentRoutes'); // New payment routes
 dotenv.config();
 const app = express();
 
+mongoose.set('strictQuery', false);
+
 // Middleware
 app.use(cors());
 app.use(express.json());

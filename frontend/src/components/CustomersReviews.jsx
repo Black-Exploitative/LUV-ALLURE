@@ -1,149 +1,235 @@
+// frontend/src/components/CustomersReviews.jsx - Removed mock data
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import ReviewModal from "./ReviewModal";
+import api from "../services/api";
 
-const CustomersReviews = ({
-  averageRating: initialAverageRating = 4.9,
-  totalReviews: initialTotalReviews = 90,
-  ratingCounts: initialRatingCounts = { 5: 83, 4: 5, 3: 2, 2: 0, 1: 0 },
-  productId = "Product ID",
-  productName = "Product Name",
-}) => {
-  const [qualityRating, setQualityRating] = useState("Very High");
-  const [fitRating, setFitRating] = useState("True to size");
+const CustomersReviews = ({ productId, productName }) => {
+  const [qualityRating, setQualityRating] = useState(null);
+  const [fitRating, setFitRating] = useState(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   // State for reviews and stats
   const [reviews, setReviews] = useState([]);
-  const [averageRating, setAverageRating] = useState(initialAverageRating);
-  const [totalReviews, setTotalReviews] = useState(initialTotalReviews);
-  const [ratingCounts, setRatingCounts] = useState(initialRatingCounts);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [ratingCounts, setRatingCounts] = useState({ 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 });
   const [canReview, setCanReview] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load stored reviews from localStorage on initial render
- useEffect(() => {
-    const checkReviewEligibility = async () => {
+  // Load reviews and check review eligibility
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setLoading(true);
+      
       try {
-        const response = await api.get(`/products/${productId}/can-review`);
-        setCanReview(response.data.canReview);
+        if (!productId || productId === "Product ID") {
+          // Load local reviews for demo/test products
+          const storedReviews = localStorage.getItem(`reviews-${productName}`);
+          if (storedReviews) {
+            const parsedReviews = JSON.parse(storedReviews);
+            setReviews(parsedReviews);
+            calculateReviewStats(parsedReviews);
+          }
+        } else {
+          // Fetch real reviews from API
+          const response = await api.get(`/products/${productId}/reviews`);
+          if (response.data && response.data.reviews) {
+            setReviews(response.data.reviews);
+            calculateReviewStats(response.data.reviews);
+            
+            // If the API provides pre-calculated stats, use those
+            if (response.data.averageRating) {
+              setAverageRating(response.data.averageRating);
+            }
+            if (response.data.totalReviews) {
+              setTotalReviews(response.data.totalReviews);
+            }
+            if (response.data.ratingCounts) {
+              setRatingCounts(response.data.ratingCounts);
+            }
+          }
+        }
       } catch (error) {
-        console.error('Error checking review eligibility:', error);
-        setCanReview(false);
-      }
-    };
-    
-    if (productId) {
-      checkReviewEligibility();
-    }
-  }, [productId]);
-
-  // Function to update review statistics
-  const updateReviewStats = (reviewsList) => {
-    const newTotalReviews = initialTotalReviews + reviewsList.length;
-
-    const newRatingCounts = { ...initialRatingCounts };
-    reviewsList.forEach((review) => {
-      if (review.rating > 0) {
-        newRatingCounts[review.rating] =
-          (newRatingCounts[review.rating] || 0) + 1;
-      }
-    });
-
-    let totalStars = 0;
-    let totalRatings = 0;
-
-    // Add up initial ratings
-    Object.keys(initialRatingCounts).forEach((rating) => {
-      totalStars += parseInt(rating) * initialRatingCounts[rating];
-      totalRatings += initialRatingCounts[rating];
-    });
-
-    // Add ratings from new reviews
-    reviewsList.forEach((review) => {
-      if (review.rating > 0) {
-        totalStars += review.rating;
-        totalRatings += 1;
-      }
-    });
-
-    const newAverageRating =
-      totalRatings > 0
-        ? (totalStars / totalRatings).toFixed(1)
-        : initialAverageRating;
-
-    setTotalReviews(newTotalReviews);
-    setRatingCounts(newRatingCounts);
-    setAverageRating(parseFloat(newAverageRating));
-
-    // Update quality and fit ratings based on review data
-    updateQualityAndFitRatings(reviewsList);
-  };
-
-  // Update quality and fit ratings based on reviews
-  const updateQualityAndFitRatings = (reviewsList) => {
-    let qualitySum = 0;
-    let qualityCount = 0;
-    let fitCounts = { "Runs small": 0, "True to size": 0, "Runs large": 0 };
-
-    reviewsList.forEach((review) => {
-      // Track quality ratings
-      if (review.quality) {
-        const qualityValues = {
-          "Very Low": 1,
-          Low: 2,
-          Okay: 3,
-          High: 4,
-          "Very High": 5,
-        };
-        if (qualityValues[review.quality]) {
-          qualitySum += qualityValues[review.quality];
-          qualityCount++;
+        console.error('Error fetching reviews:', error);
+        // Load local reviews as fallback
+        const storedReviews = localStorage.getItem(`reviews-${productName}`);
+        if (storedReviews) {
+          const parsedReviews = JSON.parse(storedReviews);
+          setReviews(parsedReviews);
+          calculateReviewStats(parsedReviews);
         }
       }
+      
+      // Check if user can leave a review
+      try {
+        if (productId && productId !== "Product ID") {
+          const eligibilityResponse = await api.get(`/products/${productId}/can-review`);
+          if (eligibilityResponse.data) {
+            setCanReview(eligibilityResponse.data.canReview);
+          }
+        } else {
+          // For demo/test products, always allow reviews
+          setCanReview(true);
+        }
+      } catch (error) {
+        console.error('Error checking review eligibility:', error);
+        setCanReview(true); // Default to allowing reviews if check fails
+      }
+      
+      setLoading(false);
+    };
+    
+    fetchReviews();
+  }, [productId, productName]);
 
-      // Track fit ratings
+  // Calculate review statistics from review data
+  const calculateReviewStats = (reviewsList) => {
+    if (!reviewsList || reviewsList.length === 0) {
+      setAverageRating(0);
+      setTotalReviews(0);
+      setRatingCounts({ 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 });
+      return;
+    }
+    
+    // Count reviews for each rating
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let totalStars = 0;
+    
+    reviewsList.forEach(review => {
+      const rating = review.rating;
+      if (rating >= 1 && rating <= 5) {
+        counts[rating] = (counts[rating] || 0) + 1;
+        totalStars += rating;
+      }
+    });
+    
+    // Calculate average rating
+    const avg = totalStars / reviewsList.length;
+    const roundedAvg = Math.round(avg * 10) / 10; // Round to 1 decimal
+    
+    setRatingCounts(counts);
+    setTotalReviews(reviewsList.length);
+    setAverageRating(roundedAvg);
+    
+    // Calculate quality and fit ratings
+    calculateQualityAndFit(reviewsList);
+  };
+
+  // Calculate quality and fit ratings
+  const calculateQualityAndFit = (reviewsList) => {
+    if (!reviewsList || reviewsList.length === 0) {
+      setQualityRating(null);
+      setFitRating(null);
+      return;
+    }
+    
+    // Calculate quality rating
+    const qualityValues = {
+      "Very Low": 1,
+      "Low": 2,
+      "Okay": 3,
+      "High": 4,
+      "Very High": 5
+    };
+    
+    let qualitySum = 0;
+    let qualityCount = 0;
+    
+    reviewsList.forEach(review => {
+      if (review.quality && qualityValues[review.quality]) {
+        qualitySum += qualityValues[review.quality];
+        qualityCount++;
+      }
+    });
+    
+    if (qualityCount > 0) {
+      const avgQuality = qualitySum / qualityCount;
+      const qualityLabels = ["Very Low", "Low", "Okay", "High", "Very High"];
+      setQualityRating(qualityLabels[Math.round(avgQuality) - 1] || "Not Rated");
+    } else {
+      setQualityRating("Not Rated");
+    }
+    
+    // Calculate fit rating
+    const fitCounts = { 
+      "Runs small": 0, 
+      "True to size": 0, 
+      "Runs large": 0 
+    };
+    
+    reviewsList.forEach(review => {
       if (review.overallFit && fitCounts[review.overallFit] !== undefined) {
         fitCounts[review.overallFit]++;
       }
     });
-
-    // Only update if we have data
-    if (qualityCount > 0) {
-      const avgQuality = qualitySum / qualityCount;
-      const qualityLabels = ["Very Low", "Low", "Okay", "High", "Very High"];
-      setQualityRating(
-        qualityLabels[Math.round(avgQuality) - 1] || "Very High"
-      );
-    }
-
-    let maxFit = "True to size";
+    
+    // Find the most common fit
+    let maxFit = "Not Rated";
     let maxCount = 0;
+    
     for (const [fit, count] of Object.entries(fitCounts)) {
       if (count > maxCount) {
         maxCount = count;
         maxFit = fit;
       }
     }
-    if (maxCount > 0) {
-      setFitRating(maxFit);
-    }
+    
+    setFitRating(maxCount > 0 ? maxFit : "Not Rated");
   };
 
-  const handleReviewSubmit = (reviewData) => {
-    const newReviews = [reviewData, ...reviews];
-    setReviews(newReviews);
-
-    // Update localStorage
-    localStorage.setItem(`reviews-${productName}`, JSON.stringify(newReviews));
-
-    updateReviewStats(newReviews);
+  // Handle review submission
+  const handleReviewSubmit = async (reviewData) => {
+    try {
+      // Add product info to review
+      const reviewWithProduct = {
+        ...reviewData,
+        productId,
+        productName
+      };
+      
+      // If connected to backend, submit review to API
+      if (productId && productId !== "Product ID") {
+        await api.post(`/products/${productId}/reviews`, reviewWithProduct);
+      }
+      
+      // Also save to localStorage for immediate display
+      const newReviews = [reviewWithProduct, ...reviews];
+      setReviews(newReviews);
+      localStorage.setItem(`reviews-${productName}`, JSON.stringify(newReviews));
+      
+      // Update stats
+      calculateReviewStats(newReviews);
+      
+      toast.success("Thank you for your review!");
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast.error("There was a problem submitting your review. Please try again.");
+      
+      // Still update local state even if API fails
+      const newReviews = [reviewData, ...reviews];
+      setReviews(newReviews);
+      localStorage.setItem(`reviews-${productName}`, JSON.stringify(newReviews));
+      calculateReviewStats(newReviews);
+    }
   };
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  if (loading) {
+    return (
+      <div id="customer-reviews" className="py-8 border-t border-gray-200">
+        <h2 className="text-xl text-center font-normal mb-6">Customer Reviews</h2>
+        <div className="flex justify-center">
+          <div className="animate-spin h-8 w-8 border-2 border-black border-t-transparent rounded-full"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -157,12 +243,14 @@ const CustomersReviews = ({
       <div className="flex flex-col md:flex-row justify-between max-w-4xl mx-auto px-4 sm:px-6 md:px-0 gap-8 md:gap-4">
         {/* Left side: Overall Rating */}
         <div className="flex flex-col items-center mb-6 md:mb-0">
-          <div className="text-5xl sm:text-6xl font-thin tracking-wide">{averageRating}</div>
+          <div className="text-5xl sm:text-6xl font-thin tracking-wide">
+            {averageRating ? averageRating.toFixed(1) : '0.0'}
+          </div>
           <div className="flex my-2">
             {[...Array(5)].map((_, i) => (
               <svg
                 key={i}
-                className="w-4 h-4 sm:w-5 sm:h-5 text-black"
+                className={`w-4 h-4 sm:w-5 sm:h-5 ${i < Math.round(averageRating) ? 'text-black' : 'text-gray-300'}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -171,7 +259,7 @@ const CustomersReviews = ({
             ))}
           </div>
           <div className="text-xs sm:text-sm text-gray-700">
-            Based on {totalReviews} reviews
+            Based on {totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}
           </div>
         </div>
 
@@ -191,12 +279,14 @@ const CustomersReviews = ({
                 <div
                   className="h-2 bg-black rounded-sm"
                   style={{
-                    width: `${(ratingCounts[rating] / totalReviews) * 100}%`,
+                    width: totalReviews > 0 
+                      ? `${(ratingCounts[rating] / totalReviews) * 100}%` 
+                      : '0%',
                   }}
                 ></div>
               </div>
               <div className="text-sm w-6 text-right">
-                {ratingCounts[rating]}
+                {ratingCounts[rating] || 0}
               </div>
             </div>
           ))}
@@ -209,10 +299,17 @@ const CustomersReviews = ({
             <div className="w-full sm:w-40 md:w-48 bg-gray-200 rounded-sm h-2 mb-1">
               <div
                 className="h-2 bg-black rounded-sm"
-                style={{ width: "90%" }}
+                style={{ 
+                  width: qualityRating 
+                    ? (qualityRating === "Very High" ? "90%" :
+                       qualityRating === "High" ? "75%" :
+                       qualityRating === "Okay" ? "50%" : 
+                       qualityRating === "Low" ? "25%" : "10%")
+                    : "0%" 
+                }}
               ></div>
             </div>
-            <div className="text-xs text-right">{qualityRating}</div>
+            <div className="text-xs text-right">{qualityRating || "Not Rated"}</div>
           </div>
 
           <div>
@@ -220,30 +317,35 @@ const CustomersReviews = ({
             <div className="w-full sm:w-40 md:w-48 bg-gray-200 rounded-sm h-2 mb-1">
               <div
                 className="h-2 bg-black rounded-sm"
-                style={{ width: "50%" }}
+                style={{ 
+                  width: fitRating
+                    ? (fitRating === "Runs small" ? "25%" :
+                       fitRating === "True to size" ? "50%" :
+                       fitRating === "Runs large" ? "75%" : "0%")
+                    : "0%"
+                }}
               ></div>
             </div>
-            <div className="text-xs text-right">{fitRating}</div>
+            <div className="text-xs text-right">{fitRating || "Not Rated"}</div>
           </div>
         </div>
       </div>
 
-      
+      {/* Write a review button */}
       <div className="flex justify-center mt-8 md:mt-10">
         {canReview ? ( 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setIsReviewModalOpen(true)}
-          className="bg-black text-white px-6 py-3 text-sm cursor-pointer"
-        >
-          Write A Review
-        </motion.button>
-        ): (
-        <p>Purchase this product to leave a review.</p>
-      )}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setIsReviewModalOpen(true)}
+            className="bg-black text-white px-6 py-3 text-sm cursor-pointer"
+          >
+            Write A Review
+          </motion.button>
+        ) : (
+          <p className="text-sm text-gray-600">Purchase this product to leave a review.</p>
+        )}
       </div>
-      
 
       {/* Display Reviews Section */}
       <div className="mt-10 md:mt-12 max-w-4xl mx-auto px-4 sm:px-6 md:px-0">
@@ -414,16 +516,13 @@ const CustomersReviews = ({
 };
 
 CustomersReviews.propTypes = {
-  averageRating: PropTypes.number,
-  totalReviews: PropTypes.number,
-  ratingCounts: PropTypes.shape({
-    1: PropTypes.number,
-    2: PropTypes.number,
-    3: PropTypes.number,
-    4: PropTypes.number,
-    5: PropTypes.number,
-  }),
+  productId: PropTypes.string,
   productName: PropTypes.string,
+};
+
+CustomersReviews.defaultProps = {
+  productId: "Product ID",
+  productName: "Product Name"
 };
 
 export default CustomersReviews;

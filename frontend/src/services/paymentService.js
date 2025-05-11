@@ -1,4 +1,5 @@
-// frontend/src/services/paymentService.js
+// frontend/src/services/paymentService.js - Fixed transaction reference generation
+import axios from 'axios';
 import api from './api';
 import { 
   initializeInlinePayment, 
@@ -73,10 +74,23 @@ const paymentService = {
 
   // Generate unique transaction reference
   generateTransactionReference: () => {
-    const timestamp = Date.now();
-    const randomNum = Math.floor(Math.random() * 1000000);
-    return `LA-${timestamp}-${randomNum}`;
-  },
+  // Use timestamp plus random values to ensure uniqueness
+  const timestamp = Date.now();
+  
+  // Create a random string to ensure uniqueness
+  // We'll use a mix of characters to create a random component
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomStr = '';
+  for (let i = 0; i < 8; i++) {
+    randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  
+  // Add a random number component too
+  const randomNum = Math.floor(Math.random() * 1000000);
+  
+  // Return a formatted reference string
+  return `LA-${timestamp}-${randomStr}-${randomNum}`;
+},
 
   // Calculate payment fee (if any)
   calculatePaymentFee: (amount, paymentMethod = 'card') => {

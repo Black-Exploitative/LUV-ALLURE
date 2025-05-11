@@ -1,4 +1,4 @@
-// frontend/src/components/PaymentProcessor.jsx
+// frontend/src/components/PaymentProcessor.jsx - Fixed payment processing functions
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
@@ -9,15 +9,20 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isPaystackLoaded, setIsPaystackLoaded] = useState(false);
+  const [scriptLoadError, setScriptLoadError] = useState(false);
   
   // Load Paystack script on component mount
   useEffect(() => {
     const loadScript = async () => {
       try {
+        console.log("Loading Paystack script...");
         await loadPaystackScript();
+        console.log("Paystack script loaded successfully");
         setIsPaystackLoaded(true);
+        setScriptLoadError(false);
       } catch (error) {
         console.error('Failed to load Paystack:', error);
+        setScriptLoadError(true);
         toast.error('Payment system failed to load. Please refresh the page.');
       }
     };
@@ -34,16 +39,35 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
     
     try {
       if (!isPaystackLoaded) {
-        toast.error('Payment system is still loading. Please wait a moment.');
+        if (scriptLoadError) {
+          toast.error('Payment system failed to load. Please refresh the page.');
+        } else {
+          toast.error('Payment system is still loading. Please wait a moment.');
+        }
         setIsLoading(false);
         return;
       }
 
-      // Prepare payment data
+      // Validate orderData
+      if (!orderData || !orderData.email || !orderData.total || !orderData.reference) {
+        console.error("Invalid order data:", orderData);
+        toast.error("Invalid order data. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("Initializing payment with data:", {
+        email: orderData.email,
+        amount: orderData.total,
+        reference: orderData.reference,
+        orderId: orderData.id
+      });
+
+      // Prepare payment data - ensure total is a number
       const paymentData = {
         callback_url: PAYSTACK_CONFIG.callbackUrl,
         email: orderData.email,
-        amount: orderData.total,
+        amount: parseFloat(orderData.total), // Ensure it's a number
         reference: orderData.reference,
         orderId: orderData.id,
         customerName: `${orderData.firstName} ${orderData.lastName}`,
@@ -51,24 +75,34 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
       };
 
       // Initialize inline payment
+      console.log("Calling initializeInlinePayment...");
       const success = await initializeInlinePayment(
         paymentData,
         // Success callback
         async (response) => {
+          console.log("Payment success callback:", response);
           setIsLoading(false);
           try {
             // Verify the payment on our server
+            console.log("Verifying payment with reference:", response.reference);
             const verificationResult = await fetch(`/api/payment/verify/${response.reference}`, {
               headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
               }
-            }).then(res => res.json());
+            }).then(res => {
+              if (!res.ok) {
+                throw new Error(`Verification failed with status: ${res.status}`);
+              }
+              return res.json();
+            });
             
+            console.log("Payment verification result:", verificationResult);
             if (verificationResult.success) {
               toast.success('Payment successful!');
               onPaymentSuccess(verificationResult);
             } else {
-              toast.error('Payment verification failed. Please contact support.');
+              console.error("Payment verification failed:", verificationResult);
+              toast.error(verificationResult.message || 'Payment verification failed. Please contact support.');
             }
           } catch (error) {
             console.error('Payment verification error:', error);
@@ -77,6 +111,7 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
         },
         // Close callback
         () => {
+          console.log("Payment modal closed");
           setIsLoading(false);
           toast.error('Payment cancelled');
           onPaymentCancel();
@@ -84,6 +119,7 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
       );
 
       if (!success) {
+        console.error("Failed to initialize payment");
         toast.error('Failed to initialize payment. Please try again.');
         setIsLoading(false);
       }
@@ -98,21 +134,60 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
     setIsLoading(true);
     
     try {
-      // Prepare payment data
+      // Validate orderData
+      if (!orderData || !orderData.email || !orderData.total || !orderData.reference) {
+        console.error("Invalid order data:", orderData);
+        toast.error("Invalid order data. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Prepare payment data - ensure total is a number
       const paymentData = {
         email: orderData.email,
-        amount: orderData.total,
+        amount: parseFloat(orderData.total), // Ensure it's a number
         reference: orderData.reference,
         orderId: orderData.id,
         customerName: `${orderData.firstName} ${orderData.lastName}`,
         items: orderData.items
       };
 
+      console.log("Creating payment URL for bank transfer...");
       // Get payment URL and open in new window
       const paymentUrl = await createPaymentUrl(paymentData);
       window.open(paymentUrl, '_blank');
       
       toast.success('Payment initiated. Please complete the payment in the new window.');
+      
+      // Set up polling to check payment status
+      let attempts = 0;
+      const maxAttempts = 60; // Check for 5 minutes (5 sec intervals)
+      
+      const checkPaymentStatus = async () => {
+        try {
+          const result = await fetch(`/api/payment/verify/${orderData.reference}`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+          }).then(res => res.json());
+          
+          if (result.success && result.status === 'success') {
+            clearInterval(statusCheck);
+            onPaymentSuccess(result);
+          } else if (attempts >= maxAttempts) {
+            clearInterval(statusCheck);
+            // Don't show error, as user might still be completing payment
+          }
+          
+          attempts++;
+        } catch (error) {
+          console.error("Error checking payment status:", error);
+        }
+      };
+      
+      // Check every 5 seconds
+      const statusCheck = setInterval(checkPaymentStatus, 5000);
+      
     } catch (error) {
       console.error('Payment processing error:', error);
       toast.error(error.message || 'Payment failed. Please try again.');
@@ -120,6 +195,22 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
       setIsLoading(false);
     }
   };
+
+  // If order data is not available, show error
+  if (!orderData) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-xl font-medium mb-6">Payment Error</h3>
+        <p className="text-red-500 mb-4">Order data is not available. Please go back and try again.</p>
+        <button
+          className="text-sm text-gray-600 hover:text-black underline"
+          onClick={onPaymentCancel}
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -157,23 +248,36 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
         <h4 className="font-medium mb-2">Order Summary</h4>
         <div className="flex justify-between mb-1">
           <span className="text-gray-600">Subtotal</span>
-          <span>₦{orderData.subtotal.toLocaleString()}</span>
+          <span>₦{parseFloat(orderData.subtotal).toLocaleString()}</span>
         </div>
         <div className="flex justify-between mb-1">
           <span className="text-gray-600">Shipping</span>
-          <span>₦{orderData.shipping.toLocaleString()}</span>
+          <span>₦{parseFloat(orderData.shipping).toLocaleString()}</span>
         </div>
         {orderData.tax > 0 && (
           <div className="flex justify-between mb-1">
             <span className="text-gray-600">Tax</span>
-            <span>₦{orderData.tax.toLocaleString()}</span>
+            <span>₦{parseFloat(orderData.tax).toLocaleString()}</span>
+          </div>
+        )}
+        {orderData.packaging > 0 && (
+          <div className="flex justify-between mb-1">
+            <span className="text-gray-600">Packaging</span>
+            <span>₦{parseFloat(orderData.packaging).toLocaleString()}</span>
           </div>
         )}
         <div className="flex justify-between font-medium text-lg mt-2 pt-2 border-t border-gray-200">
           <span>Total</span>
-          <span>₦{orderData.total.toLocaleString()}</span>
+          <span>₦{parseFloat(orderData.total).toLocaleString()}</span>
         </div>
       </div>
+      
+      {/* Script load error message */}
+      {scriptLoadError && (
+        <div className="bg-red-50 text-red-600 p-4 mb-4 rounded">
+          <p>Unable to load payment system. Please try refreshing the page or try again later.</p>
+        </div>
+      )}
       
       {/* Payment buttons */}
       <div className="flex flex-col gap-3">
@@ -238,10 +342,11 @@ PaymentProcessor.propTypes = {
     email: PropTypes.string.isRequired,
     firstName: PropTypes.string.isRequired,
     lastName: PropTypes.string.isRequired,
-    subtotal: PropTypes.number.isRequired,
-    shipping: PropTypes.number.isRequired,
-    tax: PropTypes.number.isRequired,
-    total: PropTypes.number.isRequired,
+    subtotal: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    shipping: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    tax: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    packaging: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    total: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     items: PropTypes.array.isRequired
   }).isRequired,
   onPaymentSuccess: PropTypes.func.isRequired,

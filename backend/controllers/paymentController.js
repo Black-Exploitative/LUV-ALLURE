@@ -24,11 +24,27 @@ exports.initializePayment = async (req, res, next) => {
       });
     }
 
+    // Ensure amount is a number and convert to kobo
+    let koboAmount;
+    if (typeof amount === 'string') {
+      koboAmount = Math.round(parseFloat(amount) * 100);
+    } else if (typeof amount === 'number') {
+      koboAmount = Math.round(amount * 100);
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid amount format'
+      });
+    }
+
+    // Generate a truly unique reference if one wasn't provided
+    const uniqueReference = reference || `LA-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+
     // Initialize transaction with Paystack
     const paymentData = {
       email,
-      amount, // Convert to kobo (Paystack uses smallest currency unit)
-      reference,
+      amount: koboAmount, // Convert to kobo (Paystack uses smallest currency unit)
+      reference: uniqueReference,
       metadata: {
         order_id: orderId,
         ...metadata
@@ -36,6 +52,8 @@ exports.initializePayment = async (req, res, next) => {
       callback_url: process.env.PAYSTACK_CALLBACK_URL,
       channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer']
     };
+
+    console.log('Initializing Paystack payment with amount:', koboAmount, 'kobo');
 
     const response = await paystackClient.initializeTransaction(paymentData);
 

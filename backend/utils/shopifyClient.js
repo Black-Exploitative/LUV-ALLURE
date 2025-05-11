@@ -40,6 +40,40 @@ class ShopifyClient {
   }
 }
 
+async getOrderById(orderId) {
+  try {
+    await rateLimiter.acquire();
+    
+    // Clean up the order ID if it has a prefix
+    const cleanOrderId = orderId.toString().includes('gid://') 
+      ? orderId.toString().split('/').pop() 
+      : orderId.toString();
+    
+    // Use the REST Admin API to get order by ID
+    const response = await fetch(
+      `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/orders/${cleanOrderId}.json`,
+      {
+        method: 'GET',
+        headers: {
+          'X-Shopify-Access-Token': this.adminAccessToken
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Shopify API error ${response.status}: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    return data.order || null;
+  } catch (error) {
+    console.error(`Error fetching Shopify order ${orderId}:`, error);
+    throw error;
+  } finally {
+    rateLimiter.release();
+  }
+}
 
 
   async adminQuery(query, variables = {}) {

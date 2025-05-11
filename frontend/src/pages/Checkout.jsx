@@ -111,91 +111,119 @@ const Checkout = () => {
 
   // Handle review submission and create order
   const handleReviewSubmit = async () => {
-    setIsProcessingOrder(true);
+  setIsProcessingOrder(true);
+  
+  try {
+    // Generate a unique reference for the transaction
+    const reference = paymentService.generateTransactionReference();
+    console.log("Generated unique reference:", reference);
 
-    try {
-      // Generate a unique reference for the transaction
-      const reference = paymentService.generateTransactionReference();
+    // Get cart totals
+    const { subtotal } = getCartTotals();
+    
+    // Make sure all values are properly formatted as numbers 
+    const numericSubtotal = typeof subtotal === 'string' ? parseFloat(subtotal) : subtotal;
+    const numericTax = Math.round(numericSubtotal * 0.05); // 5% tax
+    const numericPackagingCost = selectedPackaging.price || 0;
+    const numericShippingCost = typeof shippingCost === 'string' ? parseFloat(shippingCost) : shippingCost;
+    
+    // Calculate total - ensure everything is a number
+    const numericTotal = numericSubtotal + numericShippingCost + numericTax + numericPackagingCost;
+    
+    console.log("Order values:", {
+      subtotal: numericSubtotal,
+      tax: numericTax,
+      shipping: numericShippingCost,
+      packaging: numericPackagingCost,
+      total: numericTotal
+    });
 
-      // Get cart totals
-      const { subtotal } = getCartTotals();
-      const tax = Math.round(subtotal * 0.05); // 5% tax
+    // Prepare items with consistent format
+    const formattedItems = cartItems.map(item => {
+      // Normalize price to ensure it's a number
+      let itemPrice = item.price;
+      if (typeof itemPrice === "string") {
+        itemPrice = parseFloat(itemPrice.replace(/,/g, ''));
+      }
+      
+      return {
+        variantId: item.variantId || item.id,
+        quantity: item.quantity || 1,
+        title: item.name || item.title,
+        price: itemPrice,
+        image: item.image || (item.images && item.images[0])
+      };
+    });
 
-      // Add packaging cost
-      const packagingCost = selectedPackaging.price;
-
-      // Calculate total
-      const total = subtotal + shippingCost + tax + packagingCost;
-
-      // Create order on backend
-      const response = await fetch("/api/orders/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+    // Create order on backend
+    console.log("Sending order data to backend...");
+    const response = await fetch("/api/orders/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify({
+        items: formattedItems,
+        subtotal: numericSubtotal,
+        tax: numericTax,
+        shipping: numericShippingCost,
+        packagingOption: selectedPackaging,
+        giftMessage: giftMessage.trim() || null,
+        total: numericTotal,
+        transactionId: reference,
+        reference,
+        shippingProvider: shippingMethod,
+        estimatedDeliveryDays: "3-5", // Default estimate
+        shippingAddress: {
+          ...shippingAddress,
+          email: currentUser.email,
         },
-        body: JSON.stringify({
-          items: cartItems.map((item) => ({
-            variantId: item.variantId || item.id,
-            quantity: item.quantity || 1,
-            title: item.name || item.title,
-            price:
-              typeof item.price === "string"
-                ? parseFloat(item.price)
-                : item.price,
-            image: item.image || (item.images && item.images[0]),
-          })),
-          subtotal,
-          tax,
-          shipping: shippingCost,
-          packagingOption: selectedPackaging,
-          giftMessage: giftMessage.trim() || null,
-          total,
-          transactionId: reference,
-          reference,
-          shippingProvider: shippingMethod,
-          estimatedDeliveryDays: "3-5", // Default estimate
-          shippingAddress: {
-            ...shippingAddress,
-            email: currentUser.email,
-          },
-        }),
+      }),
+    });
+
+    if (!response.ok) {
+      // Handle non-2xx responses
+      const errorText = await response.text();
+      console.error("Error response from server:", errorText);
+      throw new Error(`Server responded with status ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log("Order creation response:", data);
+
+    if (data.success) {
+      // Prepare order data for payment processing
+      setOrderData({
+        id: data.orderId,
+        reference: reference,
+        email: currentUser.email,
+        firstName: shippingAddress.firstName,
+        lastName: shippingAddress.lastName,
+        subtotal: numericSubtotal,
+        shipping: numericShippingCost,
+        packaging: numericPackagingCost,
+        tax: numericTax,
+        total: numericTotal,
+        items: formattedItems
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        // Prepare order data for payment processing
-        setOrderData({
-          id: data.orderId,
-          reference: reference,
-          email: currentUser.email,
-          firstName: shippingAddress.firstName,
-          lastName: shippingAddress.lastName,
-          subtotal,
-          shipping: shippingCost,
-          packaging: packagingCost,
-          tax,
-          total,
-          items: cartItems,
-        });
-
-        // Move to payment step
-        setCurrentStep("payment");
-      } else {
-        toast.error(
-          data.message || "Failed to create order. Please try again."
-        );
-      }
-    } catch (error) {
-      console.error("Error creating order:", error);
+      // Move to payment step
+      setCurrentStep("payment");
+    } else {
       toast.error(
-        "An error occurred while processing your order. Please try again."
+        data.message || "Failed to create order. Please try again."
       );
-    } finally {
-      setIsProcessingOrder(false);
     }
-  };
+  } catch (error) {
+    console.error("Error creating order:", error);
+    toast.error(
+      error.message || "An error occurred while processing your order. Please try again."
+    );
+  } finally {
+    setIsProcessingOrder(false);
+  }
+};
 
   // Handle successful payment
   const handlePaymentSuccess = async (paymentResult) => {
