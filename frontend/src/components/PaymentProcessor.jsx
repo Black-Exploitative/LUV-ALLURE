@@ -1,4 +1,4 @@
-// frontend/src/components/PaymentProcessor.jsx - Fixed payment processing functions
+// frontend/src/components/PaymentProcessor.jsx - Fixed payment amount handling
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
@@ -56,18 +56,24 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
         return;
       }
 
+      // Ensure total is a number for consistent handling
+      let paymentAmount = orderData.total;
+      if (typeof paymentAmount === 'string') {
+        paymentAmount = parseFloat(paymentAmount.replace(/,/g, ''));
+      }
+
       console.log("Initializing payment with data:", {
         email: orderData.email,
-        amount: orderData.total,
+        amount: paymentAmount, // Will be converted to kobo in initializeInlinePayment
         reference: orderData.reference,
         orderId: orderData.id
       });
 
-      // Prepare payment data - ensure total is a number
+      // Prepare payment data
       const paymentData = {
         callback_url: PAYSTACK_CONFIG.callbackUrl,
         email: orderData.email,
-        amount: parseFloat(orderData.total), // Ensure it's a number
+        amount: paymentAmount, // Ensure it's a number - conversion to kobo happens in initializeInlinePayment
         reference: orderData.reference,
         orderId: orderData.id,
         customerName: `${orderData.firstName} ${orderData.lastName}`,
@@ -142,10 +148,16 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
         return;
       }
 
-      // Prepare payment data - ensure total is a number
+      // Ensure total is a number for consistent handling
+      let paymentAmount = orderData.total;
+      if (typeof paymentAmount === 'string') {
+        paymentAmount = parseFloat(paymentAmount.replace(/,/g, ''));
+      }
+
+      // Prepare payment data
       const paymentData = {
         email: orderData.email,
-        amount: parseFloat(orderData.total), // Ensure it's a number
+        amount: paymentAmount, // Will be converted to kobo in createPaymentUrl
         reference: orderData.reference,
         orderId: orderData.id,
         customerName: `${orderData.firstName} ${orderData.lastName}`,

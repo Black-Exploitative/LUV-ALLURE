@@ -1,4 +1,4 @@
-// frontend/src/config/paystackConfig.js - Fixed Paystack configuration
+// frontend/src/config/paystackConfig.js - Fixed amount conversion
 
 // Paystack API configuration
 const PAYSTACK_CONFIG = {

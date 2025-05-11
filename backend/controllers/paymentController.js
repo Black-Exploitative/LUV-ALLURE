@@ -1,11 +1,11 @@
-// backend/controllers/paymentController.js
+// backend/controllers/paymentController.js - Fixed payment amount conversion
 const crypto = require('crypto');
 const paystackClient = require('../utils/paystackClient');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const { createShopifyOrder } = require('../utils/orderUtils');
 
-// Initialize a payment transaction
+// Initialize a payment transaction - Fixed amount conversion
 exports.initializePayment = async (req, res, next) => {
   try {
     const { 
@@ -24,12 +24,31 @@ exports.initializePayment = async (req, res, next) => {
       });
     }
 
-    // Ensure amount is a number and convert to kobo
+    // IMPORTANT FIX: Check if the amount is already in kobo (too large)
     let koboAmount;
-    if (typeof amount === 'string') {
-      koboAmount = Math.round(parseFloat(amount) * 100);
-    } else if (typeof amount === 'number') {
-      koboAmount = Math.round(amount * 100);
+    
+    if (typeof amount === 'number') {
+      // Detect if amount already seems to be in kobo (too large)
+      if (amount > 10000000) { // If > 100,000 Naira, likely already converted to kobo
+        console.log(`Amount ${amount} appears to be already in kobo, using as is`);
+        koboAmount = Math.round(amount);
+      } else {
+        // Normal conversion from Naira to kobo (×100)
+        koboAmount = Math.round(amount * 100);
+        console.log(`Converting ${amount} Naira to ${koboAmount} kobo`);
+      }
+    } else if (typeof amount === 'string') {
+      // Parse string to number, then apply same logic
+      const parsedAmount = parseFloat(amount.replace(/,/g, ''));
+      
+      if (parsedAmount > 10000000) { // If > 100,000 Naira, likely already in kobo
+        console.log(`Amount ${parsedAmount} appears to be already in kobo, using as is`);
+        koboAmount = Math.round(parsedAmount);
+      } else {
+        // Normal conversion from Naira to kobo (×100)
+        koboAmount = Math.round(parsedAmount * 100);
+        console.log(`Converting ${parsedAmount} Naira to ${koboAmount} kobo`);
+      }
     } else {
       return res.status(400).json({
         success: false,
@@ -40,10 +59,12 @@ exports.initializePayment = async (req, res, next) => {
     // Generate a truly unique reference if one wasn't provided
     const uniqueReference = reference || `LA-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
 
+    console.log('Initializing Paystack payment with amount:', koboAmount, 'kobo');
+
     // Initialize transaction with Paystack
     const paymentData = {
       email,
-      amount: koboAmount, // Convert to kobo (Paystack uses smallest currency unit)
+      amount: koboAmount, // Properly converted to kobo
       reference: uniqueReference,
       metadata: {
         order_id: orderId,
@@ -52,8 +73,6 @@ exports.initializePayment = async (req, res, next) => {
       callback_url: process.env.PAYSTACK_CALLBACK_URL,
       channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer']
     };
-
-    console.log('Initializing Paystack payment with amount:', koboAmount, 'kobo');
 
     const response = await paystackClient.initializeTransaction(paymentData);
 
@@ -147,84 +166,6 @@ exports.verifyPayment = async (req, res, next) => {
   }
 };
 
-// Webhook handler for Paystack events
-exports.paystackWebhook = async (req, res) => {
-  try {
-    // Verify that the request is from Paystack
-    const hash = crypto.createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
-      .update(JSON.stringify(req.body))
-      .digest('hex');
-    
-    if (hash !== req.headers['x-paystack-signature']) {
-      return res.status(401).send('Invalid signature');
-    }
-    
-    const { event, data } = req.body;
-    
-    // For successful charges
-    if (event === 'charge.success') {
-      const { reference } = data;
-      
-      // Find order with this reference
-      const order = await Order.findOne({ reference });
-      
-      if (order && order.paymentStatus !== 'paid') {
-        order.paymentStatus = 'paid';
-        order.status = 'processing';
-        order.paymentDetails = {
-          reference: data.reference,
-          amount: data.amount / 100, // Convert from kobo to naira
-          currency: data.currency,
-          channel: data.channel,
-          paymentDate: new Date(),
-          transactionId: data.id,
-          cardLast4: data.authorization?.last4 || null,
-          cardBrand: data.authorization?.card_type || null
-        };
-        
-        await order.save();
-        
-        // Clear user's cart if they are logged in
-        if (order.userId) {
-          await Cart.findOneAndUpdate(
-            { userId: order.userId },
-            { items: [] }
-          );
-        }
-      }
-    }
-    
-    // Always acknowledge receipt of webhook
-    return res.status(200).send('Webhook received');
-  } catch (error) {
-    console.error('Error processing Paystack webhook:', error);
-    // Always return success to Paystack to prevent them from retrying
-    return res.status(200).send('Webhook processed');
-  }
-};
-
-// Get list of banks
-exports.getBanks = async (req, res, next) => {
-  try {
-    const response = await paystackClient.getBanks();
-    
-    res.status(200).json({
-      success: true,
-      data: response.data
-    });
-  } catch (error) {
-    console.error('Error fetching banks:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch banks',
-      error: error.message
-    });
-  }
-};
-
-// backend/controllers/paymentController.js
-// Add this function to your existing controller
-
 // Handle Paystack callback
 exports.handlePaymentCallback = async (req, res) => {
     try {
@@ -245,7 +186,7 @@ exports.handlePaymentCallback = async (req, res) => {
       
       // If the order is already paid, just redirect to success page
       if (order.paymentStatus === 'paid') {
-        return res.redirect(`${process.env.FRONTEND_URL}/order-confirmation/${order.reference}`);
+        return res.redirect(`${process.env.FRONTEND_URL}/order-details/${order.id}`);
       }
       
       // Verify the payment with Paystack
@@ -288,70 +229,8 @@ exports.handlePaymentCallback = async (req, res) => {
                 { items: [] }
               );
             }
-            // Also clear local storage cart in frontend
-            // This can be done in the handlePaymentSuccess function in Checkout.jsx
           } catch (cartError) {
             console.error('Error clearing cart:', cartError);
-          }
-          
-          // Update inventory (if not already handled by Shopify)
-          // Loop through items and update inventory in your database if needed
-          for (const item of order.items) {
-            try {
-              // Get variant ID from the item
-              const variantId = item.variantId || item.id;
-              if (!variantId) continue;
-              
-              // Normalize variant ID if needed
-              let normalizedId = variantId;
-              if (typeof normalizedId === 'string') {
-                if (normalizedId.includes('/')) {
-                  normalizedId = normalizedId.split('/').pop();
-                }
-                if (normalizedId.includes('-')) {
-                  normalizedId = normalizedId.split('-')[0];
-                }
-              }
-              
-              // Get current inventory level
-              const Product = require('../models/Product'); // Adjust path as needed
-              
-              // Find the product in your local database
-              const product = await Product.findOne({ 
-                'variants.variantId': normalizedId 
-              });
-              
-              if (product) {
-                // Find the specific variant
-                const variantIndex = product.variants.findIndex(v => 
-                  v.variantId === normalizedId || v.variantId === String(normalizedId)
-                );
-                
-                if (variantIndex >= 0) {
-                  // Get current inventory and ordered quantity
-                  const currentInventory = product.variants[variantIndex].inventoryQuantity || 0;
-                  const orderedQuantity = item.quantity || 1;
-                  
-                  // Calculate new inventory level (prevent negative values)
-                  const newInventory = Math.max(0, currentInventory - orderedQuantity);
-                  
-                  // Update inventory in your database
-                  product.variants[variantIndex].inventoryQuantity = newInventory;
-                  
-                  // If inventory reaches zero, mark as not available
-                  if (newInventory === 0) {
-                    product.variants[variantIndex].availableForSale = false;
-                  }
-                  
-                  await product.save();
-                  
-                  console.log(`Updated inventory for ${product.title} - ${product.variants[variantIndex].title}: ${currentInventory} → ${newInventory}`);
-                }
-              }
-            } catch (error) {
-              console.error(`Error updating inventory for item ${item.title || item.name}:`, error);
-              // Continue processing other items even if this one fails
-            }
           }
           
           // Redirect to success page
@@ -369,3 +248,89 @@ exports.handlePaymentCallback = async (req, res) => {
       return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
     }
   };
+
+// Webhook handler for Paystack events
+exports.paystackWebhook = async (req, res) => {
+  try {
+    // Verify that the request is from Paystack
+    const hash = crypto.createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
+      .update(JSON.stringify(req.body))
+      .digest('hex');
+    
+    if (hash !== req.headers['x-paystack-signature']) {
+      return res.status(401).send('Invalid signature');
+    }
+    
+    const { event, data } = req.body;
+    
+    // For successful charges
+    if (event === 'charge.success') {
+      const { reference } = data;
+      
+      // Find order with this reference
+      const order = await Order.findOne({ reference });
+      
+      if (order && order.paymentStatus !== 'paid') {
+        order.paymentStatus = 'paid';
+        order.status = 'processing';
+        order.paymentDetails = {
+          reference: data.reference,
+          amount: data.amount / 100, // Convert from kobo to naira
+          currency: data.currency,
+          channel: data.channel,
+          paymentDate: new Date(),
+          transactionId: data.id,
+          authCode: data.authorization?.authorization_code || null,
+          cardLast4: data.authorization?.last4 || null,
+          cardBrand: data.authorization?.card_type || null
+        };
+        
+        await order.save();
+        
+        // Create Shopify order if it wasn't created earlier
+        try {
+          if (!order.shopifyOrderId) {
+            await createShopifyOrder(order);
+          }
+        } catch (shopifyError) {
+          console.error('Error creating Shopify order from webhook:', shopifyError);
+          // Continue processing even if Shopify sync fails
+        }
+        
+        // Clear user's cart if they are logged in
+        if (order.userId) {
+          await Cart.findOneAndUpdate(
+            { userId: order.userId },
+            { items: [] }
+          );
+        }
+      }
+    }
+    
+    // Always acknowledge receipt of webhook
+    return res.status(200).send('Webhook received');
+  } catch (error) {
+    console.error('Error processing Paystack webhook:', error);
+    // Always return success to Paystack to prevent them from retrying
+    return res.status(200).send('Webhook processed');
+  }
+};
+
+// Get list of banks
+exports.getBanks = async (req, res, next) => {
+  try {
+    const response = await paystackClient.getBanks();
+    
+    res.status(200).json({
+      success: true,
+      data: response.data
+    });
+  } catch (error) {
+    console.error('Error fetching banks:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch banks',
+      error: error.message
+    });
+  }
+};

@@ -1,8 +1,8 @@
-// backend/utils/orderUtils.js - Fixed variable scoping issues
+// backend/utils/orderUtils.js - Fixed Metafields structure
 const shopifyClient = require('./shopifyClient');
 const Order = require('../models/Order');
 
-// Shared function for creating Shopify orders
+// Fixed function for creating Shopify orders
 async function createShopifyOrder(order) {
     try {
       // Only create a Shopify order if it doesn't already exist
@@ -11,10 +11,10 @@ async function createShopifyOrder(order) {
         return { id: order.shopifyOrderId };
       }
       
-      // Initialize arrays for line items and custom line items
+      // Initialize arrays for line items that can be created directly
       const lineItems = [];
-      const customLineItems = []; // Define customLineItems before using it
-    
+      
+      // Prepare line items properly formatted for the DraftOrderInput
       for (const item of order.items) {
         // Make sure we're using the correct variant ID format
         let variantId = item.variantId;
@@ -29,56 +29,20 @@ async function createShopifyOrder(order) {
           variantId = variantId.split('-')[0];
         }
         
-        // Now format it properly for the Shopify Admin API
-        const formattedVariantId = `gid://shopify/ProductVariant/${variantId}`;
-        
-        try {
-          // Verify that this variant exists and is available
-          const variant = await shopifyClient.getProductVariantById(variantId);
-          
-          if (!variant || !variant.availableForSale) {
-            console.log(`Variant ${variantId} is not available, will use custom line item instead`);
-            // Add as custom line item
-            customLineItems.push({
-              title: item.title || 'Product',
-              quantity: item.quantity || 1,
-              originalUnitPrice: parseFloat(item.price).toString(),
-              requiresShipping: true,
-              taxable: true,
-              properties: item.image ? [
-                { name: 'Image', value: item.image }
-              ] : undefined
-            });
-          } else {
-            // Add as a real product line item with the proper Shopify ID
-            lineItems.push({
-              variantId: formattedVariantId,
-              quantity: item.quantity || 1,
-              // Add image URL as property if it's not available through the variant
-              properties: item.image ? [
-                { name: 'Image', value: item.image }
-              ] : undefined
-            });
-          }
-        } catch (error) {
-          console.log(`Error verifying variant ${variantId}, will use custom line item instead:`, error);
-          // Add as custom line item
-          customLineItems.push({
-            title: item.title || 'Product',
-            quantity: item.quantity || 1,
-            originalUnitPrice: parseFloat(item.price).toString(),
-            requiresShipping: true,
-            taxable: true,
-            properties: item.image ? [
-              { name: 'Image', value: item.image }
-            ] : undefined
-          });
-        }
+        // For all items, add them as regular line items with title, quantity, price
+        // This avoids using customLineItems which is not supported
+        lineItems.push({
+          title: item.title || 'Product',
+          quantity: item.quantity || 1,
+          originalUnitPrice: parseFloat(item.price).toString(), // Ensure price is a string
+          requiresShipping: true,
+          taxable: true
+        });
       }
       
-      // Add packaging if selected
+      // Add packaging if selected as a regular line item
       if (order.packagingDetails?.packagingType !== 'normal' && order.packagingDetails?.packagingPrice > 0) {
-        customLineItems.push({
+        lineItems.push({
           title: order.packagingDetails.packagingName || "Premium Packaging",
           quantity: 1,
           originalUnitPrice: order.packagingDetails.packagingPrice.toString(),
@@ -99,7 +63,7 @@ async function createShopifyOrder(order) {
         phone: order.shippingAddress.phone || ""
       };
       
-      // Create draft order in Shopify
+      // Create draft order in Shopify with correct input format
       const draftOrderQuery = `
         mutation draftOrderCreate($input: DraftOrderInput!) {
           draftOrderCreate(input: $input) {
@@ -108,9 +72,6 @@ async function createShopifyOrder(order) {
               name
               totalPrice
               subtotalPrice
-              customer {
-                id
-              }
             }
             userErrors {
               field
@@ -120,28 +81,71 @@ async function createShopifyOrder(order) {
         }
       `;
 
-      // Create draft order input
+      // Fixed metafields array with proper 'type' field
+      const metafields = [
+        { 
+          namespace: "custom", 
+          key: "Source", 
+          value: "Luv's Allure Website", 
+          type: "single_line_text_field"  // Added type field
+        },
+        { 
+          namespace: "custom", 
+          key: "Original_Order_ID", 
+          value: order._id.toString(), 
+          type: "single_line_text_field"  // Added type field
+        },
+        { 
+          namespace: "custom", 
+          key: "Payment_Gateway", 
+          value: order.paymentGateway || "paystack", 
+          type: "single_line_text_field"  // Added type field
+        },
+        { 
+          namespace: "custom", 
+          key: "Transaction_ID", 
+          value: order.transactionId || "", 
+          type: "single_line_text_field"  // Added type field
+        },
+        { 
+          namespace: "custom", 
+          key: "Shipping_Provider", 
+          value: order.shippingProvider || "Not specified", 
+          type: "single_line_text_field"  // Added type field
+        },
+        { 
+          namespace: "custom", 
+          key: "Estimated_Delivery", 
+          value: order.estimatedDeliveryDays || "Not specified", 
+          type: "single_line_text_field"  // Added type field
+        },
+        { 
+          namespace: "custom", 
+          key: "Packaging_Type", 
+          value: order.packagingDetails?.packagingName || "Normal Packaging", 
+          type: "single_line_text_field"  // Added type field
+        }
+      ];
+      
+      // Add gift message as a metafield if it exists
+      if (order.packagingDetails?.giftMessage) {
+        metafields.push({
+          namespace: "custom",
+          key: "Gift_Message",
+          value: order.packagingDetails.giftMessage,
+          type: "multi_line_text_field" // Different type for multi-line text
+        });
+      }
+
+      // Fixed draft order input with proper metafields
       const draftOrderInput = {
         lineItems: lineItems,
-        customLineItems: customLineItems.length > 0 ? customLineItems : undefined,
         shippingAddress,
         shippingLine: {
           title: `${order.shippingProvider || "Standard"} Shipping (${order.estimatedDeliveryDays || "3-5"} days)`,
           price: (order.shipping || 0).toString()
         },
-        customer: {
-          id: order.customerId || null
-        },
-        customAttributes: [
-          { key: "Source", value: "Luv's Allure Website" },
-          { key: "Original Order ID", value: order._id.toString() },
-          { key: "Payment Gateway", value: order.paymentGateway || "paystack" },
-          { key: "Transaction ID", value: order.transactionId || "" },
-          { key: "Shipping Provider", value: order.shippingProvider || "Not specified" },
-          { key: "Estimated Delivery", value: order.estimatedDeliveryDays || "Not specified" },
-          { key: "Packaging Type", value: order.packagingDetails?.packagingName || "Normal Packaging" },
-          ...(order.packagingDetails?.giftMessage ? [{ key: "Gift Message", value: order.packagingDetails.giftMessage }] : [])
-        ],
+        metafields: metafields,
         note: `Order processed through Luv's Allure website. 
         Payment via ${order.paymentGateway?.toUpperCase() || 'PAYSTACK'}. 
         Reference: ${order.reference || 'N/A'}.
@@ -204,6 +208,10 @@ async function createShopifyOrder(order) {
       }
 
       const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
+      
+      // Update our database with the Shopify order ID
+      order.shopifyOrderId = orderId;
+      await order.save();
 
       // TRY to mark the order as paid, but don't fail if it doesn't work
       try {
