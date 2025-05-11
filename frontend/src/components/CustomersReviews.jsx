@@ -7,7 +7,8 @@ const CustomersReviews = ({
   averageRating: initialAverageRating = 4.9,
   totalReviews: initialTotalReviews = 90,
   ratingCounts: initialRatingCounts = { 5: 83, 4: 5, 3: 2, 2: 0, 1: 0 },
-  productName = "Product",
+  productId = "Product ID",
+  productName = "Product Name",
 }) => {
   const [qualityRating, setQualityRating] = useState("Very High");
   const [fitRating, setFitRating] = useState("True to size");
@@ -18,20 +19,24 @@ const CustomersReviews = ({
   const [averageRating, setAverageRating] = useState(initialAverageRating);
   const [totalReviews, setTotalReviews] = useState(initialTotalReviews);
   const [ratingCounts, setRatingCounts] = useState(initialRatingCounts);
+  const [canReview, setCanReview] = useState(false);
 
   // Load stored reviews from localStorage on initial render
-  useEffect(() => {
-    const storedReviews = localStorage.getItem(`reviews-${productName}`);
-    if (storedReviews) {
-      const parsedReviews = JSON.parse(storedReviews);
-      setReviews(parsedReviews);
-
-      // Recalculate stats based on stored reviews
-      if (parsedReviews.length > 0) {
-        updateReviewStats(parsedReviews);
+ useEffect(() => {
+    const checkReviewEligibility = async () => {
+      try {
+        const response = await api.get(`/products/${productId}/can-review`);
+        setCanReview(response.data.canReview);
+      } catch (error) {
+        console.error('Error checking review eligibility:', error);
+        setCanReview(false);
       }
+    };
+    
+    if (productId) {
+      checkReviewEligibility();
     }
-  }, [productName]);
+  }, [productId]);
 
   // Function to update review statistics
   const updateReviewStats = (reviewsList) => {
@@ -223,8 +228,9 @@ const CustomersReviews = ({
         </div>
       </div>
 
-      {/* Write a Review Button */}
+      
       <div className="flex justify-center mt-8 md:mt-10">
+        {canReview ? ( 
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -233,7 +239,11 @@ const CustomersReviews = ({
         >
           Write A Review
         </motion.button>
+        ): (
+        <p>Purchase this product to leave a review.</p>
+      )}
       </div>
+      
 
       {/* Display Reviews Section */}
       <div className="mt-10 md:mt-12 max-w-4xl mx-auto px-4 sm:px-6 md:px-0">

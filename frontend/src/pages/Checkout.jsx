@@ -212,6 +212,10 @@ const Checkout = () => {
         }
       );
 
+      clearCart();
+      localStorage.removeItem('cart');
+      
+
       const orderData = await orderResponse.json();
 
       // If Shopify order wasn't created yet, trigger creation
@@ -225,7 +229,7 @@ const Checkout = () => {
       }
 
       // Clear the cart
-      clearCart();
+      
 
       // Show success message
       toast.success("Your order has been placed successfully!");
@@ -237,6 +241,7 @@ const Checkout = () => {
       // Even if Shopify sync fails, the order was still placed in our system
       setIsRedirecting(false);
       clearCart();
+      localStorage.removeItem('cart');
       toast.success("Your order has been placed successfully!");
       navigate(`/order-confirmation/${paymentResult.order.id}`);
     }

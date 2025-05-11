@@ -8,6 +8,7 @@ export default defineConfig({
     tailwindcss(),
     react()],
   server: {
+    allowedHosts: ['brings-brochure-vbulletin-dimension.trycloudflare.com', '*'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',

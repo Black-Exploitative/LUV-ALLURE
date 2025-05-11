@@ -13,7 +13,8 @@ async function createShopifyOrder(order) {
       
       const lineItems = [];
     
-        for (const item of order.items) {
+      for (const item of order.items) {
+        // Make sure we're using the correct variant ID format
         let variantId = item.variantId;
 
         // If it has a format like "gid://shopify/ProductVariant/123456", extract just the ID
@@ -30,24 +31,24 @@ async function createShopifyOrder(order) {
         const formattedVariantId = `gid://shopify/ProductVariant/${variantId}`;
         
         try {
-        // Verify that this variant exists and is available
-        const variant = await shopifyClient.getProductVariantById(variantId);
-        
-        if (!variant || !variant.availableForSale) {
-          console.log(`Variant ${variantId} is not available, will use custom line item instead`);
+          // Verify that this variant exists and is available
+          const variant = await shopifyClient.getProductVariantById(variantId);
+          
+          if (!variant || !variant.availableForSale) {
+            console.log(`Variant ${variantId} is not available, will use custom line item instead`);
+            // Don't add to lineItems - it will be added as custom line item instead
+          } else {
+            // Add as a real product line item with the proper Shopify ID
+            lineItems.push({
+              variantId: formattedVariantId,
+              quantity: item.quantity || 1
+            });
+          }
+        } catch (error) {
+          console.log(`Error verifying variant ${variantId}, will use custom line item instead:`, error);
           // Don't add to lineItems - it will be added as custom line item instead
-        } else {
-          // Add as a real product line item
-          lineItems.push({
-            variantId: formattedVariantId,
-            quantity: item.quantity || 1
-          });
         }
-      } catch (error) {
-        console.log(`Error verifying variant ${variantId}, will use custom line item instead:`, error);
-        // Don't add to lineItems - it will be added as custom line item instead
       }
-     }
 
         const customLineItems = order.items
         .filter(item => {

@@ -16,6 +16,8 @@ router.post('/verify-payment', orderController.verifyPayment);
 // Get all orders for user
 router.get('/', orderController.getOrders);
 
+router.get('/shopify', orderController.getShopifyOrders);
+
 // Get order by ID
 router.get('/:orderId', orderController.getOrderById);
 

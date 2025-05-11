@@ -1,9 +1,12 @@
 // backend/controllers/productController.js - Fixed variable redeclaration issue
 const shopifyClient = require('../utils/shopifyClient');
+const rateLimiter = require('../utils/rateLimiter');
 
 // Get all products with comprehensive filter support
 exports.getProducts = async (req, res, next) => {
   try {
+    // Rate limit the request
+    await rateLimiter.acquire();
     const { 
       limit = 20, 
       cursor = null,
@@ -198,6 +201,10 @@ exports.getProducts = async (req, res, next) => {
   } catch (error) {
     console.error('Error fetching products:', error);
     next(error);
+
+  } finally {
+    // Release the rate limiter
+    rateLimiter.release();
   }
 };
 
@@ -387,6 +394,8 @@ function extractAvailableFilters(products) {
 // Get product by handle with enhanced error handling
 exports.getProductByHandle = async (req, res, next) => {
   try {
+    // Rate limit the request
+    await rateLimiter.acquire();
     const { handle } = req.params;
     const result = await shopifyClient.getProductByHandle(handle);
     
@@ -440,12 +449,17 @@ exports.getProductByHandle = async (req, res, next) => {
   } catch (error) {
     console.error(`Error fetching product by handle ${req.params.handle}:`, error);
     next(error);
+  } finally {
+    // Release the rate limiter
+    rateLimiter.release();
   }
 };
 
 // Get product by ID with enhanced error handling
 exports.getProductById = async (req, res, next) => {
   try {
+    // Rate limit the request
+    await rateLimiter.acquire();
     const { id } = req.params;
     
     console.log('Fetching product with ID:', id);
@@ -506,18 +520,26 @@ exports.getProductById = async (req, res, next) => {
   } catch (error) {
     console.error(`Error fetching product ${req.params.id}:`, error);
     next(error);
+  } finally {
+    // Release the rate limiter
+    rateLimiter.release();
   }
 };
 
 // Get products by category
 exports.getProductsByCategory = async (req, res, next) => {
   try {
+    // Rate limit the request
+    await rateLimiter.acquire();
     // Set the category in the query and reuse the getProducts method
     req.query.category = req.params.category;
     await exports.getProducts(req, res, next);
   } catch (error) {
     console.error(`Error fetching products by category ${req.params.category}:`, error);
     next(error);
+  } finally {
+    // Release the rate limiter
+    rateLimiter.release();
   }
 };
 
@@ -544,3 +566,47 @@ exports.getProductsByTag = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.canReviewProduct = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(200).json({ canReview: false });
+    }
+    
+    const { productId } = req.params;
+    const userEmail = req.user.email;
+    
+    // Check if user has purchased this product from Shopify
+    const hasPurchased = await checkIfUserPurchasedProduct(userEmail, productId);
+    
+    res.status(200).json({
+      canReview: hasPurchased
+    });
+  } catch (error) {
+    console.error('Error checking review eligibility:', error);
+    next(error);
+  }
+};
+
+// Helper function to check purchase history
+async function checkIfUserPurchasedProduct(email, productId) {
+  try {
+    // Implement rate limiting here
+    await rateLimiter.acquire();
+    
+    // Get all orders for this email
+    const orders = await shopifyClient.getOrdersByEmail(email);
+    
+    // Check if any order contains this product
+    return orders.some(order => 
+      order.line_items.some(item => 
+        item.product_id.toString() === productId.toString()
+      )
+    );
+  } catch (error) {
+    console.error('Error checking purchase history:', error);
+    return false;
+  } finally {
+    rateLimiter.release();
+  }
+}

@@ -1,6 +1,7 @@
 // utils/shopifyClient.js - Updated with password management methods
-const fetch = require('node-fetch');
-const shopifyConfig = require('../config/shopify');
+const fetch = require("node-fetch");
+const shopifyConfig = require("../config/shopify");
+const rateLimiter = require("./rateLimiter");
 
 class ShopifyClient {
   constructor() {
@@ -10,82 +11,113 @@ class ShopifyClient {
     this.apiVersion = shopifyConfig.apiVersion;
     this.adminApiVersion = shopifyConfig.adminApiVersion; // Added for admin API
   }
+  
+  async getOrdersByEmail(email) {
+  try {
+    await rateLimiter.acquire();
+    // Use the REST Admin API since GraphQL has higher costs
+    const response = await fetch(
+      `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/orders.json?email=${encodeURIComponent(email)}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-Shopify-Access-Token': this.adminAccessToken
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Shopify API error: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.orders || [];
+  } catch (error) {
+    console.error('Error fetching Shopify orders by email:', error);
+    throw error;
+  } finally {
+    rateLimiter.release();
+  }
+}
+
+
 
   async adminQuery(query, variables = {}) {
     try {
-      // Debug output
-      console.log("Admin API URL:", `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/graphql.json`);
-      console.log("Using Admin Token:", this.adminAccessToken ? "Token exists" : "No token found");
-      
+
+      await rateLimiter.acquire();
       if (!this.adminAccessToken) {
-        throw new Error("No admin access token provided. Check your .env file.");
+        throw new Error(
+          "No admin access token provided. Check your .env file."
+        );
       }
-  
-      // Using node-fetch for compatibility
-      // const fetch = require('node-fetch'); // Uncomment if using node-fetch directly
-      
+
       const response = await fetch(
         `${this.shopifyDomain}/admin/api/${this.adminApiVersion}/graphql.json`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-Shopify-Access-Token': this.adminAccessToken
+            "Content-Type": "application/json",
+            "X-Shopify-Access-Token": this.adminAccessToken,
           },
-          body: JSON.stringify({ query, variables })
+          body: JSON.stringify({ query, variables }),
         }
       );
+
   
-      // Log HTTP status
-      console.log(`Admin API response status: ${response.status} ${response.statusText}`);
-      
-      // Handle non-200 responses
       if (!response.ok) {
         // Get the text response for better error information
         const errorText = await response.text();
-        throw new Error(`Shopify API returned ${response.status}: ${errorText}`);
+        throw new Error(
+          `Shopify API returned ${response.status}: ${errorText}`
+        );
       }
-  
+
       const jsonResponse = await response.json();
-      
-      // Check for GraphQL errors
+
+
       if (jsonResponse.errors) {
         const errorMsg = JSON.stringify(jsonResponse.errors);
         console.error("GraphQL errors:", errorMsg);
         throw new Error(`GraphQL errors: ${errorMsg}`);
       }
-  
+
       return jsonResponse.data;
     } catch (error) {
-      console.error('Shopify Admin API detailed error:', error);
+      console.error("Shopify Admin API detailed error:", error);
       throw error;
+    } finally {
+      rateLimiter.release();
     }
   }
 
   async query(query, variables = {}) {
     try {
+      await rateLimiter.acquire();
       const response = await fetch(
         `${this.shopifyDomain}/api/${this.apiVersion}/graphql.json`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-Shopify-Storefront-Access-Token': this.storefrontAccessToken
+            "Content-Type": "application/json",
+            "X-Shopify-Storefront-Access-Token": this.storefrontAccessToken,
           },
-          body: JSON.stringify({ query, variables })
+          body: JSON.stringify({ query, variables }),
         }
       );
 
       const jsonResponse = await response.json();
-      
+
       if (jsonResponse.errors) {
         throw new Error(jsonResponse.errors[0].message);
       }
 
       return jsonResponse.data;
     } catch (error) {
-      console.error('Shopify API error:', error);
+      console.error("Shopify API error:", error);
       throw error;
+    } finally {
+      rateLimiter.release();
     }
   }
 
@@ -200,8 +232,8 @@ class ShopifyClient {
   async getProductById(productId) {
     // If the ID is a Shopify GraphQL ID (starts with "gid://"), use it directly
     // Otherwise, convert it to a GraphQL ID format
-    const formattedId = productId.startsWith('gid://') 
-      ? productId 
+    const formattedId = productId.startsWith("gid://")
+      ? productId
       : `gid://shopify/Product/${productId}`;
 
     const query = `
@@ -283,8 +315,8 @@ class ShopifyClient {
     const variables = {
       input: {
         lineItems,
-        email
-      }
+        email,
+      },
     };
 
     return this.query(query, variables);
@@ -334,8 +366,8 @@ class ShopifyClient {
         password,
         firstName,
         lastName,
-        acceptsMarketing: true
-      }
+        acceptsMarketing: true,
+      },
     };
 
     return this.query(query, variables);
@@ -361,13 +393,13 @@ class ShopifyClient {
     const variables = {
       input: {
         email,
-        password
-      }
+        password,
+      },
     };
 
     return this.query(query, variables);
   }
-  
+
   // Method to get customer by access token
   async getCustomer(customerAccessToken) {
     const query = `
@@ -454,8 +486,8 @@ class ShopifyClient {
     const variables = {
       customerAccessToken,
       customer: {
-        password
-      }
+        password,
+      },
     };
 
     return this.query(query, variables);
@@ -501,13 +533,13 @@ class ShopifyClient {
 
     return this.query(query, { resetUrl, password });
   }
-  
+
   // Get products from a specific collection
   async getProductsByCollection(collectionId, first = 10) {
-    const formattedId = collectionId.startsWith('gid://') 
-      ? collectionId 
+    const formattedId = collectionId.startsWith("gid://")
+      ? collectionId
       : `gid://shopify/Collection/${collectionId}`;
-      
+
     const query = `
       query GetProductsByCollection($collectionId: ID!, $first: Int!) {
         collection(id: $collectionId) {
@@ -555,18 +587,18 @@ class ShopifyClient {
   async getProductVariantById(variantId) {
     // Clean up the variant ID
     let cleanId = variantId;
-    if (typeof cleanId === 'string') {
-      if (cleanId.includes('/')) {
-        cleanId = cleanId.split('/').pop();
+    if (typeof cleanId === "string") {
+      if (cleanId.includes("/")) {
+        cleanId = cleanId.split("/").pop();
       }
-      if (cleanId.includes('-')) {
-        cleanId = cleanId.split('-')[0];
+      if (cleanId.includes("-")) {
+        cleanId = cleanId.split("-")[0];
       }
     }
-    
+
     // Format as a Shopify GraphQL ID
     const formattedId = `gid://shopify/ProductVariant/${cleanId}`;
-    
+
     const query = `
     query GetNodeById($id: ID!) {
       node(id: $id) {
@@ -587,15 +619,15 @@ class ShopifyClient {
       }
     }
   `;
-  
-  try {
-    const result = await this.query(query, { id: formattedId });
-    return result.node;
-  } catch (error) {
-    console.error(`Error fetching variant ${variantId}:`, error);
-    return null;
+
+    try {
+      const result = await this.query(query, { id: formattedId });
+      return result.node;
+    } catch (error) {
+      console.error(`Error fetching variant ${variantId}:`, error);
+      return null;
+    }
   }
-}
 
   /**
    * Create an order in Shopify
@@ -605,6 +637,7 @@ class ShopifyClient {
   async createOrder(orderData) {
     try {
       // First create a draft order with proper line item handling
+      await rateLimiter.acquire();
       const draftOrderQuery = `
         mutation draftOrderCreate($input: DraftOrderInput!) {
           draftOrderCreate(input: $input) {
@@ -624,23 +657,23 @@ class ShopifyClient {
           }
         }
       `;
-      
+
       // Format custom line items using the correct Shopify format
       const formattedLineItems = [...orderData.lineItems];
-      
+
       // If custom line items exist, add them
       if (orderData.customLineItems && orderData.customLineItems.length > 0) {
-        orderData.customLineItems.forEach(item => {
+        orderData.customLineItems.forEach((item) => {
           formattedLineItems.push({
             title: item.title,
             quantity: item.quantity,
             originalUnitPrice: item.originalUnitPrice,
             taxable: item.taxable,
-            requiresShipping: item.requiresShipping
+            requiresShipping: item.requiresShipping,
           });
         });
       }
-      
+
       // Create draft order input with properly formatted line items
       const draftOrderInput = {
         lineItems: formattedLineItems,
@@ -652,18 +685,24 @@ class ShopifyClient {
         tags: orderData.tags || ["website-order"],
         // Add payment info
         appliedDiscount: null,
-        paymentTerms: null
+        paymentTerms: null,
       };
-      
+
       // Execute the draft order creation
-      const draftOrderResult = await this.adminQuery(draftOrderQuery, { input: draftOrderInput });
-      
+      const draftOrderResult = await this.adminQuery(draftOrderQuery, {
+        input: draftOrderInput,
+      });
+
       if (draftOrderResult.draftOrderCreate.userErrors.length > 0) {
-        throw new Error(`Draft order creation errors: ${JSON.stringify(draftOrderResult.draftOrderCreate.userErrors)}`);
+        throw new Error(
+          `Draft order creation errors: ${JSON.stringify(
+            draftOrderResult.draftOrderCreate.userErrors
+          )}`
+        );
       }
-      
+
       const draftOrderId = draftOrderResult.draftOrderCreate.draftOrder.id;
-      
+
       // Complete the draft order to create an actual order
       const completeDraftOrderQuery = `
         mutation draftOrderComplete($id: ID!) {
@@ -684,15 +723,21 @@ class ShopifyClient {
           }
         }
       `;
-      
-      const completeResult = await this.adminQuery(completeDraftOrderQuery, { id: draftOrderId });
-      
+
+      const completeResult = await this.adminQuery(completeDraftOrderQuery, {
+        id: draftOrderId,
+      });
+
       if (completeResult.draftOrderComplete.userErrors.length > 0) {
-        throw new Error(`Draft order completion errors: ${JSON.stringify(completeResult.draftOrderComplete.userErrors)}`);
+        throw new Error(
+          `Draft order completion errors: ${JSON.stringify(
+            completeResult.draftOrderComplete.userErrors
+          )}`
+        );
       }
-      
+
       const orderId = completeResult.draftOrderComplete.draftOrder.order.id;
-      
+
       // TRY to mark the order as paid, but don't fail if it doesn't work
       try {
         const markAsPaidQuery = `
@@ -710,31 +755,43 @@ class ShopifyClient {
             }
           }
         `;
-  
-        const markAsPaidResult = await this.adminQuery(markAsPaidQuery, { 
-          input: { 
-            id: orderId
-          }
+
+        const markAsPaidResult = await this.adminQuery(markAsPaidQuery, {
+          input: {
+            id: orderId,
+          },
         });
-        
+
         if (markAsPaidResult.orderMarkAsPaid.userErrors.length > 0) {
-          console.warn(`Warning: Could not mark order as paid: ${JSON.stringify(markAsPaidResult.orderMarkAsPaid.userErrors)}`);
+          console.warn(
+            `Warning: Could not mark order as paid: ${JSON.stringify(
+              markAsPaidResult.orderMarkAsPaid.userErrors
+            )}`
+          );
         }
       } catch (paymentError) {
         // Log the error but don't fail the order creation
-        console.warn('Warning: Could not mark order as paid:', paymentError.message);
+        console.warn(
+          "Warning: Could not mark order as paid:",
+          paymentError.message
+        );
       }
-      
+
       // Return the order data regardless of payment marking status
       return {
         id: orderId,
         name: completeResult.draftOrderComplete.draftOrder.order.name,
-        processedAt: completeResult.draftOrderComplete.draftOrder.order.processedAt,
-        totalPrice: completeResult.draftOrderComplete.draftOrder.order.totalPrice
+        processedAt:
+          completeResult.draftOrderComplete.draftOrder.order.processedAt,
+        totalPrice:
+          completeResult.draftOrderComplete.draftOrder.order.totalPrice,
       };
     } catch (error) {
-      console.error('Error creating Shopify order:', error);
+      console.error("Error creating Shopify order:", error);
       throw error;
+    }
+    finally {
+      rateLimiter.release();
     }
   }
 }

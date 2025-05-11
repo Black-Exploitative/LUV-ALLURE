@@ -15,8 +15,8 @@ exports.createOrder = async (req, res, next) => {
       subtotal, 
       tax, 
       shipping, 
-      packagingOption, // Packaging option object
-      giftMessage, // Gift message for gift packaging
+      packagingOption,
+      giftMessage,
       total, 
       transactionId, 
       reference, 
@@ -30,6 +30,7 @@ exports.createOrder = async (req, res, next) => {
       userId: req.user ? req.user.id : null,
       items: items.map(item => ({
         variantId: item.variantId || item.id,
+        shopifyProductId: item.productId || item.shopifyProductId || null,
         quantity: item.quantity || 1,
         title: item.name || item.title,
         price: item.price,
@@ -38,7 +39,7 @@ exports.createOrder = async (req, res, next) => {
       subtotal,
       tax,
       shipping,
-      packagingDetails: { // Add packaging details to the order
+      packagingDetails: {
         packagingType: packagingOption?.id || 'normal',
         packagingName: packagingOption?.name || 'Normal Packaging',
         packagingPrice: packagingOption?.price || 0,
@@ -376,5 +377,83 @@ exports.updateOrderStatus = async (req, res, next) => {
     next(error);
   }
 
-  
+
 };
+exports.getShopifyOrders = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+    
+    // Get customer email to find their orders
+    const userEmail = req.user.email;
+    
+    // Use Shopify client to fetch orders
+    const shopifyOrders = await shopifyClient.getOrdersByEmail(userEmail);
+    
+    // Transform Shopify orders to match our format
+    const transformedOrders = shopifyOrders.map(order => ({
+      _id: order.id,  // Use Shopify order ID
+      reference: order.name || order.order_number,
+      createdAt: order.created_at,
+      status: mapShopifyStatusToOurs(order.fulfillment_status, order.financial_status),
+      total: parseFloat(order.total_price) || 0,
+      subtotal: parseFloat(order.subtotal_price) || 0,
+      tax: parseFloat(order.total_tax) || 0,
+      shipping: parseFloat(order.shipping_lines?.[0]?.price || 0),
+      items: order.line_items.map(item => ({
+        title: item.title,
+        quantity: item.quantity,
+        price: item.price,
+        variantId: item.variant_id,
+        productId: item.product_id,
+        image: item.image?.src || '/images/placeholder.jpg'
+      })),
+      shippingProvider: order.shipping_lines?.[0]?.title || 'Standard Shipping',
+      trackingNumber: getTrackingNumber(order),
+      trackingUrl: getTrackingUrl(order)
+    }));
+    
+    res.status(200).json({
+      success: true,
+      orders: transformedOrders
+    });
+  } catch (error) {
+    console.error('Error fetching Shopify orders:', error);
+    next(error);
+  }
+};
+
+// Helper function to map Shopify statuses to our status format
+function mapShopifyStatusToOurs(fulfillmentStatus, financialStatus) {
+  if (financialStatus === 'refunded') return 'refunded';
+  if (financialStatus !== 'paid') return 'pending';
+  if (fulfillmentStatus === 'fulfilled') return 'completed';
+  if (fulfillmentStatus === 'partial') return 'processing';
+  if (fulfillmentStatus === null && financialStatus === 'paid') return 'processing';
+  return 'pending';
+}
+
+// Helper functions to extract tracking info
+function getTrackingNumber(order) {
+  if (order.fulfillments && order.fulfillments.length > 0) {
+    const fulfillment = order.fulfillments[0];
+    if (fulfillment.tracking_number) {
+      return fulfillment.tracking_number;
+    }
+  }
+  return null;
+}
+
+function getTrackingUrl(order) {
+  if (order.fulfillments && order.fulfillments.length > 0) {
+    const fulfillment = order.fulfillments[0];
+    if (fulfillment.tracking_url) {
+      return fulfillment.tracking_url;
+    }
+  }
+  return null;
+}

@@ -24,4 +24,6 @@ router.get('/tag/:tag', productController.getProductsByTag);
 // Legacy route compatibility - handle route is still supported
 router.get('/:handle', productController.getProductByHandle);
 
+router.get('/:productId/can-review', productController.canReviewProduct);
+
 module.exports = router;

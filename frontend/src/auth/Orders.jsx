@@ -10,12 +10,13 @@ const Orders = ({ dashboard = false, limit = null }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch orders from API when component mounts
+  // Fetch orders directly from Shopify when component mounts
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/orders');
+        // Use the new endpoint that fetches from Shopify
+        const response = await api.get('/orders/shopify');
         
         if (response.data && response.data.success) {
           // Apply limit if provided
@@ -37,6 +38,7 @@ const Orders = ({ dashboard = false, limit = null }) => {
 
     fetchOrders();
   }, [limit]);
+
 
   // Helper function to format date
   const formatDate = (dateString) => {
