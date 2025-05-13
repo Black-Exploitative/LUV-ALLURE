@@ -116,7 +116,7 @@ const FeaturedProducts = () => {
     <section className="py-12 md:py-16 mt-[60px] md:mt-[90px]">
       {/* Dynamic Section Heading */}
       <div className="mx-4 sm:mx-8 md:mx-[100px] text-center">
-        <AnimatedHeading className="tracking-wider text-[22px] md:text-[30px] font-normal text-black mb-[50px] md:mb-[103px]">
+        <AnimatedHeading className="md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[22px] md:text-[30px] font-normal text-black mb-[50px] md:mb-[103px]">
           {sectionTitle}
         </AnimatedHeading>
       </div>

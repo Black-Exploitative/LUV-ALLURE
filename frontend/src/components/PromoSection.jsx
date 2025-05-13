@@ -147,7 +147,7 @@ const PromoSection = () => {
           >
             <div className="text-center max-w-lg mx-auto">
               <motion.h2
-                className="text-[30px] font-thin tracking-wider mb-[40px] text-center"
+                className="text-[30px] font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-[40px] text-center"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
@@ -170,7 +170,7 @@ const PromoSection = () => {
                 className="flex justify-center"
               >
                 <a href={promoData.linkUrl}>
-                  <p className="text-[15px] text-center font-thin tracking-wider relative group inline-block">
+                  <p className="text-[15px] text-center font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst relative group inline-block">
                     <span className="border-b-[3px] pb-[3px] group-hover:border-b-0">{promoData.linkText.substring(0, 2)}</span>
                     <span>{promoData.linkText.substring(2)}</span>
                     <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-current group-hover:w-full transition-all duration-300"></span>

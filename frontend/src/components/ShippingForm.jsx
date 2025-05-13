@@ -406,7 +406,7 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 bg-black text-white text-sm uppercase tracking-wider flex items-center justify-center"
+          className="w-full py-3 bg-black text-white text-sm uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst flex items-center justify-center"
         >
           {isLoading ? (
             <>

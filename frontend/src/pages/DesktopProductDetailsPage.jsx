@@ -1166,7 +1166,7 @@ useEffect(() => {
           {/* Right Side: Product Details */}
           <div className="w-[500px] flex flex-col justify-start">
             {/* Product Name */}
-            <h1 className="text-xl font-normal tracking-wider">{product.name}</h1>
+            <h1 className="text-xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">{product.name}</h1>
             {/*  Star Rating */}
             <StarRating
               rating={4.9}
@@ -1175,7 +1175,7 @@ useEffect(() => {
             />
 
             {/* Product Price */}
-            <p className="text-[18px] font-normal tracking-wide text-gray-700">
+            <p className="text-[18px] font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700">
               ₦{product.price ? product.price.toLocaleString() : "0"}
             </p>
 

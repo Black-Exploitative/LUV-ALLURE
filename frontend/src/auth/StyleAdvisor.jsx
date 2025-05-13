@@ -19,7 +19,7 @@ const StyleAdvisor = ({ user }) => {
   return (
     <>
       <div className="space-y-8">
-        <h2 className="text-xl font-thin tracking-wider">PERSONALIZED STYLE ADVISOR</h2>
+        <h2 className="text-xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">PERSONALIZED STYLE ADVISOR</h2>
         <p className="text-sm text-gray-600 max-w-3xl">
           Experience tailored fashion recommendations curated exclusively for
           you based on your preferences and past purchases. Our AI-driven style
@@ -39,7 +39,7 @@ const StyleAdvisor = ({ user }) => {
 
         <div className="relative z-10">
           <div className="flex items-center mb-6">
-            <h3 className="text-lg font-thin tracking-wider">
+            <h3 className="text-lg font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               YOUR STYLE PROFILE
             </h3>
             <div className="ml-3 h-[1px] flex-grow bg-gradient-to-r from-white/80 to-transparent"></div>
@@ -48,8 +48,8 @@ const StyleAdvisor = ({ user }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-xs tracking-wider">MINIMALIST</span>
-                <span className="text-xs tracking-wider">MAXIMALIST</span>
+                <span className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">MINIMALIST</span>
+                <span className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">MAXIMALIST</span>
               </div>
               <div className="h-1 bg-white/20 rounded-full w-full">
                 <motion.div
@@ -63,8 +63,8 @@ const StyleAdvisor = ({ user }) => {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-xs tracking-wider">CLASSIC</span>
-                <span className="text-xs tracking-wider">AVANT-GARDE</span>
+                <span className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">CLASSIC</span>
+                <span className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">AVANT-GARDE</span>
               </div>
               <div className="h-1 bg-white/20 rounded-full w-full">
                 <motion.div
@@ -78,8 +78,8 @@ const StyleAdvisor = ({ user }) => {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-xs tracking-wider">CASUAL</span>
-                <span className="text-xs tracking-wider">FORMAL</span>
+                <span className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">CASUAL</span>
+                <span className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">FORMAL</span>
               </div>
               <div className="h-1 bg-white/20 rounded-full w-full">
                 <motion.div
@@ -97,32 +97,32 @@ const StyleAdvisor = ({ user }) => {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-2">
                 <span className="text-xl">🧥</span>
               </div>
-              <p className="text-xs tracking-wider">OUTERWEAR</p>
-              <p className="text-xl font-thin tracking-wide">SIGNATURE</p>
+              <p className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">OUTERWEAR</p>
+              <p className="text-xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">SIGNATURE</p>
             </div>
 
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-2">
                 <span className="text-xl">👜</span>
               </div>
-              <p className="text-xs tracking-wider">ACCESSORIES</p>
-              <p className="text-xl font-thin tracking-wide">ELEVATED</p>
+              <p className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">ACCESSORIES</p>
+              <p className="text-xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">ELEVATED</p>
             </div>
 
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-2">
                 <span className="text-xl">👠</span>
               </div>
-              <p className="text-xs tracking-wider">FOOTWEAR</p>
-              <p className="text-xl font-thin tracking-wide">BOLD</p>
+              <p className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">FOOTWEAR</p>
+              <p className="text-xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">BOLD</p>
             </div>
 
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-2">
                 <span className="text-xl">👗</span>
               </div>
-              <p className="text-xs tracking-wider">SILHOUETTES</p>
-              <p className="text-xl font-thin tracking-wide">STRUCTURED</p>
+              <p className="text-xs md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">SILHOUETTES</p>
+              <p className="text-xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">STRUCTURED</p>
             </div>
           </div>
 
@@ -153,7 +153,7 @@ const StyleAdvisor = ({ user }) => {
 
       {/* Personalized Recommendations */}
       <div className="mt-12">
-        <h3 className="text-lg font-thin tracking-wider mb-6">
+        <h3 className="text-lg font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
           CURATED FOR YOU
         </h3>
 
@@ -194,7 +194,7 @@ const StyleAdvisor = ({ user }) => {
                   </button>
                 </div>
               </div>
-              <h4 className="mt-4 font-medium text-sm tracking-wide">
+              <h4 className="mt-4 font-medium text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
                 {collection.title}
               </h4>
               <p className="mt-1 text-sm text-gray-600">
@@ -209,7 +209,7 @@ const StyleAdvisor = ({ user }) => {
       <div className="mt-16 bg-gradient-to-r from-gray-50 to-gray-100 p-8 border-l-4 border-black">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
           <div>
-            <h3 className="text-lg font-thin tracking-wider">
+            <h3 className="text-lg font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               VIRTUAL STYLING SESSION
             </h3>
             <p className="mt-2 text-sm text-gray-600 max-w-xl">
@@ -243,7 +243,7 @@ const StyleAdvisor = ({ user }) => {
 
       {/* AI Style Quiz */}
       <div className="mt-16 border border-gray-200 p-8">
-        <h3 className="text-lg font-thin tracking-wider mb-6">
+        <h3 className="text-lg font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
           DISCOVER YOUR SIGNATURE LOOK
         </h3>
 
@@ -352,7 +352,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                   onClick={() => {
                     if (styleInspiration && statementPiece) {
                       setQuizStep(2);
@@ -467,7 +467,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black text-black text-sm cursor-pointer tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black text-black text-sm cursor-pointer md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider hover:bg-gray-100"
                   onClick={() => setQuizStep(1)}
                 >
                   BACK
@@ -476,7 +476,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white text-sm cursor-pointer tracking-wide"
+                  className="px-8 py-3 bg-black text-white text-sm cursor-pointer md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                   onClick={() => {
                     if (colorPalette && silhouette) {
                       setQuizStep(3);
@@ -546,7 +546,7 @@ const StyleAdvisor = ({ user }) => {
                             ? "🧶"
                             : "💫"}
                         </div>
-                        <span className="text-xs font-medium tracking-wide">
+                        <span className="text-xs font-medium md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
                           {style}
                         </span>
                       </div>
@@ -576,7 +576,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black text-black text-sm cursor-pointer tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black text-black text-sm cursor-pointer md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider hover:bg-gray-100"
                   onClick={() => setQuizStep(2)}
                 >
                   BACK
@@ -585,7 +585,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white text-sm cursor-pointer tracking-wide"
+                  className="px-8 py-3 bg-black text-white text-sm cursor-pointer md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                   onClick={() => {
                     if (selectedStyles.length > 0) {
                       setQuizStep(4);
@@ -718,7 +718,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black cursor-pointer text-black text-sm tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black cursor-pointer text-black text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider hover:bg-gray-100"
                   onClick={() => setQuizStep(3)}
                 >
                   BACK
@@ -727,7 +727,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                   onClick={() => {
                     if (occasions.length > 0 && designers.length > 0) {
                       setQuizStep(5);
@@ -854,7 +854,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 border border-black text-black cursor-pointer text-sm tracking-wide hover:bg-gray-100"
+                  className="px-6 py-3 border border-black text-black cursor-pointer text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider hover:bg-gray-100"
                   onClick={() => setQuizStep(4)}
                 >
                   BACK
@@ -863,7 +863,7 @@ const StyleAdvisor = ({ user }) => {
                 <motion.button
                   whileHover={{ backgroundColor: "#333" }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
+                  className="px-8 py-3 bg-black text-white cursor-pointer text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                   onClick={() => {
                     setShowConfetti(true);
                     setTimeout(() => {
@@ -950,7 +950,7 @@ const StyleAdvisor = ({ user }) => {
                     </svg>
                   </div>
 
-                  <h3 className="text-2xl font-thin tracking-wider">
+                  <h3 className="text-2xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                     STYLE PROFILE COMPLETED
                   </h3>
 
@@ -965,7 +965,7 @@ const StyleAdvisor = ({ user }) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-6 py-3 bg-black text-white cursor-pointer text-sm tracking-wide"
+                      className="px-6 py-3 bg-black text-white cursor-pointer text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                       onClick={() => setQuizCompleted(false)}
                     >
                       CLOSE

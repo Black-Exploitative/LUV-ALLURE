@@ -87,7 +87,7 @@ const RecentlyViewedProducts = () => {
     <div className="py-12 px-4 border-t border-gray-200">
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-thin uppercase tracking-wider">
+          <h2 className="text-xl font-thin uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
             Recently Viewed
           </h2>
           <button
@@ -154,7 +154,7 @@ const RecentlyViewedProductCard = ({ product, addToCart }) => {
               >
                 <button
                   onClick={handleAddToCart}
-                  className="w-full bg-black text-white text-xs uppercase tracking-wider py-2 hover:bg-gray-900 transition-colors cursor-pointer"
+                  className="w-full bg-black text-white text-xs uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst py-2 hover:bg-gray-900 transition-colors cursor-pointer"
                 >
                   Quick Add
                 </button>
@@ -164,7 +164,7 @@ const RecentlyViewedProductCard = ({ product, addToCart }) => {
         </div>
 
         <div className="mt-3">
-          <h3 className="text-sm font-thin uppercase tracking-wider truncate">
+          <h3 className="text-sm font-thin uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst truncate">
             {product.name}
           </h3>
           <p className="text-sm mt-1">₦{product.price}</p>

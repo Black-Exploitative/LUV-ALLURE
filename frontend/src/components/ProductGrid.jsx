@@ -469,7 +469,7 @@ const ProductGrid = ({
           {hasMore && (
             <div className="flex justify-center my-12">
               <button
-                className="px-8 py-3 border border-black hover:bg-black hover:text-white transition-colors duration-300 tracking-wide"
+                className="px-8 py-3 border border-black hover:bg-black hover:text-white transition-colors duration-300 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                 onClick={handleLoadMore}
               >
                 Load More

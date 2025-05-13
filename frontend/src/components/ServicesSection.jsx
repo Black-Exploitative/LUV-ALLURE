@@ -92,7 +92,7 @@ const ServiceCard = ({ src, title, description, index }) => {
       />
 
       <motion.h3
-        className="text-[18px] font-medium tracking-wide mt-6"
+        className="text-[18px] font-medium md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider mt-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 + index * 0.2 }}
@@ -142,7 +142,7 @@ const ServicesSection = () => {
       <div className="w-full my-[50px]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
-            <AnimatedHeading className="tracking-wider text-[25px] font-normal text-black mb-[50px]">
+            <AnimatedHeading className="md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[25px] font-normal text-black mb-[50px]">
               LUV'S ALLURE SERVICES
             </AnimatedHeading>
           </div>

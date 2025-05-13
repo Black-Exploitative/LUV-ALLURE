@@ -173,7 +173,7 @@ const NotFound = () => {
                 transition={{ duration: 0.8 }}
                 className="mb-8"
               >
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-wider text-gray-900 leading-tight">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-900 leading-tight">
                   STYLE NEVER GETS LOST
                 </h1>
               </motion.div>
@@ -264,7 +264,7 @@ const NotFound = () => {
                 >
                   <Link
                     to="/"
-                    className="inline-block px-10 py-3 border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white transition-colors duration-300 uppercase tracking-wider text-sm"
+                    className="inline-block px-10 py-3 border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white transition-colors duration-300 uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-sm"
                   >
                     Return to Collection
                   </Link>

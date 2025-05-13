@@ -1167,7 +1167,7 @@ const processedProduct = {
 
           {/* Product Details */}
           <div className="w-full">
-            <h1 className="text-xl font-normal tracking-wider">{product.name}</h1>
+            <h1 className="text-xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">{product.name}</h1>
 
             <StarRating
               rating={4.9}
@@ -1175,7 +1175,7 @@ const processedProduct = {
               scrollToReviews={scrollToReviews}
             />
 
-            <p className="text-lg font-normal tracking-wide text-gray-700">
+            <p className="text-lg font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700">
               ₦ {product.price.toLocaleString()}
             </p>
 
@@ -1323,7 +1323,7 @@ const processedProduct = {
     { /*
       {/* STYLE IT WITH 
       <div className="mt-8">
-        <h2 className="text-sm mb-4 text-center tracking-wider uppercase">
+        <h2 className="text-sm mb-4 text-center md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase">
           STYLE IT WITH
         </h2>
         {loadingRelated ? (
@@ -1353,10 +1353,10 @@ const processedProduct = {
                   className="mt-2 px-1 text-left space-y-[5px] text-gray-700 cursor-pointer"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  <h3 className="text-sm uppercase tracking-wider">
+                  <h3 className="text-sm uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                     {product.title || product.name}
                   </h3>
-                  <p className="text-sm font-normal text-gray-700 mt-1 tracking-wider">
+                  <p className="text-sm font-normal text-gray-700 mt-1 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                     ₦{parseFloat(product.price).toLocaleString()}
                   </p>
                 </div>
@@ -1372,7 +1372,7 @@ const processedProduct = {
         {/* Customers Also Purchased Section 
         {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
           <>
-            <h2 className="text-sm text-center uppercase mt-8 mb-4 tracking-wider">
+            <h2 className="text-sm text-center uppercase mt-8 mb-4 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               ALLURVERS ALSO PURCHASED
             </h2>
             {loadingRelated ? (
@@ -1406,13 +1406,13 @@ const processedProduct = {
                       className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
                     >
-                      <p className="text-xs uppercase text-gray-600 tracking-wider">
+                      <p className="text-xs uppercase text-gray-600 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                         {product.color || "DEFAULT"}
                       </p>
-                      <h3 className="text-sm font-semibold tracking-wider">
+                      <h3 className="text-sm font-semibold md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                         {product.title || product.name}
                       </h3>
-                      <p className="text-sm font-normal mt-1 tracking-wider">
+                      <p className="text-sm font-normal mt-1 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                         ₦{parseFloat(product.price).toLocaleString()}
                       </p>
                     </div>
@@ -1426,7 +1426,7 @@ const processedProduct = {
         {/* Customers Also Viewed Section 
         {(alsoViewedProducts.length > 0 || !loadingRelated) && (
           <>
-            <h2 className="text-sm text-center uppercase mt-8 mb-4 tracking-wider">
+            <h2 className="text-sm text-center uppercase mt-8 mb-4 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               ALLURVERS ALSO VIEWED
             </h2>
             {loadingRelated ? (
@@ -1461,13 +1461,13 @@ const processedProduct = {
                       className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
                     >
-                      <p className="text-xs uppercase text-gray-600 tracking-wider">
+                      <p className="text-xs uppercase text-gray-600 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                         {product.color || "DEFAULT"}
                       </p>
-                      <h3 className="text-sm font-semibold tracking-wider">
+                      <h3 className="text-sm font-semibold md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                         {product.title || product.name}
                       </h3>
-                      <p className="text-sm font-normal mt-1 tracking-wider">
+                      <p className="text-sm font-normal mt-1 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                         ₦{parseFloat(product.price).toLocaleString()}
                       </p>
                     </div>

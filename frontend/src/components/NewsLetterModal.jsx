@@ -82,17 +82,17 @@ const NewsletterModal = () => {
             <div className="flex flex-col items-center text-center">
               {!submitted ? (
                 <>
-                  <div className="font-serif tracking-wider text-xl mb-1">
+                  <div className="font-serif md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-xl mb-1">
                     LUV'S ALLURE
                   </div>
                   {/* Border line */}
                   <div className="w-16 h-px bg-black my-3"></div>
                   {/* Modal header */}
-                  <h2 className="font-serif text-2xl mb-6 uppercase tracking-widest">
+                  <h2 className="font-serif text-2xl mb-6 uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                     Join the exclusive list
                   </h2>
                   {/* Message */}
-                  <p className="text-sm  mb-8 max-w-xs font-thin tracking-wide  text-gray-800 font-base font-[Raleway] ">
+                  <p className="text-sm  mb-8 max-w-xs font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider  text-gray-800 font-base font-[Raleway] ">
                     Be the first to know about new collections, and the latest
                     in high fashion.
                   </p>
@@ -118,7 +118,7 @@ const NewsletterModal = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      className="w-full cursor-pointer bg-black text-white py-3 uppercase text-sm tracking-widest hover:bg-gray-900 transition-colors"
+                      className="w-full cursor-pointer bg-black text-white py-3 uppercase text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst hover:bg-gray-900 transition-colors"
                     >
                       Subscribe
                     </motion.button>
@@ -133,7 +133,7 @@ const NewsletterModal = () => {
                 <>
                   {/* Success message */}
                   <div className="py-6">
-                    <h2 className="font-serif text-2xl mb-3 uppercase tracking-widest">
+                    <h2 className="font-serif text-2xl mb-3 uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                       Thank You
                     </h2>
                     <div className="w-16 h-px bg-black my-3 mx-auto"></div>

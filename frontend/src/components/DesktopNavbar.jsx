@@ -482,13 +482,13 @@ export default function DesktopNavbar({ darkNavbar }) {
               {dropdownContent[activeDropdown].columns.map(
                 (column, colIndex) => (
                   <div key={colIndex} className="col-span-3">
-                    <h3 className="font-normal tracking-wider uppercase text-[15px] mb-4">{column.title}</h3>
+                    <h3 className="font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase text-[15px] mb-4">{column.title}</h3>
                     <div className="flex flex-col space-y-2">
                       {column.links.map((link, linkIndex) => (
                         <a
                           key={linkIndex}
                           href={link.href}
-                          className="text-[13px] tracking-wider uppercase text-gray-600 hover:underline hover:text-black"
+                          className="text-[13px] md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase text-gray-600 hover:underline hover:text-black"
                         >
                           {link.name}
                         </a>

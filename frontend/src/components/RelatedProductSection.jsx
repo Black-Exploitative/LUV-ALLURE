@@ -17,7 +17,7 @@ export const RelatedProductsSection = ({
   if (loading) {
     return (
       <div className="mt-8">
-        <h2 className="text-[15px] mb-4 text-center tracking-wider uppercase">
+        <h2 className="text-[15px] mb-4 text-center md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase">
           {title}
         </h2>
         <div className="flex justify-center items-center py-8">
@@ -47,13 +47,13 @@ export const RelatedProductsSection = ({
             className="w-full h-[300px] object-cover"
           />
           <div className="mt-2 px-1 space-y-[5px]">
-            <p className="text-xs uppercase text-gray-600 tracking-wider">
+            <p className="text-xs uppercase text-gray-600 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               {product.color || "DEFAULT"}
             </p>
-            <h3 className="text-sm font-semibold tracking-wider">
+            <h3 className="text-sm font-semibold md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               {product.title || product.name}
             </h3>
-            <p className="text-sm font-normal tracking-wider">
+            <p className="text-sm font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               ₦{typeof product.price === 'number' 
                 ? product.price.toLocaleString() 
                 : parseFloat(product.price).toLocaleString()}
@@ -79,13 +79,13 @@ export const RelatedProductsSection = ({
             className="w-full h-[300px] object-cover"
           />
           <div className="mt-2 px-1 space-y-[5px]">
-            <p className="text-xs uppercase text-gray-600 tracking-wider">
+            <p className="text-xs uppercase text-gray-600 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               {product.color || "DEFAULT"}
             </p>
-            <h3 className="text-sm font-semibold tracking-wider">
+            <h3 className="text-sm font-semibold md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               {product.title || product.name}
             </h3>
-            <p className="text-sm font-normal tracking-wider">
+            <p className="text-sm font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               ₦{typeof product.price === 'number' 
                 ? product.price.toLocaleString() 
                 : parseFloat(product.price).toLocaleString()}
@@ -98,7 +98,7 @@ export const RelatedProductsSection = ({
 
   return (
     <div className="mt-8 mb-8">
-      <h2 className="text-[15px] text-center uppercase tracking-wider mb-6">
+      <h2 className="text-[15px] text-center uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
         {title}
       </h2>
       {desktopView}
