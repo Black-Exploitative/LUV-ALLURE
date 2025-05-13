@@ -243,7 +243,7 @@ const CustomersReviews = ({ productId, productName }) => {
       <div className="flex flex-col  md:flex-row justify-between max-w-4xl mx-auto px-4 sm:px-6  md:px-0 gap-8  md:gap-4">
         {/* Left side: Overall Rating */}
         <div className="flex flex-col items-center mb-6  md:mb-0">
-          <div className="text-5xl sm:text-6xl font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
+          <div className="text-5xl sm:text-6xl font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
             {averageRating ? averageRating.toFixed(1) : '0.0'}
           </div>
           <div className="flex my-2">

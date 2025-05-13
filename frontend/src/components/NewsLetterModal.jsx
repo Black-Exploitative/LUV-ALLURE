@@ -92,7 +92,7 @@ const NewsletterModal = () => {
                     Join the exclusive list
                   </h2>
                   {/* Message */}
-                  <p className="text-sm  mb-8 max-w-xs font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider  text-gray-800 font-base font-[Raleway] ">
+                  <p className="text-sm  mb-8 max-w-xs font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider  text-gray-800 font-base font-[Raleway] ">
                     Be the first to know about new collections, and the latest
                     in high fashion.
                   </p>

@@ -19,7 +19,7 @@ const StyleAdvisor = ({ user }) => {
   return (
     <>
       <div className="space-y-8">
-        <h2 className="text-xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">PERSONALIZED STYLE ADVISOR</h2>
+        <h2 className="text-xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">PERSONALIZED STYLE ADVISOR</h2>
         <p className="text-sm text-gray-600 max-w-3xl">
           Experience tailored fashion recommendations curated exclusively for
           you based on your preferences and past purchases. Our AI-driven style
@@ -39,7 +39,7 @@ const StyleAdvisor = ({ user }) => {
 
         <div className="relative z-10">
           <div className="flex items-center mb-6">
-            <h3 className="text-lg font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+            <h3 className="text-lg font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               YOUR STYLE PROFILE
             </h3>
             <div className="ml-3 h-[1px] flex-grow bg-gradient-to-r from-white/80 to-transparent"></div>
@@ -98,7 +98,7 @@ const StyleAdvisor = ({ user }) => {
                 <span className="text-xl">🧥</span>
               </div>
               <p className="text-xs md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">OUTERWEAR</p>
-              <p className="text-xl font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">SIGNATURE</p>
+              <p className="text-xl font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">SIGNATURE</p>
             </div>
 
             <div className="text-center">
@@ -106,7 +106,7 @@ const StyleAdvisor = ({ user }) => {
                 <span className="text-xl">👜</span>
               </div>
               <p className="text-xs md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">ACCESSORIES</p>
-              <p className="text-xl font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">ELEVATED</p>
+              <p className="text-xl font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">ELEVATED</p>
             </div>
 
             <div className="text-center">
@@ -114,7 +114,7 @@ const StyleAdvisor = ({ user }) => {
                 <span className="text-xl">👠</span>
               </div>
               <p className="text-xs md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">FOOTWEAR</p>
-              <p className="text-xl font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">BOLD</p>
+              <p className="text-xl font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">BOLD</p>
             </div>
 
             <div className="text-center">
@@ -122,7 +122,7 @@ const StyleAdvisor = ({ user }) => {
                 <span className="text-xl">👗</span>
               </div>
               <p className="text-xs md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">SILHOUETTES</p>
-              <p className="text-xl font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">STRUCTURED</p>
+              <p className="text-xl font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">STRUCTURED</p>
             </div>
           </div>
 
@@ -153,7 +153,7 @@ const StyleAdvisor = ({ user }) => {
 
       {/* Personalized Recommendations */}
       <div className="mt-12">
-        <h3 className="text-lg font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
+        <h3 className="text-lg font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
           CURATED FOR YOU
         </h3>
 
@@ -209,7 +209,7 @@ const StyleAdvisor = ({ user }) => {
       <div className="mt-16 bg-gradient-to-r from-gray-50 to-gray-100 p-8 border-l-4 border-black">
         <div className="flex flex-col  md:flex-row items-start  md:items-center justify-between">
           <div>
-            <h3 className="text-lg font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+            <h3 className="text-lg font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               VIRTUAL STYLING SESSION
             </h3>
             <p className="mt-2 text-sm text-gray-600 max-w-xl">
@@ -243,7 +243,7 @@ const StyleAdvisor = ({ user }) => {
 
       {/* AI Style Quiz */}
       <div className="mt-16 border border-gray-200 p-8">
-        <h3 className="text-lg font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
+        <h3 className="text-lg font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
           DISCOVER YOUR SIGNATURE LOOK
         </h3>
 
@@ -950,7 +950,7 @@ const StyleAdvisor = ({ user }) => {
                     </svg>
                   </div>
 
-                  <h3 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+                  <h3 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                     STYLE PROFILE COMPLETED
                   </h3>
 

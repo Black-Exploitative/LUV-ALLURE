@@ -146,7 +146,7 @@ export default function ResetPassword() {
           <div className="w-full max-w-md space-y-10">
             {/* Title */}
             <div className="text-center">
-              <h1 className="text-3xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-900">
+              <h1 className="text-3xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-900">
                 RESET PASSWORD
               </h1>
               <p className="mt-6 text-sm text-gray-600">

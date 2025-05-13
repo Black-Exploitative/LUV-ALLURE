@@ -188,7 +188,7 @@ const ContactUs = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg  md:text-xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerstr text-black"
+              className="text-lg  md:text-xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerstr text-black"
             >
               We're here to assist you with any inquiries
             </motion.p>
@@ -219,7 +219,7 @@ const ContactUs = () => {
                 ease: "easeOut",
               }}
             >
-              <h2 className="text-2xl  md:text-3xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-12 uppercase">
+              <h2 className="text-2xl  md:text-3xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-12 uppercase">
                 How Can We Help?
               </h2>
 
@@ -230,7 +230,7 @@ const ContactUs = () => {
                       className="w-full text-left py-4 flex justify-between items-center"
                       onClick={() => toggleAccordion(index)}
                     >
-                      <h3 className="text-lg  md:text-xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+                      <h3 className="text-lg  md:text-xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                         {method.title}
                       </h3>
                       <motion.div
@@ -269,7 +269,7 @@ const ContactUs = () => {
                                 <p className="text-sm text-gray-500">
                                   {item.label}
                                 </p>
-                                <p className="font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-black group-hover:underline">
+                                <p className="font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-black group-hover:underline">
                                   {item.value}
                                 </p>
                               </div>
@@ -293,7 +293,7 @@ const ContactUs = () => {
                 ease: "easeOut",
               }}
             >
-              <h2 className="text-2xl  md:text-3xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-12 uppercase">
+              <h2 className="text-2xl  md:text-3xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-12 uppercase">
                 Send Us a Message
               </h2>
 
@@ -303,7 +303,7 @@ const ContactUs = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   className="bg-[#f8f6f4] p-12 text-center"
                 >
-                  <h3 className="text-xl  md:text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
+                  <h3 className="text-xl  md:text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
                     Thank You
                   </h3>
                   <p className="text-gray-600">
@@ -437,7 +437,7 @@ const ContactUs = () => {
           className="w-full h-[60vh] bg-[#f8f6f4] mt-20 flex items-center justify-center"
         >
           <div className="text-center max-w-2xl mx-auto px-6">
-            <h2 className="text-2xl  md:text-3xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6 uppercase">
+            <h2 className="text-2xl  md:text-3xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6 uppercase">
               Our Global Presence
             </h2>
             <p className="text-gray-600 mb-8">
@@ -464,7 +464,7 @@ const ContactUs = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <h2 className="text-2xl  md:text-3xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6 uppercase">
+              <h2 className="text-2xl  md:text-3xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6 uppercase">
                 Stay Connected
               </h2>
               <p className="text-gray-600 mb-8">

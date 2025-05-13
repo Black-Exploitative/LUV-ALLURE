@@ -659,7 +659,7 @@ const FilterSortBar = ({
               className="flex items-center text-gray-800 focus:outline-none cursor-pointer"
               onClick={toggleFilter}
             >
-              <span className=" md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-sm uppercase font-thin">
+              <span className=" md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-sm uppercase font-thin sm:tracking-tight">
                 Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
               </span>
               <span className="ml-2 text-sm leading-none">+</span>
@@ -696,7 +696,7 @@ const FilterSortBar = ({
             <span className="text-gray-400">|</span>
             <div className="relative">
               <button
-                className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider focus:outline-none"
+                className="flex items-center text-gray-800 uppercase cursor-pointer text-sm font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider focus:outline-none"
                 onClick={toggleDropdown}
               >
                 Sort <IoMdArrowDropdown className="ml-1" />
@@ -743,7 +743,7 @@ const FilterSortBar = ({
             <div className="flex flex-col h-full">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-thin uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+                  <h3 className="text-sm font-thin sm:tracking-tight uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                     Filter
                   </h3>
                   <button
@@ -888,13 +888,13 @@ const FilterSortBar = ({
               <div className="p-6 border-t border-gray-200">
                 <button
                   onClick={handleApplyFilters}
-                  className="w-full py-3 bg-black text-white text-xs uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider cursor-pointer font-thin hover:bg-gray-900 transition-colors"
+                  className="w-full py-3 bg-black text-white text-xs uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider cursor-pointer font-thin sm:tracking-tight hover:bg-gray-900 transition-colors"
                 >
                   See Results
                 </button>
                 <button
                   onClick={handleClearFilters}
-                  className="w-full mt-3 text-xs text-gray-700 underline cursor-pointer font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
+                  className="w-full mt-3 text-xs text-gray-700 underline cursor-pointer font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                 >
                   Clear All Filters
                 </button>

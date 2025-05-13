@@ -683,7 +683,7 @@ const Checkout = () => {
       <CheckoutNavbar />
 
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <h1 className="text-2xl font-thin mb-8 text-center uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+        <h1 className="text-2xl font-thin sm:tracking-tight mb-8 text-center uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
           Checkout
         </h1>
 

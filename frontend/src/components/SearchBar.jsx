@@ -323,7 +323,7 @@ const SearchBar = ({ darkNavbar }) => {
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   placeholder="Search for products, colors, categories..."
-                  className="flex-grow text-base font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider focus:outline-none text-gray-700"
+                  className="flex-grow text-base font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider focus:outline-none text-gray-700"
                   autoComplete="off"
                 />
                 <button 

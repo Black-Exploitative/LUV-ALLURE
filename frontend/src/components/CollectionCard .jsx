@@ -16,7 +16,7 @@ const CollectionCard = ({ imageUrl, title, onClick, onShopNowClick }) => {
 
       <div className="absolute inset-0 bg-black/30 flex flex-col justify-between">
         <div className="flex-grow flex items-center justify-center">
-          <h2 className="text-gray-200 text-4xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+          <h2 className="text-gray-200 text-4xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
             {title}
           </h2>
         </div>

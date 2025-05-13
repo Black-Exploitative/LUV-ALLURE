@@ -13,10 +13,10 @@ const CheckoutNavbar = () => {
               className="flex items-center text-white hover:text-gray-300 transition-colors duration-300"
             >
               <FiArrowLeft className="mr-2 text-lg  md:text-xl group-hover:transform group-hover:-translate-x-1 transition-transform duration-300" />
-              <span className="hidden sm:inline text-sm font-thin uppercase  md:text-base  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
+              <span className="hidden sm:inline text-sm font-thin sm:tracking-tight uppercase  md:text-base  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
                 Back to shopping bag
               </span>
-              <span className="sm:hidden text-sm font-thin uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
+              <span className="sm:hidden text-sm font-thin sm:tracking-tight uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
                 Back
               </span>
             </Link>
@@ -34,7 +34,7 @@ const CheckoutNavbar = () => {
           </div>
 
           {/* Right: Contact */}
-          <div className="text-white text-sm  md:text-base  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-thin">
+          <div className="text-white text-sm  md:text-base  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-thin sm:tracking-tight">
             <a
               href="tel:+2348161656841"
               className="hidden sm:block hover:text-gray-300 transition-colors duration-300"

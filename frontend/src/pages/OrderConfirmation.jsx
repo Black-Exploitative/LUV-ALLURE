@@ -107,7 +107,7 @@ const OrderConfirmation = () => {
           >
             <FaCheckCircle size={56} />
           </motion.div>
-          <h1 className="text-3xl font-thin uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-3">
+          <h1 className="text-3xl font-thin sm:tracking-tight uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-3">
             Thank You For Your Order
           </h1>
           <p className="text-gray-600">

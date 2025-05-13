@@ -140,7 +140,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
             </button>
 
             <div className="px-6 pt-8 pb-4">
-              <h2 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+              <h2 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
                 SIZE GUIDE
               </h2>
               <motion.div
@@ -221,7 +221,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
                           {size.map((cell, cellIndex) => (
                             <td
                               key={cellIndex}
-                              className="px-4 py-3 text-center text-gray-800 font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
+                              className="px-4 py-3 text-center text-gray-800 font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                             >
                               {cell}
                             </td>
