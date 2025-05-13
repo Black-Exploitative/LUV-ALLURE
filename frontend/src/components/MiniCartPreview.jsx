@@ -97,7 +97,7 @@ const MiniCartPreview = () => {
             onClick={(e) => e.stopPropagation()} // Prevent clicks from bubbling up
           >
             <div className="p-4">
-              <h3 className="text-sm font-medium uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
+              <h3 className="text-sm font-medium uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-3 pb-2 border-b border-gray-100">
                 My Shopping Bag ({itemCount} item{itemCount !== 1 ? 's' : ''})
               </h3>
 
@@ -155,7 +155,7 @@ const MiniCartPreview = () => {
                     setIsHovering(false);
                     navigate('/checkout');
                   }}
-                  className="w-full cursor-pointer bg-black text-white text-xs uppercase tracking-wider py-2 hover:bg-gray-900 transition-colors"
+                  className="w-full cursor-pointer bg-black text-white text-xs uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst py-2 hover:bg-gray-900 transition-colors"
                 >
                   Checkout
                 </button>
@@ -165,7 +165,7 @@ const MiniCartPreview = () => {
                     setIsHovering(false);
                     navigate('/shopping-bag');
                   }}
-                  className="w-full cursor-pointer bg-white text-black border border-black text-xs uppercase tracking-wider py-2 hover:bg-gray-50 transition-colors"
+                  className="w-full cursor-pointer bg-white text-black border border-black text-xs uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst py-2 hover:bg-gray-50 transition-colors"
                 >
                   View Bag
                 </button>

@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
 const shopifyClient = require('../utils/shopifyClient');
-const shopifyPasswordProxy = require('../utils/ShopifyPasswordProxy');
+const shopifyPasswordProxy = require('../utils/shopifyPasswordProxy');
 
 // Register a new user
 exports.register = async (req, res, next) => {

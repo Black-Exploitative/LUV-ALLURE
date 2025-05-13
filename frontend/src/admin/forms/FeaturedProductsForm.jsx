@@ -291,9 +291,9 @@ const FeaturedProductsForm = () => {
       )}
       
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1  md:grid-cols-3 gap-6">
           {/* Left side - Section properties */}
-          <div className="md:col-span-1">
+          <div className=" md:col-span-1">
             <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
               <div className="p-6">
                 <h2 className="text-lg font-medium mb-4">Section Properties</h2>
@@ -407,7 +407,7 @@ const FeaturedProductsForm = () => {
           </div>
           
           {/* Right side - Selected products */}
-          <div className="md:col-span-2">
+          <div className=" md:col-span-2">
             <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
               <div className="p-6">
                 <h2 className="text-lg font-medium mb-4">Selected Products</h2>
@@ -493,7 +493,7 @@ const FeaturedProductsForm = () => {
                     <h3 className="text-xl font-medium">{formData.title}</h3>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2  md:grid-cols-4 gap-4">
                     {selectedProducts.length > 0 ? (
                       selectedProducts.map(product => (
                         <div key={product.id} className="border border-gray-200 bg-white p-3">

@@ -175,7 +175,7 @@ const ReviewModal = ({ isOpen, onClose, productName = "SWIVEL ALLURE MAXI DRESS"
             </div>
 
             {/* Name and Email */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block mb-2 font-medium">
                   Your name <span className="text-red-500">*</span>

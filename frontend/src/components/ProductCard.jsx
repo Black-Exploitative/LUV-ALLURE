@@ -287,7 +287,7 @@ const ProductCard = ({ product, gridType, onProductClick, mobileColumns = 2 }) =
       {/* Product Details Section - Condensed for mobile */}
       <div className="cursor-pointer mt-2">
         <motion.h3 
-          className={`${isMobile ? 'text-xs' : 'text-sm md:text-base'} font-medium text-gray-900 hover:underline line-clamp-1`}
+          className={`${isMobile ? 'text-xs' : 'text-sm  md:text-base'} font-medium text-gray-900 hover:underline line-clamp-1`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -296,7 +296,7 @@ const ProductCard = ({ product, gridType, onProductClick, mobileColumns = 2 }) =
         </motion.h3>
         
         <motion.p 
-          className={`text-gray-700 ${isMobile ? 'text-xs mt-1' : 'text-sm md:text-base mt-2'}`}
+          className={`text-gray-700 ${isMobile ? 'text-xs mt-1' : 'text-sm  md:text-base mt-2'}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
@@ -318,7 +318,7 @@ const ProductCard = ({ product, gridType, onProductClick, mobileColumns = 2 }) =
           {sizes.map((size) => (
             <motion.div
               key={size}
-              className={`${isMobile ? 'px-1 py-0.5 text-[8px] mr-1 mb-1' : 'px-2 py-1 text-xs md:text-sm mr-2 mb-2'} border cursor-pointer
+              className={`${isMobile ? 'px-1 py-0.5 text-[8px] mr-1 mb-1' : 'px-2 py-1 text-xs  md:text-sm mr-2 mb-2'} border cursor-pointer
                 ${selectedSize === size 
                   ? "border-black bg-black text-white" 
                   : "border-gray-300 hover:border-gray-400"}

@@ -24,6 +24,9 @@ export const clearCmsCache = () => {
   };
 };
 
+// Base API URL - use environment variable or fallback
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 // CMS Service for front-end content
 const cmsService = {
   // Get active homepage layout with populated sections
@@ -34,7 +37,7 @@ const cmsService = {
         return contentCache.homepage.data;
       }
       
-      const response = await axios.get('/api/cms/homepage');
+      const response = await api.get('/cms/homepage');
       const homepageData = response.data.data;
       
       // Cache the result
@@ -43,6 +46,7 @@ const cmsService = {
         timestamp: Date.now()
       };
       
+      console.log('Homepage content loaded:', homepageData);
       return homepageData;
     } catch (error) {
       console.error('Error fetching homepage content:', error);
@@ -63,7 +67,7 @@ const cmsService = {
         return contentCache.banners[pageName].data;
       }
       
-      const response = await axios.get(`/api/cms/banners?page=${pageName}`);
+      const response = await api.get(`/cms/banners?page=${pageName}`);
       
       // Get active banners and handle date filtering
       const now = new Date();
@@ -102,11 +106,14 @@ const cmsService = {
       // Check cache first
       if (contentCache.navImages[category] && 
           contentCache.navImages[category].timestamp > Date.now() - contentCache.expiryTime) {
+        console.log(`Using cached nav images for ${category}`);
         return contentCache.navImages[category].data;
       }
       
+      console.log(`Fetching navigation images for ${category}...`);
+      
       // Make sure category is included in the query string
-      const response = await axios.get(`/api/cms/nav-images`, {
+      const response = await api.get('/cms/nav-images', {
         params: { category }
       });
       
@@ -115,17 +122,30 @@ const cmsService = {
         .filter(image => image.isActive)
         .sort((a, b) => a.order - b.order);
       
-      console.log(`Images for ${category}:`, activeNavImages); // Add for debugging
+      console.log(`Found ${activeNavImages.length} images for ${category}`);
+      
+      // Fix image URLs in production
+      const imagesWithFixedUrls = activeNavImages.map(image => {
+        // If we're in production and the URL starts with /uploads, fix it
+        if (image.imageUrl && image.imageUrl.startsWith('/uploads')) {
+          // Get the base URL from the current location or use environment variable
+          const baseUrl = import.meta.env.VITE_API_URL || '';
+          image.imageUrl = `${baseUrl}${image.imageUrl}`;
+          console.log(`Fixed image URL: ${image.imageUrl}`);
+        }
+        return image;
+      });
       
       // Cache the result
       contentCache.navImages[category] = {
-        data: activeNavImages,
+        data: imagesWithFixedUrls,
         timestamp: Date.now()
       };
       
-      return activeNavImages;
+      return imagesWithFixedUrls;
     } catch (error) {
       console.error(`Error fetching navigation images for ${category}:`, error);
+      console.error('Full error:', error.response || error);
       return [];
     }
   },
@@ -218,6 +238,12 @@ export const getShopBanner = async (deviceType = 'desktop') => {
     if (activeBanner) {
       console.log(`Active ${deviceType} shop banner found:`, activeBanner);
       
+      // Fix media URLs for production
+      if (activeBanner.media?.imageUrl && activeBanner.media.imageUrl.startsWith('/uploads')) {
+        const baseUrl = import.meta.env.VITE_API_URL || '';
+        activeBanner.media.imageUrl = `${baseUrl}${activeBanner.media.imageUrl}`;
+      }
+      
       // Important: Log the button position specifically
       console.log(`Button position in ${deviceType} banner:`, activeBanner.content?.buttonPosition);
       
@@ -262,7 +288,6 @@ export const getShopBanner = async (deviceType = 'desktop') => {
   }
 };
 
-
 export const getPromoSection = async () => {
   try {
     // Make a direct call to get all sections of type promo-section
@@ -271,6 +296,12 @@ export const getPromoSection = async () => {
     
     // Get the first active promo section
     const activePromo = promoSections.find(section => section.isActive);
+    
+    // Fix media URLs for production
+    if (activePromo?.media?.imageUrl && activePromo.media.imageUrl.startsWith('/uploads')) {
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      activePromo.media.imageUrl = `${baseUrl}${activePromo.media.imageUrl}`;
+    }
     
     return activePromo;
   } catch (error) {
@@ -289,12 +320,17 @@ export const getCollectionHero = async () => {
     // Get the first active collection hero
     const activeHero = collectionHeroes.find(hero => hero.isActive);
     
+    // Fix media URLs for production
+    if (activeHero?.media?.imageUrl && activeHero.media.imageUrl.startsWith('/uploads')) {
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      activeHero.media.imageUrl = `${baseUrl}${activeHero.media.imageUrl}`;
+    }
+    
     return activeHero;
   } catch (error) {
     console.error('Error fetching collection hero:', error);
     return null;
   }
 };
-
 
 export default cmsService;

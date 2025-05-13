@@ -19,6 +19,7 @@ import api from "../services/api";
 import ColorVariants from "../components/ColorVaraint";
 import { useWishlist } from "../context/WishlistContext";
 import DesktopProductDetailsSkeleton from "../components/loadingSkeleton/DesktopProductDetailsSkeleton";
+import { useRelatedProducts, RelatedProductsSection } from '../components/RelatedProductSection';
 
 const DesktopProductDetailsPage = () => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
@@ -95,10 +96,7 @@ const DesktopProductDetailsPage = () => {
   const [displayImages, setDisplayImages] = useState([]);
 
   // Related products state
-  const [styleWithProducts, setStyleWithProducts] = useState([]);
-  const [alsoPurchasedProducts, setAlsoPurchasedProducts] = useState([]);
-  const [alsoViewedProducts, setAlsoViewedProducts] = useState([]);
-  const [loadingRelated, setLoadingRelated] = useState(true);
+  
 
   // Hooks
   const { addToCart } = useCart();
@@ -146,46 +144,7 @@ const DesktopProductDetailsPage = () => {
     };
   }, [product, productName]);
 
-  const renderStyleItWith = () => {
-    if (loadingRelated) {
-      return (
-        <div className="mt-[50px]">
-          <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
-          <div className="flex justify-center items-center py-8">
-            <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-          </div>
-        </div>
-      );
-    }
 
-    // Only render if we have style-with products
-    if (styleWithProducts && styleWithProducts.length > 0) {
-      return (
-        <div className="mt-[50px]">
-          <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
-          <div className="grid gap-4 md:gap-6">
-            {styleWithProducts.map((product, index) => (
-              <SmallProductCard
-                key={product.id || index}
-                image={
-                  product.images?.[0] ||
-                  product.image ||
-                  "/images/placeholder.jpg"
-                }
-                name={product.title || product.name}
-                color={product.color || "Default"}
-                price={`₦${parseFloat(product.price).toLocaleString()}`}
-                onViewProduct={() => navigate(`/product/${product.id}`)}
-              />
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Don't render anything if no products
-    return null;
-  };
 
   // Initialize display images when product loads
   const processAndValidateImages = (imageArray) => {
@@ -472,41 +431,6 @@ const DesktopProductDetailsPage = () => {
   }, [product?.name, productId]);
   // When a color is selected, either update the display images or navigate to the variant
 
-  // Fetch related products
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!productId) return;
-
-      try {
-        setLoadingRelated(true);
-
-        // Fetch each type of related product
-        const styleWith = await cmsService.getProductRelationships(
-          productId,
-          "style-with"
-        );
-        const alsoPurchased = await cmsService.getProductRelationships(
-          productId,
-          "also-purchased"
-        );
-        const alsoViewed = await cmsService.getProductRelationships(
-          productId,
-          "also-viewed"
-        );
-
-        // Update state with fetched products
-        setStyleWithProducts(styleWith || []);
-        setAlsoPurchasedProducts(alsoPurchased || []);
-        setAlsoViewedProducts(alsoViewed || []);
-      } catch (error) {
-        console.error("Error fetching related products:", error);
-      } finally {
-        setLoadingRelated(false);
-      }
-    };
-
-    fetchRelatedProducts();
-  }, [productId]);
 
   // Function to get images for a specific color
   const getImagesForColor = (colorName) => {
@@ -1034,48 +958,12 @@ useEffect(() => {
   }, [selectedSize, selectedColor, product?.colors]);
 
   // Fallback data for related products
-  const relatedProducts = [
-    {
-      name: "Sybil Scarf - Black",
-      color: "BLACK",
-      price: "78,000",
-      image: "/images/stylewith.jpg",
-    },
-    {
-      name: "Sybil Scarf - Pink",
-      color: "PINK",
-      price: "56,000",
-      image: "/images/stylewith2.jpg",
-    },
-  ];
-
-  // Fallback data for purchased products
-  const purchasedProducts = [
-    {
-      name: "Purchased 1",
-      price: 1000,
-      color: "BEIGE",
-      images: "/images/photo6.jpg",
-    },
-    {
-      name: "Purchased 2",
-      price: 1200,
-      color: "MAROON",
-      images: "/images/photo11.jpg",
-    },
-    {
-      name: "Purchased 3",
-      price: 800,
-      color: "CORAL",
-      images: "/images/photo6.jpg",
-    },
-    {
-      name: "Purchased 4",
-      price: 900,
-      color: "BURGUNDY",
-      images: "/images/photo11.jpg",
-    },
-  ];
+  const { 
+  styleWithProducts, 
+  alsoPurchasedProducts, 
+  alsoViewedProducts, 
+  loadingRelated 
+} = useRelatedProducts(productId);
 
   // Handle adding to cart
   const handleAddToCart = () => {
@@ -1216,13 +1104,22 @@ useEffect(() => {
 
   return (
     <>
-      <div className="mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]">
-        <div className="mt-[60px] md:mt-[100px] flex flex-row">
+      <div className="mx-4 sm:mx-6  md:mx-[40px] lg:mx-[80px]">
+        <div className="mt-[60px]  md:mt-[100px] flex flex-row">
           {/* Left Side: Product Carousel */}
-          <div className="mb-8 md:mb-0 mr-[50px] ">
+          <div className="mb-8  md:mb-0 mr-[50px] ">
             <ProductCarousel images={displayImages} />
+            <RelatedProductsSection
+                type="style-with"
+                title="STYLE IT WITH"
+                productId={productId}
+                products={styleWithProducts}
+                loading={loadingRelated}
+                navigate={navigate}
+              />
 
-            {/* Related Products - Also inside the max-w-screen-xl container */}
+
+            {/* Color Variants 
             <div className="mt-[50px]">
               <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
               {loadingRelated ? (
@@ -1230,7 +1127,7 @@ useEffect(() => {
                   <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
                 </div>
               ) : styleWithProducts.length > 0 ? (
-                <div className="grid gap-4 md:gap-6">
+                <div className="grid gap-4  md:gap-6">
                   {styleWithProducts.map((product, index) => (
                     <SmallProductCard
                       key={product.id || index}
@@ -1247,7 +1144,7 @@ useEffect(() => {
                   ))}
                 </div>
               ) : (
-                <div className="grid gap-4 md:gap-6">
+                <div className="grid gap-4  md:gap-6">
                   {relatedProducts.map((product, index) => (
                     <SmallProductCard
                       key={index}
@@ -1263,13 +1160,13 @@ useEffect(() => {
                 </div>
               )}
             </div>
-            {renderStyleItWith()}
+            {renderStyleItWith()}*/}
           </div>
 
           {/* Right Side: Product Details */}
           <div className="w-[500px] flex flex-col justify-start">
             {/* Product Name */}
-            <h1 className="text-xl font-normal tracking-wider">{product.name}</h1>
+            <h1 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">{product.name}</h1>
             {/*  Star Rating */}
             <StarRating
               rating={4.9}
@@ -1278,7 +1175,7 @@ useEffect(() => {
             />
 
             {/* Product Price */}
-            <p className="text-[18px] font-normal tracking-wide text-gray-700">
+            <p className="text-[18px] font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700">
               ₦{product.price ? product.price.toLocaleString() : "0"}
             </p>
 
@@ -1402,7 +1299,27 @@ useEffect(() => {
       </div>
 
       <div className="mx-[20px] mt-[50px] mb-[100px]">
-        {/* Customers Also Purchased Section */}
+
+        {/* Also purchased section */}
+          <RelatedProductsSection
+            type="also-purchased"
+            title="ALLURVERS ALSO PURCHASED"
+            productId={productId}
+            products={alsoPurchasedProducts}
+            loading={loadingRelated}
+            navigate={navigate}
+          />
+
+          {/* Also viewed section */}
+          <RelatedProductsSection
+            type="also-viewed"
+            title="ALLURVERS ALSO VIEWED"
+            productId={productId}
+            products={alsoViewedProducts}
+            loading={loadingRelated}
+            navigate={navigate}
+          />
+        {/* Customers Also Purchased Section 
         {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
           <>
             <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
@@ -1413,7 +1330,7 @@ useEffect(() => {
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
             ) : alsoPurchasedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {alsoPurchasedProducts.map((product) => (
                   <PurchasedCard
                     key={product.id}
@@ -1431,7 +1348,7 @@ useEffect(() => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {purchasedProducts.map((product, index) => (
                   <PurchasedCard key={index} product={product} />
                 ))}
@@ -1440,7 +1357,7 @@ useEffect(() => {
           </>
         )}
 
-        {/* Customers Also Viewed Section */}
+        {/* Customers Also Viewed Section 
         {(alsoViewedProducts.length > 0 || !loadingRelated) && (
           <>
             <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
@@ -1451,7 +1368,7 @@ useEffect(() => {
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
             ) : alsoViewedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {alsoViewedProducts.map((product) => (
                   <PurchasedCard
                     key={product.id}
@@ -1469,14 +1386,14 @@ useEffect(() => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {purchasedProducts.map((product, index) => (
                   <PurchasedCard key={index} product={product} />
                 ))}
               </div>
             )}
           </>
-        )}
+        )}*/}
       </div>
 
       <Footer />

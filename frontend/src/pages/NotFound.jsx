@@ -108,7 +108,7 @@ const NotFound = () => {
       return (
         <motion.div
           key={index}
-          className="absolute text-3xl md:text-4xl pointer-events-none"
+          className="absolute text-3xl  md:text-4xl pointer-events-none"
           style={{ 
             left: `${xPos}%`, 
             top: initialY,
@@ -163,7 +163,7 @@ const NotFound = () => {
       
       {/* Main content */}
       <div className="flex-grow flex items-center justify-center px-6 z-10 mt-[70px]">
-        <div className="max-w-4xl w-full mx-auto text-center py-16 md:py-24">
+        <div className="max-w-4xl w-full mx-auto text-center py-16  md:py-24">
           {/* Quote */}
           <AnimatePresence>
             {showQuote && (
@@ -173,7 +173,7 @@ const NotFound = () => {
                 transition={{ duration: 0.8 }}
                 className="mb-8"
               >
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-wider text-gray-900 leading-tight">
+                <h1 className="text-3xl  md:text-4xl lg:text-5xl font-extralight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-900 leading-tight">
                   STYLE NEVER GETS LOST
                 </h1>
               </motion.div>
@@ -188,7 +188,7 @@ const NotFound = () => {
           />
           
           {/* Suspended clothing items showcase */}
-          <div className="relative h-24 md:h-32 mb-12">
+          <div className="relative h-24  md:h-32 mb-12">
             {clothingItems.map((item, index) => {
               // Calculate the x position to distribute items evenly
               const xPos = (index / (clothingItems.length - 1)) * 80 + 10; // 10% to 90%
@@ -196,7 +196,7 @@ const NotFound = () => {
               return (
                 <motion.div
                   key={index}
-                  className="absolute text-4xl md:text-5xl"
+                  className="absolute text-4xl  md:text-5xl"
                   style={{ 
                     left: `${xPos}%`,
                     top: "50%",
@@ -240,7 +240,7 @@ const NotFound = () => {
                 transition={{ duration: 0.8 }}
                 className="mb-12"
               >
-                <p className="text-xl md:text-2xl text-gray-500 font-light leading-relaxed max-w-2xl mx-auto">
+                <p className="text-xl  md:text-2xl text-gray-500 font-light leading-relaxed max-w-2xl mx-auto">
                   While the page you're looking for seems to have gone out of season, 
                   our collection continues.
                 </p>
@@ -264,7 +264,7 @@ const NotFound = () => {
                 >
                   <Link
                     to="/"
-                    className="inline-block px-10 py-3 border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white transition-colors duration-300 uppercase tracking-wider text-sm"
+                    className="inline-block px-10 py-3 border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white transition-colors duration-300 uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-sm"
                   >
                     Return to Collection
                   </Link>
@@ -294,7 +294,7 @@ const NotFound = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="mt-16 md:mt-24"
+                className="mt-16  md:mt-24"
               >
                 <motion.div 
                   className="h-px w-16 bg-gray-200 mx-auto mb-8"
@@ -303,7 +303,7 @@ const NotFound = () => {
                   transition={{ duration: 0.8 }}
                 />
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+                <div className="grid grid-cols-2  md:grid-cols-4 gap-4 max-w-3xl mx-auto">
                   {[
                     { name: "NEW ARRIVALS", path: "/collections/new-arrivals", delay: 0.6 },
                     { name: "ESSENTIALS", path: "/collections/essentials", delay: 0.7 },

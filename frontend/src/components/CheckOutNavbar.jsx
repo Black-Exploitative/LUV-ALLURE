@@ -3,7 +3,7 @@ import { FiArrowLeft } from "react-icons/fi";
 
 const CheckoutNavbar = () => {
   return (
-    <nav className="bg-black w-full mt-[70px] py-14 px-4 md:px-10">
+    <nav className="bg-black w-full mt-[70px] py-14 px-4  md:px-10">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
           {/* Left: Back to shopping bag */}
@@ -12,11 +12,11 @@ const CheckoutNavbar = () => {
               to="/shopping-bag"
               className="flex items-center text-white hover:text-gray-300 transition-colors duration-300"
             >
-              <FiArrowLeft className="mr-2 text-lg md:text-xl group-hover:transform group-hover:-translate-x-1 transition-transform duration-300" />
-              <span className="hidden sm:inline text-sm font-thin uppercase md:text-base tracking-wide">
+              <FiArrowLeft className="mr-2 text-lg  md:text-xl group-hover:transform group-hover:-translate-x-1 transition-transform duration-300" />
+              <span className="hidden sm:inline text-sm font-thin sm:tracking-tight uppercase  md:text-base  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
                 Back to shopping bag
               </span>
-              <span className="sm:hidden text-sm font-thin uppercase tracking-wide">
+              <span className="sm:hidden text-sm font-thin sm:tracking-tight uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
                 Back
               </span>
             </Link>
@@ -28,13 +28,13 @@ const CheckoutNavbar = () => {
               <img
                 src="/images/LA-2.png"
                 alt="Brand Logo"
-                className="h-10 md:h-14"
+                className="h-10  md:h-14"
               />
             </Link>
           </div>
 
           {/* Right: Contact */}
-          <div className="text-white text-sm md:text-base tracking-wide font-thin">
+          <div className="text-white text-sm  md:text-base  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-thin sm:tracking-tight">
             <a
               href="tel:+2348161656841"
               className="hidden sm:block hover:text-gray-300 transition-colors duration-300"

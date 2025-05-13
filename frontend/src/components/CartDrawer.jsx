@@ -87,13 +87,13 @@ const CartDrawer = () => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 w-full md:w-96 z-60 bg-white shadow-lg flex flex-col"
+            className="fixed top-0 right-0 bottom-0 w-full  md:w-96 z-60 bg-white shadow-lg flex flex-col"
           >
             <div className="flex-1 overflow-y-auto">
               {/* Header */}
               <div className="sticky top-0 bg-white z-10 p-6 border-b border-gray-200">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-medium tracking-wide uppercase">
+                  <h2 className="text-lg font-medium  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider uppercase">
                     {selectedProduct ? 'Added to Bag' : 'Shopping Bag'}
                   </h2>
                   <button
@@ -238,7 +238,7 @@ const CartDrawer = () => {
                 {/* Buttons */}
                 <div className="space-y-3">
                   <button 
-                    className="w-full bg-black text-white py-3 hover:bg-gray-900 transition-colors text-sm uppercase tracking-wider cursor-pointer"
+                    className="w-full bg-black text-white py-3 hover:bg-gray-900 transition-colors text-sm uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst cursor-pointer"
                     onClick={() => {
                       setIsCartDrawerOpen(false);
                       navigate('/checkout');
@@ -247,7 +247,7 @@ const CartDrawer = () => {
                     Checkout
                   </button>
                   <button 
-                    className="w-full bg-white text-black border border-black py-3 hover:bg-gray-50 transition-colors text-sm uppercase tracking-wider cursor-pointer"
+                    className="w-full bg-white text-black border border-black py-3 hover:bg-gray-50 transition-colors text-sm uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst cursor-pointer"
                     onClick={() => {
                       setIsCartDrawerOpen(false);
                       navigate('/shopping-bag');

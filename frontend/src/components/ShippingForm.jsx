@@ -172,7 +172,7 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
       <h3 className="text-xl font-medium mb-6">Shipping Information</h3>
       
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1  md:grid-cols-2 gap-4 mb-6">
           {/* First Name */}
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -262,7 +262,7 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
           />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1  md:grid-cols-2 gap-4 mb-4">
           {/* City */}
           <div>
             <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
@@ -304,7 +304,7 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1  md:grid-cols-2 gap-4 mb-6">
           {/* Zip/Postal Code */}
           <div>
             <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
@@ -406,7 +406,7 @@ const ShippingForm = ({ onSubmit, isLoading, initialData }) => {
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 bg-black text-white text-sm uppercase tracking-wider flex items-center justify-center"
+          className="w-full py-3 bg-black text-white text-sm uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst flex items-center justify-center"
         >
           {isLoading ? (
             <>

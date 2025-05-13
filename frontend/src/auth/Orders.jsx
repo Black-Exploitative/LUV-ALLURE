@@ -102,12 +102,12 @@ const Orders = ({ dashboard = false, limit = null }) => {
                 index !== orders.length - 1 ? "border-b border-gray-200" : ""
               }`}
             >
-              <div className="flex flex-col md:flex-row justify-between mb-4">
+              <div className="flex flex-col  md:flex-row justify-between mb-4">
                 <div>
                   <p className="font-medium">{order.reference}</p>
                   <p className="text-sm text-gray-600">{formatDate(order.createdAt)}</p>
                 </div>
-                <div className="mt-2 md:mt-0">
+                <div className="mt-2  md:mt-0">
                   <span className={`inline-block px-3 py-1 text-xs ${
                     order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                     order.status === 'processing' ? 'bg-blue-100 text-blue-800' :

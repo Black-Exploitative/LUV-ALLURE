@@ -227,7 +227,7 @@ const CollectionHeroForm = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3  md:grid-cols-4 gap-4">
             {mediaLibrary.length > 0 ? (
               mediaLibrary
                 .filter(media => 
@@ -316,7 +316,7 @@ const CollectionHeroForm = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Media Type
@@ -423,7 +423,7 @@ const CollectionHeroForm = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Button Text
@@ -452,7 +452,7 @@ const CollectionHeroForm = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Order

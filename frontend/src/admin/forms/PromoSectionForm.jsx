@@ -206,7 +206,7 @@ const PromoSectionForm = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3  md:grid-cols-4 gap-4">
             {mediaLibrary.length > 0 ? (
               mediaLibrary
                 .filter(media => media.type === 'image')
@@ -316,7 +316,7 @@ const PromoSectionForm = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Link Text
@@ -394,7 +394,7 @@ const PromoSectionForm = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Text Alignment
@@ -450,8 +450,8 @@ const PromoSectionForm = () => {
           <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
             <div className="p-6">
               <h3 className="text-md font-medium mb-4">Preview</h3>
-              <div className="flex flex-col md:flex-row border border-gray-200 p-4 rounded">
-                <div className="md:w-1/2 mb-4 md:mb-0 md:mr-4">
+              <div className="flex flex-col  md:flex-row border border-gray-200 p-4 rounded">
+                <div className=" md:w-1/2 mb-4  md:mb-0  md:mr-4">
                   <img
                     src={formData.media.imageUrl}
                     alt={formData.media.altText}
@@ -459,9 +459,9 @@ const PromoSectionForm = () => {
                   />
                 </div>
                 
-                <div className="md:w-1/2 flex flex-col justify-center">
+                <div className=" md:w-1/2 flex flex-col justify-center">
                   <div className={`text-${formData.content.alignment} max-w-lg mx-auto`}>
-                    <h2 className="text-2xl font-thin tracking-wider mb-4">{formData.content.title}</h2>
+                    <h2 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider mb-4">{formData.content.title}</h2>
                     <p className="text-base mb-4">{formData.content.description}</p>
                     
                     <div className="inline-block relative">

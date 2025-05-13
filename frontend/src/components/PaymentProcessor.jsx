@@ -297,7 +297,7 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-black text-white py-3 text-sm uppercase tracking-wide"
+            className="w-full bg-black text-white py-3 text-sm uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
             onClick={processPayment}
             disabled={isLoading || !isPaystackLoaded}
           >
@@ -317,7 +317,7 @@ const PaymentProcessor = ({ orderData, onPaymentSuccess, onPaymentCancel }) => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-black text-white py-3 text-sm uppercase tracking-wide"
+            className="w-full bg-black text-white py-3 text-sm uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
             onClick={handlePopupPayment}
             disabled={isLoading}
           >

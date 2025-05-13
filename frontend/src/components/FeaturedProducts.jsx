@@ -113,21 +113,21 @@ const FeaturedProducts = () => {
   };
 
   return (
-    <section className="py-12 md:py-16 mt-[60px] md:mt-[90px]">
+    <section className="py-12  md:py-16 mt-[60px]  md:mt-[90px]">
       {/* Dynamic Section Heading */}
-      <div className="mx-4 sm:mx-8 md:mx-[100px] text-center">
-        <AnimatedHeading className="tracking-wider text-[22px] md:text-[30px] font-normal text-black mb-[50px] md:mb-[103px]">
+      <div className="mx-4 sm:mx-8  md:mx-[100px] text-center">
+        <AnimatedHeading className=" md: md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[22px]  md:text-[30px] font-normal text-black mb-[50px]  md:mb-[103px]">
           {sectionTitle}
         </AnimatedHeading>
       </div>
 
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-8 mx-2 sm:mx-8 md:mx-[100px]">
+      <div className="grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3  md:gap-8 mx-2 sm:mx-8  md:mx-[100px]">
         {loading ? (
           // Loading skeleton
           Array.from({ length: 4 }).map((_, index) => (
             <div key={`skeleton-${index}`} className="flex justify-center">
-              <div className="w-full max-w-[160px] sm:max-w-[240px] md:w-[300px] lg:w-[380px] h-[280px] sm:h-[350px] md:h-[420px] lg:h-[500px] bg-gray-200 animate-pulse"></div>
+              <div className="w-full max-w-[160px] sm:max-w-[240px]  md:w-[300px] lg:w-[380px] h-[280px] sm:h-[350px]  md:h-[420px] lg:h-[500px] bg-gray-200 animate-pulse"></div>
             </div>
           ))
         ) : (

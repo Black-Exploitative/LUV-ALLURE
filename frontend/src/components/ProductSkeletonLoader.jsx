@@ -6,7 +6,7 @@ const ProductSkeletonLoader = ({ gridType, count = 8 }) => {
   const skeletons = Array.from({ length: count }, (_, i) => i);
   
   // Match the dimensions from the ProductCard component
-  const imageHeightClass = gridType === 2 ? "h-[1300px] md:h-[1300px]" : "h-[700px] md:h-[700px]";
+  const imageHeightClass = gridType === 2 ? "h-[1300px]  md:h-[1300px]" : "h-[700px]  md:h-[700px]";
   
   // Animation for shimmer effect
   const shimmer = {
@@ -26,8 +26,8 @@ const ProductSkeletonLoader = ({ gridType, count = 8 }) => {
       className={`
         mx-[20px]
         ${gridType === 2 
-          ? "grid grid-cols-1 md:grid-cols-2 gap-x-[10px] gap-y-[30px]" 
-          : "grid grid-cols-2 md:grid-cols-4 gap-x-[10px] md:gap-x-[10px] gap-y-[30px]"}
+          ? "grid grid-cols-1  md:grid-cols-2 gap-x-[10px] gap-y-[30px]" 
+          : "grid grid-cols-2  md:grid-cols-4 gap-x-[10px]  md:gap-x-[10px] gap-y-[30px]"}
       `}
     >
       {skeletons.map((index) => (

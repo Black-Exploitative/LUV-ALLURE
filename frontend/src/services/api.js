@@ -1,9 +1,13 @@
-// services/api.js - Frontend API service with enhanced authentication
-
+// frontend/src/services/api.js
 import axios from 'axios';
 
-// Base API URL
-const API_URL = 'http://localhost:3001/api';
+// Detect environment for base URL
+const isProduction = import.meta.env.PROD;
+const API_URL = isProduction 
+  ? import.meta.env.VITE_API_URL || 'https://backend-mocha-eta-71.vercel.app/api'
+  : 'http://localhost:3001/api';
+
+console.log('API Service initialized with base URL:', API_URL);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -19,6 +23,10 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    // Log the request for debugging
+    if (isProduction) {
+      console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`);
     }
     return config;
   },
@@ -41,6 +49,12 @@ api.interceptors.response.use(
         // Don't reload automatically, let the context handle the redirect
       }
     }
+    
+    // Log the error for debugging
+    if (isProduction) {
+      console.error('API Error:', error.response?.status, error.response?.data);
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -109,43 +123,13 @@ export const authService = {
     }
   },
 
-  // Change password
-  changePassword: async (passwordData) => {
-    try {
-      const response = await api.post('/auth/change-password', passwordData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to change password' };
-    }
-  },
-
-  // Request password reset
-  requestPasswordReset: async (email) => {
-    try {
-      const response = await api.post('/auth/forgot-password', { email });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to request password reset' };
-    }
-  },
-
-  // Reset password with token
-  resetPassword: async (token, newPassword) => {
-    try {
-      const response = await api.post('/auth/reset-password', { token, newPassword });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to reset password' };
-    }
-  },
-
   // Check if user is logged in
   isLoggedIn: () => {
     return !!localStorage.getItem('token');
   }
 };
 
-// Product Services - Compatible with your ProductGrid component
+// Product Services
 export const fetchProducts = async () => {
   try {
     const response = await api.get('/products');
@@ -193,165 +177,6 @@ export const cartService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to add item to cart' };
-    }
-  },
-
-  // Update cart item quantity
-  updateCartItem: async (variantId, quantity) => {
-    try {
-      const response = await api.put('/cart/update', { variantId, quantity });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to update cart' };
-    }
-  },
-
-  // Remove item from cart
-  removeFromCart: async (variantId) => {
-    try {
-      const response = await api.delete(`/cart/remove/${variantId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to remove item from cart' };
-    }
-  },
-
-  // Clear cart
-  clearCart: async () => {
-    try {
-      const response = await api.delete('/cart/clear');
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to clear cart' };
-    }
-  }
-};
-
-// Order Services
-export const orderService = {
-  // Create checkout
-  createCheckout: async (shippingAddress) => {
-    try {
-      const response = await api.post('/orders/checkout', { shippingAddress });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to create checkout' };
-    }
-  },
-
-  // Get user's orders
-  getOrders: async () => {
-    try {
-      const response = await api.get('/orders');
-      return response.data.orders;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to get orders' };
-    }
-  },
-
-  // Get order by ID
-  getOrderById: async (orderId) => {
-    try {
-      const response = await api.get(`/orders/${orderId}`);
-      return response.data.order;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to get order details' };
-    }
-  }
-};
-
-// Address Services
-export const addressService = {
-  // Get user's addresses
-  getAddresses: async () => {
-    try {
-      const response = await api.get('/user/addresses');
-      return response.data.addresses;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to get addresses' };
-    }
-  },
-
-  // Add new address
-  addAddress: async (addressData) => {
-    try {
-      const response = await api.post('/user/addresses', addressData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to add address' };
-    }
-  },
-
-  // Update address
-  updateAddress: async (addressId, addressData) => {
-    try {
-      const response = await api.put(`/user/addresses/${addressId}`, addressData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to update address' };
-    }
-  },
-
-  // Delete address
-  deleteAddress: async (addressId) => {
-    try {
-      const response = await api.delete(`/user/addresses/${addressId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to delete address' };
-    }
-  },
-
-  // Set default address
-  setDefaultAddress: async (addressId) => {
-    try {
-      const response = await api.put(`/user/addresses/${addressId}/default`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to set default address' };
-    }
-  }
-};
-
-// Payment Method Services
-export const paymentService = {
-  // Get user's payment methods
-  getPaymentMethods: async () => {
-    try {
-      const response = await api.get('/user/payment-methods');
-      return response.data.paymentMethods;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to get payment methods' };
-    }
-  },
-
-  // Add new payment method
-  addPaymentMethod: async (paymentData) => {
-    try {
-      const response = await api.post('/user/payment-methods', paymentData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to add payment method' };
-    }
-  },
-
-  // Delete payment method
-  deletePaymentMethod: async (paymentMethodId) => {
-    try {
-      const response = await api.delete(`/user/payment-methods/${paymentMethodId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to delete payment method' };
-    }
-  },
-
-  // Set default payment method
-  setDefaultPaymentMethod: async (paymentMethodId) => {
-    try {
-      const response = await api.put(`/user/payment-methods/${paymentMethodId}/default`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to set default payment method' };
     }
   }
 };

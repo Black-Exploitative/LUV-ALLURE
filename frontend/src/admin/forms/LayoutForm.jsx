@@ -257,9 +257,9 @@ const LayoutForm = () => {
       )}
       
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1  md:grid-cols-3 gap-6">
           {/* Left side - Layout properties */}
-          <div className="md:col-span-1">
+          <div className=" md:col-span-1">
             <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
               <div className="p-6">
                 <h2 className="text-lg font-medium mb-4">Layout Properties</h2>
@@ -335,7 +335,7 @@ const LayoutForm = () => {
           </div>
           
           {/* Right side - Layout design */}
-          <div className="md:col-span-2">
+          <div className=" md:col-span-2">
             <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
               <div className="p-6">
                 <h2 className="text-lg font-medium mb-4">Layout Design</h2>
@@ -402,7 +402,7 @@ const LayoutForm = () => {
                             Type: {getSectionType(section.sectionId)}
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1  md:grid-cols-2 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Width

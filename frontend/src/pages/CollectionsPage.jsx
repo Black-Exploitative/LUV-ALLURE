@@ -205,9 +205,9 @@ const CollectionsPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={titleControls}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center py-20 md:py-28 border-b border-gray-100"
+          className="text-center py-20  md:py-28 border-b border-gray-100"
         >
-          <h1 className="text-3xl md:text-5xl font-thin tracking-wider text-gray-900">
+          <h1 className="text-3xl  md:text-5xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-900">
             ALL COLLECTIONS
           </h1>
           <p className="mt-6 text-lg text-gray-500 max-w-2xl mx-auto">
@@ -226,7 +226,7 @@ const CollectionsPage = () => {
             ease: [0.22, 1, 0.36, 1],
             staggerChildren: 0.1,
           }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-16 md:py-24 place-items-center"
+          className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-4 gap-8 py-16  md:py-24 place-items-center"
         >
           {collections.map((collection, index) => (
             <motion.div
@@ -250,14 +250,14 @@ const CollectionsPage = () => {
           ))}
         </motion.div>
 
-        <div className="py-20 md:py-32 text-center">
+        <div className="py-20  md:py-32 text-center">
           <div className="w-16 h-[1px] bg-gray-300 mx-auto mb-12"></div>
-          <p className="text-xl md:text-2xl font-thin tracking-wide text-gray-700 italic max-w-3xl mx-auto">
+          <p className="text-xl  md:text-2xl font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700 italic max-w-3xl mx-auto">
             Fashion is not something that exists in dresses only. Fashion is in
             the sky, in the street, fashion has to do with ideas, the way we
             live, what is happening.
           </p>
-          <p className="mt-6 text-sm uppercase tracking-widest text-gray-500">
+          <p className="mt-6 text-sm uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-500">
             — LUVS ALLURE
           </p>
         </div>
@@ -268,9 +268,9 @@ const CollectionsPage = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={newArrivalsControls}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="py-16 md:py-24 border-t border-gray-100"
+          className="py-16  md:py-24 border-t border-gray-100"
         >
-          <h2 className="text-3xl md:text-4xl font-thin tracking-wider text-gray-900 text-center mb-16">
+          <h2 className="text-3xl  md:text-4xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-900 text-center mb-16">
             NEW ARRIVALS
           </h2>
 
@@ -298,14 +298,14 @@ const CollectionsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={buttonControls}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-            className="flex justify-center mt-16 md:mt-24"
+            className="flex justify-center mt-16  md:mt-24"
           >
             <button
               onClick={handleViewProductsClick}
               className="relative overflow-hidden group bg-black"
             >
               {/* Button text */}
-              <span className="relative z-10 block px-12 py-4 text-white text-lg uppercase tracking-wider">
+              <span className="relative z-10 block px-12 py-4 text-white text-lg uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                 View All Products
               </span>
             </button>
@@ -313,9 +313,9 @@ const CollectionsPage = () => {
         </motion.div>
 
         {/* Newsletter Section */}
-        <div className="py-20 md:py-32 bg-gray-50 my-20 md:my-32">
+        <div className="py-20  md:py-32 bg-gray-50 my-20  md:my-32">
           <div className="max-w-xl mx-auto text-center px-4">
-            <h3 className="text-2xl md:text-3xl font-thin tracking-wider text-gray-900 mb-6">
+            <h3 className="text-2xl  md:text-3xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-gray-900 mb-6">
               Join Our World
             </h3>
             <p className="text-gray-600 mb-8">
@@ -328,7 +328,7 @@ const CollectionsPage = () => {
                 placeholder="Enter your email"
                 className="flex-grow px-5 py-3 border border-gray-300 focus:border-black focus:outline-none transition"
               />
-              <button className="bg-black text-white px-6 py-3 hover:bg-gray-900 transition uppercase tracking-wider">
+              <button className="bg-black text-white px-6 py-3 hover:bg-gray-900 transition uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
                 Subscribe
               </button>
             </div>

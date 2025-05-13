@@ -138,20 +138,20 @@ export default function ShoppingBag() {
 
   return (
     <>
-      <div className="min-h-screen bg-white pb-20 md:pb-0">
+      <div className="min-h-screen bg-white pb-20  md:pb-0">
         <Navbar />
         {/* Use the Banner component instead of the custom div */}
         <Banner 
           title="Shopping Bag" 
-          className="h-[100px] md:h-[150px]" 
-          textClassName="text-xl md:text-2xl font-medium uppercase"
+          className="h-[100px]  md:h-[150px]" 
+          textClassName="text-xl  md:text-2xl font-medium uppercase"
         />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-4 lg:mt-8 max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
             {/* Left side - Selections */}
             <div className="w-full lg:w-2/3">
-              <h2 className="text-md md:text-lg font-medium mb-3 uppercase">SELECTIONS</h2>
+              <h2 className="text-md  md:text-lg font-medium mb-3 uppercase">SELECTIONS</h2>
               <div className="border-t border-gray-200">
                 {!cartItems || cartItems.length === 0 ? (
                   <p className="text-center text-gray-600 py-6">Your shopping bag is empty.</p>
@@ -173,7 +173,7 @@ export default function ShoppingBag() {
                         onTouchEnd={handleTouchEnd}
                       >
                         {/* Product Image - Smaller on mobile */}
-                        <div className="w-[80px] sm:w-[120px] md:w-[150px] h-[100px] sm:h-[160px] md:h-[200px] overflow-hidden">
+                        <div className="w-[80px] sm:w-[120px]  md:w-[150px] h-[100px] sm:h-[160px]  md:h-[200px] overflow-hidden">
                           <img
                             src={
                               item.images?.[0] ||
@@ -255,7 +255,7 @@ export default function ShoppingBag() {
             </div>
 
             {/* Right side - Order summary (desktop) */}
-            <div className="w-full lg:w-1/3 mt-6 lg:mt-0 hidden md:block">
+            <div className="w-full lg:w-1/3 mt-6 lg:mt-0 hidden  md:block">
               <div className="border border-gray-200 p-4 sm:p-6">
                 <h2 className="text-lg font-medium mb-2">ORDER SUMMARY</h2>
                 <p className="text-sm text-gray-500 mb-4">{transactionId}</p>

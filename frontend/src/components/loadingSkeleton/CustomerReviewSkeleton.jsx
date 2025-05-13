@@ -15,7 +15,7 @@ const CustomerReviewsSkeleton = ({ reviewCount = 3 }) => {
   };
 
   return (
-    <div className="py-12 md:py-16 bg-gray-50">
+    <div className="py-12  md:py-16 bg-gray-50">
       {/* Section Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
         <motion.div 

@@ -1,4 +1,5 @@
-// frontend/src/context/WishlistContext.jsx
+// First, let's update the WishlistContext.jsx to ensure it's correctly fetching and storing wishlist items
+
 import { createContext, useState, useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-hot-toast';
@@ -17,14 +18,14 @@ export const WishlistProvider = ({ children }) => {
     const loadWishlist = async () => {
       setLoading(true);
       try {
-        // If user is logged in, try to get wishlist from the server
+        // If user is logged in, try to get wishlist from the server or localStorage
         if (currentUser && currentUser.id) {
           try {
-            // This would be a real API call in a complete implementation
+            // For a real API implementation this would be uncommented
             // const response = await api.get('/wishlist');
             // setWishlistItems(response.data.items);
             
-            // For now, we'll use localStorage as our "database"
+            // Using localStorage for this implementation
             const savedWishlist = localStorage.getItem(`wishlist-${currentUser.id}`);
             if (savedWishlist) {
               setWishlistItems(JSON.parse(savedWishlist));
@@ -151,4 +152,46 @@ export const useWishlist = () => {
     throw new Error('useWishlist must be used within a WishlistProvider');
   }
   return context;
+};
+
+// Now let's create a WishlistItemComponent to display in UserAccount.jsx
+export const WishlistItemComponent = ({ item, onRemove }) => {
+  return (
+    <div className="border border-gray-200 p-4 rounded-md">
+      <div className="flex items-center">
+        <div className="w-24 h-24 bg-gray-100 overflow-hidden">
+          <img 
+            src={item.image} 
+            alt={item.name} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="ml-4 flex-1">
+          <h3 className="font-medium text-sm">{item.name}</h3>
+          <p className="text-sm mt-1">₦{typeof item.price === 'number' ? item.price.toLocaleString() : item.price}</p>
+          <div className="mt-2 flex justify-between">
+            <button 
+              className="text-xs underline"
+              onClick={() => onRemove(item.id)}
+            >
+              REMOVE
+            </button>
+            <button className="text-xs underline">
+              ADD TO CART
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+WishlistItemComponent.propTypes = {
+  item: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    image: PropTypes.string.isRequired
+  }).isRequired,
+  onRemove: PropTypes.func.isRequired
 };

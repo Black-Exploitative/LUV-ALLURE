@@ -26,9 +26,9 @@ const PackagingSelection = ({ selectedPackaging, onSelectPackaging, giftMessage,
                 : 'border-gray-200 hover:border-gray-300'
             } transition-all`}
           >
-            <div className="flex flex-col md:flex-row">
+            <div className="flex flex-col  md:flex-row">
               {/* Image */}
-              <div className="md:w-1/3 aspect-video md:aspect-square relative overflow-hidden">
+              <div className=" md:w-1/3 aspect-video  md:aspect-square relative overflow-hidden">
                 <img 
                   src={option.imageUrl} 
                   alt={option.name} 
@@ -42,7 +42,7 @@ const PackagingSelection = ({ selectedPackaging, onSelectPackaging, giftMessage,
               </div>
               
               {/* Content */}
-              <div className="p-4 md:p-6 md:w-2/3 flex flex-col">
+              <div className="p-4  md:p-6  md:w-2/3 flex flex-col">
                 {/* Header with radio button */}
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center">
@@ -61,9 +61,9 @@ const PackagingSelection = ({ selectedPackaging, onSelectPackaging, giftMessage,
                   </div>
                   
                   {option.price > 0 ? (
-                    <span className="hidden md:block text-sm font-medium">+₦{option.price.toLocaleString()}</span>
+                    <span className="hidden  md:block text-sm font-medium">+₦{option.price.toLocaleString()}</span>
                   ) : (
-                    <span className="hidden md:block text-sm text-green-600 font-medium">Free</span>
+                    <span className="hidden  md:block text-sm text-green-600 font-medium">Free</span>
                   )}
                 </div>
                 

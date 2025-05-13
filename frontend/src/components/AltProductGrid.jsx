@@ -220,12 +220,12 @@ const AltProductGrid = ({
   const getGridClasses = () => {
     switch (gridType) {
       case 2:
-        return "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4";
+        return "grid-cols-1 sm:grid-cols-2  md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4";
       case 3:
-        return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4";
+        return "grid-cols-1 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4";
       case 4:
       default:
-        return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4";
+        return "grid-cols-1 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4";
     }
   };
   
@@ -288,7 +288,7 @@ const AltProductGrid = ({
       {hasMore && !loading && (
         <div className="flex justify-center mt-12">
           <button
-            className="px-8 py-3 border border-black hover:bg-black hover:text-white transition-colors duration-300 tracking-wide"
+            className="px-8 py-3 border border-black hover:bg-black hover:text-white transition-colors duration-300  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
             onClick={handleLoadMore}
           >
             Load More

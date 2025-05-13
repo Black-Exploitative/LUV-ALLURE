@@ -111,17 +111,17 @@ const SearchFiltersAndResults = ({
       </div>
       
       <div className="flex-grow overflow-auto">
-        <div className="mx-auto px-6 md:px-16 lg:px-24 max-w-screen-2xl py-6">
-          <div className="flex flex-col md:flex-row gap-8">
+        <div className="mx-auto px-6  md:px-16 lg:px-24 max-w-screen-2xl py-6">
+          <div className="flex flex-col  md:flex-row gap-8">
             {/* Filters column */}
-            <div className="w-full md:w-64 p-6 bg-white shadow-sm">
+            <div className="w-full  md:w-64 p-6 bg-white shadow-sm">
               {/* Color filter */}
               <div className="mb-6">
                 <div 
                   className="flex justify-between items-center mb-2 cursor-pointer"
                   onClick={() => setIsColorOpen(!isColorOpen)}
                 >
-                  <h3 className="font-medium text-sm text-gray-800 tracking-wider">COLOUR</h3>
+                  <h3 className="font-medium text-sm text-gray-800 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">COLOUR</h3>
                   {isColorOpen ? 
                     <FaChevronUp className="text-gray-500" /> : 
                     <FaChevronDown className="text-gray-500" />
@@ -166,7 +166,7 @@ const SearchFiltersAndResults = ({
                   className="flex justify-between items-center mb-2 cursor-pointer"
                   onClick={() => setIsSizeOpen(!isSizeOpen)}
                 >
-                  <h3 className="font-medium text-sm text-gray-800 tracking-wider">SIZE</h3>
+                  <h3 className="font-medium text-sm text-gray-800 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">SIZE</h3>
                   {isSizeOpen ? 
                     <FaChevronUp className="text-gray-500" /> : 
                     <FaChevronDown className="text-gray-500" />
@@ -209,7 +209,7 @@ const SearchFiltersAndResults = ({
                   className="flex justify-between items-center mb-2 cursor-pointer"
                   onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                 >
-                  <h3 className="font-medium text-sm text-gray-800 tracking-wider">CATEGORY</h3>
+                  <h3 className="font-medium text-sm text-gray-800 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">CATEGORY</h3>
                   {isCategoryOpen ? 
                     <FaChevronUp className="text-gray-500" /> : 
                     <FaChevronDown className="text-gray-500" />
@@ -251,9 +251,9 @@ const SearchFiltersAndResults = ({
             </div>
 
             {/* Results column with elegant fade-in animation */}
-            <div className="w-full md:flex-1 p-6 bg-white shadow-sm" ref={resultsContainerRef}>
+            <div className="w-full  md:flex-1 p-6 bg-white shadow-sm" ref={resultsContainerRef}>
               <div className="flex justify-between items-center border-b border-gray-200 pb-3 mb-6">
-                <h3 className="font-medium text-sm text-gray-800 tracking-wider">PRODUCT RESULTS</h3>
+                <h3 className="font-medium text-sm text-gray-800 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">PRODUCT RESULTS</h3>
                 <span className="text-xs text-gray-500">
                   {searchResults.length} item{searchResults.length !== 1 ? 's' : ''} found
                 </span>
@@ -286,7 +286,7 @@ const SearchFiltersAndResults = ({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.4 }}
-                  className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                  className="grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-6"
                 >
                   {searchResults.map(product => (
                     <div 
@@ -303,7 +303,7 @@ const SearchFiltersAndResults = ({
                         />
                         {/* Quick view overlay on hover */}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                          <span className="bg-white bg-opacity-90 px-4 py-2 text-xs uppercase tracking-wider text-black">
+                          <span className="bg-white bg-opacity-90 px-4 py-2 text-xs uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-black">
                             Quick View
                           </span>
                         </div>
@@ -311,7 +311,7 @@ const SearchFiltersAndResults = ({
                       
                       {/* Product Info with elegant typography */}
                       <div>
-                        <h4 className="text-sm uppercase tracking-wide text-gray-800 group-hover:text-black transition-colors duration-200">{product.title}</h4>
+                        <h4 className="text-sm uppercase  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-800 group-hover:text-black transition-colors duration-200">{product.title}</h4>
                         {product.productType && (
                           <p className="text-xs text-gray-500 mt-1">{product.productType}</p>
                         )}

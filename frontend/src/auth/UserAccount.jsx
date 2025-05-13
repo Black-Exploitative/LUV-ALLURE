@@ -10,6 +10,7 @@ import { FiChevronDown, FiChevronUp, FiMenu, FiX } from "react-icons/fi";
 import Orders from "./Orders";
 import ProfileManagement from "./ProfileManagement";
 import StyleAdvisor from "./StyleAdvisor";
+import WishlistSection from "./WishListSection";
 
 export default function UserAccount() {
   const { currentUser, logout, loading } = useAuth();
@@ -230,15 +231,15 @@ export default function UserAccount() {
         <div className="h-16 bg-black w-full"></div>
 
         {/* Main content area with side navigation */}
-        <div className="container mx-auto py-12 px-4 md:px-6">
+        <div className="container mx-auto py-12 px-4  md:px-6">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold tracking-wide text-gray-900">
+            <h1 className="text-3xl font-semibold  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-900">
               MY ACCOUNT
             </h1>
           </div>
 
           {/* Mobile section selector - only visible on mobile */}
-          <div className="md:hidden mb-6">
+          <div className=" md:hidden mb-6">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="w-full flex items-center justify-between py-3 px-4 border border-gray-300 focus:outline-none"
@@ -281,9 +282,9 @@ export default function UserAccount() {
             </AnimatePresence>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8">
+          <div className="flex flex-col  md:flex-row gap-8">
             {/* Side navigation - hidden on mobile */}
-            <div className="hidden md:block md:w-1/4">
+            <div className="hidden  md:block  md:w-1/4">
               <div className="sticky top-24">
                 <nav className="space-y-1 font-normal">
                   {sections.map((section) => (
@@ -315,19 +316,19 @@ export default function UserAccount() {
             </div>
 
             {/* Main content area - takes full width on mobile */}
-            <div className="w-full md:w-3/4">
+            <div className="w-full  md:w-3/4">
               {activeSection === "dashboard" && (
                 <div className="space-y-8">
                   <div className="p-2">
                     <h2 className="text-[20px] font-medium mb-4">
                       WELCOME BACK, {user.firstName.toUpperCase()}
                     </h2>
-                    <p className="text-[12px] text-gray-600 font-normal tracking-wide mb-6">
+                    <p className="text-[12px] text-gray-600 font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider mb-6">
                       From your account dashboard you can view your recent
                       orders, manage your shipping and billing addresses, and
                       edit your password and account details.
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 m-2">
+                    <div className="grid grid-cols-1  md:grid-cols-2 gap-4 m-2">
                       <div className="p-4 border border-gray-200 bg-white">
                         <h3 className="font-medium mb-[10px]">
                           PERSONAL INFORMATION
@@ -335,8 +336,8 @@ export default function UserAccount() {
                         <p className="text-[14px] font-normal ">
                           {user.firstName} {user.lastName}
                         </p>
-                        <p className="text-[13px] font-[100] tracking-wide">{user.email}</p>
-                        <p className="text-[13px]  tracking-wide">{user.phoneNumber}</p>
+                        <p className="text-[13px] font-[100]  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">{user.email}</p>
+                        <p className="text-[13px]   md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">{user.phoneNumber}</p>
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
@@ -387,25 +388,17 @@ export default function UserAccount() {
               )}
 
               {activeSection === "wishlist" && (
-                <div className="space-y-6">
-                  <h2 className="text-xl font-medium mb-4">MY WISHLIST</h2>
-                  <p className="text-sm text-gray-600">
-                    Items you&apos;ve saved for later.
-                  </p>
-
-                  <div className="py-12 text-center border border-gray-200">
-                    <p className="text-gray-600 mb-4">
-                      Your wishlist is empty.
-                    </p>
-                    <Link
-                      to="/shop"
-                      className="inline-block px-6 py-3 bg-black text-white text-sm"
-                    >
-                      EXPLORE COLLECTIONS
-                    </Link>
-                  </div>
-                </div>
+              <div className="space-y-6">
+                <h2 className="text-xl font-medium mb-4">MY WISHLIST</h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  Items you've saved for later.
+                </p>
+                
+                {/* This is where we insert our new WishlistSection component */}
+                <WishlistSection />
+              </div>
               )}
+  
 
               {activeSection === "addresses" && (
                 <div className="space-y-6">
@@ -429,7 +422,7 @@ export default function UserAccount() {
                       <h3 className="font-medium mb-4">
                         {isAdding ? "ADD NEW ADDRESS" : "EDIT ADDRESS"}
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1  md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-xs mb-1" htmlFor="label">
                             ADDRESS LABEL
@@ -548,7 +541,7 @@ export default function UserAccount() {
                             className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
                           />
                         </div>
-                        <div className="md:col-span-2 flex items-center">
+                        <div className=" md:col-span-2 flex items-center">
                           <input
                             type="checkbox"
                             id="isDefault"
@@ -585,7 +578,7 @@ export default function UserAccount() {
 
                   {/* List of addresses */}
                   {!isAdding && !isEditing && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1  md:grid-cols-2 gap-6">
                       {addresses.map((address) => (
                         <div key={address.id} className="p-6 border border-gray-200 relative">
                           <div className="absolute top-4 right-4 flex space-x-2">
@@ -641,7 +634,7 @@ export default function UserAccount() {
                     </motion.button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1  md:grid-cols-2 gap-6">
                     <div className="p-6 border border-gray-200 relative">
                       <div className="absolute top-4 right-4 flex space-x-2">
                         <button className="text-xs underline cursor-pointer">EDIT</button>
