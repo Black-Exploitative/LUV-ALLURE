@@ -8,10 +8,10 @@ export default defineConfig({
     tailwindcss(),
     react()],
   server: {
-    allowedHosts: ['framework-raised-very-zambia.trycloudflare.com','*'],
+    allowedHosts: ['backend-mocha-eta-71.vercel.app','*'],
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://backend-mocha-eta-71.vercel.app',
         changeOrigin: true,
         secure: false
       }
