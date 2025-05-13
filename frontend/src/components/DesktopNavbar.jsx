@@ -477,18 +477,18 @@ export default function DesktopNavbar({ darkNavbar }) {
             onMouseEnter={() => handleDropdownEnter(activeDropdown)}
             onMouseLeave={handleDropdownLeave}
           >
-            <div className="container mx-auto py-8 px-6 grid grid-cols-12 gap-6">
+            <div className="mx-[100px] py-8 px-6 grid grid-cols-12 gap-6">
               {/* Left Side - Text Links */}
               {dropdownContent[activeDropdown].columns.map(
                 (column, colIndex) => (
                   <div key={colIndex} className="col-span-3">
-                    <h3 className="font-medium text-sm mb-4">{column.title}</h3>
+                    <h3 className="font-normal tracking-wider uppercase text-[15px] mb-4">{column.title}</h3>
                     <div className="flex flex-col space-y-2">
                       {column.links.map((link, linkIndex) => (
                         <a
                           key={linkIndex}
                           href={link.href}
-                          className="text-sm hover:underline"
+                          className="text-[13px] tracking-wider uppercase text-gray-600 hover:underline hover:text-black"
                         >
                           {link.name}
                         </a>

@@ -20,9 +20,12 @@ import ColorVariants from "../components/ColorVaraint";
 import { useWishlist } from "../context/WishlistContext";
 import MobileProductCarousel from "../components/MobileProductCarousel";
 import MobileProductDetailsSkeleton from "../components/loadingSkeleton/MobileProductDetailsSkeleton";
+import { useRelatedProducts, RelatedProductsSection } from '../components/RelatedProductSection';
+
 
 const ProductDetailsPage = () => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
+  
 
   const reviewsRef = useRef(null);
   // URL and navigation
@@ -95,12 +98,6 @@ const ProductDetailsPage = () => {
   // Display images (changes based on color selection)
   const [displayImages, setDisplayImages] = useState([]);
 
-  // Related products state
-  const [styleWithProducts, setStyleWithProducts] = useState([]);
-  const [alsoPurchasedProducts, setAlsoPurchasedProducts] = useState([]);
-  const [alsoViewedProducts, setAlsoViewedProducts] = useState([]);
-  const [loadingRelated, setLoadingRelated] = useState(true);
-
   // Hooks
   const { addToCart } = useCart();
   const { addToRecentlyViewed } = useRecentlyViewed();
@@ -146,7 +143,7 @@ const ProductDetailsPage = () => {
       document.title = "Luv's Allure";
     };
   }, [product, productName]);
-
+/*
   const renderStyleItWith = () => {
     if (loadingRelated) {
       return (
@@ -186,7 +183,7 @@ const ProductDetailsPage = () => {
 
     // Don't render anything if no products
     return null;
-  };
+  }; */
 
   // Initialize display images when product loads
   const processAndValidateImages = (imageArray) => {
@@ -474,40 +471,12 @@ const ProductDetailsPage = () => {
   // When a color is selected, either update the display images or navigate to the variant
 
   // Fetch related products
-  useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!productId) return;
-
-      try {
-        setLoadingRelated(true);
-
-        // Fetch each type of related product
-        const styleWith = await cmsService.getProductRelationships(
-          productId,
-          "style-with"
-        );
-        const alsoPurchased = await cmsService.getProductRelationships(
-          productId,
-          "also-purchased"
-        );
-        const alsoViewed = await cmsService.getProductRelationships(
-          productId,
-          "also-viewed"
-        );
-
-        // Update state with fetched products
-        setStyleWithProducts(styleWith || []);
-        setAlsoPurchasedProducts(alsoPurchased || []);
-        setAlsoViewedProducts(alsoViewed || []);
-      } catch (error) {
-        console.error("Error fetching related products:", error);
-      } finally {
-        setLoadingRelated(false);
-      }
-    };
-
-    fetchRelatedProducts();
-  }, [productId]);
+  const { 
+  styleWithProducts, 
+  alsoPurchasedProducts, 
+  alsoViewedProducts, 
+  loadingRelated 
+} = useRelatedProducts(productId);
 
   // Function to get images for a specific color
   const getImagesForColor = (colorName) => {
@@ -1322,7 +1291,37 @@ const processedProduct = {
         </div>
       </div>
 
-      {/* STYLE IT WITH */}
+      {/* Style it with section */}
+        <RelatedProductsSection
+          type="style-with"
+          title="STYLE IT WITH"
+          productId={productId}
+          products={styleWithProducts}
+          loading={loadingRelated}
+          navigate={navigate}
+        />
+
+        {/* Also purchased section */}
+        <RelatedProductsSection
+          type="also-purchased"
+          title="ALLURVERS ALSO PURCHASED"
+          productId={productId}
+          products={alsoPurchasedProducts}
+          loading={loadingRelated}
+          navigate={navigate}
+        />
+
+        {/* Also viewed section */}
+        <RelatedProductsSection
+          type="also-viewed"
+          title="ALLURVERS ALSO VIEWED"
+          productId={productId}
+          products={alsoViewedProducts}
+          loading={loadingRelated}
+          navigate={navigate}
+        />
+    { /*
+      {/* STYLE IT WITH 
       <div className="mt-8">
         <h2 className="text-sm mb-4 text-center tracking-wider uppercase">
           STYLE IT WITH
@@ -1349,7 +1348,7 @@ const processedProduct = {
                   onClick={() => navigate(`/product/${product.id}`)}
                 />
 
-                {/* Text centered under image */}
+                {/* Text centered under image *
                 <div
                   className="mt-2 px-1 text-left space-y-[5px] text-gray-700 cursor-pointer"
                   onClick={() => navigate(`/product/${product.id}`)}
@@ -1370,7 +1369,7 @@ const processedProduct = {
       {renderStyleItWith()}
 
       <div className="mx-4 mt-8 mb-16">
-        {/* Customers Also Purchased Section */}
+        {/* Customers Also Purchased Section 
         {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
           <>
             <h2 className="text-sm text-center uppercase mt-8 mb-4 tracking-wider">
@@ -1402,7 +1401,7 @@ const processedProduct = {
                       onClick={() => navigate(`/product/${product.id}`)}
                     />
 
-                    {/* Text centered under image  */}
+                    {/* Text centered under image  
                     <div
                       className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
@@ -1424,7 +1423,7 @@ const processedProduct = {
           </>
         )}
 
-        {/* Customers Also Viewed Section */}
+        {/* Customers Also Viewed Section 
         {(alsoViewedProducts.length > 0 || !loadingRelated) && (
           <>
             <h2 className="text-sm text-center uppercase mt-8 mb-4 tracking-wider">
@@ -1457,7 +1456,7 @@ const processedProduct = {
                       onClick={() => navigate(`/product/${product.id}`)}
                     />
 
-                    {/* Text centered under image */}
+                    {/* Text centered under image 
                     <div
                       className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
                       onClick={() => navigate(`/product/${product.id}`)}
@@ -1478,7 +1477,7 @@ const processedProduct = {
             )}
           </>
         )}
-      </div>
+      </div>*/}
 
       <div ref={reviewsRef}>
         <CustomersReviews productName={product.name} />

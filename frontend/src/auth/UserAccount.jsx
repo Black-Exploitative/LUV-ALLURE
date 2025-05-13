@@ -10,6 +10,7 @@ import { FiChevronDown, FiChevronUp, FiMenu, FiX } from "react-icons/fi";
 import Orders from "./Orders";
 import ProfileManagement from "./ProfileManagement";
 import StyleAdvisor from "./StyleAdvisor";
+import WishlistSection from "./WishListSection";
 
 export default function UserAccount() {
   const { currentUser, logout, loading } = useAuth();
@@ -387,25 +388,17 @@ export default function UserAccount() {
               )}
 
               {activeSection === "wishlist" && (
-                <div className="space-y-6">
-                  <h2 className="text-xl font-medium mb-4">MY WISHLIST</h2>
-                  <p className="text-sm text-gray-600">
-                    Items you&apos;ve saved for later.
-                  </p>
-
-                  <div className="py-12 text-center border border-gray-200">
-                    <p className="text-gray-600 mb-4">
-                      Your wishlist is empty.
-                    </p>
-                    <Link
-                      to="/shop"
-                      className="inline-block px-6 py-3 bg-black text-white text-sm"
-                    >
-                      EXPLORE COLLECTIONS
-                    </Link>
-                  </div>
-                </div>
+              <div className="space-y-6">
+                <h2 className="text-xl font-medium mb-4">MY WISHLIST</h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  Items you've saved for later.
+                </p>
+                
+                {/* This is where we insert our new WishlistSection component */}
+                <WishlistSection />
+              </div>
               )}
+  
 
               {activeSection === "addresses" && (
                 <div className="space-y-6">
