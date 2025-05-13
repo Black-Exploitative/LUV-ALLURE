@@ -472,7 +472,7 @@ const Checkout = () => {
                         Edit
                       </button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1  md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-gray-600 text-sm">Contact</p>
                         <p>{currentUser.email}</p>
@@ -683,7 +683,7 @@ const Checkout = () => {
       <CheckoutNavbar />
 
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <h1 className="text-2xl font-thin mb-8 text-center uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+        <h1 className="text-2xl font-thin mb-8 text-center uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
           Checkout
         </h1>
 

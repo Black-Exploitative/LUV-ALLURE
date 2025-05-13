@@ -199,7 +199,7 @@ const CollectionForm = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3  md:grid-cols-4 gap-4">
             {mediaLibrary.length > 0 ? (
               mediaLibrary
                 .filter(media => media.type === 'image')
@@ -254,7 +254,7 @@ const CollectionForm = () => {
       <form onSubmit={handleSubmit}>
         <div className="bg-white border border-gray-200 rounded-md overflow-hidden mb-6">
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Collection Name
@@ -320,7 +320,7 @@ const CollectionForm = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Header Title

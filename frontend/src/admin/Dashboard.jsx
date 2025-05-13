@@ -531,7 +531,7 @@ const Dashboard = () => {
                 )}
               </div>
               
-              <div className="flex flex-col md:flex-row gap-2">
+              <div className="flex flex-col  md:flex-row gap-2">
                 {/* Desktop preview thumbnail */}
                 <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
                   {hero.media?.videoUrl ? (
@@ -1168,7 +1168,7 @@ const renderHeroList = (deviceType) => {
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Category:</label>
         <select 
-          className="w-full md:w-64 p-2 border border-gray-300 rounded-md"
+          className="w-full  md:w-64 p-2 border border-gray-300 rounded-md"
           onChange={(e) => {
             // You can add filtering logic here
             console.log('Filter by category:', e.target.value);
@@ -1186,7 +1186,7 @@ const renderHeroList = (deviceType) => {
       {!navImages || navImages.length === 0 ? (
         <p>No navigation images found. Add your first image.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-4">
           {navImages.map(image => (
             <div
               key={image._id}
@@ -1259,7 +1259,7 @@ const renderHeroList = (deviceType) => {
       </div>
 
       {/* Search and filter */}
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
+      <div className="mb-6 flex flex-col  md:flex-row gap-4">
         <div className="flex-1">
           <input
             type="text"
@@ -1300,7 +1300,7 @@ const renderHeroList = (deviceType) => {
       {!media || media.length === 0 ? (
         <p>No media found. Upload your first file.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1  md:grid-cols-3 lg:grid-cols-4 gap-4">
           {media.map(item => (
             <div
               key={item._id}
@@ -1424,9 +1424,9 @@ const renderHeroList = (deviceType) => {
               key={relationship._id}
               className={`border ${relationship.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div className="grid grid-cols-1  md:grid-cols-12 gap-4">
                 {/* Source Product */}
-                <div className="md:col-span-5 flex flex-col">
+                <div className=" md:col-span-5 flex flex-col">
                   <h4 className="text-sm font-medium text-gray-500 mb-2">Source Product</h4>
                   <div className="border border-gray-100 p-2 flex items-center flex-1">
                     <div className="w-12 h-12 bg-gray-100 mr-3 flex-shrink-0">
@@ -1443,7 +1443,7 @@ const renderHeroList = (deviceType) => {
                 </div>
 
                 {/* Arrow */}
-                <div className="md:col-span-2 flex items-center justify-center">
+                <div className=" md:col-span-2 flex items-center justify-center">
                   <div className="flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -1453,7 +1453,7 @@ const renderHeroList = (deviceType) => {
                 </div>
 
                 {/* Related Product */}
-                <div className="md:col-span-5 flex flex-col">
+                <div className=" md:col-span-5 flex flex-col">
                   <h4 className="text-sm font-medium text-gray-500 mb-2">Related Product</h4>
                   <div className="border border-gray-100 p-2 flex items-center flex-1">
                     <div className="w-12 h-12 bg-gray-100 mr-3 flex-shrink-0">

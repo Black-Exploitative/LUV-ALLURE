@@ -134,7 +134,7 @@ const CMSContent = ({
       
     case 'productRelationships':
       return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2  md:grid-cols-4 gap-4">
           {content.map(product => (
             <a key={product.id} href={`/product/${product.id}`} className="block group">
               <div className="aspect-[3/4] overflow-hidden bg-gray-100">

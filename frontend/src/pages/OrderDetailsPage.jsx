@@ -129,7 +129,7 @@ const OrderDetails = () => {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Order header */}
           <div className="p-6 border-b border-gray-200">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col  md:flex-row  md:items-center  md:justify-between">
               <div>
                 <h1 className="text-2xl font-medium mb-1">
                   Order #{order.reference}
@@ -138,7 +138,7 @@ const OrderDetails = () => {
                   Placed on {formatDate(order.createdAt)}
                 </p>
               </div>
-              <div className="mt-4 md:mt-0">
+              <div className="mt-4  md:mt-0">
                 <span
                   className={`inline-block px-3 py-1 rounded-full text-sm ${
                     order.status === "pending"
@@ -327,7 +327,7 @@ const OrderDetails = () => {
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-medium mb-4">Shipping Information</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-medium text-sm mb-2">Shipping Address</h3>
                 <address className="not-italic">
@@ -362,7 +362,7 @@ const OrderDetails = () => {
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-medium mb-4">Payment Information</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-medium text-sm mb-2">Payment Method</h3>
                 <p>

@@ -126,7 +126,7 @@ const ProfileManagement = ({ user, setUser }) => {
       <p className="text-xs text-gray-800 font-base font-[Raleway] mb-6">Update your personal information.</p>
 
       <form className="space-y-6" onSubmit={handleProfileSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1  md:grid-cols-2 gap-4">
           <div>
             <label
               htmlFor="firstName"

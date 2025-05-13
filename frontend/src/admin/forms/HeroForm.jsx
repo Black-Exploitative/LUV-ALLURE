@@ -365,7 +365,7 @@ const HeroForm = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-4">
             {relevantMedia.length > 0 ? (
               relevantMedia.map((media) => (
                 <div
@@ -468,7 +468,7 @@ const HeroForm = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Section Name
@@ -504,7 +504,7 @@ const HeroForm = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Hero Title
@@ -535,7 +535,7 @@ const HeroForm = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Button Text
@@ -572,7 +572,7 @@ const HeroForm = () => {
                 name="content.alignment"
                 value={formData.content.alignment}
                 onChange={handleChange}
-                className="w-full md:w-1/3 p-2 border border-gray-300 rounded-md"
+                className="w-full  md:w-1/3 p-2 border border-gray-300 rounded-md"
               >
                 <option value="left">Left</option>
                 <option value="center">Center</option>
@@ -590,7 +590,7 @@ const HeroForm = () => {
               <h2 className="text-lg font-medium">Desktop Hero Media</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Background Image
@@ -636,7 +636,7 @@ const HeroForm = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Alt Text
@@ -737,7 +737,7 @@ const HeroForm = () => {
               <h2 className="text-lg font-medium">Mobile Hero Media</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Mobile Background Image
@@ -783,7 +783,7 @@ const HeroForm = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Mobile Alt Text

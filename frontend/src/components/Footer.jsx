@@ -4,7 +4,7 @@ import { FaInstagram, FaFacebookF } from "react-icons/fa";
 export default function Footer() {
   return (
     <footer className="bg-black text-white py-12 px-6 mt-4">
-      <div className="container mx-auto grid md:grid-cols-4 gap-8">
+      <div className="container mx-auto grid  md:grid-cols-4 gap-8">
         {/* Contact Us Section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

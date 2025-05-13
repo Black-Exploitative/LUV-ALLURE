@@ -15,7 +15,7 @@ const SkeletalSections = () => {
         <div className="h-8 bg-gray-200 animate-pulse w-64 mx-auto mb-8 rounded"></div>
         
         {/* Product Grid Skeleton */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2  md:grid-cols-4 gap-4">
           {Array(4).fill(0).map((_, index) => (
             <div key={index} className="bg-gray-200 animate-pulse h-72 rounded">
               <div className="h-4/5 w-full bg-gray-300 animate-pulse"></div>
@@ -35,9 +35,9 @@ const SkeletalSections = () => {
       
       {/* Promo Section Skeleton */}
       <div className="w-full py-16 px-4">
-        <div className="flex flex-col md:flex-row max-w-6xl mx-auto">
-          <div className="w-full md:w-1/2 h-[400px] bg-gray-200 animate-pulse rounded"></div>
-          <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
+        <div className="flex flex-col  md:flex-row max-w-6xl mx-auto">
+          <div className="w-full  md:w-1/2 h-[400px] bg-gray-200 animate-pulse rounded"></div>
+          <div className="w-full  md:w-1/2 p-8 flex flex-col justify-center">
             <div className="h-8 bg-gray-200 animate-pulse w-3/4 mx-auto mb-4 rounded"></div>
             <div className="h-4 bg-gray-200 animate-pulse w-full mb-2 rounded"></div>
             <div className="h-4 bg-gray-200 animate-pulse w-5/6 mx-auto mb-2 rounded"></div>
@@ -51,7 +51,7 @@ const SkeletalSections = () => {
       <div className="w-full py-12 px-4 bg-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="h-8 bg-gray-200 animate-pulse w-64 mx-auto mb-8 rounded"></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2  md:grid-cols-4 gap-6">
             {Array(4).fill(0).map((_, index) => (
               <div key={index} className="p-4 flex flex-col items-center">
                 <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse mb-4"></div>

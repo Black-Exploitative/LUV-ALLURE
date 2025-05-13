@@ -403,9 +403,9 @@ const ProductGrid = ({
         ? "grid-cols-1 gap-y-[20px] mx-[15px]" 
         : "grid-cols-2 gap-x-[5px] gap-y-[15px] mx-[10px]";
     } else if (gridType === 2) {
-      return "grid-cols-1 md:grid-cols-2 gap-x-[10px] gap-y-[30px] mx-[20px]";
+      return "grid-cols-1  md:grid-cols-2 gap-x-[10px] gap-y-[30px] mx-[20px]";
     } else {
-      return "grid-cols-2 md:grid-cols-4 gap-x-[10px] md:gap-x-[10px] gap-y-[30px] mx-[20px]";
+      return "grid-cols-2  md:grid-cols-4 gap-x-[10px]  md:gap-x-[10px] gap-y-[30px] mx-[20px]";
     }
   };
 
@@ -469,7 +469,7 @@ const ProductGrid = ({
           {hasMore && (
             <div className="flex justify-center my-12">
               <button
-                className="px-8 py-3 border border-black hover:bg-black hover:text-white transition-colors duration-300 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
+                className="px-8 py-3 border border-black hover:bg-black hover:text-white transition-colors duration-300  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                 onClick={handleLoadMore}
               >
                 Load More

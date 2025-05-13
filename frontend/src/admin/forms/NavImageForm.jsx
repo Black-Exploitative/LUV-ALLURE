@@ -158,7 +158,7 @@ const NavImageForm = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3  md:grid-cols-4 gap-4">
             {mediaLibrary.length > 0 ? (
               mediaLibrary.map(media => (
                 <div 

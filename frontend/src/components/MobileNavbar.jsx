@@ -319,7 +319,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={0}
                     onClick={() => toggleSection('shop')}
                   >
-                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">SHOP</span>
+                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">SHOP</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -367,7 +367,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={1}
                     onClick={() => toggleSection('dresses')}
                   >
-                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">DRESSES</span>
+                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">DRESSES</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -415,7 +415,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={2}
                     onClick={() => toggleSection('collections')}
                   >
-                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">LOOKBOOK</span>
+                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">LOOKBOOK</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -463,7 +463,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={3}
                     onClick={() => toggleSection('newin')}
                   >
-                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">NEW ARRIVALS</span>
+                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">NEW ARRIVALS</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -506,7 +506,7 @@ export default function MobileNavbar({ darkNavbar }) {
                 {/* Additional Links without dropdowns */}
                 <motion.a
                   href="/contact-us"
-                  className="block text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
+                  className="block text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={4}
                   whileHover={{ x: 4 }}
@@ -517,7 +517,7 @@ export default function MobileNavbar({ darkNavbar }) {
                 
                 <motion.a
                   href="/services"
-                  className="block text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
+                  className="block text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={5}
                   whileHover={{ x: 4 }}

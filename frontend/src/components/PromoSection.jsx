@@ -41,15 +41,15 @@ AnimatedSection.propTypes = {
 // Skeleton loading component for PromoSection
 const PromoSectionSkeleton = () => {
   return (
-    <div className="w-full mt-[103px] mb-[162px] px-4 md:px-8 lg:px-16">
-      <div className="flex flex-col md:flex-row items-center justify-center max-w-6xl mx-auto gap-8">
+    <div className="w-full mt-[103px] mb-[162px] px-4  md:px-8 lg:px-16">
+      <div className="flex flex-col  md:flex-row items-center justify-center max-w-6xl mx-auto gap-8">
         {/* Left Image Skeleton */}
-        <div className="w-full md:w-1/2">
+        <div className="w-full  md:w-1/2">
           <div className="w-full max-w-[500px] h-[600px] bg-gray-200 animate-pulse mx-auto"></div>
         </div>
 
         {/* Right Content Skeleton */}
-        <div className="w-full md:w-1/2 px-4">
+        <div className="w-full  md:w-1/2 px-4">
           <div className="text-center max-w-lg mx-auto space-y-4">
             {/* Heading skeleton */}
             <div className="h-8 bg-gray-200 animate-pulse rounded w-3/4 mx-auto"></div>
@@ -122,11 +122,11 @@ const PromoSection = () => {
 
   return (
     <AnimatedSection delay={0.3}>
-      <div className="w-full mt-[103px] mb-[162px] px-4 md:px-8 lg:px-16">
-        <div className="flex flex-col md:flex-row items-center justify-center max-w-6xl mx-auto gap-8">
+      <div className="w-full mt-[103px] mb-[162px] px-4  md:px-8 lg:px-16">
+        <div className="flex flex-col  md:flex-row items-center justify-center max-w-6xl mx-auto gap-8">
           {/* Left Image Section */}
           <motion.div
-            className="w-full md:w-1/2"
+            className="w-full  md:w-1/2"
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
@@ -140,14 +140,14 @@ const PromoSection = () => {
 
           {/* Right Content Section */}
           <motion.div
-            className="w-full md:w-1/2 px-4"
+            className="w-full  md:w-1/2 px-4"
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <div className="text-center max-w-lg mx-auto">
               <motion.h2
-                className="text-[30px] font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-[40px] text-center"
+                className="text-[30px] font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-[40px] text-center"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
@@ -170,7 +170,7 @@ const PromoSection = () => {
                 className="flex justify-center"
               >
                 <a href={promoData.linkUrl}>
-                  <p className="text-[15px] text-center font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst relative group inline-block">
+                  <p className="text-[15px] text-center font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst relative group inline-block">
                     <span className="border-b-[3px] pb-[3px] group-hover:border-b-0">{promoData.linkText.substring(0, 2)}</span>
                     <span>{promoData.linkText.substring(2)}</span>
                     <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-current group-hover:w-full transition-all duration-300"></span>

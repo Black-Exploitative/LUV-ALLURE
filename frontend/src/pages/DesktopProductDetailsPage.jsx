@@ -1104,10 +1104,10 @@ useEffect(() => {
 
   return (
     <>
-      <div className="mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]">
-        <div className="mt-[60px] md:mt-[100px] flex flex-row">
+      <div className="mx-4 sm:mx-6  md:mx-[40px] lg:mx-[80px]">
+        <div className="mt-[60px]  md:mt-[100px] flex flex-row">
           {/* Left Side: Product Carousel */}
-          <div className="mb-8 md:mb-0 mr-[50px] ">
+          <div className="mb-8  md:mb-0 mr-[50px] ">
             <ProductCarousel images={displayImages} />
             <RelatedProductsSection
                 type="style-with"
@@ -1127,7 +1127,7 @@ useEffect(() => {
                   <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
                 </div>
               ) : styleWithProducts.length > 0 ? (
-                <div className="grid gap-4 md:gap-6">
+                <div className="grid gap-4  md:gap-6">
                   {styleWithProducts.map((product, index) => (
                     <SmallProductCard
                       key={product.id || index}
@@ -1144,7 +1144,7 @@ useEffect(() => {
                   ))}
                 </div>
               ) : (
-                <div className="grid gap-4 md:gap-6">
+                <div className="grid gap-4  md:gap-6">
                   {relatedProducts.map((product, index) => (
                     <SmallProductCard
                       key={index}
@@ -1166,7 +1166,7 @@ useEffect(() => {
           {/* Right Side: Product Details */}
           <div className="w-[500px] flex flex-col justify-start">
             {/* Product Name */}
-            <h1 className="text-xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">{product.name}</h1>
+            <h1 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">{product.name}</h1>
             {/*  Star Rating */}
             <StarRating
               rating={4.9}
@@ -1175,7 +1175,7 @@ useEffect(() => {
             />
 
             {/* Product Price */}
-            <p className="text-[18px] font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700">
+            <p className="text-[18px] font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700">
               ₦{product.price ? product.price.toLocaleString() : "0"}
             </p>
 
@@ -1330,7 +1330,7 @@ useEffect(() => {
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
             ) : alsoPurchasedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {alsoPurchasedProducts.map((product) => (
                   <PurchasedCard
                     key={product.id}
@@ -1348,7 +1348,7 @@ useEffect(() => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {purchasedProducts.map((product, index) => (
                   <PurchasedCard key={index} product={product} />
                 ))}
@@ -1368,7 +1368,7 @@ useEffect(() => {
                 <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
               </div>
             ) : alsoViewedProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {alsoViewedProducts.map((product) => (
                   <PurchasedCard
                     key={product.id}
@@ -1386,7 +1386,7 @@ useEffect(() => {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-[20px] md:gap-[20px]">
+              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
                 {purchasedProducts.map((product, index) => (
                   <PurchasedCard key={index} product={product} />
                 ))}

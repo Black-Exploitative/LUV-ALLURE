@@ -16,7 +16,7 @@ const CollectionCard = ({ imageUrl, title, onClick, onShopNowClick }) => {
 
       <div className="absolute inset-0 bg-black/30 flex flex-col justify-between">
         <div className="flex-grow flex items-center justify-center">
-          <h2 className="text-gray-200 text-4xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+          <h2 className="text-gray-200 text-4xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
             {title}
           </h2>
         </div>
@@ -36,7 +36,7 @@ const CollectionCard = ({ imageUrl, title, onClick, onShopNowClick }) => {
               transition={{ duration: 0.5, ease: "easeInOut" }}
             />
 
-            <span className="relative z-10 block px-8 py-3 border border-white text-black lg uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
+            <span className="relative z-10 block px-8 py-3 border border-white text-black lg uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
               Shop Now
             </span>
           </button>

@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 
 const DesktopProductDetailsSkeleton = () => {
   return (
-    <div className="mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]">
-      <div className="mt-[60px] md:mt-[100px] flex flex-row">
+    <div className="mx-4 sm:mx-6  md:mx-[40px] lg:mx-[80px]">
+      <div className="mt-[60px]  md:mt-[100px] flex flex-row">
         {/* Left Side: Product Carousel Skeleton */}
-        <div className="mb-8 md:mb-0 mr-[50px]">
+        <div className="mb-8  md:mb-0 mr-[50px]">
           {/* Main Image Skeleton */}
           <div className="relative mb-[5px] overflow-hidden" style={{ width: "1040px", height: "800px" }}>
             <div className="absolute top-0 left-0 flex w-[1040px]">

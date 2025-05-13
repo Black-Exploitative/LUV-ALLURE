@@ -58,7 +58,7 @@ const ServicesPage = () => {
       {/* Main Header */}
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pt-24 pb-12">
         <motion.h1
-          className="text-4xl md:text-5xl xl:text-6xl font-medium md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-center"
+          className="text-4xl  md:text-5xl xl:text-6xl font-medium  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -66,7 +66,7 @@ const ServicesPage = () => {
           LUVS ALLURE SERVICES
         </motion.h1>
         <motion.p
-          className="text-xl md:text-2xl text-gray-700 text-center mt-6 font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst"
+          className="text-xl  md:text-2xl text-gray-700 text-center mt-6 font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -88,7 +88,7 @@ const ServicesPage = () => {
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`relative px-4 md:px-6 py-6 text-xs md:text-sm md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase transition-colors duration-300 ${
+                className={`relative px-4  md:px-6 py-6 text-xs  md:text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase transition-colors duration-300 ${
                   activeTab === tab.id ? "text-black" : "text-gray-400"
                 }`}
               >
@@ -109,8 +109,8 @@ const ServicesPage = () => {
       {/* Content Sections */}
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
         {/* Delivery & Returns Section */}
-        <section id="delivery" className="py-20 md:py-32">
-          <h2 className="text-3xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="delivery" className="py-20  md:py-32">
+          <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
             Delivery & Returns
           </h2>
           <p className="text-center font-medium text-gray-600 max-w-3xl mx-auto mb-16">
@@ -119,7 +119,7 @@ const ServicesPage = () => {
             with precision and elegance.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 place-items-center">
+          <div className="grid grid-cols-1  md:grid-cols-3 gap-8 place-items-center">
             {/* Card 1 */}
             <motion.div
               className="w-full max-w-[381px] aspect-square"
@@ -145,7 +145,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
                   Complimentary Shipping & Returns
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -184,7 +184,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
                   Order & Return Tracking
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -223,7 +223,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-center">
+                <h3 className="text-xl font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-center">
                   Expedited Delivery Options
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -236,7 +236,7 @@ const ServicesPage = () => {
         </section>
 
         {/* Signature Styling Service Section */}
-        <section id="styling" className="py-20 md:py-32 relative">
+        <section id="styling" className="py-20  md:py-32 relative">
           {/* Animated Background */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
@@ -257,7 +257,7 @@ const ServicesPage = () => {
           </div>
 
           <div className="relative z-10">
-            <h2 className="text-3xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+            <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
               SIGNATURE STYLING SERVICE
             </h2>
             <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
@@ -305,14 +305,14 @@ const ServicesPage = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-medium md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                  <h3 className="text-2xl font-medium md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
                     Personal Styling Consultation
                   </h3>
                   <p className="text-gray-600 text-center mt-4">
                     Book a one-on-one session with our expert stylists to create
                     a wardrobe that perfectly expresses your personal aesthetic.
                   </p>
-                  <button className="mt-6 border-b border-black text-sm uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst pb-1">
+                  <button className="mt-6 border-b border-black text-sm uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst pb-1">
                     Book Appointment
                   </button>
                 </div>
@@ -320,8 +320,8 @@ const ServicesPage = () => {
             </div>
 
             <div className="text-center mt-16">
-              <h3 className="text-xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">CURATED ELEGANCE</h3>
-              <p className="text-gray-600 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[15px] max-w-xl mx-auto">
+              <h3 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">CURATED ELEGANCE</h3>
+              <p className="text-gray-600 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[15px] max-w-xl mx-auto">
                 Our signature styling service goes beyond fashion its about
                 creating a personal narrative through carefully curated pieces.
                 Each styling session is approached with artistry and precision,
@@ -332,18 +332,18 @@ const ServicesPage = () => {
         </section>
 
         {/* Packaging & Gifting Section */}
-        <section id="packaging" className="py-20 md:py-32 bg-[#faf9f8]">
-          <h2 className="text-3xl font-medium md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="packaging" className="py-20  md:py-32 bg-[#faf9f8]">
+          <h2 className="text-3xl font-medium md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
             Packaging & Gifting
           </h2>
-          <p className="text-center text-gray-600 md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[15px] max-w-3xl mx-auto mb-16">
+          <p className="text-center text-gray-600 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[15px] max-w-3xl mx-auto mb-16">
             Every Luvs Allure purchase is a celebration of craftsmanship,
             presented with the same attention to detail that goes into our
             collections. Discover our signature packaging and exclusive gifting
             options.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 place-items-center">
+          <div className="grid grid-cols-1  md:grid-cols-2 gap-10 place-items-center">
             {/* Card 1 */}
             <motion.div
               className="w-full max-w-[591px] aspect-square"
@@ -356,7 +356,7 @@ const ServicesPage = () => {
                 <div className="absolute inset-0 bg-[url('/packaging-image.jpg')] bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105"></div>
                 <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity duration-700"></div>
                 <div className="relative z-10 text-white text-center">
-                  <h3 className="text-2xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
+                  <h3 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
                     Signature Packaging
                   </h3>
                   <p className="max-w-md">
@@ -384,7 +384,7 @@ const ServicesPage = () => {
                 <div className="absolute inset-0 bg-[url('/gifting-image.jpg')] bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105"></div>
                 <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity duration-700"></div>
                 <div className="relative z-10 text-white text-center">
-                  <h3 className="text-2xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
+                  <h3 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
                     Bespoke Gifting
                   </h3>
                   <p className="max-w-md">
@@ -399,8 +399,8 @@ const ServicesPage = () => {
         </section>
 
         {/* Perfect Fit Tailoring Section */}
-        <section id="tailoring" className="py-20 md:py-32">
-          <h2 className="text-3xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="tailoring" className="py-20  md:py-32">
+          <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
             Perfect Fit Tailoring
           </h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
@@ -409,7 +409,7 @@ const ServicesPage = () => {
             ensuring impeccable fit and comfort.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 place-items-center">
+          <div className="grid grid-cols-1  md:grid-cols-2 gap-10 place-items-center">
             {/* Card 1 */}
             <motion.div
               className="w-full max-w-[591px] aspect-square"
@@ -435,7 +435,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
                   In-Store Tailoring
                 </h3>
                 <p className="text-gray-600 text-center mt-4 max-w-lg">
@@ -525,7 +525,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
                   At-Home Tailoring
                 </h3>
                 <p className="text-gray-600 text-center mt-4 max-w-lg">
@@ -607,8 +607,8 @@ const ServicesPage = () => {
         </section>
 
         {/* Allurvers Account Section */}
-        <section id="allurvers" className="py-20 md:py-32 bg-[#faf9f8]">
-          <h2 className="text-3xl font-normal md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="allurvers" className="py-20  md:py-32 bg-[#faf9f8]">
+          <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
             Allurvers Account
           </h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
@@ -657,7 +657,7 @@ const ServicesPage = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
+                  <h3 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
                     Exclusive Member Benefits
                   </h3>
                   <ul className="text-left text-gray-700 space-y-4 max-w-lg mx-auto mb-8">
@@ -739,12 +739,12 @@ const ServicesPage = () => {
                     </li>
                   </ul>
                   <div className="mt-8 space-x-8">
-                    <button className="relative text-sm md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase pb-1 group">
+                    <button className="relative text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase pb-1 group">
                       Sign In
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-right transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                     </button>
-                    <button className="relative text-sm md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase pb-1 group">
+                    <button className="relative text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase pb-1 group">
                       Register
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-right transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
@@ -757,10 +757,10 @@ const ServicesPage = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="py-20 md:py-28 border-t border-gray-100">
+        <section className="py-20  md:py-28 border-t border-gray-100">
           <div className="max-w-4xl mx-auto text-center">
             <motion.h2
-              className="text-3xl md:text-4xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst"
+              className="text-3xl  md:text-4xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -793,7 +793,7 @@ const ServicesPage = () => {
               }}
               viewport={{ once: true }}
             >
-              <button className="group inline-flex items-center text-sm md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase">
+              <button className="group inline-flex items-center text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase">
                 <span className="w-5 h-5 mr-2 relative">
                   <span className="absolute inset-0 flex items-center justify-center transition-opacity group-hover:opacity-0">
                     +

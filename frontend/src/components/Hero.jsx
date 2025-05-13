@@ -144,7 +144,7 @@ const [debug, setDebug] = useState({ sections: [] }); // For debugging
             {titleLetters.map((letter, index) => (
               <motion.h1
                 key={`${letter}-${index}`}
-                className={`text-[20px] font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst ${
+                className={`text-[20px] font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst ${
                   index === 0
                     ? "border-b-[3px] border-white pb-[5px] group-hover:border-b-0"
                     : ""
@@ -173,12 +173,12 @@ const [debug, setDebug] = useState({ sections: [] }); // For debugging
       ) : (
         <>
           {/* Mobile Hero - shown only on small screens */}
-          <div className="block md:hidden">
+          <div className="block  md:hidden">
             {renderHeroContent(heroData.mobile, "mobile-hero")}
           </div>
 
           {/* Desktop Hero - hidden on small screens, shown on md and up */}
-          <div className="hidden md:block">
+          <div className="hidden  md:block">
             {renderHeroContent(heroData.desktop, "desktop-hero")}
           </div>
         </>

@@ -140,7 +140,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
             </button>
 
             <div className="px-6 pt-8 pb-4">
-              <h2 className="text-2xl font-thin md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+              <h2 className="text-2xl font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
                 SIZE GUIDE
               </h2>
               <motion.div
@@ -154,7 +154,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
             <div className="flex justify-center px-6 mb-6">
               <div className="flex space-x-12 border-b">
                 <motion.button
-                  className={`pb-2 px-1 text-sm md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst ${
+                  className={`pb-2 px-1 text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst ${
                     activeTab === "women" ? "text-black" : "text-gray-400"
                   }`}
                   variants={tabVariants}
@@ -171,7 +171,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
                 </motion.button>
 
                 <motion.button
-                  className={`pb-2 px-1 text-sm md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst ${
+                  className={`pb-2 px-1 text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst ${
                     activeTab === "men" ? "text-black" : "text-gray-400"
                   }`}
                   variants={tabVariants}
@@ -198,7 +198,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
                       {sizeCharts[activeTab].headers.map((header, index) => (
                         <th
                           key={index}
-                          className="px-4 py-3 text-xs font-medium text-gray-500 uppercase md:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2xl:md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center"
+                          className="px-4 py-3 text-xs font-medium text-gray-500 uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center"
                         >
                           {header}
                         </th>
@@ -221,7 +221,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
                           {size.map((cell, cellIndex) => (
                             <td
                               key={cellIndex}
-                              className="px-4 py-3 text-center text-gray-800 font-thin md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
+                              className="px-4 py-3 text-center text-gray-800 font-thin  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider"
                             >
                               {cell}
                             </td>
@@ -240,7 +240,7 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <h3 className="text-sm font-medium mb-3 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
+                <h3 className="text-sm font-medium mb-3  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
                   HOW TO MEASURE
                 </h3>
                 <p className="text-xs text-gray-600 leading-relaxed">
