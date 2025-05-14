@@ -9,6 +9,26 @@ const ServicesPage = () => {
   const [activeTab, setActiveTab] = useState("delivery");
   const [isSticky, setIsSticky] = useState(false);
   const tabsRef = useRef(null);
+  const tabsScrollRef = useRef(null);
+  
+  // Window width for responsive behaviors
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 0
+  );
+
+  // Update window width on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial call
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Tab options
   const tabs = [
@@ -34,13 +54,23 @@ const ServicesPage = () => {
     };
   }, []);
 
+  // Scroll selected tab into view within the tabs container
+  useEffect(() => {
+    if (tabsScrollRef.current && windowWidth < 768) {
+      const activeTabElement = tabsScrollRef.current.querySelector(`[data-tab="${activeTab}"]`);
+      if (activeTabElement) {
+        const scrollLeft = activeTabElement.offsetLeft - tabsScrollRef.current.offsetWidth / 2 + activeTabElement.offsetWidth / 2;
+        tabsScrollRef.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      }
+    }
+  }, [activeTab, windowWidth]);
+
   // Scroll to section when tab is clicked
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
       const offset = isSticky ? 80 : 0; // Adjust offset for sticky nav
-      const y =
-        element.getBoundingClientRect().top + window.pageYOffset - offset;
+      const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
@@ -51,14 +81,71 @@ const ServicesPage = () => {
     scrollToSection(id);
   };
 
+  // Horizontal scrollable tabs for mobile and small-medium screens
+  const renderScrollableTabs = () => {
+    return (
+      <div 
+        ref={tabsScrollRef}
+        className="flex md:hidden overflow-x-auto no-scrollbar py-1"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {tabs.map((tab) => (
+          <button
+            data-tab={tab.id}
+            key={tab.id}
+            onClick={() => handleTabClick(tab.id)}
+            className={`relative px-3 flex-shrink-0 py-3 text-xs uppercase transition-colors duration-300 whitespace-nowrap ${
+              activeTab === tab.id ? "text-black font-medium" : "text-gray-500"
+            }`}
+          >
+            {tab.label}
+            {activeTab === tab.id && (
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"
+                layoutId="underline-mobile"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
+  // Desktop tabs for large screens
+  const renderDesktopTabs = () => {
+    return (
+      <div className="hidden md:flex justify-center relative">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabClick(tab.id)}
+            className={`relative px-2 lg:px-4 xl:px-6 py-6 text-xs lg:text-sm uppercase transition-colors duration-300 ${
+              activeTab === tab.id ? "text-black" : "text-gray-400"
+            }`}
+          >
+            {tab.label}
+            {activeTab === tab.id && (
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"
+                layoutId="underline"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen overflow-x-hidden">
       <Navbar />
 
       {/* Main Header */}
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pt-24 pb-12">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
         <motion.h1
-          className="text-4xl  md:text-5xl xl:text-6xl font-medium  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-center"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-medium tracking-wide text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -66,7 +153,7 @@ const ServicesPage = () => {
           LUVS ALLURE SERVICES
         </motion.h1>
         <motion.p
-          className="text-xl  md:text-2xl text-gray-700 text-center mt-6 font-thin sm:tracking-tight  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst"
+          className="text-lg sm:text-xl md:text-2xl text-gray-700 text-center mt-4 sm:mt-6 font-thin tracking-wide"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -78,58 +165,43 @@ const ServicesPage = () => {
       {/* Tabs Navigation */}
       <div
         ref={tabsRef}
-        className={`border-b border-gray-200 ${
+        className={`border-b border-gray-200 w-full ${
           isSticky ? "sticky top-0 bg-white z-40 shadow-sm" : ""
         }`}
       >
-        <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex justify-center relative">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabClick(tab.id)}
-                className={`relative px-4  md:px-6 py-6 text-xs  md:text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase transition-colors duration-300 ${
-                  activeTab === tab.id ? "text-black" : "text-gray-400"
-                }`}
-              >
-                {tab.label}
-                {activeTab === tab.id && (
-                  <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-black"
-                    layoutId="underline"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
+        <div className="w-full mx-auto px-4">
+          {/* Mobile & Small screens: scrollable tabs */}
+          {renderScrollableTabs()}
+          
+          {/* Large screens: full tabs */}
+          {renderDesktopTabs()}
         </div>
       </div>
 
       {/* Content Sections */}
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 overflow-x-hidden">
         {/* Delivery & Returns Section */}
-        <section id="delivery" className="py-20  md:py-32">
-          <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="delivery" className="py-12 sm:py-16 md:py-20 lg:py-32">
+          <h2 className="text-2xl sm:text-3xl font-normal tracking-wide text-center mb-6 sm:mb-8">
             Delivery & Returns
           </h2>
-          <p className="text-center font-medium text-gray-600 max-w-3xl mx-auto mb-16">
+          <p className="text-center font-medium text-gray-600 max-w-3xl mx-auto mb-10 sm:mb-16 px-4">
             Experience seamless luxury with our premium delivery and hassle-free
             returns. Every aspect of your journey with Luvs Allure is designed
             with precision and elegance.
           </p>
 
-          <div className="grid grid-cols-1  md:grid-cols-3 gap-8 place-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Card 1 */}
             <motion.div
-              className="w-full max-w-[381px] aspect-square"
+              className="w-full h-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center p-10">
-                <div className="w-20 h-20 mb-6">
+              <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center p-6 sm:p-8 md:p-10">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mb-6">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -145,7 +217,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-lg sm:text-xl font-normal tracking-wide text-center">
                   Complimentary Shipping & Returns
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -157,7 +229,7 @@ const ServicesPage = () => {
 
             {/* Card 2 */}
             <motion.div
-              className="w-full max-w-[381px] aspect-square"
+              className="w-full h-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{
@@ -167,8 +239,8 @@ const ServicesPage = () => {
               }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center p-10">
-                <div className="w-20 h-20 mb-6">
+              <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center p-6 sm:p-8 md:p-10">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mb-6">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -184,7 +256,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-lg sm:text-xl font-normal tracking-wide text-center">
                   Order & Return Tracking
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -196,7 +268,7 @@ const ServicesPage = () => {
 
             {/* Card 3 */}
             <motion.div
-              className="w-full max-w-[381px] aspect-square"
+              className="w-full h-auto sm:col-span-2 lg:col-span-1"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{
@@ -206,8 +278,8 @@ const ServicesPage = () => {
               }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center p-10">
-                <div className="w-20 h-20 mb-6">
+              <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center p-6 sm:p-8 md:p-10">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mb-6">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -223,7 +295,7 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-center">
+                <h3 className="text-lg sm:text-xl font-normal tracking-wide text-center">
                   Expedited Delivery Options
                 </h3>
                 <p className="text-gray-600 text-center mt-4">
@@ -236,7 +308,7 @@ const ServicesPage = () => {
         </section>
 
         {/* Signature Styling Service Section */}
-        <section id="styling" className="py-20  md:py-32 relative">
+        <section id="styling" className="py-12 sm:py-16 md:py-20 lg:py-32 relative">
           {/* Animated Background */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
@@ -257,24 +329,24 @@ const ServicesPage = () => {
           </div>
 
           <div className="relative z-10">
-            <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-normal tracking-wide text-center mb-6 sm:mb-8">
               SIGNATURE STYLING SERVICE
             </h2>
-            <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
+            <p className="text-center text-gray-600 max-w-3xl mx-auto mb-10 sm:mb-16 px-4">
               From birthdays to galas, our expert stylists create personalized
               looks tailored to your unique style and any occasion. Experience
               the art of curation with our dedicated team.
             </p>
 
-            <div className="flex justify-center">
+            <div className="flex justify-center px-4">
               <motion.div
-                className="w-full max-w-[402px] aspect-square"
+                className="w-full max-w-sm sm:max-w-md lg:max-w-lg"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 viewport={{ once: true }}
               >
-                <div className="h-full w-full bg-white shadow-xl flex flex-col items-center justify-center p-10 relative overflow-hidden">
+                <div className="h-full w-full bg-white shadow-xl flex flex-col items-center justify-center p-6 sm:p-8 md:p-10 relative overflow-hidden">
                   {/* Subtle animated glow */}
                   <motion.div
                     className="absolute w-[150%] h-[150%] bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
@@ -289,7 +361,7 @@ const ServicesPage = () => {
                     }}
                   />
 
-                  <div className="w-24 h-24 mb-8">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 mb-6 sm:mb-8">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -305,23 +377,23 @@ const ServicesPage = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-medium md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                  <h3 className="text-xl sm:text-2xl font-medium tracking-wide text-center">
                     Personal Styling Consultation
                   </h3>
                   <p className="text-gray-600 text-center mt-4">
                     Book a one-on-one session with our expert stylists to create
                     a wardrobe that perfectly expresses your personal aesthetic.
                   </p>
-                  <button className="mt-6 border-b border-black text-sm uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst pb-1">
+                  <button className="mt-6 border-b border-black text-sm uppercase tracking-wide pb-1">
                     Book Appointment
                   </button>
                 </div>
               </motion.div>
             </div>
 
-            <div className="text-center mt-16">
-              <h3 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">CURATED ELEGANCE</h3>
-              <p className="text-gray-600 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[15px] max-w-xl mx-auto">
+            <div className="text-center mt-12 sm:mt-16 px-4">
+              <h3 className="text-lg sm:text-xl font-normal tracking-wide mb-4">CURATED ELEGANCE</h3>
+              <p className="text-gray-600 tracking-wide text-sm sm:text-base max-w-xl mx-auto">
                 Our signature styling service goes beyond fashion its about
                 creating a personal narrative through carefully curated pieces.
                 Each styling session is approached with artistry and precision,
@@ -332,34 +404,34 @@ const ServicesPage = () => {
         </section>
 
         {/* Packaging & Gifting Section */}
-        <section id="packaging" className="py-20  md:py-32 bg-[#faf9f8]">
-          <h2 className="text-3xl font-medium md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="packaging" className="py-12 sm:py-16 md:py-20 lg:py-32 bg-[#faf9f8]">
+          <h2 className="text-2xl sm:text-3xl font-medium tracking-wide text-center mb-6 sm:mb-8">
             Packaging & Gifting
           </h2>
-          <p className="text-center text-gray-600 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-[15px] max-w-3xl mx-auto mb-16">
+          <p className="text-center text-gray-600 tracking-wide text-sm sm:text-base max-w-3xl mx-auto mb-10 sm:mb-16 px-4">
             Every Luvs Allure purchase is a celebration of craftsmanship,
             presented with the same attention to detail that goes into our
             collections. Discover our signature packaging and exclusive gifting
             options.
           </p>
 
-          <div className="grid grid-cols-1  md:grid-cols-2 gap-10 place-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 px-4 sm:px-6">
             {/* Card 1 */}
             <motion.div
-              className="w-full max-w-[591px] aspect-square"
+              className="w-full h-auto aspect-auto sm:aspect-square"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-white border border-gray-100 flex flex-col items-center justify-center p-12 relative overflow-hidden group">
+              <div className="h-full w-full bg-white border border-gray-100 flex flex-col items-center justify-center p-8 sm:p-12 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-[url('/packaging-image.jpg')] bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105"></div>
                 <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity duration-700"></div>
-                <div className="relative z-10 text-white text-center">
-                  <h3 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
+                <div className="relative z-10 text-white text-center p-4">
+                  <h3 className="text-xl sm:text-2xl font-thin tracking-wide mb-4">
                     Signature Packaging
                   </h3>
-                  <p className="max-w-md">
+                  <p className="max-w-md text-sm sm:text-base">
                     Each purchase arrives wrapped in our distinctive black
                     packaging with embossed logo and satin ribbon, creating an
                     unforgettable unboxing experience.
@@ -370,7 +442,7 @@ const ServicesPage = () => {
 
             {/* Card 2 */}
             <motion.div
-              className="w-full max-w-[591px] aspect-square"
+              className="w-full h-auto aspect-auto sm:aspect-square"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{
@@ -380,14 +452,14 @@ const ServicesPage = () => {
               }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-white border border-gray-100 flex flex-col items-center justify-center p-12 relative overflow-hidden group">
+              <div className="h-full w-full bg-white border border-gray-100 flex flex-col items-center justify-center p-8 sm:p-12 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-[url('/gifting-image.jpg')] bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105"></div>
                 <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity duration-700"></div>
-                <div className="relative z-10 text-white text-center">
-                  <h3 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-4">
+                <div className="relative z-10 text-white text-center p-4">
+                  <h3 className="text-xl sm:text-2xl font-thin tracking-wide mb-4">
                     Bespoke Gifting
                   </h3>
-                  <p className="max-w-md">
+                  <p className="max-w-md text-sm sm:text-base">
                     Make any occasion special with our personalized gift
                     services, including custom messaging, gift wrapping, and
                     curated gift selections for your loved ones.
@@ -399,27 +471,27 @@ const ServicesPage = () => {
         </section>
 
         {/* Perfect Fit Tailoring Section */}
-        <section id="tailoring" className="py-20  md:py-32">
-          <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="tailoring" className="py-12 sm:py-16 md:py-20 lg:py-32">
+          <h2 className="text-2xl sm:text-3xl font-normal tracking-wide text-center mb-6 sm:mb-8">
             Perfect Fit Tailoring
           </h2>
-          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
+          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-10 sm:mb-16 px-4">
             Ensure every piece fits perfectly. Our tailoring service adjusts
             garments from our collection to match your exact measurements,
             ensuring impeccable fit and comfort.
           </p>
 
-          <div className="grid grid-cols-1  md:grid-cols-2 gap-10 place-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 px-4 sm:px-6">
             {/* Card 1 */}
             <motion.div
-              className="w-full max-w-[591px] aspect-square"
+              className="w-full h-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-white border border-gray-100 shadow-sm flex flex-col items-center justify-center p-12">
-                <div className="w-24 h-24 mb-8">
+              <div className="h-full w-full bg-white border border-gray-100 shadow-sm flex flex-col items-center justify-center p-6 sm:p-8 md:p-12">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mb-6 sm:mb-8">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -435,17 +507,17 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-xl sm:text-2xl font-thin tracking-wide text-center">
                   In-Store Tailoring
                 </h3>
-                <p className="text-gray-600 text-center mt-4 max-w-lg">
+                <p className="text-gray-600 text-center mt-4 max-w-lg text-sm sm:text-base">
                   Visit our boutique for a personalized fitting session with our
                   master tailors who will ensure your garments fit flawlessly.
                   Initial alterations for new purchases are complimentary.
                 </p>
-                <ul className="mt-8 text-gray-600 space-y-3">
+                <ul className="mt-6 sm:mt-8 text-gray-600 space-y-2 sm:space-y-3 text-sm sm:text-base">
                   <li className="flex items-center">
-                    <span className="w-4 h-4 mr-2 text-black">
+                    <span className="w-4 h-4 mr-2 text-black flex-shrink-0">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -461,7 +533,7 @@ const ServicesPage = () => {
                     Expert measurements and consultation
                   </li>
                   <li className="flex items-center">
-                    <span className="w-4 h-4 mr-2 text-black">
+                    <span className="w-4 h-4 mr-2 text-black flex-shrink-0">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -477,7 +549,7 @@ const ServicesPage = () => {
                     Precise alterations by skilled artisans
                   </li>
                   <li className="flex items-center">
-                    <span className="w-4 h-4 mr-2 text-black">
+                    <span className="w-4 h-4 mr-2 text-black flex-shrink-0">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -498,7 +570,7 @@ const ServicesPage = () => {
 
             {/* Card 2 */}
             <motion.div
-              className="w-full max-w-[591px] aspect-square"
+              className="w-full h-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{
@@ -508,8 +580,8 @@ const ServicesPage = () => {
               }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-white border border-gray-100 shadow-sm flex flex-col items-center justify-center p-12">
-                <div className="w-24 h-24 mb-8">
+              <div className="h-full w-full bg-white border border-gray-100 shadow-sm flex flex-col items-center justify-center p-6 sm:p-8 md:p-12">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mb-6 sm:mb-8">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -525,17 +597,17 @@ const ServicesPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center">
+                <h3 className="text-xl sm:text-2xl font-thin tracking-wide text-center">
                   At-Home Tailoring
                 </h3>
-                <p className="text-gray-600 text-center mt-4 max-w-lg">
+                <p className="text-gray-600 text-center mt-4 max-w-lg text-sm sm:text-base">
                   For our VIP clients, we offer exclusive at-home tailoring
                   services. Our tailors will visit your residence to ensure your
                   garments are perfectly fitted in the comfort of your home.
                 </p>
-                <ul className="mt-8 text-gray-600 space-y-3">
+                <ul className="mt-6 sm:mt-8 text-gray-600 space-y-2 sm:space-y-3 text-sm sm:text-base">
                   <li className="flex items-center">
-                    <span className="w-4 h-4 mr-2 text-black">
+                    <span className="w-4 h-4 mr-2 text-black flex-shrink-0">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -551,8 +623,8 @@ const ServicesPage = () => {
                     Convenient scheduling at your preferred time
                   </li>
 
-                  <li className="flex items-center">
-                    <span className="w-4 h-4 mr-2 text-black">
+                  <li className="flex items-start">
+                    <span className="w-4 h-4 mr-2 mt-0.5 text-black flex-shrink-0">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -565,11 +637,10 @@ const ServicesPage = () => {
                         />
                       </svg>
                     </span>
-                    Convenient scheduling at your preferred time
+                    <span>Personal wardrobe consultation included</span>
                   </li>
-
-                  <li className="flex items-center">
-                    <span className="w-4 h-4 mr-2 text-black">
+                  <li className="flex items-start">
+                    <span className="w-4 h-4 mr-2 mt-0.5 text-black flex-shrink-0">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
@@ -582,23 +653,7 @@ const ServicesPage = () => {
                         />
                       </svg>
                     </span>
-                    Personal wardrobe consultation included
-                  </li>
-                  <li className="flex items-center">
-                    <span className="w-4 h-4 mr-2 text-black">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </span>
-                    Multiple garments altered in one appointment
+                    <span>Multiple garments altered in one appointment</span>
                   </li>
                 </ul>
               </div>
@@ -607,24 +662,24 @@ const ServicesPage = () => {
         </section>
 
         {/* Allurvers Account Section */}
-        <section id="allurvers" className="py-20  md:py-32 bg-[#faf9f8]">
-          <h2 className="text-3xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst text-center mb-8">
+        <section id="allurvers" className="py-12 sm:py-16 md:py-20 lg:py-32 bg-[#faf9f8]">
+          <h2 className="text-2xl sm:text-3xl font-normal tracking-wide text-center mb-6 sm:mb-8">
             Allurvers Account
           </h2>
-          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-16">
+          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-10 sm:mb-16 px-4">
             Join our exclusive membership program to unlock premium benefits,
             personalized offers, and VIP access to new collections.
           </p>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center px-4">
             <motion.div
-              className="w-full max-w-[591px] aspect-square"
+              className="w-full max-w-sm sm:max-w-md lg:max-w-lg"
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
             >
-              <div className="h-full w-full bg-white shadow-lg flex flex-col items-center justify-center p-12 relative overflow-hidden">
+              <div className="h-full w-full bg-white shadow-lg flex flex-col items-center justify-center p-6 sm:p-8 md:p-12 relative overflow-hidden">
                 {/* Elegant animated backdrop */}
                 <div className="absolute inset-0 bg-gradient-radial from-gray-50 to-white opacity-70"></div>
                 <motion.div
@@ -641,7 +696,7 @@ const ServicesPage = () => {
                 />
 
                 <div className="relative z-10 text-center">
-                  <div className="w-24 h-24 mx-auto mb-8">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-6 sm:mb-8">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -657,10 +712,10 @@ const ServicesPage = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst mb-6">
+                  <h3 className="text-xl sm:text-2xl font-thin tracking-wide mb-6">
                     Exclusive Member Benefits
                   </h3>
-                  <ul className="text-left text-gray-700 space-y-4 max-w-lg mx-auto mb-8">
+                  <ul className="text-left text-gray-700 space-y-3 sm:space-y-4 max-w-lg mx-auto mb-8 text-sm sm:text-base">
                     <li className="flex items-start">
                       <span className="w-5 h-5 mr-3 mt-0.5 text-black flex-shrink-0">
                         <svg
@@ -738,13 +793,13 @@ const ServicesPage = () => {
                       </span>
                     </li>
                   </ul>
-                  <div className="mt-8 space-x-8">
-                    <button className="relative text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase pb-1 group">
+                  <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+                    <button className="relative text-sm tracking-wide uppercase pb-1 group">
                       Sign In
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-right transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                     </button>
-                    <button className="relative text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase pb-1 group">
+                    <button className="relative text-sm tracking-wide uppercase pb-1 group">
                       Register
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
                       <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-black origin-right transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
@@ -757,10 +812,10 @@ const ServicesPage = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="py-20  md:py-28 border-t border-gray-100">
-          <div className="max-w-4xl mx-auto text-center">
+        <section className="py-12 sm:py-16 md:py-20 md:py-28 border-t border-gray-100">
+          <div className="max-w-4xl mx-auto text-center px-4">
             <motion.h2
-              className="text-3xl  md:text-4xl font-thin sm:tracking-tight md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst"
+              className="text-2xl sm:text-3xl md:text-4xl font-thin tracking-wide"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -769,7 +824,7 @@ const ServicesPage = () => {
               May we help you?
             </motion.h2>
             <motion.p
-              className="mt-6 text-gray-600 max-w-2xl mx-auto"
+              className="mt-4 sm:mt-6 text-gray-600 max-w-2xl mx-auto text-sm sm:text-base"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{
@@ -783,7 +838,7 @@ const ServicesPage = () => {
               universe with a Client Advisor.
             </motion.p>
             <motion.div
-              className="mt-10"
+              className="mt-8 sm:mt-10"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{
@@ -793,7 +848,7 @@ const ServicesPage = () => {
               }}
               viewport={{ once: true }}
             >
-              <button className="group inline-flex items-center text-sm md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase">
+              <button className="group inline-flex items-center text-sm tracking-wide uppercase">
                 <span className="w-5 h-5 mr-2 relative">
                   <span className="absolute inset-0 flex items-center justify-center transition-opacity group-hover:opacity-0">
                     +
