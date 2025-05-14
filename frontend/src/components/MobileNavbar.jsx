@@ -290,6 +290,7 @@ export default function MobileNavbar({ darkNavbar }) {
           </motion.div>
 
           <motion.div className="flex items-center">
+            <a href='/user-account'>
             <motion.img
               src={
                 darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"
@@ -299,6 +300,7 @@ export default function MobileNavbar({ darkNavbar }) {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             />
+            </a>
           </motion.div>
 
           {/* Mobile Cart with Preview */}
