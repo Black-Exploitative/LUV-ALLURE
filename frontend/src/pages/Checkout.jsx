@@ -256,7 +256,7 @@ const Checkout = () => {
   const handlePaymentSuccess = async (paymentResult) => {
     setIsRedirecting(true);
     try {
-      // Verify that the order was created in Shopify (additional server call)
+   
       const orderResponse = await fetch(
         `/api/orders/${paymentResult.order.id}/verify-shopify`,
         {
@@ -283,7 +283,7 @@ const Checkout = () => {
         });
       }
 
-      // Clear the cart
+      
       
 
       // Show success message
@@ -293,7 +293,7 @@ const Checkout = () => {
       navigate(`/order-confirmation/${paymentResult.order.id}`);
     } catch (error) {
       console.error("Error finalizing order:", error);
-      // Even if Shopify sync fails, the order was still placed in our system
+      
       setIsRedirecting(false);
       clearCart();
       localStorage.removeItem('cart');
@@ -326,13 +326,13 @@ const Checkout = () => {
         break;
     }
     
-    // Scroll to top on mobile when changing steps
+    
     if (windowWidth < 768) {
       window.scrollTo(0, 0);
     }
   };
 
-  // Render progress steps indicator
+ 
   const renderProgressSteps = () => {
     const steps = [
       { id: "shipping", label: "Shipping" },
@@ -341,7 +341,7 @@ const Checkout = () => {
       { id: "payment", label: "Payment" },
     ];
 
-    // On mobile, simplify to just show current step with back/forward indicators
+    
     if (windowWidth < 640) {
       const currentIndex = steps.findIndex(step => step.id === currentStep);
       
@@ -480,7 +480,7 @@ const Checkout = () => {
               {step.label}
             </div>
 
-            {/* Connector line (except after last step) */}
+           
             {index < steps.length - 1 && (
               <div className="w-16 h-[1px] bg-gray-300 mx-4"></div>
             )}
@@ -490,10 +490,10 @@ const Checkout = () => {
     );
   };
 
-  // Calculate order summary for the current state
+
   const getOrderSummary = () => {
     const { subtotal, itemCount } = getCartTotals();
-    const tax = Math.round(subtotal * 0.05); // 5% tax
+    const tax = Math.round(subtotal * 0.05);
     const packagingCost = selectedPackaging ? selectedPackaging.price : 0;
     const total = subtotal + (shippingCost || 0) + tax + packagingCost;
 
@@ -507,7 +507,7 @@ const Checkout = () => {
     };
   };
 
-  // Mobile Order Summary Accordion
+  
   const renderMobileSummaryAccordion = (summary) => {
     return (
       <div className="lg:hidden mb-8 border rounded-lg overflow-hidden">
@@ -549,7 +549,7 @@ const Checkout = () => {
     );
   };
 
-  // Render the appropriate step content
+
   const renderStepContent = () => {
     const summary = getOrderSummary();
 
@@ -557,7 +557,7 @@ const Checkout = () => {
       case "shipping":
         return (
           <>
-            {/* Mobile Order Summary Accordion */}
+         
             {renderMobileSummaryAccordion(summary)}
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -741,15 +741,15 @@ const Checkout = () => {
                               alt={item.name || item.title}
                               className="w-16 h-16 object-cover rounded mr-4"
                             />
-                            <div className="flex-1 min-w-0"> {/* Added min-w-0 to prevent text overflow */}
-                              <p className="font-medium truncate"> {/* Added truncate for long names */}
+                            <div className="flex-1 min-w-0"> 
+                              <p className="font-medium truncate"> 
                                 {item.name || item.title}
                               </p>
                               <p className="text-sm text-gray-600">
                                 Quantity: {item.quantity || 1}
                               </p>
                             </div>
-                            <div className="ml-4 text-right whitespace-nowrap"> {/* Keep price from wrapping */}
+                            <div className="ml-4 text-right whitespace-nowrap"> 
                               <p className="font-medium">
                                 ₦
                                 {(
@@ -858,7 +858,7 @@ const Checkout = () => {
     }
   };
 
-  // If cart is empty, don't render the checkout page
+  
   if (cartItems.length === 0 || !isAuthenticated) {
     return (
       <div className="h-screen flex items-center justify-center">
