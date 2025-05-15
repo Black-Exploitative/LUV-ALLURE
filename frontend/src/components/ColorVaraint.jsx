@@ -415,7 +415,7 @@ const ColorVariants = ({
           <button
             key={index}
             className={`w-[40px] h-[40px] flex transition-all cursor-pointer duration-300 items-center justify-center overflow-hidden ${
-              selectedColor?.toLowerCase() === variant.color?.toLowerCase()
+              selectedColor?.toLowerCase().trim() === variant.color?.toLowerCase().trim()
                 ? "ring-1 ring-black"
                 : "ring-1 ring-gray-300"
             }`}
