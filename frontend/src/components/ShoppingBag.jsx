@@ -19,6 +19,45 @@ const generateProductId = (product) => {
   return `${nameStr}-${sizeStr}-${colorStr}-${priceStr}`;
 };
 
+// Helper function to get color code from color name
+const getColorCode = (colorName) => {
+  if (!colorName) return "#CCCCCC"; // Default gray
+
+  const colorMap = {
+    "Black": "#000000",
+    "White": "#FFFFFF",
+    "Red": "#FF0000",
+    "Green": "#008000",
+    "Blue": "#0000FF",
+    "Yellow": "#FFFF00",
+    "Pink": "#FFC0CB",
+    "Purple": "#800080",
+    "Orange": "#FFA500",
+    "Gray": "#808080",
+    "Brown": "#A52A2A",
+    "Beige": "#F5F5DC",
+    "Maroon": "#800000",
+    "Violet": "#8A2BE2",
+    "Teal": "#008080",
+    "Navy": "#000080",
+    "Coral": "#FF7F50",
+    "Burgundy": "#800020",
+    "Olive": "#808000",
+    "Turquoise": "#40E0D0"
+  };
+
+  // Try to match case-insensitive
+  const normalizedColorName = colorName.trim().toLowerCase();
+  
+  for (const [key, value] of Object.entries(colorMap)) {
+    if (key.toLowerCase() === normalizedColorName) {
+      return value;
+    }
+  }
+  
+  return "#CCCCCC"; // Default gray if color not found
+};
+
 export default function ShoppingBag() {
   const { cartItems, removeFromCart, updateCartItemQuantity } = useCart();
   const [quantities, setQuantities] = useState({});
@@ -163,6 +202,9 @@ export default function ShoppingBag() {
                       ? parseFloat(item.price.replace(/,/g, ""))
                       : parseFloat(item.price) || 0;
                   
+                  // Get the color code for the item's color
+                  const colorCode = getColorCode(item.selectedColor || item.color);
+                  
                   return (
                     <div
                       key={itemId}
@@ -188,7 +230,21 @@ export default function ShoppingBag() {
                       <div className="ml-3 flex-1 flex flex-col justify-between">
                         <div>
                           <h3 className="text-[14px] sm:text-[16px] font-medium truncate max-w-[180px] sm:max-w-full">{item.name}</h3>
-                          <p className="text-[11px] text-gray-500">{item.color} • {item.selectedSize}</p>
+                          
+                          {/* Color and Size with color swatch */}
+                          <div className="flex items-center mt-1">
+                            <div 
+                              className="w-3 h-3 rounded-full mr-1.5 border border-gray-300 flex-shrink-0" 
+                              style={{ 
+                                backgroundColor: colorCode,
+                                boxShadow: colorCode.toLowerCase() === '#ffffff' ? 'inset 0 0 0 1px #e5e5e5' : 'none'
+                              }}
+                              aria-hidden="true"
+                            ></div>
+                            <p className="text-[11px] text-gray-500">
+                              {item.selectedColor || item.color} • {item.selectedSize}
+                            </p>
+                          </div>
                         </div>
                         
                         {/* Quantity Controls - Better tap targets */}

@@ -1,8 +1,46 @@
-// frontend/src/components/CartDrawer.jsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useState, useEffect } from 'react';
+
+// Helper function to get color code from color name
+const getColorCode = (colorName) => {
+  if (!colorName) return "#CCCCCC"; // Default gray
+
+  const colorMap = {
+    "Black": "#000000",
+    "White": "#FFFFFF",
+    "Red": "#FF0000",
+    "Green": "#008000",
+    "Blue": "#0000FF",
+    "Yellow": "#FFFF00",
+    "Pink": "#FFC0CB",
+    "Purple": "#800080",
+    "Orange": "#FFA500",
+    "Gray": "#808080",
+    "Brown": "#A52A2A",
+    "Beige": "#F5F5DC",
+    "Maroon": "#800000",
+    "Violet": "#8A2BE2",
+    "Teal": "#008080",
+    "Navy": "#000080",
+    "Coral": "#FF7F50",
+    "Burgundy": "#800020",
+    "Olive": "#808000",
+    "Turquoise": "#40E0D0"
+  };
+
+  // Try to match case-insensitive
+  const normalizedColorName = colorName.trim().toLowerCase();
+  
+  for (const [key, value] of Object.entries(colorMap)) {
+    if (key.toLowerCase() === normalizedColorName) {
+      return value;
+    }
+  }
+  
+  return "#CCCCCC"; // Default gray if color not found
+};
 
 const CartDrawer = () => {
   const navigate = useNavigate();
@@ -119,6 +157,10 @@ const CartDrawer = () => {
                         const currentQuantity = quantities[itemId] || item.quantity || 1;
                         const itemTotal = calculateItemTotal(item);
                         
+                        // Get color info for the swatch
+                        const itemColor = item.selectedColor || item.color;
+                        const colorCode = getColorCode(itemColor);
+                        
                         return (
                           <motion.div 
                             key={itemId} 
@@ -161,10 +203,20 @@ const CartDrawer = () => {
                                     <span>{item.selectedSize}</span>
                                   </div>
                                 )}
-                                {item.color && (
-                                  <div>
-                                    <span className="uppercase">Color: </span>
-                                    <span>{item.color}</span>
+                                {itemColor && (
+                                  <div className="flex items-center">
+                                    <span className="uppercase mr-1">Color: </span>
+                                    <div className="flex items-center">
+                                      <div 
+                                        className="w-3 h-3 rounded-full mr-1 border border-gray-300 flex-shrink-0" 
+                                        style={{ 
+                                          backgroundColor: colorCode,
+                                          boxShadow: colorCode.toLowerCase() === '#ffffff' ? 'inset 0 0 0 1px #e5e5e5' : 'none'
+                                        }}
+                                        aria-hidden="true"
+                                      ></div>
+                                      <span>{itemColor}</span>
+                                    </div>
                                   </div>
                                 )}
                               </div>
