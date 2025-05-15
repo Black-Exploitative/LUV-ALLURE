@@ -18,8 +18,6 @@ const ColorVariants = ({
   const [colorVariants, setColorVariants] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
-
   // Extract color from product name
   const extractColorFromProductName = (productName) => {
     if (productName && productName.includes(" - ")) {
@@ -421,8 +419,7 @@ const ColorVariants = ({
           <button
             key={index}
             className={`w-[40px] h-[40px] flex transition-all cursor-pointer duration-300 items-center justify-center overflow-hidden ${
-              selectedColor?.toLowerCase().trim() ===
-              variant.color?.toLowerCase().trim()
+              selectedColor?.toLowerCase() === variant.color?.toLowerCase()
                 ? "ring-1 ring-black"
                 : "ring-1 ring-gray-300"
             }`}
