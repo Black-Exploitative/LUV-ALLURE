@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -319,15 +318,18 @@ export default function UserAccount() {
             <div className="w-full  md:w-3/4">
               {activeSection === "dashboard" && (
                 <div className="space-y-8">
-                  <div className="p-2">
-                    <h2 className="text-[20px] font-medium mb-4">
-                      WELCOME BACK, {user.firstName.toUpperCase()}
-                    </h2>
-                    <p className="text-[12px] text-gray-600 font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider mb-6">
+                  <div className="p-2 flex flex-col">
+                    {/* Welcome text - visible only on medium screens and up */}
+                    <p className="hidden md:block text-[12px] text-gray-600 font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider mb-6">
                       From your account dashboard you can view your recent
                       orders, manage your shipping and billing addresses, and
                       edit your password and account details.
                     </p>
+                    
+                    <h2 className="text-[20px] font-medium mb-4">
+                      WELCOME BACK, {user.firstName.toUpperCase()}
+                    </h2>
+                    
                     <div className="grid grid-cols-1  md:grid-cols-2 gap-4 m-2">
                       <div className="p-4 border border-gray-200 bg-white">
                         <h3 className="font-medium mb-[10px]">
@@ -362,6 +364,8 @@ export default function UserAccount() {
                         </motion.button>
                       </div>
                     </div>
+                    
+                   
                   </div>
 
                   <div className="space-y-4">
@@ -371,6 +375,13 @@ export default function UserAccount() {
                       <Orders dashboard={true} limit={2} />
                     </div>
                   </div>
+
+                   
+                    <p className="md:hidden text-[12px] text-gray-600 font-normal mt-6 mb-2">
+                      From your account dashboard you can view your recent
+                      orders, manage your shipping and billing addresses, and
+                      edit your password and account details.
+                    </p>
                 </div>
               )}
 
