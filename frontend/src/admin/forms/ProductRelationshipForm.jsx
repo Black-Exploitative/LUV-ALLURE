@@ -239,6 +239,7 @@ const ProductRelationshipForm = () => {
     }
   };
   
+  
   // Product selection UI
   const renderProductSearch = (title, placeholder, onSelectProduct) => (
     <div className="mb-6">

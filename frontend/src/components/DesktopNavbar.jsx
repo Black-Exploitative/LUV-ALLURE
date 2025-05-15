@@ -17,6 +17,7 @@ export default function DesktopNavbar({ darkNavbar }) {
   const location = useLocation();
   const navRef = useRef(null);
   const dropdownRefs = useRef({});
+  const [isTabletSize, setIsTabletSize] = useState(false);
 
   const [navImages, setNavImages] = useState({
     shop: [],
@@ -24,6 +25,22 @@ export default function DesktopNavbar({ darkNavbar }) {
     collections: [],
     newin: [],
   });
+
+  // Detect tablet size for responsive adjustments
+  useEffect(() => {
+    const checkTabletSize = () => {
+      setIsTabletSize(window.innerWidth < 1280 && window.innerWidth >= 1024);
+    };
+    
+    // Initial check
+    checkTabletSize();
+    
+    // Add event listener
+    window.addEventListener('resize', checkTabletSize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkTabletSize);
+  }, []);
 
   // Load navigation images from CMS
   const loadNavigationImages = async () => {
@@ -283,12 +300,31 @@ export default function DesktopNavbar({ darkNavbar }) {
     return dropdownContent[category].featuredItems;
   };
 
+  // Responsive padding classes based on screen size
+  const getPaddingClasses = () => {
+    return isTabletSize ? "mx-6" : "mx-[100px]";
+  };
+
+  // Responsive spacing for links
+  const getLinkSpacing = () => {
+    return isTabletSize ? "space-x-1" : "space-x-2 lg:space-x-6";
+  };
+
+  // Determine how many featured items to show based on screen size
+  const getFeaturedItemsCount = (category) => {
+    if (isTabletSize) {
+      // For smaller screens, only show 1-2 items
+      return Math.min(getDropdownFeaturedItems(category).length, 2);
+    }
+    return getDropdownFeaturedItems(category).length;
+  };
+
   return (
     <>
-      <div className="mx-[100px] py-4 flex flex-row justify-between items-center h-[70px] relative">
+      <div className={`${getPaddingClasses()} py-4 flex flex-row justify-between items-center h-[70px] relative`}>
         {/* Left-side Navigation Links */}
         <div
-          className={`flex space-x-2 lg:space-x-6 text-xs lg:text-[12px] ${
+          className={`flex ${getLinkSpacing()} text-xs lg:text-[12px] ${
             darkNavbar ? "text-white" : "text-black"
           }`}
         >
@@ -344,57 +380,61 @@ export default function DesktopNavbar({ darkNavbar }) {
             )}
           </div>
 
-          {/* COLLECTIONS Dropdown - Hide on smaller tablets */}
-          <div
-            className="nav-dropdown-container relative hidden lg:block"
-            onMouseEnter={() => handleDropdownEnter("collections")}
-            onMouseLeave={handleDropdownLeave}
-            ref={(el) => (dropdownRefs.current["collections"] = el)}
-          >
-            <a
-              href="#"
-              className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
-                activeDropdown === "collections" ? "active-nav-item" : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveDropdown(
-                  activeDropdown === "collections" ? null : "collections"
-                );
-              }}
+          {/* COLLECTIONS Dropdown - Show if not on tablet size */}
+          {!isTabletSize && (
+            <div
+              className="nav-dropdown-container relative"
+              onMouseEnter={() => handleDropdownEnter("collections")}
+              onMouseLeave={handleDropdownLeave}
+              ref={(el) => (dropdownRefs.current["collections"] = el)}
             >
-              LOOKBOOK
-            </a>
-            {/* Highlight indicator that appears at the bottom of navbar */}
-            {activeDropdown === "collections" && (
-              <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
-            )}
-          </div>
+              <a
+                href="#"
+                className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
+                  activeDropdown === "collections" ? "active-nav-item" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveDropdown(
+                    activeDropdown === "collections" ? null : "collections"
+                  );
+                }}
+              >
+                LOOKBOOK
+              </a>
+              {/* Highlight indicator that appears at the bottom of navbar */}
+              {activeDropdown === "collections" && (
+                <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
+              )}
+            </div>
+          )}
 
-          {/* NEW IN Dropdown - Hide on smaller tablets */}
-          <div
-            className="nav-dropdown-container relative hidden lg:block"
-            onMouseEnter={() => handleDropdownEnter("newin")}
-            onMouseLeave={handleDropdownLeave}
-            ref={(el) => (dropdownRefs.current["newin"] = el)}
-          >
-            <a
-              href="#"
-              className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
-                activeDropdown === "newin" ? "active-nav-item" : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveDropdown(activeDropdown === "newin" ? null : "newin");
-              }}
+          {/* NEW IN Dropdown - Show if not on tablet size */}
+          {!isTabletSize && (
+            <div
+              className="nav-dropdown-container relative"
+              onMouseEnter={() => handleDropdownEnter("newin")}
+              onMouseLeave={handleDropdownLeave}
+              ref={(el) => (dropdownRefs.current["newin"] = el)}
             >
-              NEW ARRIVALS
-            </a>
-            {/* Highlight indicator that appears at the bottom of navbar */}
-            {activeDropdown === "newin" && (
-              <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
-            )}
-          </div>
+              <a
+                href="#"
+                className={`hover:opacity-80 h-full flex items-center relative whitespace-nowrap ${
+                  activeDropdown === "newin" ? "active-nav-item" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveDropdown(activeDropdown === "newin" ? null : "newin");
+                }}
+              >
+                NEW ARRIVALS
+              </a>
+              {/* Highlight indicator that appears at the bottom of navbar */}
+              {activeDropdown === "newin" && (
+                <div className="absolute bottom-[-24px] left-0 right-0 h-[2px] bg-current" />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Logo (Center) */}
@@ -413,26 +453,30 @@ export default function DesktopNavbar({ darkNavbar }) {
 
         {/* Right-side Navigation */}
         <div
-          className={`flex items-center space-x-6 text-xs lg:text-[12px] ${
+          className={`flex items-center space-x-4 lg:space-x-6 text-xs lg:text-[12px] ${
             darkNavbar ? "text-white" : "text-black"
           }`}
         >
           {/* Show these links only on larger screens */}
-          <a
-            href="/contact-us"
-            className="hover:opacity-80 h-full flex items-center whitespace-nowrap"
-          >
-            CONTACT US
-          </a>
-          <a
-            href="/services"
-            className="hover:opacity-80 h-full flex items-center whitespace-nowrap"
-          >
-            SERVICES
-          </a>
+          {!isTabletSize && (
+            <>
+              <a
+                href="/contact-us"
+                className="hover:opacity-80 h-full flex items-center whitespace-nowrap"
+              >
+                CONTACT US
+              </a>
+              <a
+                href="/services"
+                className="hover:opacity-80 h-full flex items-center whitespace-nowrap"
+              >
+                SERVICES
+              </a>
+            </>
+          )}
 
           {/* Icons - wrapped in a flex container with consistent alignment */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3 lg:space-x-6">
             <motion.div className="flex items-center h-full">
               <SearchBar darkNavbar={darkNavbar} />
             </motion.div>
@@ -477,18 +521,18 @@ export default function DesktopNavbar({ darkNavbar }) {
             onMouseEnter={() => handleDropdownEnter(activeDropdown)}
             onMouseLeave={handleDropdownLeave}
           >
-            <div className="mx-[100px] py-8 px-6 grid grid-cols-12 gap-6">
+            <div className={`${getPaddingClasses()} py-8 px-6 grid grid-cols-12 gap-4 lg:gap-6`}>
               {/* Left Side - Text Links */}
               {dropdownContent[activeDropdown].columns.map(
                 (column, colIndex) => (
                   <div key={colIndex} className="col-span-3">
-                    <h3 className="font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase text-[15px] mb-4">{column.title}</h3>
+                    <h3 className="font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase text-[15px] mb-4">{column.title}</h3>
                     <div className="flex flex-col space-y-2">
                       {column.links.map((link, linkIndex) => (
                         <a
                           key={linkIndex}
                           href={link.href}
-                          className="text-[13px] md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase text-gray-600 hover:underline hover:text-black"
+                          className="text-[13px] md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase text-gray-600 hover:underline hover:text-black"
                         >
                           {link.name}
                         </a>
@@ -499,9 +543,13 @@ export default function DesktopNavbar({ darkNavbar }) {
               )}
 
               {/* Right Side - Featured Images from CMS */}
-              {getDropdownFeaturedItems(activeDropdown).map(
-                (item, itemIndex) => (
-                  <div key={itemIndex} className="col-span-3">
+              {getDropdownFeaturedItems(activeDropdown)
+                .slice(0, getFeaturedItemsCount(activeDropdown))
+                .map((item, itemIndex) => (
+                  <div 
+                    key={itemIndex} 
+                    className={isTabletSize ? "col-span-6" : "col-span-3"}
+                  >
                     <a href={item.href} className="block">
                       <div className="aspect-[3/4] overflow-hidden">
                         <img
@@ -515,8 +563,7 @@ export default function DesktopNavbar({ darkNavbar }) {
                       </p>
                     </a>
                   </div>
-                )
-              )}
+                ))}
             </div>
           </motion.div>
         )}

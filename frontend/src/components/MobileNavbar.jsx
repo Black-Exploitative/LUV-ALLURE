@@ -12,6 +12,21 @@ export default function MobileNavbar({ darkNavbar }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
   const { cartItemCount, setIsCartDrawerOpen } = useCart();
+  const [isTablet, setIsTablet] = useState(false);
+
+
+  // Detect tablet size for better padding
+  useEffect(() => {
+    const handleResize = () => {
+      setIsTablet(window.innerWidth >= 640);
+    };
+    
+    // Initial check
+    handleResize();
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -223,7 +238,7 @@ export default function MobileNavbar({ darkNavbar }) {
 
   return (
     <>
-      <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
+      <div className={`container mx-auto ${isTablet ? 'px-8' : 'px-6'} py-4 flex justify-between items-center h-[70px] relative`}>
         {/* Hamburger Menu Button */}
         <motion.button
           className="relative z-50 cursor-pointer"
@@ -276,6 +291,7 @@ export default function MobileNavbar({ darkNavbar }) {
           </motion.div>
 
           <motion.div className="flex items-center">
+            <a href='/user-account'>
             <motion.img
               src={
                 darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"
@@ -285,6 +301,7 @@ export default function MobileNavbar({ darkNavbar }) {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             />
+            </a>
           </motion.div>
 
           {/* Mobile Cart with Preview */}
@@ -308,7 +325,7 @@ export default function MobileNavbar({ darkNavbar }) {
             exit="closed"
             variants={menuVariants}
           >
-            <div className="container mx-auto px-6 flex flex-col text-black">
+            <div className={`container mx-auto ${isTablet ? 'px-10' : 'px-6'} flex flex-col text-black`}>
               {/* Main Navigation Links with Expandable Sections */}
               <div className="space-y-2 mt-6">
                 {/* SHOP Section */}
@@ -319,7 +336,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={0}
                     onClick={() => toggleSection('shop')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">SHOP</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">SHOP</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -367,7 +384,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={1}
                     onClick={() => toggleSection('dresses')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">DRESSES</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">DRESSES</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -384,7 +401,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         variants={subMenuVariants}
                         className="overflow-hidden"
                       >
-                        <div className="pt-4 pl-4 space-y-6">
+                        <div className={`pt-4 ${isTablet ? 'grid grid-cols-2 gap-6' : 'pl-4 space-y-6'}`}>
                           {dropdownContent.dresses.columns.map((column, colIndex) => (
                             <div key={colIndex}>
                               <h3 className="font-medium text-sm mb-3">{column.title}</h3>
@@ -415,7 +432,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={2}
                     onClick={() => toggleSection('collections')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">LOOKBOOK</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">LOOKBOOK</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -432,7 +449,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         variants={subMenuVariants}
                         className="overflow-hidden"
                       >
-                        <div className="pt-4 pl-4 space-y-6">
+                        <div className={`pt-4 ${isTablet ? 'grid grid-cols-2 gap-6' : 'pl-4 space-y-6'}`}>
                           {dropdownContent.collections.columns.map((column, colIndex) => (
                             <div key={colIndex}>
                               <h3 className="font-medium text-sm mb-3">{column.title}</h3>
@@ -463,7 +480,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={3}
                     onClick={() => toggleSection('newin')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">NEW ARRIVALS</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">NEW ARRIVALS</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -506,7 +523,7 @@ export default function MobileNavbar({ darkNavbar }) {
                 {/* Additional Links without dropdowns */}
                 <motion.a
                   href="/contact-us"
-                  className="block text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
+                  className="block text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={4}
                   whileHover={{ x: 4 }}
@@ -517,7 +534,7 @@ export default function MobileNavbar({ darkNavbar }) {
                 
                 <motion.a
                   href="/services"
-                  className="block text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
+                  className="block text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={5}
                   whileHover={{ x: 4 }}

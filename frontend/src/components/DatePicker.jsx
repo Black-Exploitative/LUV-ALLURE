@@ -7,7 +7,7 @@ const DatePicker = ({ value, onChange, error }) => {
   const [displayValue, setDisplayValue] = useState("");
   const dropdownRef = useRef(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [internalValue, setInternalValue] = useState(value);
+  const [internalValue, setInternalValue] = useState(value || "");
 
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -39,31 +39,41 @@ const DatePicker = ({ value, onChange, error }) => {
   useEffect(() => {
     if (value && value !== internalValue) {
       setInternalValue(value);
-      const date = new Date(value);
-      setSelectedYear(date.getFullYear().toString());
-      setSelectedMonth(months[date.getMonth()]);
-      setSelectedDay(date.getDate().toString());
-      
-      setDisplayValue(`${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`);
+      try {
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+          setSelectedYear(date.getFullYear().toString());
+          setSelectedMonth(months[date.getMonth()]);
+          setSelectedDay(date.getDate().toString());
+          
+          setDisplayValue(`${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`);
+        }
+      } catch (e) {
+        console.error("Error parsing date:", e);
+      }
     }
   }, [value, months, internalValue]);
   
   // Update the date when selections change - but only if all are selected and not on initial load
   useEffect(() => {
     if (selectedMonth && selectedDay && selectedYear && !isInitialLoad) {
-      const monthIndex = months.indexOf(selectedMonth);
-      const newDate = new Date(parseInt(selectedYear), monthIndex, parseInt(selectedDay));
-      
-      // Format as "YYYY-MM-DD" for the input value
-      const formattedDate = newDate.toISOString().split('T')[0];
-      
-      // Only update if the date actually changed to prevent loops
-      if (formattedDate !== internalValue) {
-        setInternalValue(formattedDate);
-        onChange({ target: { name: 'dateOfBirth', value: formattedDate } });
+      try {
+        const monthIndex = months.indexOf(selectedMonth);
+        const newDate = new Date(parseInt(selectedYear), monthIndex, parseInt(selectedDay));
         
-        // Format for display
-        setDisplayValue(`${selectedMonth} ${selectedDay}, ${selectedYear}`);
+        // Format as "YYYY-MM-DD" for the input value
+        const formattedDate = newDate.toISOString().split('T')[0];
+        
+        // Only update if the date actually changed to prevent loops
+        if (formattedDate !== internalValue) {
+          setInternalValue(formattedDate);
+          onChange({ target: { name: 'dateOfBirth', value: formattedDate } });
+          
+          // Format for display
+          setDisplayValue(`${selectedMonth} ${selectedDay}, ${selectedYear}`);
+        }
+      } catch (e) {
+        console.error("Error creating date:", e);
       }
     }
     
@@ -104,20 +114,10 @@ const DatePicker = ({ value, onChange, error }) => {
     }
   };
   
-  const itemVariants = {
-    hover: { 
-      backgroundColor: "rgba(0,0,0,0.05)",
-      color: "#000000",
-      transition: { duration: 0.2 }
-    }
-  };
-  
-  const selectorVariants = {
-    inactive: { opacity: 0.6, x: 0 },
-    active: { 
-      opacity: 1,
-      transition: { duration: 0.3 }
-    }
+  // Handle direct input changes
+  const handleInputChange = (e) => {
+    // This prevents the component from updating when another form field changes
+    e.stopPropagation();
   };
 
   return (
@@ -145,7 +145,7 @@ const DatePicker = ({ value, onChange, error }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            className="absolute z-10 mt-1 w-full bg-white border border-gray-200 shadow-lg rounded-sm"
+            className="absolute z-50 mt-1 w-full bg-white border border-gray-200 shadow-lg rounded-sm"
             variants={dropdownVariants}
             initial="hidden"
             animate="visible"
@@ -156,7 +156,6 @@ const DatePicker = ({ value, onChange, error }) => {
               <motion.div 
                 className={`flex-1 py-2 text-center cursor-pointer text-xs ${activeSelector === 'month' ? 'font-medium' : 'text-gray-500'}`}
                 onClick={() => setActiveSelector('month')}
-                variants={selectorVariants}
                 animate={activeSelector === 'month' ? 'active' : 'inactive'}
               >
                 MONTH
@@ -167,7 +166,6 @@ const DatePicker = ({ value, onChange, error }) => {
               <motion.div 
                 className={`flex-1 py-2 text-center cursor-pointer text-xs ${activeSelector === 'day' ? 'font-medium' : 'text-gray-500'}`}
                 onClick={() => setActiveSelector('day')}
-                variants={selectorVariants}
                 animate={activeSelector === 'day' ? 'active' : 'inactive'}
               >
                 DAY
@@ -178,7 +176,6 @@ const DatePicker = ({ value, onChange, error }) => {
               <motion.div 
                 className={`flex-1 py-2 text-center cursor-pointer text-xs ${activeSelector === 'year' ? 'font-medium' : 'text-gray-500'}`}
                 onClick={() => setActiveSelector('year')}
-                variants={selectorVariants}
                 animate={activeSelector === 'year' ? 'active' : 'inactive'}
               >
                 YEAR
@@ -202,7 +199,6 @@ const DatePicker = ({ value, onChange, error }) => {
                         setSelectedMonth(month);
                         setActiveSelector('day');
                       }}
-                      variants={itemVariants}
                       whileHover="hover"
                     >
                       {month}
@@ -223,7 +219,6 @@ const DatePicker = ({ value, onChange, error }) => {
                         setSelectedDay(day.toString());
                         setActiveSelector('year');
                       }}
-                      variants={itemVariants}
                       whileHover="hover"
                     >
                       {day}
@@ -244,7 +239,6 @@ const DatePicker = ({ value, onChange, error }) => {
                         setSelectedYear(year.toString());
                         setIsOpen(false);
                       }}
-                      variants={itemVariants}
                       whileHover="hover"
                     >
                       {year}
@@ -262,8 +256,9 @@ const DatePicker = ({ value, onChange, error }) => {
         type="date"
         name="dateOfBirth"
         value={internalValue || ''}
-        onChange={() => {}}
+        onChange={handleInputChange}
         className="hidden"
+        aria-hidden="true"
       />
     </div>
   );

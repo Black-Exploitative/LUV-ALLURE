@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unknown-property */
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import MobileNavbar from "./MobileNavbar";
@@ -11,6 +10,7 @@ export default function Navbar() {
   const navRef = useRef(null);
   
   // State to track screen size for responsive behavior
+  // Increased the breakpoint to 1024px (lg) from 768px (md) to better handle tablets
   const [isMobileView, setIsMobileView] = useState(false);
 
   useEffect(() => {
@@ -22,10 +22,11 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Add responsive breakpoint detection
+  // Add responsive breakpoint detection with improved breakpoints for tablets
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768);
+      // Using 1024px as breakpoint ensures tablets in portrait mode get mobile nav
+      setIsMobileView(window.innerWidth < 1024);
     };
 
     // Initial check
@@ -50,7 +51,6 @@ export default function Navbar() {
           : "bg-transparent"
       }`}
     >
-     
       {isMobileView ? (
         <MobileNavbar darkNavbar={darkNavbar} />
       ) : (

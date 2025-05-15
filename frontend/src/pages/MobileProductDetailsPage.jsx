@@ -1,10 +1,6 @@
-/* eslint-disable no-unused-vars */
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
-import ProductCarousel from "../components/ProductCarousel";
 import ExpandableSection from "../components/ExpandableSection";
-import SmallProductCard from "../components/SmallProductCard";
-import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import { useRecentlyViewed } from "../context/RecentlyViewedProducts";
@@ -12,7 +8,6 @@ import { motion } from "framer-motion";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import StarRating from "../components/StarRating";
-import cmsService from "../services/cmsService";
 import CustomersReviews from "../components/CustomersReviews";
 import SizeGuideModal from "../components/SizeGuideModal";
 import api from "../services/api";
@@ -22,18 +17,18 @@ import MobileProductCarousel from "../components/MobileProductCarousel";
 import MobileProductDetailsSkeleton from "../components/loadingSkeleton/MobileProductDetailsSkeleton";
 import { useRelatedProducts, RelatedProductsSection } from '../components/RelatedProductSection';
 
-
-const ProductDetailsPage = () => {
+const MobileProductDetailsPage = ({ viewportMode = "mobile" }) => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
-  
-
   const reviewsRef = useRef(null);
+  
   // URL and navigation
   const { slug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
   const rawProduct = location.state?.product;
+  
+  // Determine if we're in tablet portrait mode
+  const isTabletPortrait = viewportMode === "tablet-portrait";
 
   const scrollToReviews = () => {
     reviewsRef.current?.scrollIntoView({
@@ -41,6 +36,8 @@ const ProductDetailsPage = () => {
       block: "start",
     });
   };
+  
+  // Parse product slug
   const parseProductSlug = (slug) => {
     if (!slug) return { productId: null, productName: null, colorName: null };
 
@@ -143,47 +140,6 @@ const ProductDetailsPage = () => {
       document.title = "Luv's Allure";
     };
   }, [product, productName]);
-/*
-  const renderStyleItWith = () => {
-    if (loadingRelated) {
-      return (
-        <div className="mt-[50px]">
-          <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
-          <div className="flex justify-center items-center py-8">
-            <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-          </div>
-        </div>
-      );
-    }
-
-    // Only render if we have style-with products
-    if (styleWithProducts && styleWithProducts.length > 0) {
-      return (
-        <div className="mt-[50px]">
-          <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
-          <div className="grid gap-4  md:gap-6">
-            {styleWithProducts.map((product, index) => (
-              <SmallProductCard
-                key={product.id || index}
-                image={
-                  product.images?.[0] ||
-                  product.image ||
-                  "/images/placeholder.jpg"
-                }
-                name={product.title || product.name}
-                color={product.color || "Default"}
-                price={`₦${parseFloat(product.price).toLocaleString()}`}
-                onViewProduct={() => navigate(`/product/${product.id}`)}
-              />
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Don't render anything if no products
-    return null;
-  }; */
 
   // Initialize display images when product loads
   const processAndValidateImages = (imageArray) => {
@@ -201,7 +157,7 @@ const ProductDetailsPage = () => {
     });
   };
 
-  // Replace your current useEffect for initializing displayImages with this:
+  // Set up display images when product loads
   useEffect(() => {
     if (product) {
       console.log(
@@ -225,7 +181,7 @@ const ProductDetailsPage = () => {
     }
   }, [product]);
 
-  // Fetch product data when component mounts or productId changes
+// Fetch product data when component mounts or productId changes
   useEffect(() => {
     let isMounted = true;
     let controller = new AbortController();
@@ -468,17 +424,15 @@ const ProductDetailsPage = () => {
 
     fetchColorVariants();
   }, [product?.name, productId]);
-  // When a color is selected, either update the display images or navigate to the variant
 
   // Fetch related products
   const { 
-  styleWithProducts, 
-  alsoPurchasedProducts, 
-  alsoViewedProducts, 
-  loadingRelated 
-} = useRelatedProducts(productId);
-
-  // Function to get images for a specific color
+    styleWithProducts, 
+    alsoPurchasedProducts, 
+    alsoViewedProducts, 
+    loadingRelated 
+  } = useRelatedProducts(productId);
+// Function to get images for a specific color
   const getImagesForColor = (colorName) => {
     if (!product || !colorName) return product?.images || [];
 
@@ -975,50 +929,6 @@ const processedProduct = {
     );
   }, [selectedSize, selectedColor, product?.colors]);
 
-  // Fallback data for related products
-  const relatedProducts = [
-    {
-      name: "Sybil Scarf - Black",
-      color: "BLACK",
-      price: "78,000",
-      image: "/images/stylewith.jpg",
-    },
-    {
-      name: "Sybil Scarf - Pink",
-      color: "PINK",
-      price: "56,000",
-      image: "/images/stylewith2.jpg",
-    },
-  ];
-
-  // Fallback data for purchased products
-  const purchasedProducts = [
-    {
-      name: "Purchased 1",
-      price: 1000,
-      color: "BEIGE",
-      images: "/images/photo6.jpg",
-    },
-    {
-      name: "Purchased 2",
-      price: 1200,
-      color: "MAROON",
-      images: "/images/photo11.jpg",
-    },
-    {
-      name: "Purchased 3",
-      price: 800,
-      color: "CORAL",
-      images: "/images/photo6.jpg",
-    },
-    {
-      name: "Purchased 4",
-      price: 900,
-      color: "BURGUNDY",
-      images: "/images/photo11.jpg",
-    },
-  ];
-
   // Handle adding to cart
   const handleAddToCart = () => {
     if (!canAddToCart) return;
@@ -1062,9 +972,6 @@ const processedProduct = {
     const isNowInWishlist = toggleWishlist(productForWishlist);
     setIsInWishlistState(isNowInWishlist);
   };
-
-  // Color selection handler
-  // When a color is selected, either update the display images or navigate to the variant
   const handleColorSelect = (colorName, variantId, variantHandle) => {
     console.log(
       `Color selected: ${colorName}, variant ID: ${variantId}, handle: ${variantHandle}`
@@ -1092,8 +999,8 @@ const processedProduct = {
 
   // Render loading state
   if (loading) {
-  return <MobileProductDetailsSkeleton />;
-}
+    return <MobileProductDetailsSkeleton />;
+  }
 
   // Render error state
   if (error) {
@@ -1125,62 +1032,46 @@ const processedProduct = {
     );
   }
 
-  const renderColorVariantsUI = () => {
-    if (!colorVariants || colorVariants.length === 0) return null;
-
-    return (
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <p className="text-xs font-medium">OTHER COLOR OPTIONS:</p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {colorVariants.map((variant, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <button
-                className="w-[40px] h-[40px] overflow-hidden border border-gray-300 rounded-full"
-                onClick={() =>
-                  navigate(`/product/${variant.handle || variant.id}`)
-                }
-              >
-                <img
-                  src={variant.image}
-                  alt={variant.color}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-              <span className="text-xs mt-1">{variant.color}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
-      <div className="px-4">
-        <div className="mt-16 flex flex-col">
-          {/* Product Carousel */}
+      <div className={`px-4 ${isTabletPortrait ? 'sm:px-8' : ''}`}>
+        <div className={`mt-16 flex flex-col ${isTabletPortrait ? 'sm:mt-24' : ''}`}>
+          {/* Product Carousel - adjust height for tablet portrait */}
           <div className="mb-8 w-full">
-            <MobileProductCarousel images={displayImages} />
+            <MobileProductCarousel 
+              images={displayImages} 
+              viewportMode={viewportMode}
+            />
           </div>
 
           {/* Product Details */}
-          <div className="w-full">
-            <h1 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">{product.name}</h1>
+          <div className={`w-full ${isTabletPortrait ? 'sm:px-8' : ''}`}>
+            {/* Product Name - larger on tablet */}
+            <h1 className={`
+              ${isTabletPortrait ? 'text-2xl' : 'text-xl'} 
+              font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider
+            `}>
+              {product.name}
+            </h1>
 
+            {/* Star Rating */}
             <StarRating
               rating={4.9}
               reviewCount={90}
               scrollToReviews={scrollToReviews}
             />
 
-            <p className="text-lg font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700">
+            {/* Product Price - larger on tablet */}
+            <p className={`
+              ${isTabletPortrait ? 'text-xl' : 'text-lg'} 
+              font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider text-gray-700
+            `}>
               ₦ {product.price.toLocaleString()}
             </p>
 
             <hr className="border-t border-gray-300 my-4" />
 
+            {/* Color Variants */}
             <ColorVariants
               product={product}
               productId={productId}
@@ -1192,9 +1083,11 @@ const processedProduct = {
             {/* Size Selection */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
-                <p className="text-xs font-medium">SIZE:</p>
+                <p className={`${isTabletPortrait ? 'text-sm' : 'text-xs'} font-medium`}>
+                  SIZE:
+                </p>
                 <button
-                  className="text-[12px] underline cursor-pointer"
+                  className={`${isTabletPortrait ? 'text-sm' : 'text-[12px]'} underline cursor-pointer`}
                   onClick={() => setSizeGuideOpen(true)}
                 >
                   Size Guide
@@ -1206,15 +1099,19 @@ const processedProduct = {
                 onClose={() => setSizeGuideOpen(false)}
               />
 
+              {/* Size buttons - larger on tablet */}
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size, index) => (
                   <button
                     key={index}
-                    className={`border w-[40px] h-[40px] text-[10px] font-normal flex items-center justify-center ${
-                      selectedSize === size
+                    className={`
+                      border 
+                      ${isTabletPortrait ? 'w-[50px] h-[50px] text-[12px]' : 'w-[40px] h-[40px] text-[10px]'} 
+                      font-normal flex items-center justify-center 
+                      ${selectedSize === size
                         ? "border-black"
-                        : "border-gray-300 hover:bg-gray-100"
-                    }`}
+                        : "border-gray-300 hover:bg-gray-100"}
+                    `}
                     onClick={() => setSelectedSize(size)}
                   >
                     {size}
@@ -1223,13 +1120,16 @@ const processedProduct = {
               </div>
             </div>
 
-            {/* Add to Cart Button */}
+            {/* Add to Cart Button - larger on tablet */}
             <motion.button
-              className={`w-full py-3 text-[13.7px] transition-colors ${
-                canAddToCart
+              className={`
+                w-full py-3 
+                ${isTabletPortrait ? 'text-sm py-4' : 'text-[13.7px]'} 
+                transition-colors 
+                ${canAddToCart
                   ? "bg-black text-white hover:bg-gray-800"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+              `}
               onClick={handleAddToCart}
               disabled={!canAddToCart || isAddingToCart}
               whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
@@ -1242,15 +1142,19 @@ const processedProduct = {
                 : `SELECT ${product.colors.length > 0 ? "COLOR AND " : ""}SIZE`}
             </motion.button>
 
-            {/* Wishlist */}
+            {/* Wishlist button */}
             <div
-              className="flex items-center gap-2 text-[13px] mt-4 mb-2 cursor-pointer"
+              className={`
+                flex items-center gap-2 
+                ${isTabletPortrait ? 'text-sm mt-5 mb-3' : 'text-[13px] mt-4 mb-2'} 
+                cursor-pointer
+              `}
               onClick={handleToggleWishlist}
             >
               {isInWishlist ? (
-                <FaHeart className="h-[15px] w-[15px] text-black" />
+                <FaHeart className={`${isTabletPortrait ? 'h-[18px] w-[18px]' : 'h-[15px] w-[15px]'} text-black`} />
               ) : (
-                <FiHeart className="h-[15px] w-[15px]" />
+                <FiHeart className={`${isTabletPortrait ? 'h-[18px] w-[18px]' : 'h-[15px] w-[15px]'}`} />
               )}
               <span>
                 {isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}
@@ -1259,7 +1163,7 @@ const processedProduct = {
 
             <hr className="border-t border-gray-300 my-4" />
 
-            {/* Expandable Sections */}
+            {/* Expandable sections - larger text on tablet */}
             <ExpandableSection
               title="PRODUCT DETAILS"
               content={product.description}
@@ -1291,193 +1195,35 @@ const processedProduct = {
         </div>
       </div>
 
-      {/* Style it with section */}
-        <RelatedProductsSection
-          type="style-with"
-          title="STYLE IT WITH"
-          productId={productId}
-          products={styleWithProducts}
-          loading={loadingRelated}
-          navigate={navigate}
-        />
+      {/* Related product sections */}
+      <RelatedProductsSection
+        type="style-with"
+        title="STYLE IT WITH"
+        productId={productId}
+        products={styleWithProducts}
+        loading={loadingRelated}
+        navigate={navigate}
+      />
 
-        {/* Also purchased section */}
-        <RelatedProductsSection
-          type="also-purchased"
-          title="ALLURVERS ALSO PURCHASED"
-          productId={productId}
-          products={alsoPurchasedProducts}
-          loading={loadingRelated}
-          navigate={navigate}
-        />
+      {/* Also purchased section */}
+      <RelatedProductsSection
+        type="also-purchased"
+        title="ALLURVERS ALSO PURCHASED"
+        productId={productId}
+        products={alsoPurchasedProducts}
+        loading={loadingRelated}
+        navigate={navigate}
+      />
 
-        {/* Also viewed section */}
-        <RelatedProductsSection
-          type="also-viewed"
-          title="ALLURVERS ALSO VIEWED"
-          productId={productId}
-          products={alsoViewedProducts}
-          loading={loadingRelated}
-          navigate={navigate}
-        />
-    { /*
-      {/* STYLE IT WITH 
-      <div className="mt-8">
-        <h2 className="text-sm mb-4 text-center md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst uppercase">
-          STYLE IT WITH
-        </h2>
-        {loadingRelated ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-          </div>
-        ) : (
-          <div className="flex mx-[20px] gap-2 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
-            {(styleWithProducts.length > 0
-              ? styleWithProducts
-              : relatedProducts
-            ).map((product, index) => (
-              <div key={index} className=" min-w-[60%] max-w-[60%] snap-start">
-                <img
-                  src={
-                    product.images?.[0] ||
-                    product.image ||
-                    "/images/placeholder.jpg"
-                  }
-                  alt={product.title || product.name}
-                  className="w-full object-cover cursor-pointer"
-                  onClick={() => navigate(`/product/${product.id}`)}
-                />
-
-                {/* Text centered under image *
-                <div
-                  className="mt-2 px-1 text-left space-y-[5px] text-gray-700 cursor-pointer"
-                  onClick={() => navigate(`/product/${product.id}`)}
-                >
-                  <h3 className="text-sm uppercase md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                    {product.title || product.name}
-                  </h3>
-                  <p className="text-sm font-normal text-gray-700 mt-1 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                    ₦{parseFloat(product.price).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {renderStyleItWith()}
-
-      <div className="mx-4 mt-8 mb-16">
-        {/* Customers Also Purchased Section 
-        {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
-          <>
-            <h2 className="text-sm text-center uppercase mt-8 mb-4 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-              ALLURVERS ALSO PURCHASED
-            </h2>
-            {loadingRelated ? (
-              <div className="flex justify-center items-center py-8">
-                <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="flex gap-2 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
-                {(alsoPurchasedProducts.length > 0
-                  ? alsoPurchasedProducts
-                  : purchasedProducts
-                ).map((product, index) => (
-                  <div
-                    key={index}
-                    className="min-w-[70%] max-w-[70%] snap-start"
-                  >
-                
-                    <img
-                      src={
-                        product.image?.[0] ||
-                        product.image ||
-                        "/images/photo11.jpg"
-                      }
-                      alt={product.title || product.name}
-                      className="w-full object-cover cursor-pointer"
-                      onClick={() => navigate(`/product/${product.id}`)}
-                    />
-
-                    {/* Text centered under image  
-                    <div
-                      className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
-                      onClick={() => navigate(`/product/${product.id}`)}
-                    >
-                      <p className="text-xs uppercase text-gray-600 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                        {product.color || "DEFAULT"}
-                      </p>
-                      <h3 className="text-sm font-semibold md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                        {product.title || product.name}
-                      </h3>
-                      <p className="text-sm font-normal mt-1 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                        ₦{parseFloat(product.price).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Customers Also Viewed Section 
-        {(alsoViewedProducts.length > 0 || !loadingRelated) && (
-          <>
-            <h2 className="text-sm text-center uppercase mt-8 mb-4 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-              ALLURVERS ALSO VIEWED
-            </h2>
-            {loadingRelated ? (
-              <div className="flex justify-center items-center py-8">
-                <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="flex gap-2 overflow-x-auto no-scrollbar px-1 snap-x snap-mandatory scroll-smooth">
-                {(alsoViewedProducts.length > 0
-                  ? alsoViewedProducts
-                  : purchasedProducts
-                ).map((product, index) => (
-                  <div
-                    key={index}
-                    className="min-w-[70%] max-w-[70%] snap-start"
-                  >
-                   
-               
-                    <img
-                      src={
-                        product.image?.[0] ||
-                        product.image ||
-                        "/images/photo12.jpg"
-                      }
-                      alt={product.title || product.name}
-                      className="w-full object-cover cursor-pointer"
-                      onClick={() => navigate(`/product/${product.id}`)}
-                    />
-
-                    {/* Text centered under image 
-                    <div
-                      className="mt-2 px-1 space-y-[5px] text-left cursor-pointer"
-                      onClick={() => navigate(`/product/${product.id}`)}
-                    >
-                      <p className="text-xs uppercase text-gray-600 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                        {product.color || "DEFAULT"}
-                      </p>
-                      <h3 className="text-sm font-semibold md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                        {product.title || product.name}
-                      </h3>
-                      <p className="text-sm font-normal mt-1 md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">
-                        ₦{parseFloat(product.price).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>*/}
+      {/* Also viewed section */}
+      <RelatedProductsSection
+        type="also-viewed"
+        title="ALLURVERS ALSO VIEWED"
+        productId={productId}
+        products={alsoViewedProducts}
+        loading={loadingRelated}
+        navigate={navigate}
+      />
 
       <div ref={reviewsRef}>
         <CustomersReviews productName={product.name} />
@@ -1488,4 +1234,4 @@ const processedProduct = {
   );
 };
 
-export default ProductDetailsPage;
+export default MobileProductDetailsPage;
