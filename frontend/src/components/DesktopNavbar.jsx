@@ -148,8 +148,8 @@ export default function DesktopNavbar({ darkNavbar }) {
           links: [
             { name: "Dresses", href: "/shop/dresses" },
             { name: "Tops", href: "/shop/tops" },
-            { name: "Skirts & Skorts", href: "#/shop/skirts&skorts" },
-            { name: "Sets", href: "#/shop/sets" },
+            { name: "Skirts & Skorts", href: "/shop/skirts&skorts" },
+            { name: "Sets", href: "/shop/sets" },
             { name: "Pants & Capris'", href: "/shop/pants" },
             { name: "Jumpsuits", href: "/shop/jumpsuits" },
             { name: "All Clothing", href: "/shop" },

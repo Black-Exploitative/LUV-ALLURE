@@ -64,7 +64,7 @@ export default function Footer() {
       </div>
 
       <div>
-        <img src="../../public/images/LA-2.png" alt="Logo" className="mx-auto mt-8 w-[500px] h-auto" />
+        <img src="/images/LA-2.png" alt="Logo" className="mx-auto mt-8 w-[500px] h-auto" />
       </div>
       
       {/* Bottom */}

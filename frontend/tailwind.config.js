@@ -2,7 +2,7 @@ export const theme = {
     extend: {
         fontFamily: {
             system: [
-                '"Work Sans"',
+                '"Inter"',
                 'system-ui',
                 '-apple-system', 
                 'BlinkMacSystemFont',

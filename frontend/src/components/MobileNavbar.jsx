@@ -115,6 +115,7 @@ export default function MobileNavbar({ darkNavbar }) {
       columns: [
         {
           title: "ALL CLOTHING",
+          link: "/shop",
           links: [
             { name: "Dresses", href: "/shop/dresses" },
             { name: "Tops", href: "/shop/tops" },
@@ -127,6 +128,7 @@ export default function MobileNavbar({ darkNavbar }) {
         },
         {
           title: "ALL GIFTING",
+          link: "/shop/gifting",
           links: [
             { name: "Gift Cards", href: "/Shop/gift-cards" },
             { name: "Vouchers", href: "/Shop/vouchers" },
@@ -140,8 +142,9 @@ export default function MobileNavbar({ darkNavbar }) {
       columns: [
         {
           title: "DRESSES BY LENGTH",
+          link: "/shop/dresses",
           links: [
-            { name: "All Dresses", href: "/shop" },
+            { name: "All Dresses", href: "/shop/dresses" },
             { name: "Mini Dresses", href: "/shop/mini-dresses" },
             { name: "Maxi Dresses", href: "/shop/maxi-dresses" },
             { name: "Midi Dresses", href: "/shop/midi-dresses" },
@@ -149,6 +152,7 @@ export default function MobileNavbar({ darkNavbar }) {
         },
         {
           title: "DRESSES BY STYLE",
+          link: "/shop/dresses",
           links: [
             { name: "Prom Dresses", href: "/shop/prom-dresses" },
             { name: "Formal Dresses", href: "/shop/formal-dresses" },
@@ -182,7 +186,7 @@ export default function MobileNavbar({ darkNavbar }) {
       columns: [
         {
           title: "Collections",
-          links: [{ name: "All Vendors", href: "/collections" }],
+          links: [{ name: "All Collections", href: "/collections" }],
         },
         {
           title: "OCCASION",
@@ -272,7 +276,7 @@ export default function MobileNavbar({ darkNavbar }) {
         <div className="text-xl font-bold absolute left-1/2 transform -translate-x-1/2">
           <a href="/">
             <motion.img
-              src={darkNavbar ? "/images/LA-2.png" : "/images/LA-1.png"}
+              src={darkNavbar ? "/images/logo-white.png" : "/images/logo-black.svg"}
               alt="Logo"
               className="h-[55px]"
               initial={{ opacity: 0.8 }}
@@ -356,7 +360,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.shop.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
@@ -404,7 +408,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className={`pt-4 ${isTablet ? 'grid grid-cols-2 gap-6' : 'pl-4 space-y-6'}`}>
                           {dropdownContent.dresses.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
@@ -452,7 +456,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className={`pt-4 ${isTablet ? 'grid grid-cols-2 gap-6' : 'pl-4 space-y-6'}`}>
                           {dropdownContent.collections.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
@@ -500,7 +504,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.newin.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a

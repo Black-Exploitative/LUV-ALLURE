@@ -1046,7 +1046,7 @@ useEffect(() => {
       {/* Add overflow-x-hidden to prevent horizontal scrolling */}
       <div className="overflow-x-hidden">
         {/* Container with responsive padding for each device */}
-        <div className={`mx-4 sm:mx-6 lg:mx-[80px] ${isTabletLandscape ? 'mx-auto max-w-full' : 'max-w-7xl'}`}>
+        <div className={` ${isTabletLandscape ? 'mx-auto max-w-full' : 'mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]'}`}>
         <div className={`mt-[60px] md:mt-[100px] flex flex-row ${isTabletLandscape ? 'gap-4' : ''}`}>
           {/* Left Side: Product Carousel */}
           <div className={` ${isTabletLandscape ? 'flex-1 max-w-[70%]' : 'mb-8  md:mb-0 mr-[50px] '}`}>
