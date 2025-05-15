@@ -336,20 +336,21 @@ const ColorVariants = ({
 
   // Handle color selection
   const handleColorSelect = (colorName, variantId, variantSlug) => {
-    // If selected color is for the current product, just update the selected color
-    if (variantId === productId) {
-      console.log(`Selecting color ${colorName} on current product`);
-      setSelectedColor(colorName);
+  if (variantId === productId) {
+    console.log(`Selecting color ${colorName} on current product`);
 
-      // Find images for this color
-      const colorImages = getImagesForColor(colorName);
-      setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
-    } else {
-      // If it's another variant, navigate to that product using the slug format
-      console.log(`Navigating to variant with color ${colorName}`);
-      navigate(`/product/${variantSlug}`);
-    }
-  };
+    setSelectedColor(colorName);
+    
+
+    const colorImages = getImagesForColor(colorName);
+    setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
+  } else {
+
+    console.log(`Navigating to variant with color ${colorName}`);
+    navigate(`/product/${variantSlug}`);
+  }
+};
+
 
   // Render loading skeleton for color swatches
   if (loading) {
