@@ -336,21 +336,18 @@ const ColorVariants = ({
 
   // Handle color selection
   const handleColorSelect = (colorName, variantId, variantSlug) => {
-  if (variantId === productId) {
-    console.log(`Selecting color ${colorName} on current product`);
+    if (variantId === productId) {
+      console.log(`Selecting color ${colorName} on current product`);
 
-    setSelectedColor(colorName);
-    
+      setSelectedColor(colorName);
 
-    const colorImages = getImagesForColor(colorName);
-    setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
-  } else {
-
-    console.log(`Navigating to variant with color ${colorName}`);
-    navigate(`/product/${variantSlug}`);
-  }
-};
-
+      const colorImages = getImagesForColor(colorName);
+      setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
+    } else {
+      console.log(`Navigating to variant with color ${colorName}`);
+      navigate(`/product/${variantSlug}`);
+    }
+  };
 
   // Render loading skeleton for color swatches
   if (loading) {
@@ -383,7 +380,9 @@ const ColorVariants = ({
     return (
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <p className="text-xs font-medium">COLOR:</p>
+          <p className="text-xs font-medium">
+            COLOR: {selectedColor || "Select a color"}
+          </p>
         </div>
         <div className="flex flex-wrap gap-3">
           {product?.colors?.map((color, index) => (
