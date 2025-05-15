@@ -14,6 +14,7 @@ export default function MobileNavbar({ darkNavbar }) {
   const { cartItemCount, setIsCartDrawerOpen } = useCart();
   const [isTablet, setIsTablet] = useState(false);
 
+
   // Detect tablet size for better padding
   useEffect(() => {
     const handleResize = () => {

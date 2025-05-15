@@ -221,20 +221,34 @@ export default function SignUp() {
                   <p className="mt-1 text-xs text-red-500">{errors.email}</p>
                 )}
               </div>
-
               <div>
                 <label htmlFor="dateOfBirth" className="block text-xs font-medium text-gray-700 mb-1">
                   DATE OF BIRTH
                 </label>
                 <DatePicker
                   value={formData.dateOfBirth}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    // Make sure we only update dateOfBirth and don't touch other form fields
+                    const newValue = e.target.value;
+                    setFormData(prev => ({
+                      ...prev,
+                      dateOfBirth: newValue
+                    }));
+                    
+                    // Clear dateOfBirth error if it exists
+                    if (errors.dateOfBirth) {
+                      setErrors(prev => ({
+                        ...prev,
+                        dateOfBirth: undefined
+                      }));
+                    }
+                  }}
                   error={errors.dateOfBirth}
                 />
                 {errors.dateOfBirth && (
                   <p className="mt-1 text-xs text-red-500">{errors.dateOfBirth}</p>
                 )}
-              </div>
+</div>
 
               <div>
                 <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1">
