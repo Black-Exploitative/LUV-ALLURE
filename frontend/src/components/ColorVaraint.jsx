@@ -29,6 +29,8 @@ const ColorVariants = ({
     return null;
   };
 
+  
+
 
 const createDefaultVariants = () => {
   if (!product) return [];
