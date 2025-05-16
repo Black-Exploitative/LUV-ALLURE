@@ -29,16 +29,29 @@ const ColorVariants = ({
     return null;
   };
 
-// Updated createDefaultVariants function that fixes the color selection issue
-// while preserving all the original functionality
 
 const createDefaultVariants = () => {
   if (!product) return [];
   
-  console.log("Creating default variants for product with no variants");
+  console.log("Creating default variants for product no variants");
   
-  // Try to extract color from product name
-  const extractedColor = extractColorFromProductName(product.name)?.trim();
+  // Extract color tags from product tags
+  const extractColorFromTags = () => {
+    if (!product.tags || !Array.isArray(product.tags)) return null;
+    
+    // Look for color-* tags
+    const colorTag = product.tags.find(tag => tag.startsWith('color-'));
+    if (colorTag) {
+      // Extract color name from color-{colorname} format
+      return colorTag.replace('color-', '').trim();
+    }
+    return null;
+  };
+  
+  // Try to extract color from tags first, then from product name
+  const extractedColorFromTags = extractColorFromTags();
+  const extractedColorFromName = extractColorFromProductName(product.name)?.trim();
+  const extractedColor = extractedColorFromTags || extractedColorFromName;
   
   // Base name is either the part before " - " or the full name
   let baseName = product.name;
@@ -59,7 +72,7 @@ const createDefaultVariants = () => {
         .toLowerCase()
         .replace(/\s+/g, "-")}_${productId}`;
       
-      // Fix: Use case-insensitive comparison for isCurrentVariant
+      // Use case-insensitive comparison for isCurrentVariant
       const isCurrentVariant = extractedColor 
         ? color.name.toLowerCase() === extractedColor.toLowerCase() 
         : false;
@@ -79,7 +92,7 @@ const createDefaultVariants = () => {
       };
     });
   }
-  // If no colors defined but we extracted a color from the name
+  // If no colors defined but we extracted a color from tags or name
   else if (extractedColor) {
     const slug = `${baseName
       .toLowerCase()
@@ -103,9 +116,35 @@ const createDefaultVariants = () => {
       },
     ];
   }
-  // If no colors at all, create a default "Black" option
+  // If no colors at all, create a default based on first variant's color
+  else if (product.variants && product.variants.length > 0) {
+    const firstVariant = product.variants[0];
+    const variantColor = firstVariant.selectedOptions?.find(opt => 
+      opt.name.toLowerCase() === 'color')?.value || "Default";
+    
+    const slug = `${baseName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}---${variantColor.toLowerCase()}_${productId}`;
+    
+    defaultVariants = [
+      {
+        id: productId,
+        name: `${baseName} - ${variantColor}`,
+        baseName,
+        color: variantColor,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true,
+      },
+    ];
+  }
+  // Last resort fallback
   else {
-    const defaultColor = "Black";
+    const defaultColor = "Default";
     const slug = `${baseName
       .toLowerCase()
       .replace(/\s+/g, "-")}---${defaultColor.toLowerCase()}_${productId}`;
@@ -127,19 +166,17 @@ const createDefaultVariants = () => {
     ];
   }
   
- 
+  // Initialize selected color if not set
   if (!selectedColor && defaultVariants.length > 0) {
     const currentVariant =
       defaultVariants.find((v) => v.isCurrentVariant) || defaultVariants[0];
     setSelectedColor(currentVariant.color);
   }
-
   else if (selectedColor && defaultVariants.length > 0) {
     const matchingVariant = defaultVariants.find(
       v => v.color.toLowerCase() === selectedColor.toLowerCase()
     );
     if (matchingVariant && matchingVariant.color !== selectedColor) {
-   
       setSelectedColor(matchingVariant.color);
     }
   }

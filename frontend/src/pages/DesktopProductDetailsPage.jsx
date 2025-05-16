@@ -40,36 +40,36 @@ const DesktopProductDetailsPage = ({ viewportMode = "desktop" }) => {
   
   // Parse slug - keeping original implementation
   const parseProductSlug = (slug) => {
-    if (!slug) return { productId: null, productName: null, colorName: null };
+  if (!slug) return { productId: null, productName: null, colorName: null };
 
-    // Check if the slug follows the pattern product-name---color_productId
-    if (slug.includes("---") && slug.includes("_")) {
-      const [namePart, idPart] = slug.split("_");
-      const [productName, colorName] = namePart.split("---");
-      return {
-        productId: idPart,
-        productName: productName,
-        colorName: colorName,
-      };
-    }
-
-    // Handle the case where it's just product-name_productId
-    const parts = slug.split("_");
-    if (parts.length > 1) {
-      return {
-        productId: parts[parts.length - 1],
-        productName: parts.slice(0, -1).join("_"),
-        colorName: null,
-      };
-    }
-
-    // Fallback for simple slugs (just the ID)
+  // Check if the slug follows the pattern product-name---color_productId
+  if (slug.includes("---") && slug.includes("_")) {
+    const [namePart, idPart] = slug.split("_");
+    const [productName, colorName] = namePart.split("---");
     return {
-      productId: slug,
-      productName: null,
+      productId: idPart,
+      productName: productName,
+      colorName: colorName,
+    };
+  }
+
+  // Handle the case where it's just product-name_productId
+  const parts = slug.split("_");
+  if (parts.length > 1) {
+    return {
+      productId: parts[parts.length - 1],
+      productName: parts.slice(0, -1).join("_"),
       colorName: null,
     };
+  }
+
+  // Fallback for simple slugs (just the ID)
+  return {
+    productId: slug,
+    productName: null,
+    colorName: null,
   };
+};
 
   // Product state
   const [product, setProduct] = useState(null);
@@ -283,128 +283,302 @@ const DesktopProductDetailsPage = ({ viewportMode = "desktop" }) => {
     };
   }, [slug]);
 
+  const extractColorFromProductName = (productName) => {
+  if (productName && productName.includes(" - ")) {
+    const parts = productName.split(" - ");
+    if (parts.length >= 2) {
+      return parts[1].trim();
+    }
+  }
+  return null;
+};
+
+// Function to create default variants when API fails or returns no variants
+const createDefaultVariants = () => {
+  if (!product) return [];
+  
+  console.log("Creating default variants for product with no variants");
+  
+  // Extract color tags from product tags
+  const extractColorFromTags = () => {
+    if (!product.tags || !Array.isArray(product.tags)) return null;
+    
+    // Look for color-* tags
+    const colorTag = product.tags.find(tag => tag.startsWith('color-'));
+    if (colorTag) {
+      // Extract color name from color-{colorname} format
+      return colorTag.replace('color-', '').trim();
+    }
+    return null;
+  };
+  
+  // Try to extract color from tags first, then from product name
+  const extractedColorFromTags = extractColorFromTags();
+  const extractedColorFromName = extractColorFromProductName(product.name)?.trim();
+  const extractedColor = extractedColorFromTags || extractedColorFromName;
+  
+  // Base name is either the part before " - " or the full name
+  let baseName = product.name;
+  if (baseName.includes(" - ")) {
+    baseName = baseName.split(" - ")[0].trim();
+  }
+  
+  // Create default color variants
+  let defaultVariants = [];
+  
+  // If product has colors defined, use those
+  if (product.colors && product.colors.length > 0) {
+    defaultVariants = product.colors.map((color) => {
+      // Create a slug format consistent with variant products
+      const slug = `${baseName
+        .toLowerCase()
+        .replace(/\s+/g, "-")}---${color.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")}_${productId}`;
+      
+      // Use case-insensitive comparison for isCurrentVariant
+      const isCurrentVariant = extractedColor 
+        ? color.name.toLowerCase() === extractedColor.toLowerCase() 
+        : false;
+      
+      return {
+        id: productId,
+        name: `${baseName} - ${color.name}`,
+        baseName,
+        color: color.name,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: isCurrentVariant,
+      };
+    });
+  }
+  // If no colors defined but we extracted a color from tags or name
+  else if (extractedColor) {
+    const slug = `${baseName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}---${extractedColor
+      .toLowerCase()
+      .replace(/\s+/g, "-")}_${productId}`;
+    
+    defaultVariants = [
+      {
+        id: productId,
+        name: product.name,
+        baseName,
+        color: extractedColor,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true,
+      },
+    ];
+  }
+  // If no colors at all, create a default based on first variant's color
+  else if (product.variants && product.variants.length > 0) {
+    const firstVariant = product.variants[0];
+    const variantColor = firstVariant.selectedOptions?.find(opt => 
+      opt.name.toLowerCase() === 'color')?.value || "Default";
+    
+    const slug = `${baseName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}---${variantColor.toLowerCase()}_${productId}`;
+    
+    defaultVariants = [
+      {
+        id: productId,
+        name: `${baseName} - ${variantColor}`,
+        baseName,
+        color: variantColor,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true,
+      },
+    ];
+  }
+  // Last resort fallback
+  else {
+    const defaultColor = "Default";
+    const slug = `${baseName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}---${defaultColor.toLowerCase()}_${productId}`;
+    
+    defaultVariants = [
+      {
+        id: productId,
+        name: `${baseName} - ${defaultColor}`,
+        baseName,
+        color: defaultColor,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true,
+      },
+    ];
+  }
+  
+  // Initialize selected color if not set
+  if (!selectedColor && defaultVariants.length > 0) {
+    const currentVariant =
+      defaultVariants.find((v) => v.isCurrentVariant) || defaultVariants[0];
+    setSelectedColor(currentVariant.color);
+  }
+  else if (selectedColor && defaultVariants.length > 0) {
+    const matchingVariant = defaultVariants.find(
+      v => v.color.toLowerCase() === selectedColor.toLowerCase()
+    );
+    if (matchingVariant && matchingVariant.color !== selectedColor) {
+      setSelectedColor(matchingVariant.color);
+    }
+  }
+  
+  return defaultVariants;
+};
+
   // Fetch all color variants when the product loads
   useEffect(() => {
     if (!product || !productId) return;
 
     // Function to fetch products with the same model tag
     const fetchColorVariants = async () => {
-      try {
-        // Extract base model name from product name (simplified approach)
-        // If product name doesn't contain a dash, use the whole name
-        let baseModelName;
-        if (product.name.includes(" - ")) {
-          baseModelName = product.name
-            .split(" - ")[0]
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "-");
+  try {
+    setLoading(true);
+    // Extract base model name from product name
+    let baseModelName;
+    if (product.name.includes(" - ")) {
+      baseModelName = product.name
+        .split(" - ")[0]
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+    } else {
+      baseModelName = product.name
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+    }
+
+    // Create tag for model search
+    const modelTag = `model-${baseModelName}`;
+    console.log(`Searching for color variants with tag: ${modelTag}`);
+
+    // Use the correct endpoint for tag-based search
+    const response = await api.get(`/search/tag?tag=${modelTag}`);
+
+    if (
+      response.data &&
+      response.data.products &&
+      response.data.products.length > 0
+    ) {
+      console.log(
+        `Found ${response.data.products.length} potential color variants`
+      );
+
+      // Process variants to extract color information
+      const processedVariants = response.data.products.map((variant) => {
+        // First try to extract color from color-* tags
+        let variantColor = "";
+        let baseName = "";
+
+        if (variant.tags && Array.isArray(variant.tags)) {
+          const colorTag = variant.tags.find(tag => tag.startsWith('color-'));
+          if (colorTag) {
+            variantColor = colorTag.replace('color-', '');
+            // Capitalize first letter
+            variantColor = variantColor.charAt(0).toUpperCase() + variantColor.slice(1);
+          }
+        }
+        
+        // If no color-* tag found, extract from title
+        if (!variantColor) {
+          if (variant.title && variant.title.includes(" - ")) {
+            const parts = variant.title.split(" - ");
+            baseName = parts[0].trim();
+            variantColor = parts[1].trim();
+          } else {
+            baseName = variant.title || "";
+            variantColor =
+              extractColorFromProductName(variant.title) ||
+              (product.colors && product.colors.length > 0
+                ? product.colors[0].name
+                : "Default");
+          }
+        }
+
+        // Format the slug for navigation
+        const slug = `${baseName
+          .toLowerCase()
+          .replace(/\s+/g, "-")}---${variantColor
+          .toLowerCase()
+          .replace(/\s+/g, "-")}_${variant.id}`;
+
+        // Get the appropriate swatch image - use 5th image if available
+        let swatchImage;
+        if (variant.images && Array.isArray(variant.images)) {
+          swatchImage =
+            variant.images[4] ||
+            variant.images[0] ||
+            "/images/placeholder.jpg";
+        } else if (variant.image) {
+          swatchImage = variant.image;
         } else {
-          baseModelName = product.name
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "-");
+          swatchImage = "/images/placeholder.jpg";
         }
 
-        // Create tag for model search
-        const modelTag = `model-${baseModelName}`;
-        console.log(`Searching for color variants with tag: ${modelTag}`);
+        return {
+          id: variant.id,
+          name: variant.title || "",
+          baseName,
+          color: variantColor,
+          slug: slug,
+          image: swatchImage,
+          price: variant.price,
+          isCurrentVariant: variant.id === productId,
+        };
+      });
 
-        // Use the correct endpoint for tag-based search
-        const response = await api.get(`/search/tag?tag=${modelTag}`);
+      setColorVariants(processedVariants);
 
-        if (response.data && response.data.products) {
-          console.log(
-            `Found ${response.data.products.length} potential color variants`
-          );
-
-          // Include the current product in the color variants
-          const currentProductIncluded = response.data.products.some(
-            (variant) => variant.id === productId
-          );
-
-          // If current product is not included in the search results, add it
-          let variants = [...response.data.products];
-          if (!currentProductIncluded) {
-            console.log(
-              `Current product not found in results, adding it manually`
-            );
-            variants = [
-              {
-                id: productId,
-                title: product.name,
-                handle: "", // We don't need the handle for current product
-                image: product.images[0],
-                price: product.price,
-              },
-              ...variants,
-            ];
-          }
-
-          // Process variants to extract color information
-          const processedVariants = variants.map((variant) => {
-            // Extract color from name or title (assuming format: "Product Name - Color")
-            let variantColor = "";
-            if (variant.name && variant.name.includes(" - ")) {
-              variantColor = variant.name.split(" - ")[1].trim();
-            } else if (variant.title && variant.title.includes(" - ")) {
-              variantColor = variant.title.split(" - ")[1].trim();
-            } else {
-              // Default color if not specified
-              variantColor = variant.id === productId ? "Default" : "Variant";
-              console.log(
-                `No color found in name/title for variant ${variant.id}, using ${variantColor}`
-              );
-            }
-
-            return {
-              id: variant.id,
-              name: variant.name || variant.title,
-              color: variantColor,
-              handle: variant.handle,
-              image:
-                variant.images?.[0] ||
-                variant.image ||
-                "/images/placeholder.jpg",
-              price: variant.price,
-            };
-          });
-
-          // Update the product's colors with all color variants
-          const uniqueColors = [];
-          const colorNames = new Set();
-
-          processedVariants.forEach((variant) => {
-            if (!colorNames.has(variant.color)) {
-              colorNames.add(variant.color);
-              uniqueColors.push({
-                name: variant.color,
-                code: getColorCode(variant.color),
-                inStock: true,
-                variantId: variant.id,
-                variantHandle: variant.handle,
-                variantImage: variant.image,
-              });
-            }
-          });
-
-          console.log(
-            `Found ${uniqueColors.length} unique color variants:`,
-            uniqueColors.map((c) => c.name).join(", ")
-          );
-
-          // Replace product's colors with all available colors if we found variants
-          if (uniqueColors.length > 0) {
-            setProduct((prevProduct) => ({
-              ...prevProduct,
-              colors: uniqueColors,
-            }));
-          }
+      // Set the selected color if not already set
+      if (!selectedColor) {
+        const currentVariant = processedVariants.find(
+          (v) => v.isCurrentVariant
+        );
+        if (currentVariant) {
+          setSelectedColor(currentVariant.color);
         }
-      } catch (error) {
-        console.error("Error fetching color variants:", error);
       }
-    };
+    } else {
+      // No variants found from search, create default variants
+      const defaultVariants = createDefaultVariants();
+      setColorVariants(defaultVariants);
+    }
+  } catch (error) {
+    console.error("Error fetching color variants:", error);
+    // On API error, still create default variants
+    const defaultVariants = createDefaultVariants();
+    setColorVariants(defaultVariants);
+  } finally {
+    setLoading(false);
+
+    if (selectedColor) {
+      setSelectedColor(selectedColor.trim());
+    }
+  }
+};
 
     fetchColorVariants();
   }, [product?.name, productId]);
@@ -522,13 +696,17 @@ const DesktopProductDetailsPage = ({ viewportMode = "desktop" }) => {
 
 // Then update the useEffect
 useEffect(() => {
-  if (product?.colors && colorName) {
+  if (product?.colors && product.colors.length > 0 && colorName) {
     // Find color with case-insensitive match but preserve original casing
     const matchedColor = product.colors.find(c => 
       c.name.toLowerCase() === colorName.toLowerCase()
     );
     if (matchedColor) {
       setSelectedColor(matchedColor.name);
+      
+      // Update display images when color is selected from URL
+      const colorImages = getImagesForColor(matchedColor.name);
+      setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
     } else {
       // Fallback to first color if no match
       setSelectedColor(product.colors[0]?.name || "");
