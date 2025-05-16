@@ -70,6 +70,8 @@ const MobileProductDetailsPage = ({ viewportMode = "mobile" }) => {
     };
   };
 
+
+
   // Product state
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
