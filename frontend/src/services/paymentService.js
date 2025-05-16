@@ -1,5 +1,4 @@
 // frontend/src/services/paymentService.js - Fixed transaction reference generation
-import axios from 'axios';
 import api from './api';
 import { 
   initializeInlinePayment, 

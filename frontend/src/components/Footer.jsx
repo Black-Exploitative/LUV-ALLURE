@@ -30,8 +30,6 @@ export default function Footer() {
           <ul className="text-sm text-gray-400 space-y-2">
             <li><a href="/collections" className="hover:underline">New Arrivals</a></li>
             <li><a href="/women" className="hover:underline">Women</a></li>
-            <li><a href="/men" className="hover:underline">Men</a></li>
-            <li><a href="/accessories" className="hover:underline">Accessories</a></li>
             <li><a href="/sale" className="hover:underline">Sale</a></li>
           </ul>
         </motion.div>
@@ -66,7 +64,7 @@ export default function Footer() {
       </div>
 
       <div>
-        <img src="../../public/images/LA-2.png" alt="Logo" className="mx-auto mt-8 w-[500px] h-auto" />
+        <img src="/images/LA-2.png" alt="Logo" className="mx-auto mt-8 w-[500px] h-auto" />
       </div>
       
       {/* Bottom */}

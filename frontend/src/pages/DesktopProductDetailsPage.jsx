@@ -1,10 +1,8 @@
-/* eslint-disable no-unused-vars */
+
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
 import ProductCarousel from "../components/ProductCarousel";
 import ExpandableSection from "../components/ExpandableSection";
-import SmallProductCard from "../components/SmallProductCard";
-import PurchasedCard from "../components/PurchasedCard";
 import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import { useRecentlyViewed } from "../context/RecentlyViewedProducts";
@@ -12,7 +10,6 @@ import { motion } from "framer-motion";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import StarRating from "../components/StarRating";
-import cmsService from "../services/cmsService";
 import CustomersReviews from "../components/CustomersReviews";
 import SizeGuideModal from "../components/SizeGuideModal";
 import api from "../services/api";
@@ -21,16 +18,18 @@ import { useWishlist } from "../context/WishlistContext";
 import DesktopProductDetailsSkeleton from "../components/loadingSkeleton/DesktopProductDetailsSkeleton";
 import { useRelatedProducts, RelatedProductsSection } from '../components/RelatedProductSection';
 
-const DesktopProductDetailsPage = () => {
+const DesktopProductDetailsPage = ({ viewportMode = "desktop" }) => {
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
-
   const reviewsRef = useRef(null);
+  
   // URL and navigation
   const { slug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
   const rawProduct = location.state?.product;
+  
+  // Check if we're in tablet landscape mode
+  const isTabletLandscape = viewportMode === "tablet-landscape";
 
   const scrollToReviews = () => {
     reviewsRef.current?.scrollIntoView({
@@ -38,37 +37,39 @@ const DesktopProductDetailsPage = () => {
       block: "start",
     });
   };
+  
+  // Parse slug - keeping original implementation
   const parseProductSlug = (slug) => {
-    if (!slug) return { productId: null, productName: null, colorName: null };
+  if (!slug) return { productId: null, productName: null, colorName: null };
 
-    // Check if the slug follows the pattern product-name---color_productId
-    if (slug.includes("---") && slug.includes("_")) {
-      const [namePart, idPart] = slug.split("_");
-      const [productName, colorName] = namePart.split("---");
-      return {
-        productId: idPart,
-        productName: productName,
-        colorName: colorName,
-      };
-    }
-
-    // Handle the case where it's just product-name_productId
-    const parts = slug.split("_");
-    if (parts.length > 1) {
-      return {
-        productId: parts[parts.length - 1],
-        productName: parts.slice(0, -1).join("_"),
-        colorName: null,
-      };
-    }
-
-    // Fallback for simple slugs (just the ID)
+  // Check if the slug follows the pattern product-name---color_productId
+  if (slug.includes("---") && slug.includes("_")) {
+    const [namePart, idPart] = slug.split("_");
+    const [productName, colorName] = namePart.split("---");
     return {
-      productId: slug,
-      productName: null,
+      productId: idPart,
+      productName: productName,
+      colorName: colorName,
+    };
+  }
+
+  // Handle the case where it's just product-name_productId
+  const parts = slug.split("_");
+  if (parts.length > 1) {
+    return {
+      productId: parts[parts.length - 1],
+      productName: parts.slice(0, -1).join("_"),
       colorName: null,
     };
+  }
+
+  // Fallback for simple slugs (just the ID)
+  return {
+    productId: slug,
+    productName: null,
+    colorName: null,
   };
+};
 
   // Product state
   const [product, setProduct] = useState(null);
@@ -82,30 +83,26 @@ const DesktopProductDetailsPage = () => {
   const [colorVariants, setColorVariants] = useState([]);
   const { isInWishlist, toggleWishlist } = useWishlist();
 
-  // Replace the existing state
+  // Wishlist state
   const [isInWishlistState, setIsInWishlistState] = useState(false);
 
-  // Add this useEffect to initialize wishlist state when product loads
+  // Update wishlist state when product loads
   useEffect(() => {
     if (product && product.id) {
       setIsInWishlistState(isInWishlist(product.id));
     }
   }, [product, isInWishlist]);
 
-  // Display images (changes based on color selection)
+  // Display images for colors
   const [displayImages, setDisplayImages] = useState([]);
 
-  // Related products state
-  
-
-  // Hooks
+  // Hooks for cart and history
   const { addToCart } = useCart();
   const { addToRecentlyViewed } = useRecentlyViewed();
 
   // Extract product ID from the slug
   const productId = useMemo(() => {
     if (!slug) return null;
-    // Extract ID from the format "product-name_123456"
     const parts = slug.split("_");
     return parts.length > 1 ? parts[parts.length - 1] : slug;
   }, [slug]);
@@ -115,44 +112,34 @@ const DesktopProductDetailsPage = () => {
     if (!slug) return "";
     const parts = slug.split("_");
     if (parts.length > 1) {
-      // Remove the last part (the ID) and join the rest
       return parts
         .slice(0, -1)
         .join(" ")
         .split("-")
-        .join(" ") // Replace hyphens with spaces
-        .replace(/\b\w/g, (l) => l.toUpperCase()); // Capitalize first letter of each word
+        .join(" ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
     }
     return "";
   }, [slug]);
 
   // Set page title
   useEffect(() => {
-    // Set default title
     document.title = "Luv's Allure";
-
-    // Update title when product loads
     if (product?.name) {
       document.title = `${product.name} | Luv's Allure`;
     } else if (productName) {
       document.title = `${productName} | Luv's Allure`;
     }
-
-    // Cleanup when component unmounts
     return () => {
-      document.title = "Luv's Allure"; // Reset to default
+      document.title = "Luv's Allure";
     };
   }, [product, productName]);
-
-
 
   // Initialize display images when product loads
   const processAndValidateImages = (imageArray) => {
     if (!Array.isArray(imageArray) || imageArray.length === 0) {
       return ["/images/placeholder.jpg"];
     }
-
-    // Ensure all images are valid strings
     return imageArray.map((img) => {
       if (typeof img === "string") return img;
       if (img && typeof img === "object") {
@@ -162,13 +149,9 @@ const DesktopProductDetailsPage = () => {
     });
   };
 
-  // Replace your current useEffect for initializing displayImages with this:
+  // Set display images when product loads
   useEffect(() => {
     if (product) {
-      console.log(
-        "Setting initial display images from product:",
-        product.images
-      );
       if (product.images && product.images.length > 0) {
         // Process images to ensure they're valid
         const validatedImages = processAndValidateImages(product.images);
@@ -176,7 +159,6 @@ const DesktopProductDetailsPage = () => {
 
         // Force render by using a timeout
         setTimeout(() => {
-          console.log("Re-validating images after delay");
           setDisplayImages([...validatedImages]);
         }, 50);
       } else {
@@ -186,9 +168,6 @@ const DesktopProductDetailsPage = () => {
     }
   }, [product]);
 
-  
-
-  // Fetch product data when component mounts or productId changes
   useEffect(() => {
     let isMounted = true;
     let controller = new AbortController();
@@ -304,128 +283,302 @@ const DesktopProductDetailsPage = () => {
     };
   }, [slug]);
 
+  const extractColorFromProductName = (productName) => {
+  if (productName && productName.includes(" - ")) {
+    const parts = productName.split(" - ");
+    if (parts.length >= 2) {
+      return parts[1].trim();
+    }
+  }
+  return null;
+};
+
+// Function to create default variants when API fails or returns no variants
+const createDefaultVariants = () => {
+  if (!product) return [];
+  
+  console.log("Creating default variants for product with no variants");
+  
+  // Extract color tags from product tags
+  const extractColorFromTags = () => {
+    if (!product.tags || !Array.isArray(product.tags)) return null;
+    
+    // Look for color-* tags
+    const colorTag = product.tags.find(tag => tag.startsWith('color-'));
+    if (colorTag) {
+      // Extract color name from color-{colorname} format
+      return colorTag.replace('color-', '').trim();
+    }
+    return null;
+  };
+  
+  // Try to extract color from tags first, then from product name
+  const extractedColorFromTags = extractColorFromTags();
+  const extractedColorFromName = extractColorFromProductName(product.name)?.trim();
+  const extractedColor = extractedColorFromTags || extractedColorFromName;
+  
+  // Base name is either the part before " - " or the full name
+  let baseName = product.name;
+  if (baseName.includes(" - ")) {
+    baseName = baseName.split(" - ")[0].trim();
+  }
+  
+  // Create default color variants
+  let defaultVariants = [];
+  
+  // If product has colors defined, use those
+  if (product.colors && product.colors.length > 0) {
+    defaultVariants = product.colors.map((color) => {
+      // Create a slug format consistent with variant products
+      const slug = `${baseName
+        .toLowerCase()
+        .replace(/\s+/g, "-")}---${color.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")}_${productId}`;
+      
+      // Use case-insensitive comparison for isCurrentVariant
+      const isCurrentVariant = extractedColor 
+        ? color.name.toLowerCase() === extractedColor.toLowerCase() 
+        : false;
+      
+      return {
+        id: productId,
+        name: `${baseName} - ${color.name}`,
+        baseName,
+        color: color.name,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: isCurrentVariant,
+      };
+    });
+  }
+  // If no colors defined but we extracted a color from tags or name
+  else if (extractedColor) {
+    const slug = `${baseName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}---${extractedColor
+      .toLowerCase()
+      .replace(/\s+/g, "-")}_${productId}`;
+    
+    defaultVariants = [
+      {
+        id: productId,
+        name: product.name,
+        baseName,
+        color: extractedColor,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true,
+      },
+    ];
+  }
+  // If no colors at all, create a default based on first variant's color
+  else if (product.variants && product.variants.length > 0) {
+    const firstVariant = product.variants[0];
+    const variantColor = firstVariant.selectedOptions?.find(opt => 
+      opt.name.toLowerCase() === 'color')?.value || "Default";
+    
+    const slug = `${baseName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}---${variantColor.toLowerCase()}_${productId}`;
+    
+    defaultVariants = [
+      {
+        id: productId,
+        name: `${baseName} - ${variantColor}`,
+        baseName,
+        color: variantColor,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true,
+      },
+    ];
+  }
+  // Last resort fallback
+  else {
+    const defaultColor = "Default";
+    const slug = `${baseName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}---${defaultColor.toLowerCase()}_${productId}`;
+    
+    defaultVariants = [
+      {
+        id: productId,
+        name: `${baseName} - ${defaultColor}`,
+        baseName,
+        color: defaultColor,
+        slug,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : "/images/placeholder.jpg",
+        price: product.price,
+        isCurrentVariant: true,
+      },
+    ];
+  }
+  
+  // Initialize selected color if not set
+  if (!selectedColor && defaultVariants.length > 0) {
+    const currentVariant =
+      defaultVariants.find((v) => v.isCurrentVariant) || defaultVariants[0];
+    setSelectedColor(currentVariant.color);
+  }
+  else if (selectedColor && defaultVariants.length > 0) {
+    const matchingVariant = defaultVariants.find(
+      v => v.color.toLowerCase() === selectedColor.toLowerCase()
+    );
+    if (matchingVariant && matchingVariant.color !== selectedColor) {
+      setSelectedColor(matchingVariant.color);
+    }
+  }
+  
+  return defaultVariants;
+};
+
   // Fetch all color variants when the product loads
   useEffect(() => {
     if (!product || !productId) return;
 
     // Function to fetch products with the same model tag
     const fetchColorVariants = async () => {
-      try {
-        // Extract base model name from product name (simplified approach)
-        // If product name doesn't contain a dash, use the whole name
-        let baseModelName;
-        if (product.name.includes(" - ")) {
-          baseModelName = product.name
-            .split(" - ")[0]
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "-");
+  try {
+    setLoading(true);
+    // Extract base model name from product name
+    let baseModelName;
+    if (product.name.includes(" - ")) {
+      baseModelName = product.name
+        .split(" - ")[0]
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+    } else {
+      baseModelName = product.name
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+    }
+
+    // Create tag for model search
+    const modelTag = `model-${baseModelName}`;
+    console.log(`Searching for color variants with tag: ${modelTag}`);
+
+    // Use the correct endpoint for tag-based search
+    const response = await api.get(`/search/tag?tag=${modelTag}`);
+
+    if (
+      response.data &&
+      response.data.products &&
+      response.data.products.length > 0
+    ) {
+      console.log(
+        `Found ${response.data.products.length} potential color variants`
+      );
+
+      // Process variants to extract color information
+      const processedVariants = response.data.products.map((variant) => {
+        // First try to extract color from color-* tags
+        let variantColor = "";
+        let baseName = "";
+
+        if (variant.tags && Array.isArray(variant.tags)) {
+          const colorTag = variant.tags.find(tag => tag.startsWith('color-'));
+          if (colorTag) {
+            variantColor = colorTag.replace('color-', '');
+            // Capitalize first letter
+            variantColor = variantColor.charAt(0).toUpperCase() + variantColor.slice(1);
+          }
+        }
+        
+        // If no color-* tag found, extract from title
+        if (!variantColor) {
+          if (variant.title && variant.title.includes(" - ")) {
+            const parts = variant.title.split(" - ");
+            baseName = parts[0].trim();
+            variantColor = parts[1].trim();
+          } else {
+            baseName = variant.title || "";
+            variantColor =
+              extractColorFromProductName(variant.title) ||
+              (product.colors && product.colors.length > 0
+                ? product.colors[0].name
+                : "Default");
+          }
+        }
+
+        // Format the slug for navigation
+        const slug = `${baseName
+          .toLowerCase()
+          .replace(/\s+/g, "-")}---${variantColor
+          .toLowerCase()
+          .replace(/\s+/g, "-")}_${variant.id}`;
+
+        // Get the appropriate swatch image - use 5th image if available
+        let swatchImage;
+        if (variant.images && Array.isArray(variant.images)) {
+          swatchImage =
+            variant.images[4] ||
+            variant.images[0] ||
+            "/images/placeholder.jpg";
+        } else if (variant.image) {
+          swatchImage = variant.image;
         } else {
-          baseModelName = product.name
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "-");
+          swatchImage = "/images/placeholder.jpg";
         }
 
-        // Create tag for model search
-        const modelTag = `model-${baseModelName}`;
-        console.log(`Searching for color variants with tag: ${modelTag}`);
+        return {
+          id: variant.id,
+          name: variant.title || "",
+          baseName,
+          color: variantColor,
+          slug: slug,
+          image: swatchImage,
+          price: variant.price,
+          isCurrentVariant: variant.id === productId,
+        };
+      });
 
-        // Use the correct endpoint for tag-based search
-        const response = await api.get(`/search/tag?tag=${modelTag}`);
+      setColorVariants(processedVariants);
 
-        if (response.data && response.data.products) {
-          console.log(
-            `Found ${response.data.products.length} potential color variants`
-          );
-
-          // Include the current product in the color variants
-          const currentProductIncluded = response.data.products.some(
-            (variant) => variant.id === productId
-          );
-
-          // If current product is not included in the search results, add it
-          let variants = [...response.data.products];
-          if (!currentProductIncluded) {
-            console.log(
-              `Current product not found in results, adding it manually`
-            );
-            variants = [
-              {
-                id: productId,
-                title: product.name,
-                handle: "", // We don't need the handle for current product
-                image: product.images[0],
-                price: product.price,
-              },
-              ...variants,
-            ];
-          }
-
-          // Process variants to extract color information
-          const processedVariants = variants.map((variant) => {
-            // Extract color from name or title (assuming format: "Product Name - Color")
-            let variantColor = "";
-            if (variant.name && variant.name.includes(" - ")) {
-              variantColor = variant.name.split(" - ")[1].trim();
-            } else if (variant.title && variant.title.includes(" - ")) {
-              variantColor = variant.title.split(" - ")[1].trim();
-            } else {
-              // Default color if not specified
-              variantColor = variant.id === productId ? "Default" : "Variant";
-              console.log(
-                `No color found in name/title for variant ${variant.id}, using ${variantColor}`
-              );
-            }
-
-            return {
-              id: variant.id,
-              name: variant.name || variant.title,
-              color: variantColor,
-              handle: variant.handle,
-              image:
-                variant.images?.[0] ||
-                variant.image ||
-                "/images/placeholder.jpg",
-              price: variant.price,
-            };
-          });
-
-          // Update the product's colors with all color variants
-          const uniqueColors = [];
-          const colorNames = new Set();
-
-          processedVariants.forEach((variant) => {
-            if (!colorNames.has(variant.color)) {
-              colorNames.add(variant.color);
-              uniqueColors.push({
-                name: variant.color,
-                code: getColorCode(variant.color),
-                inStock: true,
-                variantId: variant.id,
-                variantHandle: variant.handle,
-                variantImage: variant.image,
-              });
-            }
-          });
-
-          console.log(
-            `Found ${uniqueColors.length} unique color variants:`,
-            uniqueColors.map((c) => c.name).join(", ")
-          );
-
-          // Replace product's colors with all available colors if we found variants
-          if (uniqueColors.length > 0) {
-            setProduct((prevProduct) => ({
-              ...prevProduct,
-              colors: uniqueColors,
-            }));
-          }
+      // Set the selected color if not already set
+      if (!selectedColor) {
+        const currentVariant = processedVariants.find(
+          (v) => v.isCurrentVariant
+        );
+        if (currentVariant) {
+          setSelectedColor(currentVariant.color);
         }
-      } catch (error) {
-        console.error("Error fetching color variants:", error);
       }
-    };
+    } else {
+      // No variants found from search, create default variants
+      const defaultVariants = createDefaultVariants();
+      setColorVariants(defaultVariants);
+    }
+  } catch (error) {
+    console.error("Error fetching color variants:", error);
+    // On API error, still create default variants
+    const defaultVariants = createDefaultVariants();
+    setColorVariants(defaultVariants);
+  } finally {
+    setLoading(false);
+
+    if (selectedColor) {
+      setSelectedColor(selectedColor.trim());
+    }
+  }
+};
 
     fetchColorVariants();
   }, [product?.name, productId]);
@@ -543,13 +696,17 @@ const DesktopProductDetailsPage = () => {
 
 // Then update the useEffect
 useEffect(() => {
-  if (product?.colors && colorName) {
+  if (product?.colors && product.colors.length > 0 && colorName) {
     // Find color with case-insensitive match but preserve original casing
     const matchedColor = product.colors.find(c => 
       c.name.toLowerCase() === colorName.toLowerCase()
     );
     if (matchedColor) {
       setSelectedColor(matchedColor.name);
+      
+      // Update display images when color is selected from URL
+      const colorImages = getImagesForColor(matchedColor.name);
+      setDisplayImages(colorImages.length > 0 ? colorImages : product.images);
     } else {
       // Fallback to first color if no match
       setSelectedColor(product.colors[0]?.name || "");
@@ -948,8 +1105,14 @@ useEffect(() => {
       variants: rawProduct.variants || [],
     };
   };
+  const { 
+    styleWithProducts, 
+    alsoPurchasedProducts, 
+    alsoViewedProducts, 
+    loadingRelated 
+  } = useRelatedProducts(productId);
 
-  // Determine if product can be added to cart
+  // Determine if product can be added to cart - remains the same
   const canAddToCart = useMemo(() => {
     return (
       selectedSize !== "" &&
@@ -957,20 +1120,10 @@ useEffect(() => {
     );
   }, [selectedSize, selectedColor, product?.colors]);
 
-  // Fallback data for related products
-  const { 
-  styleWithProducts, 
-  alsoPurchasedProducts, 
-  alsoViewedProducts, 
-  loadingRelated 
-} = useRelatedProducts(productId);
-
-  // Handle adding to cart
+  // Handle adding to cart - remains the same
   const handleAddToCart = () => {
     if (!canAddToCart) return;
-
     setIsAddingToCart(true);
-
     // Generate a unique ID for this product + size + color combination
     const productWithOptions = {
       ...product,
@@ -980,19 +1133,15 @@ useEffect(() => {
       selectedSize,
       selectedColor,
     };
-
-    // Try to add to cart - returns false if already in cart
     addToCart(productWithOptions);
-
     setTimeout(() => {
       setIsAddingToCart(false);
     }, 800);
   };
 
-  // Toggle wishlist state
+  // Toggle wishlist state - remains the same
   const handleToggleWishlist = () => {
     if (!product) return;
-
     const productForWishlist = {
       id: product.id,
       name: product.name,
@@ -1004,11 +1153,10 @@ useEffect(() => {
           ? product.colors[0].name
           : null),
     };
-
     const isNowInWishlist = toggleWishlist(productForWishlist);
     setIsInWishlistState(isNowInWishlist);
-  };
-
+  }; 
+  
   // Color selection handler
   // When a color is selected, either update the display images or navigate to the variant
   const handleColorSelect = (colorName, variantId, variantHandle) => {
@@ -1036,7 +1184,7 @@ useEffect(() => {
     }
   };
 
-  // Render loading state
+   // Render loading state
   if (loading) {
     return <DesktopProductDetailsSkeleton />;
   }
@@ -1071,236 +1219,191 @@ useEffect(() => {
     );
   }
 
-  const renderColorVariantsUI = () => {
-    if (!colorVariants || colorVariants.length === 0) return null;
-
-    return (
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <p className="text-xs font-medium">OTHER COLOR OPTIONS:</p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {colorVariants.map((variant, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <button
-                className="w-[40px] h-[40px] overflow-hidden border border-gray-300 rounded-full"
-                onClick={() =>
-                  navigate(`/product/${variant.handle || variant.id}`)
-                }
-              >
-                <img
-                  src={variant.image}
-                  alt={variant.color}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-              <span className="text-xs mt-1">{variant.color}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
-      <div className="mx-4 sm:mx-6  md:mx-[40px] lg:mx-[80px]">
-        <div className="mt-[60px]  md:mt-[100px] flex flex-row">
+      {/* Add overflow-x-hidden to prevent horizontal scrolling */}
+      <div className="overflow-x-hidden">
+        {/* Container with responsive padding for each device */}
+        <div className={` ${isTabletLandscape ? 'mx-auto max-w-full' : 'mx-4 sm:mx-6 md:mx-[40px] lg:mx-[80px]'}`}>
+        <div className={`mt-[60px] md:mt-[100px] flex flex-row ${isTabletLandscape ? 'gap-4' : ''}`}>
           {/* Left Side: Product Carousel */}
-          <div className="mb-8  md:mb-0 mr-[50px] ">
-            <ProductCarousel images={displayImages} />
-            <RelatedProductsSection
-                type="style-with"
-                title="STYLE IT WITH"
+          <div className={` ${isTabletLandscape ? 'flex-1 max-w-[70%]' : 'mb-8  md:mb-0 mr-[50px] '}`}>
+            <ProductCarousel 
+              images={displayImages} 
+              viewportMode={viewportMode}
+            />
+              {!isTabletLandscape && (
+                  <div className="mt-12">
+                    <RelatedProductsSection
+                      type="style-with"
+                      title="STYLE IT WITH"
+                      productId={productId}
+                      products={styleWithProducts}
+                      loading={loadingRelated}
+                      navigate={navigate}
+                    />
+                  </div>
+                )}
+            </div>
+
+            {/* Right Side: Product Details */}
+            <div className={`${isTabletLandscape ? 'flex-1 max-w-[30%] pl-4' : 'w-[500px] flex flex-col justify-start'}`}>
+              {/* Product Name */}
+              <h1 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider">
+                {product.name}
+              </h1>
+              
+              {/* Star Rating */}
+              <StarRating
+                rating={4.9}
+                reviewCount={90}
+                scrollToReviews={scrollToReviews}
+              />
+
+              {/* Product Price */}
+              <p className="text-[18px] font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider text-gray-700">
+                ₦{product.price ? product.price.toLocaleString() : "0"}
+              </p>
+
+              <hr className="border-t border-gray-300 my-4" />
+
+              {/* Color Selection */}
+              <ColorVariants
+                product={product}
                 productId={productId}
-                products={styleWithProducts}
-                loading={loadingRelated}
-                navigate={navigate}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+                setDisplayImages={setDisplayImages}
               />
 
-
-            {/* Color Variants 
-            <div className="mt-[50px]">
-              <h2 className="text-[15px] mb-4 text-center">STYLE IT WITH</h2>
-              {loadingRelated ? (
-                <div className="flex justify-center items-center py-8">
-                  <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-                </div>
-              ) : styleWithProducts.length > 0 ? (
-                <div className="grid gap-4  md:gap-6">
-                  {styleWithProducts.map((product, index) => (
-                    <SmallProductCard
-                      key={product.id || index}
-                      image={
-                        product.images?.[0] ||
-                        product.image ||
-                        "/images/placeholder.jpg"
-                      }
-                      name={product.title || product.name}
-                      color={product.color || "Default"}
-                      price={`₦${parseFloat(product.price).toLocaleString()}`}
-                      onViewProduct={() => navigate(`/product/${product.id}`)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid gap-4  md:gap-6">
-                  {relatedProducts.map((product, index) => (
-                    <SmallProductCard
-                      key={index}
-                      image={product.image}
-                      name={product.name}
-                      color={product.color}
-                      price={product.price}
-                      onViewProduct={() =>
-                        console.log(`Viewing ${product.name}`)
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-            {renderStyleItWith()}*/}
-          </div>
-
-          {/* Right Side: Product Details */}
-          <div className="w-[500px] flex flex-col justify-start">
-            {/* Product Name */}
-            <h1 className="text-xl font-normal md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr :tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr  lg:tracking-wide xl:tracking-wider 2xl:tracking-widerr 2 lg:tracking-wide xl:tracking-wider 2xl:tracking-widerst">{product.name}</h1>
-            {/*  Star Rating */}
-            <StarRating
-              rating={4.9}
-              reviewCount={90}
-              scrollToReviews={scrollToReviews}
-            />
-
-            {/* Product Price */}
-            <p className="text-[18px] font-normal  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider text-gray-700">
-              ₦{product.price ? product.price.toLocaleString() : "0"}
-            </p>
-
-            <hr className="border-t border-gray-300 my-4" />
-
-            {/* Color Selection - Only show if there are colors */}
-            <ColorVariants
-              product={product}
-              productId={productId}
-              selectedColor={selectedColor}
-              setSelectedColor={setSelectedColor}
-              setDisplayImages={setDisplayImages}
-            />
-
-            {/* Size Selection */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <p className="text-xs font-medium">SIZE:</p>
-                <button
-                  className="text-[12px] underline cursor-pointer"
-                  onClick={() => setSizeGuideOpen(true)}
-                >
-                  Size Guide
-                </button>
-              </div>
-
-              {/* Size Guide Modal */}
-              <SizeGuideModal
-                isOpen={isSizeGuideOpen}
-                onClose={() => setSizeGuideOpen(false)}
-              />
-              <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size, index) => (
+              {/* Size Selection */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-xs font-medium">SIZE:</p>
                   <button
-                    key={index}
-                    className={`border w-[40px] h-[40px] text-[10px] font-normal items-center cursor-pointer ${
-                      selectedSize === size
-                        ? "border-black border-width-[0.5px]"
-                        : "border-gray-300 hover:bg-gray-100"
-                    } transition-colors`}
-                    onClick={() => setSelectedSize(size)}
+                    className="text-[12px] underline cursor-pointer"
+                    onClick={() => setSizeGuideOpen(true)}
                   >
-                    {size}
+                    Size Guide
                   </button>
-                ))}
+                </div>
+
+                {/* Size Guide Modal */}
+                <SizeGuideModal
+                  isOpen={isSizeGuideOpen}
+                  onClose={() => setSizeGuideOpen(false)}
+                />
+                
+                {/* Size buttons */}
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((size, index) => (
+                    <button
+                      key={index}
+                      className={`border w-[40px] h-[40px] text-[10px] font-normal items-center cursor-pointer ${
+                        selectedSize === size
+                          ? "border-black border-width-[0.5px]"
+                          : "border-gray-300 hover:bg-gray-100"
+                      } transition-colors`}
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              {/* Add to Cart Button */}
+              <motion.button
+                className={`w-full py-3 transition-colors cursor-pointer text-[13.7px] ${
+                  canAddToCart
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+                onClick={handleAddToCart}
+                disabled={!canAddToCart || isAddingToCart}
+                whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
+                animate={{
+                  opacity: isAddingToCart ? 0.7 : 1,
+                }}
+              >
+                {isAddingToCart
+                  ? "ADDING TO BAG..."
+                  : canAddToCart
+                  ? "ADD TO SHOPPING BAG"
+                  : `SELECT ${product.colors.length > 0 ? "COLOR AND " : ""}SIZE`}
+              </motion.button>
+
+              {/* Wishlist Button */}
+              <div
+                className="flex items-center justify-start gap-2 text-[13px] mt-4 mb-2 cursor-pointer"
+                onClick={handleToggleWishlist}
+              >
+                {isInWishlistState ? (
+                  <FaHeart className="h-[15px] w-[15px] text-black" />
+                ) : (
+                  <FiHeart className="h-[15px] w-[15px]" />
+                )}
+                <span>
+                  {isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}
+                </span>
+              </div>
+
+              <hr className="border-t border-gray-300 my-4" />
+
+              {/* Expandable Sections */}
+              <ExpandableSection
+                title="PRODUCT DETAILS"
+                content={product.description}
+              />
+              <ExpandableSection
+                title="MATERIAL & COMPOSITION"
+                content={product.material || "Information not available"}
+              />
+              <ExpandableSection
+                title="SIZE & FIT"
+                content="Our dresses are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
+              />
+              <ExpandableSection
+                title="CARE INSTRUCTIONS"
+                content={
+                  product.care ||
+                  "Handle with care. See label for detailed instructions."
+                }
+              />
+              <ExpandableSection
+                title="SHIPPING"
+                content="We offer fast and reliable shipping nationwide. Your order will be processed and shipped within 2-3 business days."
+              />
+              <ExpandableSection
+                title="RETURNS"
+                content="If you're not satisfied with your purchase, you may return the item within 30 days for a full refund."
+              />
             </div>
-
-            {/* Add to Cart Button */}
-            <motion.button
-              className={`w-full py-3 transition-colors cursor-pointer text-[13.7px] ${
-                canAddToCart
-                  ? "bg-black text-white hover:bg-gray-800"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-              onClick={handleAddToCart}
-              disabled={!canAddToCart || isAddingToCart}
-              whileTap={{ scale: canAddToCart ? 0.98 : 1 }}
-              animate={{
-                opacity: isAddingToCart ? 0.7 : 1,
-              }}
-            >
-              {isAddingToCart
-                ? "ADDING TO BAG..."
-                : canAddToCart
-                ? "ADD TO SHOPPING BAG"
-                : `SELECT ${product.colors.length > 0 ? "COLOR AND " : ""}SIZE`}
-            </motion.button>
-
-            {/* Wishlist Button */}
-            <div
-              className="flex items-center justify-start gap-2 text-[13px] mt-4 mb-2 cursor-pointer"
-              onClick={handleToggleWishlist}
-            >
-              {isInWishlist ? (
-                <FaHeart className="h-[15px] w-[15px] text-black" />
-              ) : (
-                <FiHeart className="h-[15px] w-[15px]" />
-              )}
-              <span>
-                {isInWishlistState ? "Remove from Wishlist" : "Add to Wishlist"}
-              </span>
-            </div>
-
-            <hr className="border-t border-gray-300 my-4" />
-
-            {/* Expandable Sections */}
-            <ExpandableSection
-              title="PRODUCT DETAILS"
-              content={product.description}
-            />
-            <ExpandableSection
-              title="MATERIAL & COMPOSITION"
-              content={product.material || "Information not available"}
-            />
-            <ExpandableSection
-              title="SIZE & FIT"
-              content="Our dresses are available in various sizes to ensure a perfect fit for everyone. Please refer to the size chart for more details."
-            />
-            <ExpandableSection
-              title="CARE INSTRUCTIONS"
-              content={
-                product.care ||
-                "Handle with care. See label for detailed instructions."
-              }
-            />
-            <ExpandableSection
-              title="SHIPPING"
-              content="We offer fast and reliable shipping nationwide. Your order will be processed and shipped within 2-3 business days."
-            />
-            <ExpandableSection
-              title="RETURNS"
-              content="If you're not satisfied with your purchase, you may return the item within 30 days for a full refund."
-            />
           </div>
         </div>
-      </div>
 
-      <div ref={reviewsRef}>
-        <CustomersReviews productName={product.name} />
-      </div>
+        {isTabletLandscape && (
+        <div className="w-full px-4 mx-auto mt-8">
+          <RelatedProductsSection
+            type="style-with"
+            title="STYLE IT WITH"
+            productId={productId}
+            products={styleWithProducts}
+            loading={loadingRelated}
+            navigate={navigate}
+          />
+        </div>
+      )}
 
-      <div className="mx-[20px] mt-[50px] mb-[100px]">
+        {/* Customer Reviews Section */}
+        <div ref={reviewsRef} className="w-full">
+          <CustomersReviews productName={product.name} />
+        </div>
 
-        {/* Also purchased section */}
+        {/* Also Purchased & Also Viewed Sections */}
+        <div className="w-full px-4 mx-auto mt-[50px] mb-[100px]">
+          
+          {/* Related products sections */}
           <RelatedProductsSection
             type="also-purchased"
             title="ALLURVERS ALSO PURCHASED"
@@ -1310,7 +1413,6 @@ useEffect(() => {
             navigate={navigate}
           />
 
-          {/* Also viewed section */}
           <RelatedProductsSection
             type="also-viewed"
             title="ALLURVERS ALSO VIEWED"
@@ -1319,84 +1421,10 @@ useEffect(() => {
             loading={loadingRelated}
             navigate={navigate}
           />
-        {/* Customers Also Purchased Section 
-        {(alsoPurchasedProducts.length > 0 || !loadingRelated) && (
-          <>
-            <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
-              ALLURVERS ALSO PURCHASED
-            </h2>
-            {loadingRelated ? (
-              <div className="flex justify-center items-center py-8">
-                <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-              </div>
-            ) : alsoPurchasedProducts.length > 0 ? (
-              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
-                {alsoPurchasedProducts.map((product) => (
-                  <PurchasedCard
-                    key={product.id}
-                    product={{
-                      id: product.id,
-                      name: product.title || product.name,
-                      price: parseFloat(product.price),
-                      color: product.color || "DEFAULT",
-                      images:
-                        product.images?.[0] ||
-                        product.image ||
-                        "/images/placeholder.jpg",
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
-                {purchasedProducts.map((product, index) => (
-                  <PurchasedCard key={index} product={product} />
-                ))}
-              </div>
-            )}
-          </>
-        )}
+        </div>
 
-        {/* Customers Also Viewed Section 
-        {(alsoViewedProducts.length > 0 || !loadingRelated) && (
-          <>
-            <h2 className="text-[15px] text-center uppercase mt-[50px] mb-[50px]">
-              ALLURVERS ALSO VIEWED
-            </h2>
-            {loadingRelated ? (
-              <div className="flex justify-center items-center py-8">
-                <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
-              </div>
-            ) : alsoViewedProducts.length > 0 ? (
-              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
-                {alsoViewedProducts.map((product) => (
-                  <PurchasedCard
-                    key={product.id}
-                    product={{
-                      id: product.id,
-                      name: product.title || product.name,
-                      price: parseFloat(product.price),
-                      color: product.color || "DEFAULT",
-                      images:
-                        product.images?.[0] ||
-                        product.image ||
-                        "/images/placeholder.jpg",
-                    }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2  md:grid-cols-4 gap-[20px]  md:gap-[20px]">
-                {purchasedProducts.map((product, index) => (
-                  <PurchasedCard key={index} product={product} />
-                ))}
-              </div>
-            )}
-          </>
-        )}*/}
+        <Footer />
       </div>
-
-      <Footer />
     </>
   );
 };

@@ -12,6 +12,21 @@ export default function MobileNavbar({ darkNavbar }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
   const { cartItemCount, setIsCartDrawerOpen } = useCart();
+  const [isTablet, setIsTablet] = useState(false);
+
+
+  // Detect tablet size for better padding
+  useEffect(() => {
+    const handleResize = () => {
+      setIsTablet(window.innerWidth >= 640);
+    };
+    
+    // Initial check
+    handleResize();
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -100,6 +115,7 @@ export default function MobileNavbar({ darkNavbar }) {
       columns: [
         {
           title: "ALL CLOTHING",
+          link: "/shop",
           links: [
             { name: "Dresses", href: "/shop/dresses" },
             { name: "Tops", href: "/shop/tops" },
@@ -112,6 +128,7 @@ export default function MobileNavbar({ darkNavbar }) {
         },
         {
           title: "ALL GIFTING",
+          link: "/shop/gifting",
           links: [
             { name: "Gift Cards", href: "/Shop/gift-cards" },
             { name: "Vouchers", href: "/Shop/vouchers" },
@@ -125,8 +142,9 @@ export default function MobileNavbar({ darkNavbar }) {
       columns: [
         {
           title: "DRESSES BY LENGTH",
+          link: "/shop/dresses",
           links: [
-            { name: "All Dresses", href: "/shop" },
+            { name: "All Dresses", href: "/shop/dresses" },
             { name: "Mini Dresses", href: "/shop/mini-dresses" },
             { name: "Maxi Dresses", href: "/shop/maxi-dresses" },
             { name: "Midi Dresses", href: "/shop/midi-dresses" },
@@ -134,6 +152,7 @@ export default function MobileNavbar({ darkNavbar }) {
         },
         {
           title: "DRESSES BY STYLE",
+          link: "/shop/dresses",
           links: [
             { name: "Prom Dresses", href: "/shop/prom-dresses" },
             { name: "Formal Dresses", href: "/shop/formal-dresses" },
@@ -167,7 +186,7 @@ export default function MobileNavbar({ darkNavbar }) {
       columns: [
         {
           title: "Collections",
-          links: [{ name: "All Vendors", href: "/collections" }],
+          links: [{ name: "All Collections", href: "/collections" }],
         },
         {
           title: "OCCASION",
@@ -223,7 +242,7 @@ export default function MobileNavbar({ darkNavbar }) {
 
   return (
     <>
-      <div className="container mx-auto py-4 px-6 flex justify-between items-center h-[70px] relative">
+      <div className={`container mx-auto ${isTablet ? 'px-8' : 'px-6'} py-4 flex justify-between items-center h-[70px] relative`}>
         {/* Hamburger Menu Button */}
         <motion.button
           className="relative z-50 cursor-pointer"
@@ -257,7 +276,7 @@ export default function MobileNavbar({ darkNavbar }) {
         <div className="text-xl font-bold absolute left-1/2 transform -translate-x-1/2">
           <a href="/">
             <motion.img
-              src={darkNavbar ? "/images/LA-2.png" : "/images/LA-1.png"}
+              src={darkNavbar ? "/images/logo-white.png" : "/images/logo-black.svg"}
               alt="Logo"
               className="h-[55px]"
               initial={{ opacity: 0.8 }}
@@ -276,6 +295,7 @@ export default function MobileNavbar({ darkNavbar }) {
           </motion.div>
 
           <motion.div className="flex items-center">
+            <a href='/user-account'>
             <motion.img
               src={
                 darkNavbar ? "/icons/contact.svg" : "/icons/contact-black.svg"
@@ -285,6 +305,7 @@ export default function MobileNavbar({ darkNavbar }) {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             />
+            </a>
           </motion.div>
 
           {/* Mobile Cart with Preview */}
@@ -308,7 +329,7 @@ export default function MobileNavbar({ darkNavbar }) {
             exit="closed"
             variants={menuVariants}
           >
-            <div className="container mx-auto px-6 flex flex-col text-black">
+            <div className={`container mx-auto ${isTablet ? 'px-10' : 'px-6'} flex flex-col text-black`}>
               {/* Main Navigation Links with Expandable Sections */}
               <div className="space-y-2 mt-6">
                 {/* SHOP Section */}
@@ -319,7 +340,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={0}
                     onClick={() => toggleSection('shop')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">SHOP</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">SHOP</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -339,7 +360,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.shop.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
@@ -367,7 +388,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={1}
                     onClick={() => toggleSection('dresses')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">DRESSES</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">DRESSES</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -384,10 +405,10 @@ export default function MobileNavbar({ darkNavbar }) {
                         variants={subMenuVariants}
                         className="overflow-hidden"
                       >
-                        <div className="pt-4 pl-4 space-y-6">
+                        <div className={`pt-4 ${isTablet ? 'grid grid-cols-2 gap-6' : 'pl-4 space-y-6'}`}>
                           {dropdownContent.dresses.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
@@ -415,7 +436,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={2}
                     onClick={() => toggleSection('collections')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">LOOKBOOK</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">LOOKBOOK</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -432,10 +453,10 @@ export default function MobileNavbar({ darkNavbar }) {
                         variants={subMenuVariants}
                         className="overflow-hidden"
                       >
-                        <div className="pt-4 pl-4 space-y-6">
+                        <div className={`pt-4 ${isTablet ? 'grid grid-cols-2 gap-6' : 'pl-4 space-y-6'}`}>
                           {dropdownContent.collections.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
@@ -463,7 +484,7 @@ export default function MobileNavbar({ darkNavbar }) {
                     custom={3}
                     onClick={() => toggleSection('newin')}
                   >
-                    <span className="text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">NEW ARRIVALS</span>
+                    <span className="text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium">NEW ARRIVALS</span>
                     <img 
                       src="/icons/arrow-down.svg" 
                       alt="Expand" 
@@ -483,7 +504,7 @@ export default function MobileNavbar({ darkNavbar }) {
                         <div className="pt-4 pl-4 space-y-6">
                           {dropdownContent.newin.columns.map((column, colIndex) => (
                             <div key={colIndex}>
-                              <h3 className="font-medium text-sm mb-3">{column.title}</h3>
+                              <h3 className="font-medium text-sm mb-3"><a href={column.link}>{column.title}</a></h3>
                               <div className="flex flex-col space-y-3">
                                 {column.links.map((link, linkIndex) => (
                                   <a
@@ -506,7 +527,7 @@ export default function MobileNavbar({ darkNavbar }) {
                 {/* Additional Links without dropdowns */}
                 <motion.a
                   href="/contact-us"
-                  className="block text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
+                  className="block text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={4}
                   whileHover={{ x: 4 }}
@@ -517,7 +538,7 @@ export default function MobileNavbar({ darkNavbar }) {
                 
                 <motion.a
                   href="/services"
-                  className="block text-xl  md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
+                  className="block text-xl md:tracking-wide lg:tracking-wide xl:tracking-wider 2xl:tracking-wider font-medium py-4 border-b border-gray-200"
                   variants={linkVariants}
                   custom={5}
                   whileHover={{ x: 4 }}

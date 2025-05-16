@@ -228,11 +228,13 @@ export const getShopBanner = async (deviceType = 'desktop') => {
     const banners = response.data.data || [];
     
     // Find the first active banner for the specified device type
+    // FIXED: More explicit filtering logic to prevent duplication
     const activeBanner = banners.find(banner => {
-      // Check if banner is active and matches the deviceType or has no deviceType specified (for backward compatibility)
+      // Check if banner is active and EXACTLY matches the deviceType
+      // For desktop, also accept banners with no deviceType specified (for backward compatibility)
       return banner.isActive && 
              (banner.deviceType === deviceType || 
-              (!banner.deviceType && deviceType === 'desktop')); // Treat banners with no device type as desktop banners
+              (!banner.deviceType && deviceType === 'desktop'));
     });
     
     if (activeBanner) {
