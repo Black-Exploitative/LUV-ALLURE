@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
 import PropTypes from "prop-types";
-import AnimatedImage from "./AnimatedImage";
+// import AnimatedImage from "./AnimatedImage";
 import api from "../services/api";
 
 // Animated Section component with animations
@@ -131,7 +131,7 @@ const PromoSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <AnimatedImage
+            <img
               src={promoData.imageUrl}
               alt="Left Side Image"
               className="w-full max-w-[500px] h-[600px] object-cover mx-auto"

@@ -1,16 +1,19 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import DatePicker from "react-datepicker"; 
+import "react-datepicker/dist/react-datepicker.css"; 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import DatePicker from "../components/DatePicker"; 
+
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    dateOfBirth: "",
+    dateOfBirth: null, 
     email: "",
     password: "",
     confirmPassword: "",
@@ -36,6 +39,22 @@ export default function SignUp() {
       setErrors(prev => ({
         ...prev,
         [name]: undefined
+      }));
+    }
+  };
+
+  // Handle date change separately
+  const handleDateChange = (date) => {
+    setFormData(prev => ({
+      ...prev,
+      dateOfBirth: date
+    }));
+    
+    // Clear error for date field
+    if (errors.dateOfBirth) {
+      setErrors(prev => ({
+        ...prev,
+        dateOfBirth: undefined
       }));
     }
   };
@@ -112,8 +131,8 @@ export default function SignUp() {
       // Copy data to avoid modifying the state directly
       const userData = {
         ...formData,
-        // Convert to a birthdate field as expected by the backend
-        birthdate: formData.dateOfBirth
+        // Format date to ISO string for the backend
+        birthdate: formData.dateOfBirth ? formData.dateOfBirth.toISOString().split('T')[0] : null
       };
       
       // Register the user
@@ -147,7 +166,6 @@ export default function SignUp() {
       
       <div className="flex-grow flex flex-col items-center justify-center px-6 py-12">
         
-
         <div className="w-full max-w-md space-y-10">
           {/* Title */}
           <div className="text-center">
@@ -346,15 +364,13 @@ export default function SignUp() {
             </div>
 
             <div>
-              <motion.button
+              <button
                 type="submit"
-                whileHover={{ backgroundColor: "#333" }}
-                whileTap={{ scale: 0.98 }}
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-3 px-4 cursor-pointer border border-transparent text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none transition duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-3 px-4 cursor-pointer border border-transparent text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none transition duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
-              </motion.button>
+              </button>
             </div>
           </form>
 
