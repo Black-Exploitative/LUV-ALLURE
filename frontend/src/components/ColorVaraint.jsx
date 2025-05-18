@@ -408,7 +408,7 @@ const createDefaultVariants = () => {
     return (
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <p className="text-xs font-medium">COLOR:</p>
+          <p className="text-xs font-medium">COLOR: Select a color</p>
         </div>
         <div className="flex flex-wrap gap-3">
           {[1, 2, 3, 4].map((index) => (
@@ -434,9 +434,7 @@ const createDefaultVariants = () => {
     return (
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <p className="text-xs font-medium">
-            COLOR: {selectedColor || "Select a color"}
-          </p>
+          <p className="text-xs font-medium">COLOR: Select a color</p>
         </div>
         <div className="flex flex-wrap gap-3">
           {product?.colors?.map((color, index) => (
@@ -466,7 +464,7 @@ const createDefaultVariants = () => {
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
-        <p className="text-xs font-medium">COLOR: {selectedColor}</p>
+        <p className="text-xs font-medium">COLOR: Select a color</p>
       </div>
       <div className="flex flex-wrap gap-3">
         {colorVariants.map((variant, index) => (
