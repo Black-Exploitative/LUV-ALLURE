@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
-import { Navigate, useLocation, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiEye, FiEyeOff, FiLock, FiMail, FiShield } from 'react-icons/fi';
-import { useAdminAuth } from './AdminAuthProvider';
+import { useState, useEffect } from "react";
+import { Navigate, useLocation, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FiEye, FiEyeOff, FiLock, FiMail, FiShield } from "react-icons/fi";
+import { useAdminAuth } from "./AdminAuthProvider";
 
 const AdminSignIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // ⚠️ TEMPORARY DEFAULT CREDENTIALS
+  const [email, setEmail] = useState("admin@luvsallure.com");
+  const [password, setPassword] = useState("Admin123!@#");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { adminLogin, isAdminAuthenticated, isAdminLoading } = useAdminAuth();
   const location = useLocation();
-  
- 
-  const from = location.state?.from?.pathname || '/admin';
+
+  const from = location.state?.from?.pathname || "/admin";
 
   if (isAdminAuthenticated) {
     return <Navigate to={from} replace />;
   }
 
-
+  // Show loading if checking auth state
   if (isAdminLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -34,15 +34,15 @@ const AdminSignIn = () => {
     const newErrors = {};
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
@@ -51,7 +51,7 @@ const AdminSignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -59,13 +59,12 @@ const AdminSignIn = () => {
 
     try {
       const result = await adminLogin(email, password);
-      
+
       if (!result.success) {
         setErrors({ general: result.message });
       }
-      
     } catch (error) {
-      setErrors({ general: 'An unexpected error occurred. Please try again.' });
+      setErrors({ general: "An unexpected error occurred. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -106,6 +105,8 @@ const AdminSignIn = () => {
             onSubmit={handleSubmit}
           >
             <div className="bg-white rounded-lg shadow-lg p-8 space-y-6">
+          
+
               {/* General Error */}
               {errors.general && (
                 <motion.div
@@ -119,7 +120,10 @@ const AdminSignIn = () => {
 
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Admin Email
                 </label>
                 <div className="relative">
@@ -134,7 +138,7 @@ const AdminSignIn = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className={`block w-full pl-10 pr-3 py-3 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm ${
-                      errors.email ? 'border-red-300' : 'border-gray-300'
+                      errors.email ? "border-red-300" : "border-gray-300"
                     }`}
                     placeholder="Enter your admin email"
                   />
@@ -146,7 +150,10 @@ const AdminSignIn = () => {
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -161,7 +168,7 @@ const AdminSignIn = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className={`block w-full pl-10 pr-10 py-3 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm ${
-                      errors.password ? 'border-red-300' : 'border-gray-300'
+                      errors.password ? "border-red-300" : "border-gray-300"
                     }`}
                     placeholder="Enter your password"
                   />
@@ -199,7 +206,7 @@ const AdminSignIn = () => {
                       Signing in...
                     </div>
                   ) : (
-                    'Sign in to Admin Portal'
+                    "Sign in to Admin Portal"
                   )}
                 </motion.button>
               </div>
@@ -214,11 +221,8 @@ const AdminSignIn = () => {
             className="text-center"
           >
             <div className="text-sm text-gray-500 bg-white rounded-lg p-4 shadow">
-              <p className="mb-2">
-                <strong>Security Notice:</strong> This is a restricted area for authorized administrators only.
-              </p>
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="text-black hover:text-gray-600 font-medium transition-colors"
               >
                 ← Back to Website
