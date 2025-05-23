@@ -92,18 +92,25 @@ const OfferSection = () => {
             .slice()
             .sort((a, b) => a.order - b.order);
           
-          setSections(sortedSections);
+          // Filter out duplicate section types - keep only the first occurrence of each type
+          const uniqueSections = [];
+          const seenTypes = new Set();
           
-          // Track which section types will be rendered from CMS data
-          const types = new Set();
           sortedSections.forEach(section => {
             if (section.sectionId && section.sectionId.type) {
-              types.add(section.sectionId.type);
+              const sectionType = section.sectionId.type;
+              if (!seenTypes.has(sectionType)) {
+                uniqueSections.push(section);
+                seenTypes.add(sectionType);
+              }
             }
           });
-          setRenderedSectionTypes(types);
           
-          console.log("Rendered section types:", [...types]);
+          setSections(uniqueSections);
+          setRenderedSectionTypes(seenTypes);
+          
+          console.log("Rendered section types:", [...seenTypes]);
+          console.log("Unique sections:", uniqueSections);
         }
       } catch (error) {
         console.error('Error fetching homepage layout:', error);

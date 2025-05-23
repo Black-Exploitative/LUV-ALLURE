@@ -1,18 +1,16 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiHome, FiImage, FiGrid, FiLayers, FiLayout, 
   FiSettings, FiLogOut, FiEdit, FiTrash, FiPlus,
   FiLink, FiShoppingBag, FiEye, FiStar, FiAward,
   FiBookOpen, FiDatabase, FiTarget, FiFolder,
-  FiMonitor,
-  FiSmartphone
+  FiMonitor, FiSmartphone, FiMenu, FiX, FiVideo
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
-import HeroForm from './forms/HeroForm';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('homepage');
@@ -30,12 +28,18 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [relationshipType, setRelationshipType] = useState('style-with');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const navigate = useNavigate();
 
   useEffect(() => {
     // Load initial data based on active section
     loadData(activeSection);
+  }, [activeSection]);
+
+  // Close sidebar when section changes on mobile
+  useEffect(() => {
+    setSidebarOpen(false);
   }, [activeSection]);
 
   // Function to load data based on selected section
@@ -86,7 +90,7 @@ const Dashboard = () => {
           response = await api.get('/cms/featured-products/sections');
           setFeaturedSections(response.data.sections || []);
           break;
-        case 'collections': // New case for collections
+        case 'collections': 
           response = await api.get('/collections');
           setCollections(response.data.data || []);
           break;
@@ -134,7 +138,7 @@ const Dashboard = () => {
         case 'featured-products':
           endpoint = `/cms/featured-products/${id}`;
           break;
-        case 'collections': // New case for collections
+        case 'collections': 
           endpoint = `/collections/${id}`;
           break;
         default:
@@ -175,7 +179,7 @@ const Dashboard = () => {
         case 'featured-products':
           endpoint = `/cms/featured-products/${id}`;
           break;
-        case 'collections': // New case for collections
+        case 'collections': 
           endpoint = `/collections/${id}`;
           break;
         default:
@@ -228,6 +232,11 @@ const Dashboard = () => {
   ];
   
   // Animation variants for sidebar
+  const sidebarVariants = {
+    open: { x: 0 },
+    closed: { x: '-100%' }
+  };
+
   const sidebarItemVariants = {
     hover: { x: 10, transition: { duration: 0.2 } }
   };
@@ -243,18 +252,18 @@ const Dashboard = () => {
   // Shop Banners section renderer
   const renderShopBanners = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Shop Banners</h2>
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Link
             to="/admin/shop-banner/new?device=desktop"
-            className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+            className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
           >
             <FiMonitor className="mr-2" /> <FiPlus className="mr-1" /> Desktop Banner
           </Link>
           <Link
             to="/admin/shop-banner/new?device=mobile"
-            className="flex items-center px-4 py-2 bg-gray-700 text-white hover:bg-gray-800"
+            className="flex items-center justify-center px-4 py-2 bg-gray-700 text-white hover:bg-gray-800 text-sm"
           >
             <FiSmartphone className="mr-2" /> <FiPlus className="mr-1" /> Mobile Banner
           </Link>
@@ -266,23 +275,21 @@ const Dashboard = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
         </div>
       ) : (
-        <>
-          <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
-            <h3 className="font-medium flex items-center mb-2">
+        <div className="space-y-6">
+          <div className="p-4 bg-gray-50 border border-gray-200 rounded">
+            <h3 className="font-medium flex items-center mb-4">
               <FiMonitor className="mr-2" /> Desktop Shop Banners
             </h3>
-            {/* Desktop Banners List */}
             {renderShopBannerList('desktop')}
           </div>
           
-          <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded">
-            <h3 className="font-medium flex items-center mb-2">
+          <div className="p-4 bg-gray-50 border border-gray-200 rounded">
+            <h3 className="font-medium flex items-center mb-4">
               <FiSmartphone className="mr-2" /> Mobile Shop Banners
             </h3>
-            {/* Mobile Banners List */}
             {renderShopBannerList('mobile')}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -304,14 +311,14 @@ const Dashboard = () => {
     }
     
     return (
-      <div className="grid gap-4">
+      <div className="space-y-4">
         {shopBanners.map(banner => (
           <div
             key={banner._id}
             className={`border ${banner.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
           >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+              <div className="flex-1 min-w-0">
                 <h4 className="font-medium">{banner.name}</h4>
                 <div className="flex items-center mt-1">
                   <span className={`inline-block w-2 h-2 rounded-full ${banner.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
@@ -321,13 +328,13 @@ const Dashboard = () => {
                 </div>
                 
                 {banner.content?.buttonText && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 mt-1 break-all">
                     Button: "{banner.content.buttonText}" → {banner.content.buttonLink || '#'}
                   </p>
                 )}
               </div>
               
-              <div className="w-24 h-24 bg-gray-100 flex-shrink-0 ml-4">
+              <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
                 {banner.media?.imageUrl && (
                   <img 
                     src={banner.media.imageUrl} 
@@ -338,7 +345,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="flex justify-end space-x-2 mt-2">
+            <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
               <button
                 onClick={() => toggleActive('sections', banner._id, banner.isActive)}
                 className={`px-3 py-1 text-xs rounded-md ${
@@ -399,7 +406,7 @@ const Dashboard = () => {
         return renderSections();
       case 'banners':
         return renderBanners();
-      case 'hero': // Add this new case
+      case 'hero': 
         return renderHeroSections();
       case 'navigation':
         return renderNavImages();
@@ -417,7 +424,7 @@ const Dashboard = () => {
         return renderFeaturedProducts();
       case 'collections': 
         return renderCollections();
-      case 'shop-banners': // Add the new case for shop banners
+      case 'shop-banners': 
         return renderShopBanners();
       case 'settings':
         return renderSettings();
@@ -429,11 +436,11 @@ const Dashboard = () => {
   // Render functions for each section
   const renderLayouts = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Homepage Layouts</h2>
         <Link
           to="/admin/layouts/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Layout
         </Link>
@@ -442,14 +449,14 @@ const Dashboard = () => {
       {!layouts || layouts.length === 0 ? (
         <p>No layouts found. Create your first layout.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {layouts.map((layout, index) => (
             <div
               key={layout._id || index}
-              className={`border p-4 ${layout.isActive ? 'border-black' : 'border-gray-200'}`}
+              className={`border p-4 ${layout.isActive ? 'border-black' : 'border-gray-200'} rounded-md`}
             >
-              <div className="flex justify-between items-center">
-                <div>
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{layout.name}</h3>
                   <p className="text-sm text-gray-600">
                     {layout.isActive ? 'Active' : 'Inactive'} • {layout.sections?.length || 0} sections
@@ -458,7 +465,7 @@ const Dashboard = () => {
                     Created: {new Date(layout.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex flex-wrap gap-2">
                   {!layout.isActive && (
                     <button
                       onClick={() => setLayoutActive(layout._id)}
@@ -488,248 +495,158 @@ const Dashboard = () => {
       )}
     </div>
   );
-  const renderHeroSections = () => (
-  <div>
-    <div className="flex justify-between items-center mb-6">
-      <h2 className="text-xl font-medium">Hero Sections</h2>
-      <Link
-        to="/admin/hero/new"
-        className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
-      >
-        <FiPlus className="mr-2" /> Create Hero Section
-      </Link>
-    </div>
 
-    {loading ? (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+  const renderHeroSections = () => (
+    <div>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <h2 className="text-xl font-medium">Hero Sections</h2>
+        <Link
+          to="/admin/hero/new"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
+        >
+          <FiPlus className="mr-2" /> Create Hero Section
+        </Link>
       </div>
-    ) : (
-      <div className="grid gap-4">
-        {/* Get all hero sections, combining related desktop and mobile pairs */}
-        {groupHeroSections().map(hero => (
-          <div
-            key={hero._id}
-            className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h4 className="font-medium">{hero.name}</h4>
-                <div className="flex items-center mt-1">
-                  <span className={`inline-block w-2 h-2 rounded-full ${hero.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
-                  <p className="text-sm text-gray-600">
-                    {hero.isActive ? 'Active' : 'Inactive'} • 
-                    {hero.hasMobileVersion ? ' Desktop & Mobile' : ' Desktop only'}
-                  </p>
-                </div>
-                
-                {hero.content?.title && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Title: "{hero.content.title}"
-                    {hero.content.buttonText && ` • Button: "${hero.content.buttonText}"`}
-                  </p>
-                )}
-              </div>
-              
-              <div className="flex flex-col  md:flex-row gap-2">
-                {/* Desktop preview thumbnail */}
-                <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
-                  {hero.media?.videoUrl ? (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                      <FiVideo className="text-gray-500 text-xl" />
-                    </div>
-                  ) : hero.media?.imageUrl ? (
-                    <img 
-                      src={hero.media.imageUrl} 
-                      alt={hero.media.altText || hero.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                      <span className="text-sm text-gray-600">No media</span>
-                    </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {groupHeroSections().map(hero => (
+            <div
+              key={hero._id}
+              className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
+            >
+              <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium">{hero.name}</h4>
+                  <div className="flex items-center mt-1">
+                    <span className={`inline-block w-2 h-2 rounded-full ${hero.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                    <p className="text-sm text-gray-600">
+                      {hero.isActive ? 'Active' : 'Inactive'} • 
+                      {hero.hasMobileVersion ? ' Desktop & Mobile' : ' Desktop only'}
+                    </p>
+                  </div>
+                  
+                  {hero.content?.title && (
+                    <p className="text-xs text-gray-500 mt-1 break-all">
+                      Title: "{hero.content.title}"
+                      {hero.content.buttonText && ` • Button: "${hero.content.buttonText}"`}
+                    </p>
                   )}
                 </div>
                 
-                {/* Mobile preview thumbnail if available */}
-                {hero.mobileMedia && (
+                <div className="flex flex-row gap-2">
+                  {/* Desktop preview thumbnail */}
                   <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
-                    {hero.mobileMedia.videoUrl ? (
+                    {hero.media?.videoUrl ? (
                       <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                        <div className="relative w-10 h-16 bg-gray-300 flex items-center justify-center">
-                          <FiVideo className="text-gray-500" />
-                          <FiSmartphone className="absolute bottom-0 right-0 text-gray-500" />
-                        </div>
+                        <FiVideo className="text-gray-500 text-xl" />
                       </div>
-                    ) : hero.mobileMedia.imageUrl ? (
-                      <div className="relative w-full h-full">
-                        <img 
-                          src={hero.mobileMedia.imageUrl} 
-                          alt={hero.mobileMedia.altText || `${hero.name} (Mobile)`} 
-                          className="w-full h-full object-cover"
-                        />
-                        <FiSmartphone className="absolute bottom-1 right-1 text-white" />
+                    ) : hero.media?.imageUrl ? (
+                      <img 
+                        src={hero.media.imageUrl} 
+                        alt={hero.media.altText || hero.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <span className="text-sm text-gray-600">No media</span>
                       </div>
-                    ) : null}
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-2 mt-2">
-              <button
-                onClick={() => toggleActive('sections', hero._id, hero.isActive)}
-                className={`px-3 py-1 text-xs rounded-md ${
-                  hero.isActive 
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
-                    : 'bg-green-50 text-green-700 hover:bg-green-100'
-                }`}
-              >
-                {hero.isActive ? 'Deactivate' : 'Activate'}
-              </button>
-              <Link 
-                to={`/admin/hero/edit/${hero._id}`}
-                className="p-2 text-gray-600 hover:text-black"
-              >
-                <FiEdit />
-              </Link>
-              <button 
-                onClick={() => handleDelete('sections', hero._id)}
-                className="p-2 text-gray-600 hover:text-red-600"
-              >
-                <FiTrash />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-// Helper function to group related desktop and mobile hero sections
-const groupHeroSections = () => {
-  // Filter to only get hero type sections
-  const heroSections = sections.filter(section => section.type === 'hero');
-  
-  // Group by related content (button link or title)
-  const desktopHeroes = heroSections.filter(
-    hero => !hero.deviceType || hero.deviceType === 'desktop'
-  );
-  
-  return desktopHeroes.map(desktopHero => {
-    // Try to find matching mobile hero
-    const mobileHero = heroSections.find(hero => 
-      hero.deviceType === 'mobile' && 
-      (hero.content?.buttonLink === desktopHero.content?.buttonLink ||
-       hero.content?.title === desktopHero.content?.title)
-    );
-    
-    return {
-      ...desktopHero,
-      hasMobileVersion: !!mobileHero,
-      mobileMedia: mobileHero?.media,
-    };
-  });
-};
-
-// Step 5: Add the helper function for rendering hero lists:
-const renderHeroList = (deviceType) => {
-  // Filter sections to show only hero type with matching deviceType
-  const heroSections = sections.filter(section => 
-    section.type === 'hero' && 
-    (section.deviceType === deviceType || (!section.deviceType && deviceType === 'desktop'))
-  );
-  
-  if (heroSections.length === 0) {
-    return (
-      <p className="text-sm text-gray-500 py-2">
-        No {deviceType} heroes found. Click the button above to create one.
-      </p>
-    );
-  }
-  
-  return (
-    <div className="grid gap-4">
-      {heroSections.map(hero => (
-        <div
-          key={hero._id}
-          className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
-        >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h4 className="font-medium">{hero.name}</h4>
-              <div className="flex items-center mt-1">
-                <span className={`inline-block w-2 h-2 rounded-full ${hero.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
-                <p className="text-sm text-gray-600">
-                  {hero.isActive ? 'Active' : 'Inactive'} • 
-                  {hero.media?.videoUrl ? ' Video' : ' Image'} background
-                </p>
+                  
+                  {/* Mobile preview thumbnail if available */}
+                  {hero.mobileMedia && (
+                    <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
+                      {hero.mobileMedia.videoUrl ? (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                          <div className="relative w-10 h-16 bg-gray-300 flex items-center justify-center">
+                            <FiVideo className="text-gray-500" />
+                            <FiSmartphone className="absolute bottom-0 right-0 text-gray-500" />
+                          </div>
+                        </div>
+                      ) : hero.mobileMedia.imageUrl ? (
+                        <div className="relative w-full h-full">
+                          <img 
+                            src={hero.mobileMedia.imageUrl} 
+                            alt={hero.mobileMedia.altText || `${hero.name} (Mobile)`} 
+                            className="w-full h-full object-cover"
+                          />
+                          <FiSmartphone className="absolute bottom-1 right-1 text-white" />
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
               </div>
               
-              {hero.content?.title && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Title: "{hero.content.title}"
-                  {hero.content.buttonText && ` • Button: "${hero.content.buttonText}"`}
-                </p>
-              )}
+              <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => toggleActive('sections', hero._id, hero.isActive)}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    hero.isActive 
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  {hero.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <Link 
+                  to={`/admin/hero/edit/${hero._id}`}
+                  className="p-2 text-gray-600 hover:text-black"
+                >
+                  <FiEdit />
+                </Link>
+                <button 
+                  onClick={() => handleDelete('sections', hero._id)}
+                  className="p-2 text-gray-600 hover:text-red-600"
+                >
+                  <FiTrash />
+                </button>
+              </div>
             </div>
-            
-            <div className="w-24 h-24 bg-gray-100 flex-shrink-0 ml-4">
-              {hero.media?.videoUrl ? (
-                <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                  <span className="text-sm text-gray-600">Video Preview</span>
-                </div>
-              ) : hero.media?.imageUrl ? (
-                <img 
-                  src={hero.media.imageUrl} 
-                  alt={hero.media.altText || hero.name} 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                  <span className="text-sm text-gray-600">No media</span>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-2 mt-2">
-            <button
-              onClick={() => toggleActive('sections', hero._id, hero.isActive)}
-              className={`px-3 py-1 text-xs rounded-md ${
-                hero.isActive 
-                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
-                  : 'bg-green-50 text-green-700 hover:bg-green-100'
-              }`}
-            >
-              {hero.isActive ? 'Deactivate' : 'Activate'}
-            </button>
-            <Link 
-              to={`/admin/sections/edit/${hero._id}`}
-              className="p-2 text-gray-600 hover:text-black"
-            >
-              <FiEdit />
-            </Link>
-            <button 
-              onClick={() => handleDelete('sections', hero._id)}
-              className="p-2 text-gray-600 hover:text-red-600"
-            >
-              <FiTrash />
-            </button>
-          </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
-};
+
+  // Helper function to group related desktop and mobile hero sections
+  const groupHeroSections = () => {
+    // Filter to only get hero type sections
+    const heroSections = sections.filter(section => section.type === 'hero');
+    
+    // Group by related content (button link or title)
+    const desktopHeroes = heroSections.filter(
+      hero => !hero.deviceType || hero.deviceType === 'desktop'
+    );
+    
+    return desktopHeroes.map(desktopHero => {
+      // Try to find matching mobile hero
+      const mobileHero = heroSections.find(hero => 
+        hero.deviceType === 'mobile' && 
+        (hero.content?.buttonLink === desktopHero.content?.buttonLink ||
+         hero.content?.title === desktopHero.content?.title)
+      );
+      
+      return {
+        ...desktopHero,
+        hasMobileVersion: !!mobileHero,
+        mobileMedia: mobileHero?.media,
+      };
+    });
+  };
+
   const renderSections = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Content Sections</h2>
         <Link
           to="/admin/sections/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Section
         </Link>
@@ -738,14 +655,14 @@ const renderHeroList = (deviceType) => {
       {!sections || sections.length === 0 ? (
         <p>No content sections found. Create your first section.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {sections.map(section => (
             <div
               key={section._id}
-              className={`border ${section.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${section.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="flex justify-between items-center">
-                <div>
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{section.name}</h3>
                   <div className="flex items-center mt-1">
                     <span className={`inline-block w-2 h-2 rounded-full ${section.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
@@ -753,8 +670,17 @@ const renderHeroList = (deviceType) => {
                       Type: {section.type} • {section.isActive ? 'Active' : 'Inactive'}
                     </p>
                   </div>
+                  {/* Preview of section content */}
+                  <div className="mt-3 pt-3 border-t border-gray-100 text-sm text-gray-600">
+                    {section.content?.title && (
+                      <p className="truncate">Title: {section.content.title}</p>
+                    )}
+                    {section.media?.imageUrl && (
+                      <p className="truncate">Image: {section.media.imageUrl}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex space-x-2 items-center">
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => toggleActive('sections', section._id, section.isActive)}
                     className={`px-3 py-1 text-xs rounded-md ${
@@ -779,15 +705,6 @@ const renderHeroList = (deviceType) => {
                   </button>
                 </div>
               </div>
-              {/* Preview of section content */}
-              <div className="mt-3 pt-3 border-t border-gray-100 text-sm text-gray-600">
-                {section.content?.title && (
-                  <p className="truncate">Title: {section.content.title}</p>
-                )}
-                {section.media?.imageUrl && (
-                  <p className="truncate">Image: {section.media.imageUrl}</p>
-                )}
-              </div>
             </div>
           ))}
         </div>
@@ -797,11 +714,11 @@ const renderHeroList = (deviceType) => {
 
   const renderBanners = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Banners</h2>
         <Link
           to="/admin/banners/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Banner
         </Link>
@@ -810,14 +727,14 @@ const renderHeroList = (deviceType) => {
       {!banners || banners.length === 0 ? (
         <p>No banners found. Create your first banner.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {banners.map(banner => (
             <div
               key={banner._id}
-              className={`border ${banner.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${banner.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="flex justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{banner.name}</h3>
                   <div className="flex items-center mt-1">
                     <span className={`inline-block w-2 h-2 rounded-full ${banner.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
@@ -845,7 +762,7 @@ const renderHeroList = (deviceType) => {
                   )}
                 </div>
               </div>
-              <div className="flex justify-end space-x-2 mt-2">
+              <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
                 <button
                   onClick={() => toggleActive('banners', banner._id, banner.isActive)}
                   className={`px-3 py-1 text-xs rounded-md ${
@@ -878,11 +795,11 @@ const renderHeroList = (deviceType) => {
 
   const renderFeaturedProducts = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Featured Products Sections</h2>
         <Link
           to="/admin/featured-products/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Section
         </Link>
@@ -891,20 +808,20 @@ const renderHeroList = (deviceType) => {
       {!featuredSections || featuredSections.length === 0 ? (
         <p>No featured product sections found. Create your first section.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {featuredSections.map(section => (
             <div
               key={section.sectionId || section._id}
-              className={`border ${section.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${section.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="flex justify-between items-center">
-                <div>
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{section.title || 'Unnamed Section'}</h3>
                   <p className="text-sm text-gray-600">
                     Section ID: {section.sectionId} • {section.productIds?.length || 0} products
                   </p>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex flex-wrap gap-2">
                   <Link 
                     to={`/admin/featured-products/edit/${section.sectionId}`}
                     className="px-3 py-1 text-xs bg-black text-white hover:bg-gray-800"
@@ -928,11 +845,11 @@ const renderHeroList = (deviceType) => {
 
   const renderCollectionHeroes = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Collection Hero</h2>
         <Link
           to="/admin/collection-hero/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Collection Hero
         </Link>
@@ -941,14 +858,14 @@ const renderHeroList = (deviceType) => {
       {!collectionHeroes || collectionHeroes.length === 0 ? (
         <p>No collection heroes found. Create your first one.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {collectionHeroes.map(hero => (
             <div
               key={hero._id}
-              className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${hero.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="flex justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{hero.name}</h3>
                   <div className="flex items-center mt-1">
                     <span className={`inline-block w-2 h-2 rounded-full ${hero.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
@@ -967,7 +884,7 @@ const renderHeroList = (deviceType) => {
                   )}
                 </div>
               </div>
-              <div className="flex justify-end space-x-2 mt-2">
+              <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
                 <button
                   onClick={() => toggleActive('collection-hero', hero._id, hero.isActive)}
                   className={`px-3 py-1 text-xs rounded-md ${
@@ -1000,11 +917,11 @@ const renderHeroList = (deviceType) => {
 
   const renderPromoSections = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Promo Sections</h2>
         <Link
           to="/admin/promo-section/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Promo Section
         </Link>
@@ -1013,14 +930,14 @@ const renderHeroList = (deviceType) => {
       {!promoSections || promoSections.length === 0 ? (
         <p>No promo sections found. Create your first one.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {promoSections.map(promo => (
             <div
               key={promo._id}
-              className={`border ${promo.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${promo.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="flex justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{promo.name}</h3>
                   <div className="flex items-center mt-1">
                     <span className={`inline-block w-2 h-2 rounded-full ${promo.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
@@ -1044,7 +961,7 @@ const renderHeroList = (deviceType) => {
                   )}
                 </div>
               </div>
-              <div className="flex justify-end space-x-2 mt-2">
+              <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
                 <button
                   onClick={() => toggleActive('promo-section', promo._id, promo.isActive)}
                   className={`px-3 py-1 text-xs rounded-md ${
@@ -1077,11 +994,11 @@ const renderHeroList = (deviceType) => {
 
   const renderShopHeaders = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Shop Headers</h2>
         <Link
           to="/admin/shop-header/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Shop Header
         </Link>
@@ -1090,14 +1007,14 @@ const renderHeroList = (deviceType) => {
       {!shopHeaders || shopHeaders.length === 0 ? (
         <p>No shop headers found. Create your first one.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {shopHeaders.map(header => (
             <div
               key={header._id}
-              className={`border ${header.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${header.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="flex justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{header.name}</h3>
                   <div className="flex items-center mt-1">
                     <span className={`inline-block w-2 h-2 rounded-full ${header.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
@@ -1121,7 +1038,7 @@ const renderHeroList = (deviceType) => {
                   )}
                 </div>
               </div>
-              <div className="flex justify-end space-x-2 mt-2">
+              <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
                 <button
                   onClick={() => toggleActive('shop-header', header._id, header.isActive)}
                   className={`px-3 py-1 text-xs rounded-md ${
@@ -1154,11 +1071,11 @@ const renderHeroList = (deviceType) => {
 
   const renderNavImages = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Navigation Images</h2>
         <Link
           to="/admin/nav-images/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Add New Image
         </Link>
@@ -1168,7 +1085,7 @@ const renderHeroList = (deviceType) => {
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Category:</label>
         <select 
-          className="w-full  md:w-64 p-2 border border-gray-300 rounded-md"
+          className="w-full sm:w-64 p-2 border border-gray-300 rounded-md"
           onChange={(e) => {
             // You can add filtering logic here
             console.log('Filter by category:', e.target.value);
@@ -1186,36 +1103,34 @@ const renderHeroList = (deviceType) => {
       {!navImages || navImages.length === 0 ? (
         <p>No navigation images found. Add your first image.</p>
       ) : (
-        <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {navImages.map(image => (
             <div
               key={image._id}
-              className={`border ${image.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${image.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div>
-                <div className="w-full h-40 bg-gray-100 mb-2">
-                  {image.imageUrl && (
-                    <img 
-                      src={image.imageUrl} 
-                      alt={image.altText || image.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-                <h3 className="font-medium">{image.name}</h3>
-                <div className="flex items-center mt-1">
-                  <span className={`inline-block w-2 h-2 rounded-full ${image.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
-                  <p className="text-sm text-gray-600">
-                    Category: {image.category}
-                  </p>
-                </div>
-                {image.link && (
-                  <p className="text-xs text-gray-500 mt-1 truncate">
-                    Link: {image.link}
-                  </p>
+              <div className="w-full h-40 bg-gray-100 mb-2">
+                {image.imageUrl && (
+                  <img 
+                    src={image.imageUrl} 
+                    alt={image.altText || image.name} 
+                    className="w-full h-full object-cover"
+                  />
                 )}
               </div>
-              <div className="flex justify-end space-x-2 mt-2">
+              <h3 className="font-medium">{image.name}</h3>
+              <div className="flex items-center mt-1">
+                <span className={`inline-block w-2 h-2 rounded-full ${image.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
+                <p className="text-sm text-gray-600">
+                  Category: {image.category}
+                </p>
+              </div>
+              {image.link && (
+                <p className="text-xs text-gray-500 mt-1 break-all">
+                  Link: {image.link}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
                 <button
                   onClick={() => toggleActive('navigation', image._id, image.isActive)}
                   className={`px-3 py-1 text-xs rounded-md ${
@@ -1248,18 +1163,18 @@ const renderHeroList = (deviceType) => {
 
   const renderMedia = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Media Library</h2>
         <Link
           to="/admin/media/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Upload Media
         </Link>
       </div>
 
       {/* Search and filter */}
-      <div className="mb-6 flex flex-col  md:flex-row gap-4">
+      <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <input
             type="text"
@@ -1271,7 +1186,7 @@ const renderHeroList = (deviceType) => {
             }}
           />
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <select 
             className="p-2 border border-gray-300 rounded-md"
             onChange={(e) => {
@@ -1300,11 +1215,11 @@ const renderHeroList = (deviceType) => {
       {!media || media.length === 0 ? (
         <p>No media found. Upload your first file.</p>
       ) : (
-        <div className="grid grid-cols-1  md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {media.map(item => (
             <div
               key={item._id}
-              className="border border-gray-200 hover:border-black transition-colors"
+              className="border border-gray-200 hover:border-black transition-colors rounded-md overflow-hidden"
             >
               <div className="w-full h-40 bg-gray-100">
                 {item.type === 'image' ? (
@@ -1334,7 +1249,7 @@ const renderHeroList = (deviceType) => {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end space-x-2 p-2 border-t">
+              <div className="flex justify-end gap-2 p-2 border-t">
                 <Link 
                   to={`/admin/media/edit/${item._id}`}
                   className="p-2 text-gray-600 hover:text-black"
@@ -1375,11 +1290,11 @@ const renderHeroList = (deviceType) => {
 
   const renderRelationships = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Product Relationships</h2>
         <Link
           to="/admin/product-relationships/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Relationship
         </Link>
@@ -1387,12 +1302,12 @@ const renderHeroList = (deviceType) => {
 
       {/* Relationship type filter tabs */}
       <div className="mb-6">
-        <div className="border-b border-gray-200">
-          <div className="flex -mb-px">
+        <div className="border-b border-gray-200 overflow-x-auto">
+          <div className="flex -mb-px min-w-max">
             {relationshipTypes.map(type => (
               <button
                 key={type.value}
-                className={`mr-1 py-2 px-4 text-sm font-medium flex items-center ${
+                className={`mr-1 py-2 px-4 text-sm font-medium flex items-center whitespace-nowrap ${
                   relationshipType === type.value
                     ? 'border-b-2 border-black text-black'
                     : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -1424,13 +1339,12 @@ const renderHeroList = (deviceType) => {
               key={relationship._id}
               className={`border ${relationship.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="grid grid-cols-1  md:grid-cols-12 gap-4">
+              <div className="space-y-4">
                 {/* Source Product */}
-                <div className=" md:col-span-5 flex flex-col">
+                <div>
                   <h4 className="text-sm font-medium text-gray-500 mb-2">Source Product</h4>
-                  <div className="border border-gray-100 p-2 flex items-center flex-1">
+                  <div className="border border-gray-100 p-2 flex items-center">
                     <div className="w-12 h-12 bg-gray-100 mr-3 flex-shrink-0">
-                      {/* Placeholder for product image */}
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
                         <FiShoppingBag />
                       </div>
@@ -1443,7 +1357,7 @@ const renderHeroList = (deviceType) => {
                 </div>
 
                 {/* Arrow */}
-                <div className=" md:col-span-2 flex items-center justify-center">
+                <div className="flex items-center justify-center">
                   <div className="flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -1453,11 +1367,10 @@ const renderHeroList = (deviceType) => {
                 </div>
 
                 {/* Related Product */}
-                <div className=" md:col-span-5 flex flex-col">
+                <div>
                   <h4 className="text-sm font-medium text-gray-500 mb-2">Related Product</h4>
-                  <div className="border border-gray-100 p-2 flex items-center flex-1">
+                  <div className="border border-gray-100 p-2 flex items-center">
                     <div className="w-12 h-12 bg-gray-100 mr-3 flex-shrink-0">
-                      {/* Placeholder for product image */}
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
                         <FiShoppingBag />
                       </div>
@@ -1471,35 +1384,37 @@ const renderHeroList = (deviceType) => {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end items-center space-x-2 mt-3 pt-3 border-t border-gray-100">
-                <div className="mr-auto flex items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center">
                   <span className={`inline-block w-2 h-2 rounded-full ${relationship.isActive ? 'bg-green-500' : 'bg-gray-300'} mr-2`}></span>
                   <span className="text-sm text-gray-500">
                     {relationship.isActive ? 'Active' : 'Inactive'} • Order: {relationship.order}
                   </span>
                 </div>
-                <button
-                  onClick={() => toggleActive('relationships', relationship._id, relationship.isActive)}
-                  className={`px-3 py-1 text-xs rounded-md ${
-                    relationship.isActive 
-                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
-                      : 'bg-green-50 text-green-700 hover:bg-green-100'
-                  }`}
-                >
-                  {relationship.isActive ? 'Deactivate' : 'Activate'}
-                </button>
-                <Link 
-                  to={`/admin/product-relationships/edit/${relationship._id}`}
-                  className="p-2 text-gray-600 hover:text-black"
-                >
-                  <FiEdit />
-                </Link>
-                <button 
-                  onClick={() => handleDelete('relationships', relationship._id)}
-                  className="p-2 text-gray-600 hover:text-red-600"
-                >
-                  <FiTrash />
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => toggleActive('relationships', relationship._id, relationship.isActive)}
+                    className={`px-3 py-1 text-xs rounded-md ${
+                      relationship.isActive 
+                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                        : 'bg-green-50 text-green-700 hover:bg-green-100'
+                    }`}
+                  >
+                    {relationship.isActive ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <Link 
+                    to={`/admin/product-relationships/edit/${relationship._id}`}
+                    className="p-2 text-gray-600 hover:text-black"
+                  >
+                    <FiEdit />
+                  </Link>
+                  <button 
+                    onClick={() => handleDelete('relationships', relationship._id)}
+                    className="p-2 text-gray-600 hover:text-red-600"
+                  >
+                    <FiTrash />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -1511,7 +1426,7 @@ const renderHeroList = (deviceType) => {
   const renderSettings = () => (
     <div>
       <h2 className="text-xl font-medium mb-6">Settings</h2>
-      <div className="border border-gray-200 p-6">
+      <div className="border border-gray-200 p-6 rounded-md">
         <h3 className="font-medium mb-4">Admin Account</h3>
         <div className="space-y-4">
           <div>
@@ -1520,7 +1435,7 @@ const renderHeroList = (deviceType) => {
             </label>
             <input
               type="email"
-              className="w-full p-2 border border-gray-300"
+              className="w-full p-2 border border-gray-300 rounded-md"
               placeholder="admin@example.com"
               disabled
             />
@@ -1529,7 +1444,7 @@ const renderHeroList = (deviceType) => {
           <div>
             <Link
               to="/admin/change-password"
-              className="px-4 py-2 bg-black text-white hover:bg-gray-800 inline-block"
+              className="px-4 py-2 bg-black text-white hover:bg-gray-800 inline-block rounded-md"
             >
               Change Password
             </Link>
@@ -1546,7 +1461,7 @@ const renderHeroList = (deviceType) => {
             </label>
             <input
               type="text"
-              className="w-full p-2 border border-gray-300"
+              className="w-full p-2 border border-gray-300 rounded-md"
               defaultValue="Luv's Allure"
             />
           </div>
@@ -1557,14 +1472,14 @@ const renderHeroList = (deviceType) => {
             </label>
             <input
               type="email"
-              className="w-full p-2 border border-gray-300"
+              className="w-full p-2 border border-gray-300 rounded-md"
               defaultValue="contact@luvsallure.com"
             />
           </div>
           
           <div className="pt-4">
             <button
-              className="px-4 py-2 bg-black text-white hover:bg-gray-800"
+              className="px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-md"
             >
               Save Settings
             </button>
@@ -1576,11 +1491,11 @@ const renderHeroList = (deviceType) => {
 
   const renderCollections = () => (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-medium">Collections</h2>
         <Link
           to="/admin/collections/new"
-          className="flex items-center px-4 py-2 bg-black text-white hover:bg-gray-800"
+          className="flex items-center justify-center px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
         >
           <FiPlus className="mr-2" /> Create New Collection
         </Link>
@@ -1589,14 +1504,14 @@ const renderHeroList = (deviceType) => {
       {!collections || collections.length === 0 ? (
         <p>No collections found. Create your first collection.</p>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {collections.map(collection => (
             <div
               key={collection._id}
-              className={`border ${collection.isActive ? 'border-black' : 'border-gray-200'} p-4`}
+              className={`border ${collection.isActive ? 'border-black' : 'border-gray-200'} p-4 rounded-md`}
             >
-              <div className="flex justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-medium">{collection.name}</h3>
                   <p className="text-sm text-gray-600 mt-1">
                     Handle: {collection.handle} • 
@@ -1610,7 +1525,7 @@ const renderHeroList = (deviceType) => {
                   )}
                 </div>
                 {collection.headerImage && (
-                  <div className="w-24 h-24 bg-gray-100 flex-shrink-0 ml-4">
+                  <div className="w-24 h-24 bg-gray-100 flex-shrink-0">
                     <img 
                       src={collection.headerImage} 
                       alt={collection.name} 
@@ -1619,14 +1534,14 @@ const renderHeroList = (deviceType) => {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end space-x-2 mt-2">
+              <div className="flex flex-wrap gap-2 justify-end mt-4 pt-2 border-t border-gray-100">
                 <a
                   href={`/collections/${collection.handle}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  className="px-3 py-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md flex items-center"
                 >
-                  <FiEye className="inline mr-1" /> View
+                  <FiEye className="mr-1" /> View
                 </a>
                 <button
                   onClick={() => toggleActive('collections', collection._id, collection.isActive)}
@@ -1660,61 +1575,102 @@ const renderHeroList = (deviceType) => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="bg-white w-64 border-r border-gray-200">
-        <div className="p-6 flex items-center space-x-4 border-b">
-          <img src="/images/logo-black.svg" alt="Luv's Allure" className="h-8" />
-          <div>
-            <h1 className="font-medium text-sm">Admin Dashboard</h1>
-            <p className="text-xs text-gray-500">Content Management</p>
-          </div>
-        </div>
-        
-        <nav className="p-4">
-          <ul className="space-y-1">
-            {navItems.map(item => (
-              <li key={item.id}>
-                <motion.button
-                  variants={sidebarItemVariants}
-                  whileHover="hover"
-                  className={`flex items-center w-full p-3 rounded-md ${
-                    activeSection === item.id
-                      ? 'bg-gray-100 text-black'
-                      : 'text-gray-600 hover:text-black'
-                  }`}
-                  onClick={() => setActiveSection(item.id)}
-                >
-                  <item.icon className="mr-3" />
-                  <span>{item.label}</span>
-                </motion.button>
-              </li>
-            ))}
-          </ul>
-          
-          <div className="border-t border-gray-200 mt-6 pt-6">
-            <motion.button
-              variants={sidebarItemVariants}
-              whileHover="hover"
-              className="flex items-center w-full p-3 rounded-md text-gray-600 hover:text-black"
-              onClick={() => {
-                localStorage.removeItem('token');
-                navigate('/signin');
-              }}
+      <AnimatePresence>
+        <motion.div 
+          initial={{ x: '-100%' }}
+          animate={{ x: sidebarOpen || window.innerWidth >= 1024 ? 0 : '-100%' }}
+          exit={{ x: '-100%' }}
+          transition={{ duration: 0.3 }}
+          className={`
+            bg-white w-64 border-r border-gray-200 fixed lg:relative inset-y-0 left-0 z-50
+            ${sidebarOpen || 'lg:block hidden'}
+          `}
+        >
+          <div className="p-4 lg:p-6 flex items-center justify-between border-b">
+            <div className="flex items-center space-x-4">
+              <img src="/images/logo-black.svg" alt="Luv's Allure" className="h-8" />
+              <div className="hidden lg:block">
+                <h1 className="font-medium text-sm">Admin Dashboard</h1>
+                <p className="text-xs text-gray-500">Content Management</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-1 text-gray-500 hover:text-gray-700"
             >
-              <FiLogOut className="mr-3" />
-              <span>Logout</span>
-            </motion.button>
+              <FiX size={20} />
+            </button>
           </div>
-        </nav>
-      </div>
+          
+          <nav className="p-4 overflow-y-auto h-full pb-20">
+            <ul className="space-y-1">
+              {navItems.map(item => (
+                <li key={item.id}>
+                  <motion.button
+                    variants={sidebarItemVariants}
+                    whileHover="hover"
+                    className={`flex items-center w-full p-3 rounded-md text-left ${
+                      activeSection === item.id
+                        ? 'bg-gray-100 text-black'
+                        : 'text-gray-600 hover:text-black'
+                    }`}
+                    onClick={() => setActiveSection(item.id)}
+                  >
+                    <item.icon className="mr-3 flex-shrink-0" />
+                    <span className="truncate">{item.label}</span>
+                  </motion.button>
+                </li>
+              ))}
+            </ul>
+            
+            <div className="border-t border-gray-200 mt-6 pt-6">
+              <motion.button
+                variants={sidebarItemVariants}
+                whileHover="hover"
+                className="flex items-center w-full p-3 rounded-md text-gray-600 hover:text-black text-left"
+                onClick={() => {
+                  localStorage.removeItem('token');
+                  navigate('/signin');
+                }}
+              >
+                <FiLogOut className="mr-3 flex-shrink-0" />
+                <span>Logout</span>
+              </motion.button>
+            </div>
+          </nav>
+        </motion.div>
+      </AnimatePresence>
       
       {/* Main Content */}
-      <div className="flex-1 p-8 overflow-y-auto">
-        {renderContent()}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile header */}
+        <div className="lg:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 text-gray-600 hover:text-black"
+          >
+            <FiMenu size={20} />
+          </button>
+          <h1 className="font-medium text-lg">Admin Dashboard</h1>
+          <div className="w-10" /> {/* Spacer */}
+        </div>
+
+        {/* Content area */}
+        <div className="flex-1 p-4 lg:p-8 overflow-y-auto">
+          {renderContent()}
+        </div>
       </div>
     </div>
   );
 };
-
 
 export default Dashboard;

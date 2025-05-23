@@ -1,4 +1,3 @@
-// frontend/src/components/ShopBanner.jsx
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
 import { getShopBanner } from "../services/cmsService";
@@ -194,7 +193,7 @@ export default function ShopBanner() {
           >
             <a 
               href={data.buttonLink}
-              className="inline-block px-8 py-3 border-2 border-white text-white text-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300"
+              className="inline-block px-8 py-3 border-2 border-white text-white text-lg hover:bg-white hover:text-black transition-all duration-300"
             >
               {data.buttonText}
             </a>

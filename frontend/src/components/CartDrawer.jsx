@@ -203,7 +203,7 @@ const CartDrawer = () => {
                                     <span>{item.selectedSize}</span>
                                   </div>
                                 )}
-                                {itemColor && (
+                                {/* {itemColor && (
                                   <div className="flex items-center">
                                     <span className="uppercase mr-1">Color: </span>
                                     <div className="flex items-center">
@@ -218,7 +218,7 @@ const CartDrawer = () => {
                                       <span>{itemColor}</span>
                                     </div>
                                   </div>
-                                )}
+                                )} */}
                               </div>
                               
                               {/* Quantity Controls */}
