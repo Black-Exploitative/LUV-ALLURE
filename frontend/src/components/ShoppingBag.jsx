@@ -232,7 +232,7 @@ export default function ShoppingBag() {
                           <h3 className="text-[14px] sm:text-[16px] font-medium truncate max-w-[180px] sm:max-w-full">{item.name}</h3>
                           
                           {/* Color and Size with color swatch */}
-                          <div className="flex items-center mt-1">
+                          {/* <div className="flex items-center mt-1">
                             <div 
                               className="w-3 h-3 rounded-full mr-1.5 border border-gray-300 flex-shrink-0" 
                               style={{ 
@@ -244,7 +244,7 @@ export default function ShoppingBag() {
                             <p className="text-[11px] text-gray-500">
                               {item.selectedColor || item.color} • {item.selectedSize}
                             </p>
-                          </div>
+                          </div> */}
                         </div>
                         
                         {/* Quantity Controls - Better tap targets */}

@@ -203,7 +203,22 @@ const CartDrawer = () => {
                                     <span>{item.selectedSize}</span>
                                   </div>
                                 )}
-                               
+                                {/* {itemColor && (
+                                  <div className="flex items-center">
+                                    <span className="uppercase mr-1">Color: </span>
+                                    <div className="flex items-center">
+                                      <div 
+                                        className="w-3 h-3 rounded-full mr-1 border border-gray-300 flex-shrink-0" 
+                                        style={{ 
+                                          backgroundColor: colorCode,
+                                          boxShadow: colorCode.toLowerCase() === '#ffffff' ? 'inset 0 0 0 1px #e5e5e5' : 'none'
+                                        }}
+                                        aria-hidden="true"
+                                      ></div>
+                                      <span>{itemColor}</span>
+                                    </div>
+                                  </div>
+                                )} */}
                               </div>
                               
                               {/* Quantity Controls */}
